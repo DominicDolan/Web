@@ -1,5 +1,6 @@
 
 .appGrid {
     display: grid;
-    grid-template-rows: 2rem 2rem 1fr;
+    grid-template-areas: "nav menu content";
+    grid-template-columns: 14rem 20rem 1fr;
 }

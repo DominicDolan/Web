@@ -5,6 +5,7 @@ import {flex} from "./FlexRules"
 import {aspectRatio, sizes} from "./SizeRules"
 import {grids} from "./GridRules"
 import {textAligns} from "./AlignRules";
+import {displayRules} from "./DisplayRules";
 
 
 export const layoutPreset = definePreset(() => {
@@ -17,7 +18,8 @@ export const layoutPreset = definePreset(() => {
             ...grids,
             ...sizes,
             ...aspectRatio,
-            ...textAligns
+            ...textAligns,
+            ...displayRules
         ]
     }
 })

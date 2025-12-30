@@ -15,37 +15,67 @@ export default function App() {
     return (
         <Router
             root={(props: any) => (
-                <div class={styles.appGrid} sizing={"w-full"} spacing={"pa-4"}>
-                    <header grid-row={"start-1 span-1"} grid-col={"start-1"} flex={"row gap-4"} sizing={"h-4"}>
-                        <i>menu</i>
-                        <h1>Theme builder Test</h1>
-                    </header>
-                    <nav
-                        class={"glass"}
-                        grid-row={"start-1 span-2"}
-                        grid-col={"start-1"}
-                        flex={"row gap-1 center"}
-                        spacing={"px-2 py-4 ma-auto"}
-                        sizing={"w-40%"}>
-                        <A href={"/export"}>
-                            <span>
-                                Export
-                            </span>
-                        </A>
-                        <A href={"/editor"}>
-                            <span>
-                                Theme
-                            </span>
-                        </A>
-                        <A href={"/contact"}>
-                            <span>
-                                Contact Us
-                            </span>
-                        </A>
+                <div class={styles.appGrid + " app"} sizing={"w-full h-full"}>
+                    <nav grid-area={"nav"} spacing={"py-4 px-6"} flex={"col gap-8"}>
+                        <header>
+                            <h1>Theme.Build</h1>
+                        </header>
+                        <div sizing={"w-full"} flex={"col gap-6"}>
+                            <button>Add Theme</button>
+                            <ul class="nav" flex={"col gap-4"} sizing={"w-full"} spacing={"pl-0"}>
+                                <li>
+                                    <A href={"/theme/1"} class={"display-block"}>Theme 1</A>
+                                </li>
+                                <li>
+                                    <A href={"/theme/2"} class={"display-block"}>Theme 2</A>
+                                </li>
+                                <li>
+                                    <A href={"/"} class={"display-block"}>Home</A>
+                                </li>
+                            </ul>
+                        </div>
                     </nav>
-                    <main class={"elevated"}
-                          grid-row={"start-2 span-2"}
-                          grid-col={"start-1"}
+                    <aside
+                        spacing={"py-6 px-6"}
+                        grid-area={"menu"}
+                        flex={"col center"}>
+                        <section sizing={"w-full"} flex={"col gap-4"} spacing={"mb-8"}>
+                            <h2 spacing={"mb-2"}>Theme Settings</h2>
+                            <form-field flex={"col gap-2"}>
+                                <label>Name</label>
+                                <input-shell>
+                                    <input type={"text"}/>
+                                </input-shell>
+                            </form-field>
+                            <form-field flex={"col gap-2"}>
+                                <label>Description</label>
+                                <textarea/>
+                            </form-field>
+                            <form-field flex={"col gap-2"}>
+                                <label>Tags</label>
+                                <select/>
+                            </form-field>
+                        </section>
+                        <hr sizing={"w-full"}/>
+                        <section sizing={"w-full"} flex={"col gap-4"} spacing={"mt-10 mb-8"}>
+                            <h2 spacing={"mb-2"}>Edit Theme</h2>
+                            <ul class={"plain"} flex={"col"}>
+                                <li flex={"row space-between"}>
+                                    <A href={"/editor"}>Edit Colors</A>
+                                    <i>keyboard_arrow_right</i>
+                                </li>
+                                <li flex={"row space-between"}>
+                                    <A href={"/editor2"}>Edit Fonts</A>
+                                    <i>keyboard_arrow_right</i>
+                                </li>
+                                <li flex={"row space-between"}>
+                                    <A href={"/editor3"}>Edit Elements</A>
+                                    <i>keyboard_arrow_right</i>
+                                </li>
+                            </ul>
+                        </section>
+                    </aside>
+                    <main grid-area={"content"}
                           sizing={"h-full min-w-200 max-w-400 w-70%"}
                           spacing={"pa-8 pt-16 ma-auto"} >
                         {props.children}

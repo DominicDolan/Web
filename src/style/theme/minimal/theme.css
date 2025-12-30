@@ -2,6 +2,9 @@
 @import "button.css";
 @import "text.css";
 @import "card.css";
+@import "input.css";
+@import "list.css";
+@import "icon.css";
 
 @layer defaults {
 
@@ -19,6 +22,8 @@
         --on-background: black;
 
         --success-color: #26a269;
+        --on-success-color: white;
+
         --warning-color: #f5c211;
         --error-color: #c01c28;
 
@@ -38,9 +43,23 @@
         --on-active-color: var(--on-secondary-color);
     }
 
+    .success {
+        --active-color: var(--success-color);
+        --on-active-color: var(--on-primary-color);
+    }
+
     html {
         background: var(--background-color);
         background-size: cover;
     }
 
+    .app > nav, .app > aside {
+        background-color: var(--surface-color);
+        color: var(--on-surface-color);
+    }
+
+    .app > aside {
+        box-shadow: 8px 0 12px -1px var(--shadow-color);
+        border-left: 1px solid var(--shadow-color);
+    }
 }

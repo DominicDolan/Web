@@ -6,9 +6,5 @@ export interface LayoutAttributes extends Partial<Record<LayoutAttributeNames, s
 declare module 'solid-js' {
     namespace JSX {
         interface HTMLAttributes<T> extends LayoutAttributes {}
-
-        interface IntrinsicElements {
-            ["text-input"]: any
-        }
     }
 }

@@ -1,15 +1,19 @@
 
 
 @layer base {
-    nav, article, aside, main, .card {
+    article, .card {
         border-radius: 1rem;
         background-repeat: no-repeat;
         padding: 1rem;
     }
+
+    .surface {
+        background-color: var(--surface-color);
+    }
 }
 
 @layer elements {
-    nav, article, aside, main, .card {
+    article, .card {
         --current-color: var(--active-color, var(--primary-color));
         --on-current-color: var(--on-active-color, var(--on-primary-color));
 

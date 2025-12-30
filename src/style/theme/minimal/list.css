@@ -1,0 +1,71 @@
+
+
+@layer base {
+    ul {
+        --current-color: var(--active-color, var(--primary-color));
+        --on-current-color: var(--on-active-color, var(--on-primary-color));
+        padding: 0;
+    }
+}
+
+@layer elements {
+
+    ul.nav {
+        & > li {
+            font-size: 0.975rem;
+            font-weight: 500;
+            line-height: 1.5;
+            border-radius: 0.5rem;
+
+            &:not(:has(> *)) {
+                padding: 0.5rem 0.9rem;
+            }
+
+            & > * {
+                display: block;
+                padding: 0.5rem 0.9rem;
+            }
+
+            border: none;
+
+            &.active, &:has(.active) {
+                background: var(--current-color);
+                color: var(--on-current-color);
+            }
+
+            &:hover:not(.active):not(:has(.active)) {
+                background: color-mix(in oklab, var(--current-color) 10%, transparent);
+            }
+        }
+    }
+
+    ul.plain {
+        list-style: none;
+
+        & > li {
+            --border-color: oklab(from currentColor 70% a b / 0.5);
+            border-bottom: 1px solid var(--border-color);
+
+
+            &:not(:has(> *)) {
+                padding: 0.8rem 0.9rem;
+            }
+
+            & > * {
+                display: block;
+                padding: 0.8rem 0.9rem;
+            }
+
+
+            &.active, &:has(.active) {
+                --background-color: color-mix(in oklab, var(--current-color) 5%, transparent);
+                background: var(--background-color);
+                color: var(--current-color);
+            }
+
+            &:hover {
+                background: color-mix(in oklab, var(--current-color) 10%, transparent);
+            }
+        }
+    }
+}

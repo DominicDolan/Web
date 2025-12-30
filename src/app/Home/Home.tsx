@@ -18,5 +18,12 @@ export default function Home() {
             </a>{" "}
             to learn how to build SolidStart apps.
         </p>
+        <hr/>
+        <section>
+            <h2>Testing</h2>
+        </section>
+        <article>
+            <h2>Testing again</h2>
+        </article>
     </div>
 }
