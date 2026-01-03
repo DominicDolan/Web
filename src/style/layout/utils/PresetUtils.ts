@@ -1,4 +1,4 @@
-import {escapeSelector} from "unocss"
+import {escapeSelector} from "@unocss/core"
 
 export const numberWithUnitRE = /^(-?\d*(?:\.\d+)?)(px|pt|pc|%|r?(?:em|ex|lh|cap|ch|ic)|(?:[sld]?v|cq)(?:[whib]|min|max)|in|cm|mm|rpx)?$/i
 export const numberRE = /^(-?\d*(?:\.\d+)?)$/
@@ -61,4 +61,79 @@ export function number(str: string) {
     const num = Number.parseFloat(str)
     if (!Number.isNaN(num))
         return round(num)
+}
+
+
+function bracketWithType(str: string, requiredType?: string) {
+    if (str && str.startsWith('[') && str.endsWith(']')) {
+        let base: string | undefined
+        let hintedType: string | undefined
+
+        const match = str.match(bracketTypeRe)
+        if (!match) {
+            base = str.slice(1, -1)
+        }
+        else {
+            if (!requiredType) {
+                hintedType = match[1]
+            }
+            else if (match[1] !== requiredType) {
+                return
+            }
+
+            base = str.slice(match[0].length, -1)
+        }
+
+        if (!base)
+            return
+
+        // test/preset-attributify.test.ts > fixture5
+        if (base === '=""')
+            return
+
+        let curly = 0
+        for (const i of base) {
+            if (i === '[') {
+                curly += 1
+            }
+            else if (i === ']') {
+                curly -= 1
+                if (curly < 0)
+                    return
+            }
+        }
+        if (curly)
+            return
+
+        switch (hintedType) {
+            case 'string': return base
+                .replace(/(^|[^\\])_/g, '$1 ')
+                .replace(/\\_/g, '_')
+
+            case 'quoted': return base
+                .replace(/(^|[^\\])_/g, '$1 ')
+                .replace(/\\_/g, '_')
+                .replace(/(["\\])/g, '\\$1')
+                .replace(/^(.+)$/, '"$1"')
+        }
+
+        return base
+            .replace(/(url\(.*?\))/g, v => v.replace(/_/g, '\\_'))
+            .replace(/(^|[^\\])_/g, '$1 ')
+            .replace(/\\_/g, '_')
+            .replace(/(?:calc|clamp|max|min)\((.*)/g, (match) => {
+                const vars: string[] = []
+                return match
+                    .replace(/var\((--.+?)[,)]/g, (match, g1) => {
+                        vars.push(g1)
+                        return match.replace(g1, '--un-calc')
+                    })
+                    .replace(/(-?\d*\.?\d(?!-\d.+[,)](?![^+\-/*])\D)(?:%|[a-z]+)?|\))([+\-/*])/g, '$1 $2 ')
+                    .replace(/--un-calc/g, () => vars.shift()!)
+            })
+    }
+}
+
+export function bracket(str: string) {
+    return bracketWithType(str, undefined)
 }

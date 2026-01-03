@@ -5,6 +5,7 @@
 @import "input.css";
 @import "list.css";
 @import "icon.css";
+@import "loader.css";
 
 @layer defaults {
 
@@ -53,12 +54,12 @@
         background-size: cover;
     }
 
-    .app > nav, .app > aside {
+    #app .pageNav, #app .themeSettings {
         background-color: var(--surface-color);
         color: var(--on-surface-color);
     }
 
-    .app > aside {
+    #app .themeSettings {
         box-shadow: 8px 0 12px -1px var(--shadow-color);
         border-left: 1px solid var(--shadow-color);
     }

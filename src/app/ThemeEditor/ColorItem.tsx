@@ -1,7 +1,8 @@
 import {useSubmissions} from "@solidjs/router"
-import {updateColors, useColorContext} from "~/app/ThemeEditor/ThemeEditor"
 import {createMemo} from "solid-js"
 import {ColorDefinition} from "~/data/ColorDefinition";
+import {updateColors, useColorContext} from "~/app/ThemeEditor/ColorSettings";
+import {$ZodIssue} from "zod/v4/core";
 
 export default function ColorItem(props: { definition: ColorDefinition }) {
 
@@ -19,7 +20,7 @@ export default function ColorItem(props: { definition: ColorDefinition }) {
         if (success) {
             return []
         }
-        return error.issues ?? []
+        return (error as any).issues as $ZodIssue[] ?? []
     })
 
     function getIssueByPath(path: string) {

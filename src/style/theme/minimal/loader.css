@@ -1,0 +1,21 @@
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+skeleton-loader *:not(:has(> *)) {
+    background: linear-gradient(90deg,
+    rgba(0, 0, 0, 0.06) 25%,
+    rgba(0, 0, 0, 0.12) 37%,
+    rgba(0, 0, 0, 0.06) 63%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+    pointer-events: none;
+    user-select: none;
+    border-radius: 0.25rem;
+}

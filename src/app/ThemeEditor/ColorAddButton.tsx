@@ -1,5 +1,4 @@
-import {useColorContext} from "~/app/ThemeEditor/ThemeEditor";
-import {createId} from "@paralleldrive/cuid2";
+import {useColorContext} from "~/app/ThemeEditor/ColorSettings";
 
 export function ColorAddButton() {
 
