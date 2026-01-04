@@ -1,10 +1,10 @@
 
 import type { Rule } from '@unocss/core'
-import type {CSSEntries, DynamicMatcher} from "unocss"
+import type {CSSEntries} from "unocss"
 import {directionMap} from "./utils/PresetMappings"
 import {rem} from "./utils/PresetUtils"
 
-export function directionSize(propertyPrefix: string): DynamicMatcher {
+export function directionSize(propertyPrefix: string) {
     return (value: string[]): CSSEntries | undefined => {
         const [_, direction, size] = value
 

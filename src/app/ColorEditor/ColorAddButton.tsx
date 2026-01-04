@@ -1,4 +1,4 @@
-import {useColorContext} from "~/app/ThemeEditor/ColorSettings";
+import {useColorContext} from "~/app/ColorEditor/ColorEditor";
 
 export function ColorAddButton() {
 
@@ -12,5 +12,5 @@ export function ColorAddButton() {
         })
     }
 
-    return <button onClick={addColor}>Add Color</button>
+    return <button onClick={addColor} flex={"row gap-2 center"}><i>add</i> Add Color</button>
 }

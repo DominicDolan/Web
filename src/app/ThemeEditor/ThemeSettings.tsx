@@ -1,36 +1,23 @@
-import {A, createAsync, useNavigate, useParams} from "@solidjs/router";
-import {createEffect, For, on, onMount, Show} from "solid-js";
+import {A, useNavigate} from "@solidjs/router";
+import {createMemo, For, onMount, Show} from "solid-js";
+import {useThemeContext} from "~/app/ThemeEditor/ThemeEditor";
+import {reduceDeltasToModel} from "~/packages/repository/DeltaReducer";
 
-async function getThemeQuery(themeId: string) {
-    return new Promise<any>(resolve => {
-        setTimeout(() => {
-            resolve({
-                name: "Test Theme",
-                description: "This is a test theme",
-                tags: ["test", "theme"],
-            })
-        }, 1000)
-    })
-}
+
 export function ThemeSettings(props: { children?: any, params: { themeId?: string }}) {
 
+    const [push, { getStreamById }] = useThemeContext()
     const navigate = useNavigate()
-    const params = useParams()
 
-    const theme = createAsync(() => {
-        return new Promise<any>(resolve => {
-            createEffect(on(() => props.params.themeId, (newValue) => {
-                if (newValue != null) {
-                    getThemeQuery(newValue).then(resolve)
-                }
-            }))
-        })
+    const theme = createMemo(() => {
+        if (props.params.themeId == null) return undefined
+        const stream = getStreamById(props.params.themeId);
+        if (stream == null) return undefined
+
+        return reduceDeltasToModel(stream)
     })
 
-
     onMount(() => {
-
-        console.log("mounted")
         if (props.params.themeId == null) {
             setTimeout(() => {
                 navigate("1", { replace: true })
@@ -38,10 +25,22 @@ export function ThemeSettings(props: { children?: any, params: { themeId?: strin
         } else if (props.children == null) {
             navigate(`${props.params.themeId}/colors`, { replace: true })
         }
-
     })
+
+    function onNameChange(e: Event) {
+        const t = theme()
+        if (t == null) return
+        push(t.id, { name: (e.target as HTMLInputElement).value })
+    }
+
+    function onDescriptionChange(e: Event) {
+        const t = theme()
+        if (t == null) return
+        push(t.id, { description: (e.target as HTMLInputElement).value })
+    }
+
     return <>
-        <Show when={props.params.themeId != null} fallback={<skeleton-loader class={"themeSettings"} flex={"col gap-8"} spacing={"pa-8"}>
+        <Show when={theme() != null} fallback={<skeleton-loader class={"themeSettings"} flex={"col gap-8"} spacing={"pa-8"}>
             <div sizing={"w-full h-0.75rem"}></div>
             <For each={Array.from({length: 3})}>
                 {() => <div flex={"col gap-4"}>
@@ -55,19 +54,18 @@ export function ThemeSettings(props: { children?: any, params: { themeId?: strin
             <div
                 class={"themeSettings"}
                 spacing={"py-6 px-6"}
-                grid-area={"menu"}
                 flex={"col center"}>
                 <section sizing={"w-full"} flex={"col gap-4"} spacing={"mb-8"}>
                     <h2 spacing={"mb-2"}>Theme Settings</h2>
                     <form-field flex={"col gap-2"}>
                         <label>Name</label>
                         <input-shell>
-                            <input type={"text"}/>
+                            <input type={"text"} value={theme()?.name ?? ""} onInput={onNameChange} required/>
                         </input-shell>
                     </form-field>
                     <form-field flex={"col gap-2"}>
                         <label>Description</label>
-                        <textarea/>
+                        <textarea onInput={onDescriptionChange}>{theme()?.description ?? ""}</textarea>
                     </form-field>
                     <form-field flex={"col gap-2"}>
                         <label>Tags</label>

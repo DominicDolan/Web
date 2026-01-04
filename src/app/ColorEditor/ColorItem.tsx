@@ -1,7 +1,7 @@
 import {useSubmissions} from "@solidjs/router"
 import {createMemo} from "solid-js"
 import {ColorDefinition} from "~/data/ColorDefinition";
-import {updateColors, useColorContext} from "~/app/ThemeEditor/ColorSettings";
+import {updateColors, useColorContext} from "~/app/ColorEditor/ColorEditor";
 import {$ZodIssue} from "zod/v4/core";
 
 export default function ColorItem(props: { definition: ColorDefinition }) {
@@ -49,7 +49,7 @@ export default function ColorItem(props: { definition: ColorDefinition }) {
         })
     }
 
-    return <div flex={"row gap-8"}>
+    return <div flex={"row gap-8"} spacing={"ma-4"}>
         <div flex={"col gap-4"}>
             <div flex={"row gap-4"}>
                 <input value={props.definition.hex} onInput={onColorChanged} class={"filled"} type={"color"} sizing={"h-10 w-16"}/>

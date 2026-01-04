@@ -3,6 +3,7 @@ import {createModelStore, ModelStore} from "~/packages/repository/ModelStore";
 import {ModelDelta} from "~/data/ModelDelta";
 import {sliceArrayAfter} from "~/packages/repository/DeltaMerger";
 import {Model} from "~/data/Model";
+import {DeltaStore} from "~/packages/repository/DeltaStore";
 
 export type ContextStoreProviderProps<M extends Model> = {
     deltas: Record<string, ModelDelta<M>[]> | undefined
@@ -27,7 +28,10 @@ export function deltasSince<M extends Model>(timestamp: number, callback: Requir
 
 
 export function createDeltaModelContextStore<M extends Model>() {
-    const storeContext = createContext<{ pushDelta: ModelStore<M>[1]}>()
+    const storeContext = createContext<{
+        pushDelta: ModelStore<M>[1],
+        getStreamById: DeltaStore<M>[1]["getStreamById"],
+    }>()
 
     function useDeltaStore() {
         const context = useContext(storeContext)
@@ -36,7 +40,10 @@ export function createDeltaModelContextStore<M extends Model>() {
         }
 
         return [
-            context.pushDelta
+            context.pushDelta,
+            {
+                getStreamById: context.getStreamById,
+            }
         ] as const
     }
 
@@ -70,7 +77,7 @@ export function createDeltaModelContextStore<M extends Model>() {
         }
 
         return <Show when={props.deltas != undefined} fallback={props.fallback}>
-            <storeContext.Provider value={{pushDelta: push}}>
+            <storeContext.Provider value={{pushDelta: push, getStreamById: store.getStreamById}}>
                 {props.children(models)}
             </storeContext.Provider>
         </Show>

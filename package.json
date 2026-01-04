@@ -18,14 +18,14 @@
     "@solidjs/router": "0.15.4",
     "@solidjs/start": "1.2.0",
     "solid-js": "1.9.10",
-    "unocss": "66.5.0",
+    "unocss": "66.5.12",
     "vinxi": "0.5.8",
     "vite-plugin-solid": "2.11.10",
     "zod": "4.1.12"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251218.0",
-    "@unocss/preset-attributify": "66.5.0",
+    "@unocss/preset-attributify": "66.5.12",
     "concurrently": "^9.2.1",
     "jsdom": "27.2.0",
     "sass-embedded": "1.91.0",

@@ -10,7 +10,7 @@ import {AsyncTestPage} from "~/app/AsyncTestPage/AsyncTestPage"
 import {ContextStoreTestPage} from "~/app/ContextStoreTestPage/ContextStoreTestPage"
 import {DeltaModelContextStoreTest} from "~/app/DeltaModelContextStoreTest/DeltaModelContextStoreTest";
 import {ThemeSettings} from "~/app/ThemeEditor/ThemeSettings";
-import ColorSettings from "~/app/ThemeEditor/ColorSettings";
+import ColorEditor from "~/app/ColorEditor/ColorEditor";
 
 export default function App() {
 
@@ -21,9 +21,10 @@ export default function App() {
             <Route path={"/"} component={Home} info={{title: "Home"}}/>
             <Route path={"/export"} component={ExportConfig} info={{title: "Import"}}/>
             <Route path={"/editor"} component={ThemeEditor} info={{title: "Editor"}}>
+                <Route path={"/"}></Route>
                 <Route path={"/:themeId?"} component={ThemeSettings}>
                     <Route path={"/"} component={() => <Navigate href={"colors"}/>}/>
-                    <Route path={"/colors"} component={ColorSettings}/>
+                    <Route path={"/colors"} component={ColorEditor}/>
                 </Route>
             </Route>
             <Route path={"/contact"} component={ContactUs} info={{title: "Contact Us"}}/>
