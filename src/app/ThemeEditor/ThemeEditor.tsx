@@ -71,7 +71,7 @@ export default function ThemeEditor(props: { children?: any}) {
     const [latestTimestamp, setLatestTimestamp] = createSignal(0)
 
     const navigate = useNavigate()
-    const matches = useMatch(() => "/editor/:themeId?")
+    const matches = useMatch(() => "/editor/:themeId?/:subroute")
     onMount(() => {
         const deltas = themeDeltas()
         if (deltas != null && Object.keys(deltas).length > 0 && (matches() == undefined || matches()?.params.themeId == null)) {

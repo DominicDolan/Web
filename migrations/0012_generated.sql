@@ -1,0 +1,27 @@
+-- Generated migration file. Do not edit by hand.
+-- Generated at: 2026-01-04T04:52:53.463Z
+-- Source directory: src/schema
+
+-- Source: src/schema/ColorDefinitionSql.ts
+DROP TABLE IF EXISTS "color_events";
+CREATE TABLE IF NOT EXISTS "color_events" (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  model_id TEXT NOT NULL,
+  payload TEXT NOT NULL,
+  event_type TEXT NOT NULL,
+  timestamp INTEGER NOT NULL,
+  group_by_id TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS "color_events_timestamp_group_by_id_idx_1" ON "color_events" ("timestamp", "group_by_id");
+
+-- Source: src/schema/ThemeDefinitionSql.ts
+DROP TABLE IF EXISTS "theme_events";
+CREATE TABLE IF NOT EXISTS "theme_events" (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  model_id TEXT NOT NULL,
+  payload TEXT NOT NULL,
+  event_type TEXT NOT NULL,
+  timestamp INTEGER NOT NULL,
+  group_by_id TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS "theme_events_timestamp_group_by_id_idx_1" ON "theme_events" ("timestamp", "group_by_id");
