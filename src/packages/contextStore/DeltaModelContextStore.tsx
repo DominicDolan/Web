@@ -5,12 +5,14 @@ import {sliceArrayAfter} from "~/packages/repository/DeltaMerger";
 import {Model} from "~/data/Model";
 import {DeltaStore} from "~/packages/repository/DeltaStore";
 
-export type ContextStoreProviderProps<M extends Model> = {
+export type ContextStoreProviderPropsBase<M extends Model> = {
     deltas: Record<string, ModelDelta<M>[]> | undefined
     children: (list: M[]) => any
     fallback?: any
     onDeltaPush?: (modelId: string, newDeltas: ModelDelta<M>[], store: ReturnType<typeof createModelStore<M>>[2]) => void
 }
+export type ContextStoreProviderProps<M extends Model, P extends Record<string, any> | undefined = undefined> = P extends undefined ?
+    ContextStoreProviderPropsBase<M> : ContextStoreProviderPropsBase<M> & { custom: P }
 
 export function deltasSince<M extends Model>(timestamp: number, callback: Required<ContextStoreProviderProps<M>>["onDeltaPush"]): ContextStoreProviderProps<M>["onDeltaPush"] {
     return (modelId: string, newDeltas: ModelDelta<M>[], store: ReturnType<typeof createModelStore<M>>[2]) => {
@@ -26,12 +28,14 @@ export function deltasSince<M extends Model>(timestamp: number, callback: Requir
     }
 }
 
+type StoreContext<M extends Model, P extends Record<string, any> | undefined> = {
+    pushDelta: ModelStore<M>[1],
+    getStreamById: DeltaStore<M>[1]["getStreamById"]
+    customProps: P
+}
 
-export function createDeltaModelContextStore<M extends Model>() {
-    const storeContext = createContext<{
-        pushDelta: ModelStore<M>[1],
-        getStreamById: DeltaStore<M>[1]["getStreamById"],
-    }>()
+export function createDeltaModelContextStore<M extends Model, P extends Record<string, any> | undefined = undefined>() {
+    const storeContext = createContext<StoreContext<M, P>>()
 
     function useDeltaStore() {
         const context = useContext(storeContext)
@@ -43,11 +47,12 @@ export function createDeltaModelContextStore<M extends Model>() {
             context.pushDelta,
             {
                 getStreamById: context.getStreamById,
+                custom: (("customProps" in context) ? context.customProps : undefined) as P
             }
         ] as const
     }
 
-    function ContextStoreProvider(props: ContextStoreProviderProps<M>) {
+    function ContextStoreProvider(props: ContextStoreProviderProps<M, P>) {
         const [models, push, store] = createModelStore<M>(props.deltas)
         const {onAnyDeltaPush} = store
 
@@ -77,7 +82,11 @@ export function createDeltaModelContextStore<M extends Model>() {
         }
 
         return <Show when={props.deltas != undefined} fallback={props.fallback}>
-            <storeContext.Provider value={{pushDelta: push, getStreamById: store.getStreamById}}>
+            <storeContext.Provider value={{
+                pushDelta: push,
+                getStreamById: store.getStreamById,
+                customProps: ("custom" in props) ? props.custom : undefined
+            } as StoreContext<M, P>}>
                 {props.children(models)}
             </storeContext.Provider>
         </Show>

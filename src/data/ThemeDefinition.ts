@@ -2,7 +2,7 @@ import {modelSchema} from "~/data/Model";
 import {z} from "zod";
 
 export const themeDefinitionSchema = modelSchema.extend({
-    name: z.string(),
+    name: z.string().trim(),
     description: z.string().optional(),
 })
 

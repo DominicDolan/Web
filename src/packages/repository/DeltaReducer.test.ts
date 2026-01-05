@@ -157,4 +157,28 @@ describe("squashDeltasToSingle", () => {
         expect(delta?.payload.name).toEqual(name)
         expect(delta?.payload.lastName).toEqual(lastName)
     })
+
+    test("Should squash deltas in the right order", () => {
+        const modelId = "someId"
+        const name = "updated name"
+        const updatedName = "updated name 2"
+        const firstDelta: ModelDelta<TestModel> = {
+            modelId,
+            timestamp: 100,
+            type: "update",
+            payload: { name }
+        }
+
+        const secondDelta: ModelDelta<TestModel> = {
+            modelId,
+            timestamp: 100,
+            type: "update",
+            payload: { name: updatedName }
+        }
+        const delta = squashDeltasToSingle([firstDelta, secondDelta])
+
+        expect(delta).not.toBeNull()
+        expect(delta?.modelId).toEqual(modelId)
+        expect(delta?.payload.name).toEqual(updatedName)
+    })
 })

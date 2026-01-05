@@ -6,8 +6,8 @@ import {reduceDeltasToModel} from "~/packages/repository/DeltaReducer";
 
 export function ThemeSettings(props: { children?: any, params: { themeId?: string }}) {
 
-    const [push, { getStreamById }] = useThemeContext()
-    const navigate = useNavigate()
+    const [push, { getStreamById, custom }] = useThemeContext()
+    const {onReadyToSave} = custom
 
     const theme = createMemo(() => {
         if (props.params.themeId == null) return undefined
@@ -15,16 +15,6 @@ export function ThemeSettings(props: { children?: any, params: { themeId?: strin
         if (stream == null) return undefined
 
         return reduceDeltasToModel(stream)
-    })
-
-    onMount(() => {
-        if (props.params.themeId == null) {
-            setTimeout(() => {
-                navigate("1", { replace: true })
-            },1000)
-        } else if (props.children == null) {
-            navigate(`${props.params.themeId}/colors`, { replace: true })
-        }
     })
 
     function onNameChange(e: Event) {
@@ -37,6 +27,10 @@ export function ThemeSettings(props: { children?: any, params: { themeId?: strin
         const t = theme()
         if (t == null) return
         push(t.id, { description: (e.target as HTMLInputElement).value })
+    }
+
+    function onBlur() {
+        onReadyToSave()
     }
 
     return <>
@@ -60,12 +54,12 @@ export function ThemeSettings(props: { children?: any, params: { themeId?: strin
                     <form-field flex={"col gap-2"}>
                         <label>Name</label>
                         <input-shell>
-                            <input type={"text"} value={theme()?.name ?? ""} onInput={onNameChange} required/>
+                            <input type={"text"} value={theme()?.name ?? ""} onInput={onNameChange} onBlur={onBlur} required/>
                         </input-shell>
                     </form-field>
                     <form-field flex={"col gap-2"}>
                         <label>Description</label>
-                        <textarea onInput={onDescriptionChange}>{theme()?.description ?? ""}</textarea>
+                        <textarea onInput={onDescriptionChange} onBlur={onBlur} >{theme()?.description ?? ""}</textarea>
                     </form-field>
                     <form-field flex={"col gap-2"}>
                         <label>Tags</label>

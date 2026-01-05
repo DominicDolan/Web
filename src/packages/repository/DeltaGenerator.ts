@@ -61,7 +61,8 @@ export function calculateDelta<M extends Model>(before: M, after: M): ModelDelta
     // Return the delta with required fields and changes
     return {
         modelId: after.id,
-        timestamp: after.updatedAt,
-        ...changes
+        timestamp: Date.now(),
+        type: "update",
+        payload: changes
     } as ModelDelta<M>;
 }

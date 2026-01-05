@@ -59,7 +59,7 @@ const pushThemeDeltaAction = action(async (delta: ModelDelta<ThemeDefinition>, u
     }
 })
 
-export const [ThemeProvider, useThemeContext] = createDeltaModelContextStore<ThemeDefinition>()
+export const [ThemeProvider, useThemeContext] = createDeltaModelContextStore<ThemeDefinition, { onReadyToSave: () => void}>()
 
 export default function ThemeEditor(props: { children?: any}) {
 
@@ -94,13 +94,21 @@ export default function ThemeEditor(props: { children?: any}) {
         if (themeSubmission.result?.success && themeSubmission.result.updatedAt > latestTimestamp()) {
             setLatestTimestamp(themeSubmission.result.updatedAt)
         }
-    }, 1000)
+    }, 4000)
+
+    function flushSaveAction() {
+        save.flush()
+    }
 
     function onThemeDeltaPush(modelId: string, deltas: ModelDelta<ThemeDefinition>[]) {
         save(modelId, deltas)
     }
+
     return <Suspense>
-        <ThemeProvider deltas={themeDeltas()} onDeltaPush={deltasSince(latestTimestamp(), onThemeDeltaPush)}>
+        <ThemeProvider
+            deltas={themeDeltas()}
+            onDeltaPush={deltasSince(latestTimestamp(), onThemeDeltaPush)}
+            custom={{onReadyToSave: flushSaveAction}}>
             {(themes) => <>
                 <div grid-cols={"[14rem,20rem,1fr]"} sizing={"w-full h-full"}>
                     <NavBarTemplate>
