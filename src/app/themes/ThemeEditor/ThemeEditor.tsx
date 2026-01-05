@@ -8,7 +8,7 @@ import {deltaArrayToGroup, squashDeltasToSingle} from "~/packages/repository/Del
 import {createDeltaModelContextStore, deltasSince} from "~/packages/contextStore/DeltaModelContextStore";
 import {ThemeDefinition, themeDefinitionSchema} from "~/data/ThemeDefinition";
 import {createSignal, For, onMount, Suspense} from "solid-js";
-import AddThemeButton from "~/app/ThemeEditor/AddThemeButton";
+import AddThemeButton from "~/app/themes/ThemeEditor/AddThemeButton";
 import {keyedDebounce} from "~/packages/utils/KeyedDebounce";
 import {ModelDelta} from "~/data/ModelDelta";
 import {ColorDefinition} from "~/data/ColorDefinition";

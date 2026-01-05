@@ -1,10 +1,10 @@
 import {A, useNavigate} from "@solidjs/router";
 import {createMemo, For, onMount, Show} from "solid-js";
-import {useThemeContext} from "~/app/ThemeEditor/ThemeEditor";
+import {useThemeContext} from "~/app/themes/ThemeEditor/ThemeEditor";
 import {reduceDeltasToModel} from "~/packages/repository/DeltaReducer";
 
 
-export function ThemeSettings(props: { children?: any, params: { themeId?: string }}) {
+export default function ThemeSettings(props: { children?: any, params: { themeId?: string }}) {
 
     const [push, { getStreamById, custom }] = useThemeContext()
     const {onReadyToSave} = custom

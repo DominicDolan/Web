@@ -1,4 +1,4 @@
-import {useThemeContext} from "~/app/ThemeEditor/ThemeEditor";
+import {useThemeContext} from "~/app/themes/ThemeEditor/ThemeEditor";
 import {useNavigate} from "@solidjs/router";
 
 

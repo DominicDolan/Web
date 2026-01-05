@@ -1,4 +1,4 @@
-import {useColorContext} from "~/app/ColorEditor/ColorEditor";
+import {useColorContext} from "~/app/themes/ColorEditor/ColorEditor";
 
 export function ColorAddButton() {
 

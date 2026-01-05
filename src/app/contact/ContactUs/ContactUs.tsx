@@ -1,6 +1,5 @@
-import styles from "~/app/ImportConfig/ExportConfig.module.css"
 import {action} from "@solidjs/router"
-import {useContactUsStore} from "~/app/ContactUs/ContactUsStore"
+import {useContactUsStore} from "~/app/contact/ContactUs/ContactUsStore"
 import {createId} from "@paralleldrive/cuid2"
 
 const saveContactUsForm = action(async (id: string, formData: FormData) => {
@@ -26,7 +25,7 @@ export default function ContactUs() {
 
     return <div>
         <h2>Contact Us</h2>
-        <form action={saveContactUsForm.with(id)} method={"post"} class={`filled ${styles.formGrid}`} spacing={"pa-4"}>
+        <form action={saveContactUsForm.with(id)} method={"post"} class={`filled`} spacing={"pa-4"}>
             <form-field flex={"col gap-2"}>
                 <label>First Name</label>
                 <input-shell>
