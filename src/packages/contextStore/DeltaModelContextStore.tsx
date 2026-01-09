@@ -1,4 +1,4 @@
-import {createContext, createEffect, on, Show, useContext} from "solid-js";
+import {Context, createContext, createEffect, on, Show, useContext} from "solid-js";
 import {createModelStore, ModelStore} from "~/packages/repository/ModelStore";
 import {ModelDelta} from "~/data/ModelDelta";
 import {sliceArrayAfter} from "~/packages/repository/DeltaMerger";
@@ -35,7 +35,18 @@ type StoreContext<M extends Model, P extends Record<string, any> | undefined> = 
 }
 
 export function createDeltaModelContextStore<M extends Model, P extends Record<string, any> | undefined = undefined>() {
-    const storeContext = createContext<StoreContext<M, P>>()
+    const HMR_KEY = "DeltaModelContextStore.storeContext";
+
+    const storeContext =
+        (((import.meta as any).hot?.data?.[HMR_KEY] as Context<StoreContext<M, P>> | undefined)
+        ?? ((globalThis as any)[HMR_KEY] as Context<StoreContext<M, P>> | undefined)
+        ?? createContext<StoreContext<M, P>>()) as Context<StoreContext<M, P>>
+
+    if ((import.meta as any).hot?.data) {
+        (import.meta as any).hot.data[HMR_KEY] = storeContext;
+    } else {
+        (globalThis as any)[HMR_KEY] = storeContext;
+    }
 
     function useDeltaStore() {
         const context = useContext(storeContext)

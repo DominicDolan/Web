@@ -1,5 +1,5 @@
 import {createDeltaStore, DeltaStore} from "~/packages/repository/DeltaStore"
-import {createStore, reconcile} from "solid-js/store"
+import {createStore, produce, reconcile} from "solid-js/store"
 import {reduceDeltasOntoModel, reduceDeltasToModel} from "~/packages/repository/DeltaReducer"
 import {createEvent, createKeyedEvent, EventListener, KeyedEventListener} from "~/packages/utils/EventListener"
 import {ModelDelta} from "~/data/ModelDelta"
@@ -18,6 +18,7 @@ export type ModelStore<M extends Model> = [
         pushMany: DeltaStore<M>[1]["pushMany"]
         onModelCreate: EventListener<[PartialModel<M>]>[0]
         onModelUpdate: EventListener<[PartialModel<M>]>[0]
+        onModelDelete: EventListener<[string]>[0]
         onAnyDeltaPush: DeltaStore<M>[1]["onAnyDeltaPush"]
         onModelUpdateById: KeyedEventListener<[PartialModel<M>]>[0]
     }
@@ -32,6 +33,8 @@ export function createModelStore<M extends Model>(initialDeltas?: Record<string,
     const [onModelUpdateById, triggerModelUpdateById] = createKeyedEvent<[PartialModel<M>]>()
     const [onModelCreate, triggerModelCreate] = createEvent<[PartialModel<M>]>()
     const [onCreateDeltaPushInternal, triggerCreateDeltaPush] = createEvent<[ModelDelta<M>[]]>()
+
+    const [onModelDelete, triggerModelDelete] = createEvent<[string]>()
 
     onCreateDeltaPush((values) => {
         triggerCreateDeltaPush(values)
@@ -61,6 +64,16 @@ export function createModelStore<M extends Model>(initialDeltas?: Record<string,
         }
     })
 
+    onModelDelete((id) => {
+        const index = modelsListStore.findIndex(m => m.id === id)
+        if (index === -1) {
+            return
+        } else {
+            setModelListStore(produce((arr) => arr.splice(index, 1)))
+        }
+
+    })
+
     if (initialDeltas != null) {
         for (const key in initialDeltas) {
             pushMany(initialDeltas[key])
@@ -73,6 +86,14 @@ export function createModelStore<M extends Model>(initialDeltas?: Record<string,
 
         const oldModel = modelsById[modelId]
         const newModel = reduceDeltasOntoModel(oldModel, stream)
+
+        if (newModel == null) {
+            setModelsById(produce((models) => {
+                delete models[modelId]
+            }))
+            triggerModelDelete(modelId)
+            return
+        }
 
         setModelsById(modelId, reconcile(newModel as M))
         triggerModelUpdate(newModel)
@@ -100,6 +121,7 @@ export function createModelStore<M extends Model>(initialDeltas?: Record<string,
             onModelUpdateById,
             onAnyDeltaPush,
             onModelCreate,
+            onModelDelete
         }
     ] as ModelStore<M>
 }

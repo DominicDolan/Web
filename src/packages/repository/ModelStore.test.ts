@@ -15,7 +15,7 @@ async function sleep(time: number) {
     })
 }
 
-describe("ReadModelStore deltaStore reading", () => {
+describe("ModelStore deltaStore reading", () => {
     test("Update to delta store causes ReadModelStore to update", async () => {
         const store = createModelStore<TestModel>()
         const [values, pushDelta, { pushMany }] = store
@@ -135,5 +135,33 @@ describe("ReadModelStore deltaStore reading", () => {
         const newModel = push(modelId, { name })
 
         expect(newModel.name).toEqual(name)
+    })
+
+    test("Deleting a record removes it from the store", () => {
+        const store = createModelStore<TestModel>()
+        const [values, push, { pushMany }] = store
+
+        const modelId = "someId"
+        const name = "some name"
+
+        pushMany([{
+            modelId,
+            timestamp: 100,
+            type: "create",
+            payload: {
+                name
+            }
+        }])
+
+        expect(values?.length).toBe(1)
+
+        pushMany([{
+            modelId,
+            timestamp: 200,
+            type: "delete",
+            payload: {}
+        }])
+
+        expect(values?.length).toBe(0)
     })
 })

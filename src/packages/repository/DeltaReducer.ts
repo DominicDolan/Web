@@ -32,7 +32,7 @@ export function reduceDeltasToModel<M extends Model>(deltas: ModelDelta<M>[]): P
 
 export function reduceDeltasToModelAfter<M extends Model>(deltas: ModelDelta<M>[], after: number): PartialModel<M> | null {
     if (deltas.length === 0) {
-        return null
+        return {} as PartialModel<M>
     }
     const ids = new Set(deltas.map(e => e.modelId))
     if (ids.size !== 1) {
@@ -51,12 +51,16 @@ export function reduceDeltasToModelAfter<M extends Model>(deltas: ModelDelta<M>[
         if (deltas[i].timestamp <= after) {
             continue
         }
+        if (deltas[i].type === "delete") return null
+
         for (const key in deltas[i].payload) {
+
             if (handledKeys.includes(key)) continue
 
             acc[key as keyof PartialModel<M>] = deltas[i].payload[key as keyof ModelData<M>] as any
             handledKeys.push(key)
         }
+        if (deltas[i].type === "create") break
     }
 
     return acc
@@ -93,8 +97,9 @@ export function squashDeltasToSingle<M extends Model>(deltas: ModelDelta<M>[]): 
     return { modelId: lastDelta.modelId, timestamp: lastDelta.timestamp, payload, type } as ModelDelta<M>
 }
 
-export function reduceDeltasOntoModel<M extends Model>(model: PartialModel<M>, deltas: ModelDelta<M>[]): PartialModel<M> {
+export function reduceDeltasOntoModel<M extends Model>(model: PartialModel<M>, deltas: ModelDelta<M>[]): PartialModel<M> | null {
     const newModel = reduceDeltasToModelAfter(deltas, model.updatedAt)
+    if (newModel == null) return null
 
     return {
         ...model,

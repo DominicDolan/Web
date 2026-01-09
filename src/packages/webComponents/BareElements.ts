@@ -7,7 +7,18 @@ function defineBareElements(tags: readonly string[]): void {
     }
 }
 
-const bareElementTags = ["tab-group", "tab-item", "chip-group", "chip-item", "feedback-message", "skeleton-loader", "input-shell", "form-field"] as const
+const bareElementTags = [
+    "tab-group",
+    "tab-item",
+    "chip-group",
+    "chip-item",
+    "feedback-message",
+    "skeleton-loader",
+    "input-shell",
+    "form-field",
+    "popover-host",
+    "popover-activator",
+] as const
 export type BareElementTag = typeof bareElementTags[number];
 defineBareElements(
     bareElementTags
@@ -25,6 +36,8 @@ declare module 'solid-js' {
             ["skeleton-loader"]: any
             ["input-shell"]: any
             ["form-field"]: any
+            ["popover-host"]: any
+            ["popover-activator"]: any
         }
     }
 }

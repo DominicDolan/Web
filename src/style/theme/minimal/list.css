@@ -68,4 +68,28 @@
             }
         }
     }
+
+    ul.menu {
+        list-style: none;
+
+        border-radius: 0.5rem;
+        background-color: var(--surface-color);
+        box-shadow:
+                0 8px 12px -1px var(--shadow-color),
+                0 4px 6px -1px var(--shadow-color);
+
+        &:not(:has(> *)) {
+            padding: 0.8rem 0.9rem;
+        }
+
+        & > * {
+            display: block;
+            padding: 0.8rem 0.9rem;
+            cursor: pointer;
+        }
+
+        &:hover {
+            background: color-mix(in oklab, var(--surface-color) 90%, currentColor);
+        }
+    }
 }

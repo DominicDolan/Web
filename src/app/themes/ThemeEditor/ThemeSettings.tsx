@@ -2,6 +2,7 @@ import {A, useNavigate} from "@solidjs/router";
 import {createMemo, For, onMount, Show} from "solid-js";
 import {useThemeContext} from "~/app/themes/ThemeEditor/ThemeEditor";
 import {reduceDeltasToModel} from "~/packages/repository/DeltaReducer";
+import Popover from "~/packages/utils/Popover";
 
 
 export default function ThemeSettings(props: { children?: any, params: { themeId?: string }}) {
@@ -33,6 +34,24 @@ export default function ThemeSettings(props: { children?: any, params: { themeId
         onReadyToSave()
     }
 
+    const navigate = useNavigate()
+    function onDeleteClick(e: MouseEvent) {
+        const t = theme()
+        if (t == null) return
+
+        // close the popover
+        const popover = (e.currentTarget as HTMLElement).closest("[popover]") as any
+        popover?.hidePopover?.()
+
+        const ok = window.confirm(`Delete theme "${t.name}"?`)
+        if (!ok) return
+
+        push("delete", t.id)
+        onReadyToSave()
+        navigate("/editor", { replace: true })
+    }
+
+
     return <>
         <Show when={theme() != null} fallback={<skeleton-loader class={"themeSettings"} flex={"col gap-8"} spacing={"pa-8"}>
             <div sizing={"w-full h-0.75rem"}></div>
@@ -50,16 +69,36 @@ export default function ThemeSettings(props: { children?: any, params: { themeId
                 spacing={"py-6 px-6"}
                 flex={"col center"}>
                 <section sizing={"w-full"} flex={"col gap-4"} spacing={"mb-8"}>
-                    <h2 spacing={"mb-2"}>Theme Settings</h2>
+                    <hgroup flex={"row center space-between"}>
+                        <h2>Theme Settings</h2>
+                        <Popover
+                            placement="bottom-end"
+                            activator={(activatorProps) => (
+                                <button
+                                    class={"text"}
+                                    {...activatorProps}
+                                    flex={"row center"}
+                                    spacing={"pa-2"}
+                                    aria-label="Theme settings menu">
+                                    <i>more_vert</i>
+                                </button>)
+                        }>
+                            <ul class={"menu"}>
+                                <li onClick={onDeleteClick} flex={"row gap-2 center"}><i>delete</i>Delete</li>
+                            </ul>
+                        </Popover>
+
+                    </hgroup>
                     <form-field flex={"col gap-2"}>
                         <label>Name</label>
                         <input-shell>
-                            <input type={"text"} value={theme()?.name ?? ""} onInput={onNameChange} onBlur={onBlur} required/>
+                            <input type={"text"} value={theme()?.name ?? ""} onInput={onNameChange} onBlur={onBlur}
+                                   required/>
                         </input-shell>
                     </form-field>
                     <form-field flex={"col gap-2"}>
                         <label>Description</label>
-                        <textarea onInput={onDescriptionChange} onBlur={onBlur} >{theme()?.description ?? ""}</textarea>
+                        <textarea onInput={onDescriptionChange} onBlur={onBlur}>{theme()?.description ?? ""}</textarea>
                     </form-field>
                     <form-field flex={"col gap-2"}>
                         <label>Tags</label>
