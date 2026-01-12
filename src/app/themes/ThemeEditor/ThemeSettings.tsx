@@ -1,14 +1,14 @@
 import {A, useNavigate} from "@solidjs/router";
-import {createMemo, For, onMount, Show} from "solid-js";
-import {useThemeContext} from "~/app/themes/ThemeEditor/ThemeEditor";
+import {createMemo, For, onMount, Show, useContext} from "solid-js";
+import {flushThemeContext, useThemeContext} from "~/app/themes/ThemeEditor/ThemeEditor";
 import {reduceDeltasToModel} from "~/packages/repository/DeltaReducer";
 import Popover from "~/packages/utils/Popover";
 
-
 export default function ThemeSettings(props: { children?: any, params: { themeId?: string }}) {
 
-    const [push, { getStreamById, custom }] = useThemeContext()
-    const {onReadyToSave} = custom
+    const [push, { getStreamById }] = useThemeContext()
+
+    const {onReadyToSave} = useContext(flushThemeContext)
 
     const theme = createMemo(() => {
         if (props.params.themeId == null) return undefined

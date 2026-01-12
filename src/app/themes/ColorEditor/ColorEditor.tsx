@@ -13,7 +13,7 @@ import {keyedDebounce} from "~/packages/utils/KeyedDebounce";
 import {ModelDelta} from "~/data/ModelDelta";
 import {ColorDefinition, colorDefinitionSchema} from "~/data/ColorDefinition";
 import {deltaArrayToGroup, squashDeltasToSingle} from "~/packages/repository/DeltaReducer";
-import {createDeltaModelContextStore, deltasSince} from "~/packages/contextStore/DeltaModelContextStore";
+import {createDeltaModelContextStore, deltasSince} from "~/packages/deltaStoreUtils/DeltaModelContextStore";
 import ColorItem from "~/app/themes/ColorEditor/ColorItem";
 import {ColorAddButton} from "~/app/themes/ColorEditor/ColorAddButton";
 import ExportCSSButton from "~/app/themes/ColorEditor/ExportCSSButton";

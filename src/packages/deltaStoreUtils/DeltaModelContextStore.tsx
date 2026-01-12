@@ -7,9 +7,9 @@ import {DeltaStore} from "~/packages/repository/DeltaStore";
 
 export type ContextStoreProviderPropsBase<M extends Model> = {
     deltas: Record<string, ModelDelta<M>[]> | undefined
-    children: (list: M[]) => any
+    children: (list: M[], store: ModelStore<M>[2], props: any) => any
     fallback?: any
-    onDeltaPush?: (modelId: string, newDeltas: ModelDelta<M>[], store: ReturnType<typeof createModelStore<M>>[2]) => void
+    onDeltaPush?: (modelId: string, newDeltas: ModelDelta<M>[], store: ModelStore<M>[2]) => void
 }
 export type ContextStoreProviderProps<M extends Model, P extends Record<string, any> | undefined = undefined> = P extends undefined ?
     ContextStoreProviderPropsBase<M> : ContextStoreProviderPropsBase<M> & { custom: P }
@@ -98,7 +98,7 @@ export function createDeltaModelContextStore<M extends Model, P extends Record<s
                 getStreamById: store.getStreamById,
                 customProps: ("custom" in props) ? props.custom : undefined
             } as StoreContext<M, P>}>
-                {props.children(models)}
+                {props.children(models, store)}
             </storeContext.Provider>
         </Show>
     }
@@ -107,4 +107,30 @@ export function createDeltaModelContextStore<M extends Model, P extends Record<s
         ContextStoreProvider,
         useDeltaStore,
     ] as const
+}
+
+export type ContextStoreProviderComponentProps<M extends Model, P extends Record<string, any> | undefined> = Omit<ContextStoreProviderProps<M, P>, "children"> & { children?: any }
+
+export function defineContextStoreComponent<M extends Model>(setup: (models: M[], store: ModelStore<M>[2], props?: { children?: any }) => any){
+
+    const [ContextStoreProvider, useDeltaStore] = createDeltaModelContextStore<M, { children?: any }>()
+
+    function ContextContent(props: {models: M[], store: ModelStore<M>[2], children?: any}) {
+                console.log("children ContextContent", props.children)
+        const contentFromSetup = setup(props.models, props.store, { children: props.children })
+
+        return <>{contentFromSetup}</>
+    }
+    const component = function ContextStoreComponent(props: ContextStoreProviderComponentProps<M, { children?: any }>) {
+        return <ContextStoreProvider
+            deltas={props.deltas}
+            fallback={props.fallback}
+            onDeltaPush={props.onDeltaPush}>{
+            (models, store) => {
+                console.log("props", props)
+                return <ContextContent models={models} store={store}>{props.children}</ContextContent>
+            }}</ContextStoreProvider>
+    }
+
+    return [component, useDeltaStore] as const as [typeof component, typeof useDeltaStore]
 }

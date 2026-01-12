@@ -13,6 +13,7 @@ export type DeltaStore<M extends Model> = readonly [
     },
     {
         getStreamById(id: string): ModelDelta<M>[] | undefined,
+        getIds(): string[],
         pushMany: (deltas: ModelDelta<M>[]) => Array<ModelDelta<M>>
         onAnyDeltaPush: EventListener<[ModelDelta<M>[]]>[0]
         onAnyDeltaPushById: KeyedEventListener<[ModelDelta<M>[]]>[0]
@@ -122,6 +123,9 @@ export function createDeltaStore<M extends Model>() {
         {
             getStreamById(id: string): ModelDelta<M>[] | undefined {
                 return deltaStreams?.[id]
+            },
+            getIds() {
+                return Object.keys(deltaStreams ?? {})
             },
             pushMany: pushManyDeltas,
             onAnyDeltaPush,
