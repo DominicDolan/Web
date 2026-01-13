@@ -1,12 +1,12 @@
 import {useSubmissions} from "@solidjs/router"
 import {createMemo} from "solid-js"
 import {ColorDefinition} from "~/data/ColorDefinition";
-import {updateColors, useColorContext} from "~/app/themes/ColorEditor/ColorEditor";
+import {updateColors, useColorStore} from "~/app/themes/ColorEditor/ColorEditor";
 import {$ZodIssue} from "zod/v4/core";
 
 export default function ColorItem(props: { definition: ColorDefinition }) {
 
-    const [push] = useColorContext()
+    const { pushColorDelta } = useColorStore()
     const submissions = useSubmissions(updateColors, ([input]) => {
         return input.modelId === props.definition.id
     })
@@ -29,14 +29,14 @@ export default function ColorItem(props: { definition: ColorDefinition }) {
 
     function onColorChanged(e: InputEvent) {
         submissions[0]?.clear()
-        push(props.definition.id, {
+        pushColorDelta(props.definition.id, {
             hex: (e.target as HTMLInputElement).value
         })
     }
 
     function onAlphaChanged(e: Event) {
         submissions[0]?.clear()
-        push(props.definition.id, {
+        pushColorDelta(props.definition.id, {
             alpha: parseFloat((e.target as HTMLInputElement).value)
         })
 
@@ -44,7 +44,7 @@ export default function ColorItem(props: { definition: ColorDefinition }) {
 
     function onNameChanged(e: Event) {
         submissions[0]?.clear()
-        push(props.definition.id, {
+        pushColorDelta(props.definition.id, {
             name: (e.target as HTMLInputElement).value
         })
     }

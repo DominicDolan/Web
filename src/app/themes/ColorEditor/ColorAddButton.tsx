@@ -1,8 +1,8 @@
-import {useColorContext} from "~/app/themes/ColorEditor/ColorEditor";
+import {useColorStore} from "~/app/themes/ColorEditor/ColorEditor";
 
 export function ColorAddButton() {
 
-    const [pushColorDelta] = useColorContext()
+    const { pushColorDelta } = useColorStore()
 
     function addColor() {
         pushColorDelta("create", {

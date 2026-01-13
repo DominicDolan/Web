@@ -53,7 +53,7 @@ export function useDatabaseForModel<M extends Model >(sqlSchema: ModelSchema<M>)
                 .bind(groupBy)
                 .all<ModelEventRow>()
 
-            return results.map(convertEventRowToModelDelta)
+            return results.map(convertEventRowToModelDelta<M>)
         },
         getOne: async (id: string) => {
             const db = await getDB()
@@ -61,7 +61,7 @@ export function useDatabaseForModel<M extends Model >(sqlSchema: ModelSchema<M>)
             const sql = sqlSchema.generateSelectSingleSql()
             const {results} = await db.prepare(sql).bind(id).all<ModelEventRow>()
 
-            return results.map(convertEventRowToModelDelta)
+            return results.map(convertEventRowToModelDelta<M>)
         },
         insert: async (delta: ModelDelta<M>, group: string) => {
             const db = await getDB()

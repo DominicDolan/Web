@@ -5,15 +5,13 @@ import {
     query,
     RouteSectionProps,
     useAction,
-    useParams,
     useSubmission
 } from "@solidjs/router";
-import {createEffect, createSignal, For, Show, Suspense} from "solid-js";
+import {For, Show, Suspense} from "solid-js";
 import {keyedDebounce} from "~/packages/utils/KeyedDebounce";
 import {ModelDelta} from "~/data/ModelDelta";
 import {ColorDefinition, colorDefinitionSchema} from "~/data/ColorDefinition";
 import {deltaArrayToGroup, squashDeltasToSingle} from "~/packages/repository/DeltaReducer";
-import {createDeltaModelContextStore, deltasSince} from "~/packages/deltaStoreUtils/DeltaModelContextStore";
 import ColorItem from "~/app/themes/ColorEditor/ColorItem";
 import {ColorAddButton} from "~/app/themes/ColorEditor/ColorAddButton";
 import ExportCSSButton from "~/app/themes/ColorEditor/ExportCSSButton";
@@ -22,6 +20,13 @@ import colorDefinitionSql from "~/schema/ColorDefinitionSql";
 import {createModelStore} from "~/packages/repository/ModelStore";
 import {calculateDelta} from "~/packages/repository/DeltaGenerator";
 import {zodResponse} from "~/packages/utils/ZodResponse";
+import {createContextStore} from "~/packages/deltaStoreUtils/ContextStore";
+import {
+    DeltaAdapterParams,
+    DeltaContextProvider,
+    withDeltaAdapter
+} from "~/packages/deltaStoreUtils/CotextStoreDeltaAdapter";
+import {createDeltaStoreTimestampMarker} from "~/packages/deltaStoreUtils/DeltaStoreTimestampMarker";
 
 const colorQuery = query(async (themeId: string) => {
     "use server"
@@ -63,8 +68,41 @@ export const updateColors = action(async (delta: ModelDelta<ColorDefinition>, th
     return zodResponse(result, { revalidate: [] })
 })
 
-export const [ColorProvider, useColorContext] = createDeltaModelContextStore<ColorDefinition>()
+export const [useColorStore] = createContextStore(withDeltaAdapter((params: DeltaAdapterParams<{ deltas: Record<string, ModelDelta<ColorDefinition>[]>, themeId?: string }>) => {
+    const saveAction = useAction(updateColors)
+    const colorsSubmission = useSubmission(updateColors)
 
+
+    const timestampMarker = createDeltaStoreTimestampMarker(params.store)
+    timestampMarker.markAll()
+
+    const save = keyedDebounce(async (colorId: string) => {
+        const themeId = params.props.themeId
+        if (themeId == null) return
+
+        const deltas = timestampMarker.getStreamFromMarked(colorId)
+        const mergedDeltas = squashDeltasToSingle(deltas)
+
+        if (mergedDeltas == null) return
+
+        colorsSubmission.clear()
+        await saveAction(mergedDeltas, themeId)
+
+        if (colorsSubmission.result?.success && colorsSubmission.result.updatedAt > timestampMarker.getTimestampsById(colorId)) {
+            timestampMarker.mark(colorId)
+        }
+    }, 300)
+
+
+    params.store.onAnyDeltaPush((deltas) => {
+        save(deltas[0].modelId)
+    })
+
+    return {
+        colors: params.models,
+        pushColorDelta: params.push,
+    }
+}))
 
 export default function ColorEditor(props: RouteSectionProps<undefined>) {
 
@@ -74,31 +112,6 @@ export default function ColorEditor(props: RouteSectionProps<undefined>) {
         return colorQuery(themeId);
     })
 
-    const saveAction = useAction(updateColors)
-
-    const colorsSubmission = useSubmission(updateColors)
-
-    const [latestTimestamp, setLatestTimestamp] = createSignal(0)
-
-    const save = keyedDebounce(async (_: string, deltas: ModelDelta<ColorDefinition>[]) => {
-        const themeId = props.params.themeId
-        if (themeId == null) return
-
-        const mergedDeltas = squashDeltasToSingle(deltas)
-
-        if (mergedDeltas == null) return
-
-        colorsSubmission.clear()
-        await saveAction(mergedDeltas, themeId)
-
-        if (colorsSubmission.result?.success && colorsSubmission.result.updatedAt > latestTimestamp()) {
-            setLatestTimestamp(colorsSubmission.result.updatedAt)
-        }
-    }, 300)
-
-    function onColorDeltaPush(modelId: string, deltas: ModelDelta<ColorDefinition>[]) {
-        save(modelId, deltas)
-    }
     return <article sizing={"w-50rem"} spacing={"ma-auto"}>
         <Suspense
             fallback={
@@ -115,29 +128,28 @@ export default function ColorEditor(props: RouteSectionProps<undefined>) {
                     </div>
                 </skeleton-loader>
             }>
-            <ColorProvider deltas={colorDeltas()}
-                           onDeltaPush={deltasSince(latestTimestamp(), onColorDeltaPush)}>
-                {(colorModels) => <>
+            <DeltaContextProvider deltas={colorDeltas()} themeId={props.params.themeId} useStore={useColorStore}>
+                {({colors}) => <>
                     <hgroup flex={"row space-between"}>
                         <h3>Edit Colours</h3>
                         <ColorAddButton/>
                     </hgroup>
                     <div flex={"col gap-4"}>
                         <div>
-                            <Show when={colorModels.length > 0} fallback={<div>No colors defined</div>}>
-                                <For each={colorModels}>
+                            <Show when={colors.length > 0} fallback={<div>No colors defined</div>}>
+                                <For each={colors}>
                                     {(def) => {
                                         return <ColorItem definition={def}/>
                                     }}
                                 </For>
                                 <div flex={"row gap-4"}>
-                                    <ExportCSSButton colorModels={colorModels}/>
+                                    <ExportCSSButton colorModels={colors}/>
                                 </div>
                             </Show>
                         </div>
                     </div>
                 </>}
-            </ColorProvider>
+            </DeltaContextProvider>
         </Suspense>
     </article>
 }

@@ -1,18 +1,18 @@
 import {A, useNavigate} from "@solidjs/router";
-import {createMemo, For, onMount, Show, useContext} from "solid-js";
-import {flushThemeContext, useThemeContext} from "~/app/themes/ThemeEditor/ThemeEditor";
+import {createMemo, For, Show} from "solid-js";
+import {useThemeStore} from "~/app/themes/ThemeEditor/ThemeEditor";
 import {reduceDeltasToModel} from "~/packages/repository/DeltaReducer";
 import Popover from "~/packages/utils/Popover";
 
 export default function ThemeSettings(props: { children?: any, params: { themeId?: string }}) {
 
-    const [push, { getStreamById }] = useThemeContext()
+    const {pushThemeDelta, getThemeDeltasByModelId} = useThemeStore()
 
-    const {onReadyToSave} = useContext(flushThemeContext)
+    const {flushSaveAction} = useThemeStore()
 
     const theme = createMemo(() => {
         if (props.params.themeId == null) return undefined
-        const stream = getStreamById(props.params.themeId);
+        const stream = getThemeDeltasByModelId(props.params.themeId);
         if (stream == null) return undefined
 
         return reduceDeltasToModel(stream)
@@ -21,17 +21,17 @@ export default function ThemeSettings(props: { children?: any, params: { themeId
     function onNameChange(e: Event) {
         const t = theme()
         if (t == null) return
-        push(t.id, { name: (e.target as HTMLInputElement).value })
+        pushThemeDelta(t.id, { name: (e.target as HTMLInputElement).value })
     }
 
     function onDescriptionChange(e: Event) {
         const t = theme()
         if (t == null) return
-        push(t.id, { description: (e.target as HTMLInputElement).value })
+        pushThemeDelta(t.id, { description: (e.target as HTMLInputElement).value })
     }
 
     function onBlur() {
-        onReadyToSave()
+        flushSaveAction()
     }
 
     const navigate = useNavigate()
@@ -46,8 +46,8 @@ export default function ThemeSettings(props: { children?: any, params: { themeId
         const ok = window.confirm(`Delete theme "${t.name}"?`)
         if (!ok) return
 
-        push("delete", t.id)
-        onReadyToSave()
+        pushThemeDelta("delete", t.id)
+        flushSaveAction()
         navigate("/editor", { replace: true })
     }
 

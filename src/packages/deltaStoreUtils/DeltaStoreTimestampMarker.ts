@@ -20,7 +20,6 @@ function createDeltaStoreTimestampMarker<M extends Model>(store: DeltaStore<M> |
     const [timestampsById, setTimestampsById] = createStore<Record<string, number>>({})
 
     function mark(id: string, timestamp?: number) {
-        console.log("marking", id, "with timestamp", timestamp ?? 0)
         if (timestamp == undefined) {
             timestamp = storeFns.getStreamById(id)?.at(-1)?.timestamp ?? 0
         }

@@ -1,45 +1,83 @@
-import {Context, createContext, useContext, Component, createSignal} from "solid-js"
-import {createStore} from "solid-js/store"
+import {Context, createContext, useContext, Component, createSignal, createEffect} from "solid-js"
 
-type DefineContextStore<Props> = <R>(setup: (props: Props) => R) => () => R
+type ProviderComponent<Props> = Component<Props & { children?: any }>
+export type UseContextStore<Props, R> = {
+    (): R
+    Provider: ProviderComponent<Props>
+}
+type DefineContextStore<Props> = <R>(setup: (props: Props) => R) => UseContextStore<Props, R>
 
-export type CreateContextStore<Props extends Record<string, any>> = [
+export type CreateContextStoreMulti<Props extends Record<string, any>> = [
+    DefineContextStore<Props>,
     Component<Props & {children?: any}>,
-    DefineContextStore<Props>
 ]
 
-export function createContextStore<Props extends Record<string, any>>(): CreateContextStore<Props> {
-    const storeContext = createContext<Props>()
-    const [data, setData] = createStore<Record<symbol, any>>({})
+export type CreateContextStore<Props extends Record<string, any>, R> = [
+    UseContextStore<Props, R>,
+    Component<Props & {children?: any}>,
+]
 
-    function useContextStore<R>(key: symbol, setup: (props: Props) => R): R {
-        const props = useContext(storeContext)
-        if (props == null) {
-            throw new Error(`Unable to retrieve props for context store with key: ${String(key)}`)
-        }
-        if (data[key] == null) {
-            setData(key, setup(props))
-        }
-        return data[key] as R
+export function createContextStore<Props extends Record<string, any>, R = unknown>(setup: (props: Props) => R): CreateContextStore<Props, R> {
+    const [defineStore, Provider] = createContextStoreMulti<Props>()
+
+    return [
+        defineStore(setup),
+        Provider,
+    ]
+}
+
+type ContextValue<Props> = {
+    props: Props
+    data: Map<symbol, unknown>
+}
+
+export function createContextStoreMulti<Props extends Record<string, any>>(): CreateContextStoreMulti<Props> {
+    const HMR_KEY = "createContextStoreMulti.storeContext";
+
+    const storeContext = (((import.meta as any).hot?.data?.[HMR_KEY] as Context<ContextValue<Props>> | undefined)
+            ?? ((globalThis as any)[HMR_KEY] as Context<ContextValue<Props>> | undefined)
+            ?? createContext<ContextValue<Props>>()) as Context<ContextValue<Props>>
+
+    if ((import.meta as any).hot?.data) {
+        (import.meta as any).hot.data[HMR_KEY] = storeContext;
+    } else {
+        (globalThis as any)[HMR_KEY] = storeContext;
     }
 
-    const defineContextStore = function<R>(setup: (props: Props) => R): () => R {
+    function useContextStore<R>(key: symbol, setup: (props: Props) => R): R {
+        const ctx = useContext(storeContext)
+        if (ctx == null) {
+            throw new Error(`Unable to retrieve props for context store with key: ${String(key)}`)
+        }
+        if (!ctx.data.has(key)) {
+            ctx.data.set(key, setup(ctx.props))
+        }
+        return ctx.data.get(key) as R
+    }
+
+    const defineContextStore = function <R>(setup: (props: Props) => R) {
         const contextStoreKey = Symbol()
 
-        return () => {
+        const useStore = () => {
             return useContextStore(contextStoreKey, setup)
         }
+        useStore.Provider = ContextStoreProvider
+
+        return useStore
     }
 
     function ContextStoreProvider(props: Props & {children?: any}) {
+        const data = new Map<symbol, unknown>()
 
-        return <storeContext.Provider value={props}>
+        return <storeContext.Provider value={{props, data}}>
             {props.children}
         </storeContext.Provider>
     }
 
+    useContextStore.Provider = ContextStoreProvider
+
     return [
-        ContextStoreProvider,
         defineContextStore,
+        ContextStoreProvider,
     ]
 }
