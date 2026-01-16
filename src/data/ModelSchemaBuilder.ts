@@ -1,5 +1,6 @@
-import type {z, ZodType} from "zod"
 import {Model} from "~/data/Model";
+import { parseCreateTable, diffSchemas, generateAlterStatements, type TableSchema } from "./SchemaDiffer";
+import { getSchemaContext } from "./SchemaContext";
 
 type ForeignKey = {
     column: string
@@ -16,6 +17,7 @@ type IndexDef = {
 
 export type ModelSqlSchemaOptions = {
     recreate?: boolean
+    oldSql?: string // Previous SQL to diff against
 }
 
 /**
@@ -25,7 +27,6 @@ export type ModelSqlSchemaOptions = {
  */
 export function createModelSchema<T extends Model>(
     tableName: string,
-    payloadSchema: ZodType<T>,
     options?: ModelSqlSchemaOptions
 ) {
     const columns: string[] = []
@@ -37,9 +38,8 @@ export function createModelSchema<T extends Model>(
     columns.push(`payload TEXT NOT NULL`)
     columns.push(`event_type TEXT NOT NULL`)
     columns.push(`timestamp INTEGER NOT NULL`)
-    columns.push(`group_by_id TEXT NOT NULL`)
 
-    indexes.push({ columns: ["timestamp", "group_by_id"]})
+    indexes.push({ columns: ["timestamp"]})
     const api = {
         addColumnRaw(sql: string) {
             columns.push(sql)
@@ -73,47 +73,73 @@ export function createModelSchema<T extends Model>(
 
         build() {
 
+            const fkClauses = foreignKeys.map((fk) => {
+                const [refTable, refColWithParens] = fk.references.split("(")
+                const refCol = refColWithParens?.replace(")", "")
+                const onDelete = fk.onDelete ? ` ON DELETE ${fk.onDelete}` : ""
+                const onUpdate = fk.onUpdate ? ` ON UPDATE ${fk.onUpdate}` : ""
+                return `FOREIGN KEY ("${fk.column}") REFERENCES "${refTable}"("${refCol}")${onDelete}${onUpdate}`
+            })
+
+            const createTable = `CREATE TABLE IF NOT EXISTS "${tableName}" (\n  ${[...columns, ...fkClauses].join(",\n  ")}\n);`
+
+            const createIndexes = indexes.map((idx, i) => {
+                const name =
+                    idx.name ??
+                    `${tableName}_${idx.columns.join("_")}_${idx.unique ? "uniq" : "idx"}_${i + 1}`
+                const unique = idx.unique ? "UNIQUE " : ""
+                const cols = idx.columns.map((c) => `"${c}"`).join(", ")
+                return `CREATE ${unique}INDEX IF NOT EXISTS "${name}" ON "${tableName}" (${cols});`
+            })
+
+            let sql: string
+
+            // Check for oldSql in options or from global context
+            const context = getSchemaContext()
+            const oldSql = options?.oldSql ?? context?.oldSchemas.get(tableName)
+
+            // If oldSql is provided, try to generate ALTER TABLE statements
+            if (oldSql) {
+                const newFullSql = [createTable, ...createIndexes].join("\n")
+                const oldSchema = parseCreateTable(oldSql)
+                const newSchema = parseCreateTable(newFullSql)
+
+                if (oldSchema && newSchema) {
+                    const diff = diffSchemas(oldSchema, newSchema)
+
+                    if (diff.needsRecreate || options?.recreate) {
+                        // Need to recreate table
+                        const dropTable = `DROP TABLE IF EXISTS "${tableName}";\n`
+                        sql = [dropTable + createTable, ...createIndexes].join("\n")
+                    } else if (!diff.exists) {
+                        // Table doesn't exist, create it
+                        sql = newFullSql
+                    } else {
+                        // Generate ALTER statements
+                        const alterStatements = generateAlterStatements(diff, true)
+                        if (alterStatements.length > 0) {
+                            sql = alterStatements.join("\n")
+                        } else {
+                            // No changes needed
+                            sql = `-- No changes needed for table "${tableName}"`
+                        }
+                    }
+                } else {
+                    // Couldn't parse, fall back to create
+                    sql = [createTable, ...createIndexes].join("\n")
+                }
+            } else if (options?.recreate) {
+                // Force recreate
+                const dropTable = `DROP TABLE IF EXISTS "${tableName}";\n`
+                sql = [dropTable + createTable, ...createIndexes].join("\n")
+            } else {
+                // Normal CREATE IF NOT EXISTS
+                sql = [createTable, ...createIndexes].join("\n")
+            }
+
             return {
                 tableName,
-                payloadSchema,
-                generateSqlSchema() {
-                    const fkClauses = foreignKeys.map((fk) => {
-                        const [refTable, refColWithParens] = fk.references.split("(")
-                        const refCol = refColWithParens?.replace(")", "")
-                        const onDelete = fk.onDelete ? ` ON DELETE ${fk.onDelete}` : ""
-                        const onUpdate = fk.onUpdate ? ` ON UPDATE ${fk.onUpdate}` : ""
-                        return `FOREIGN KEY ("${fk.column}") REFERENCES "${refTable}"("${refCol}")${onDelete}${onUpdate}`
-                    })
-
-                    const dropTable = options?.recreate ? `DROP TABLE IF EXISTS "${tableName}";\n` : ""
-                    const createTable = `CREATE TABLE IF NOT EXISTS "${tableName}" (\n  ${[...columns, ...fkClauses].join(",\n  ")}\n);`
-
-                    const createIndexes = indexes.map((idx, i) => {
-                        const name =
-                            idx.name ??
-                            `${tableName}_${idx.columns.join("_")}_${idx.unique ? "uniq" : "idx"}_${i + 1}`
-                        const unique = idx.unique ? "UNIQUE " : ""
-                        const cols = idx.columns.map((c) => `"${c}"`).join(", ")
-                        return `CREATE ${unique}INDEX IF NOT EXISTS "${name}" ON "${tableName}" (${cols});`
-                    })
-
-                    return [dropTable + createTable, ...createIndexes].join("\n")
-                },
-                generateSelectGroupSql() {
-                    return `SELECT * FROM "${tableName}" WHERE group_by_id = ? ORDER BY timestamp ASC;`
-                },
-                generateSelectSingleSql() {
-                    return `SELECT * FROM "${tableName}" WHERE model_id = ? ORDER BY timestamp ASC;`
-                },
-                generateInsertSingle() {
-                    return `INSERT INTO "${tableName}" (group_by_id, model_id, event_type, payload, timestamp) VALUES (?, ?, ?, ?, ?)`
-                },
-                generateInsert(valueCount: number = 1) {
-                    const columns = ["group_by_id", "model_id", "event_type", "payload", "timestamp"]
-                    const valueSet = `(${Array(columns.length).fill("?").join(", ")})`
-                    const values = Array(valueCount).fill(valueSet).join(", ")
-                    return `INSERT INTO "${tableName}" (${columns.join(", ")}) VALUES ${values}`
-                }
+                sql
             }
         },
     }

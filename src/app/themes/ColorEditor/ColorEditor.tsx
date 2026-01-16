@@ -10,13 +10,12 @@ import {
 import {For, Show, Suspense} from "solid-js";
 import {keyedDebounce} from "~/packages/utils/KeyedDebounce";
 import {ModelDelta} from "~/data/ModelDelta";
-import {ColorDefinition, colorDefinitionSchema} from "~/data/ColorDefinition";
+import {ColorDefinition, colorDefinitionSchema} from "~/models/ColorDefinition";
 import {deltaArrayToGroup, squashDeltasToSingle} from "~/packages/repository/DeltaReducer";
 import ColorItem from "~/app/themes/ColorEditor/ColorItem";
 import {ColorAddButton} from "~/app/themes/ColorEditor/ColorAddButton";
 import ExportCSSButton from "~/app/themes/ColorEditor/ExportCSSButton";
-import {useDatabaseForModel} from "~/data/DBService";
-import colorDefinitionSql from "~/schema/ColorDefinitionSql";
+import {useDatabaseTable} from "~/data/DBService";
 import {createModelStore} from "~/packages/repository/ModelStore";
 import {calculateDelta} from "~/packages/repository/DeltaGenerator";
 import {zodResponse} from "~/packages/utils/ZodResponse";
@@ -30,16 +29,16 @@ import {createDeltaStoreTimestampMarker} from "~/packages/deltaStoreUtils/DeltaS
 
 const colorQuery = query(async (themeId: string) => {
     "use server"
-    const db = useDatabaseForModel(colorDefinitionSql)
+    const db = useDatabaseTable(colorDefinitionSchema)
 
-    const definitions = await db.getManyByGroup(themeId)
+    const definitions = await db.getManyBy("theme", themeId)
     return deltaArrayToGroup(definitions)
 }, "get-colors")
 
 export const updateColors = action(async (delta: ModelDelta<ColorDefinition>, themeId: string) => {
     "use server"
     const modelId = delta.modelId
-    const db = useDatabaseForModel(colorDefinitionSql)
+    const db = useDatabaseTable(colorDefinitionSchema)
     const existingDeltas: ModelDelta<ColorDefinition>[] = await db.getOne(modelId)
     const [_, push] = createModelStore({[modelId]: existingDeltas})
 
@@ -53,7 +52,7 @@ export const updateColors = action(async (delta: ModelDelta<ColorDefinition>, th
 
         if (deltaToSave) {
             try {
-                await db.insert(deltaToSave, themeId)
+                await db.insert(deltaToSave, { "theme": themeId})
             } catch (e) {
                 console.error("Error saving color delta:", e)
                 return json({

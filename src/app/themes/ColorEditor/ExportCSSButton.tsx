@@ -1,4 +1,4 @@
-import {ColorDefinition} from "~/data/ColorDefinition";
+import {ColorDefinition} from "~/models/ColorDefinition";
 
 
 export default function ExportCSSButton(props: {colorModels: ColorDefinition[]}) {

@@ -1,8 +1,8 @@
 import {Model, ModelData} from "~/data/Model";
-import {ModelSchema} from "~/data/ModelSchemaBuilder";
 import {getRequestEvent} from "solid-js/web";
 import {ModelDelta} from "~/data/ModelDelta";
 import {isDevelopment} from "~/packages/utils/Environment";
+import {z, ZodType} from "zod";
 
 async function getDB(): Promise<D1Database> {
     const event = getRequestEvent();
@@ -42,59 +42,58 @@ function convertEventRowToModelDelta<M extends Model>(row: ModelEventRow): Model
     }
 }
 
-export function useDatabaseForModel<M extends Model >(sqlSchema: ModelSchema<M>) {
+export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
+    const tableInfo = z.globalRegistry.get(schema)?.table
+    const tableName =  (typeof tableInfo === "object" && tableInfo != null && "tableName" in tableInfo) ? tableInfo.tableName : undefined
 
     return {
-        getManyByGroup: async (groupBy: string) => {
+        async getAll() {
             const db = await getDB()
+            const sql = `SELECT * FROM "${tableName}";`
 
-            const sql = sqlSchema.generateSelectGroupSql()
             const {results} = await db.prepare(sql)
-                .bind(groupBy)
                 .all<ModelEventRow>()
 
             return results.map(convertEventRowToModelDelta<M>)
         },
-        getOne: async (id: string) => {
+        async getOne(id: string) {
             const db = await getDB()
+            const sql = `SELECT * FROM "${tableName}" WHERE model_id = ?;`
 
-            const sql = sqlSchema.generateSelectSingleSql()
-            const {results} = await db.prepare(sql).bind(id).all<ModelEventRow>()
+            const {results} = await db.prepare(sql)
+                .bind(id)
+                .all<ModelEventRow>()
 
             return results.map(convertEventRowToModelDelta<M>)
         },
-        insert: async (delta: ModelDelta<M>, group: string) => {
+        async getManyBy(column: string, value: string) {
+            const db = await getDB()
+            const sql = `SELECT * FROM "${tableName}" WHERE ${column} = ? ORDER BY timestamp ASC;`
+
+            const {results} = await db.prepare(sql)
+                .bind(value)
+                .all<ModelEventRow>()
+
+            return results.map(convertEventRowToModelDelta<M>)
+        },
+        async insert(delta: ModelDelta<M>, extra?: Record<string, unknown>) {
             const db = await getDB()
 
-            const sql = sqlSchema.generateInsertSingle()
+            const extraColumns = extra ? Object.keys(extra) : []
+            const extraValues = extra ? Object.values(extra) : []
+
+            const columns = ['model_id', 'event_type', 'payload', 'timestamp', ...extraColumns].join(', ')
+            const placeholders = ['?', '?', '?', '?', ...extraColumns.map(() => '?')].join(', ')
+
+            const sql = `INSERT INTO "${tableName}" (${columns}) VALUES (${placeholders})`
 
             await db.prepare(sql).bind(
-                group, // theme_id (hardcoded to 1 as requested)
                 delta.modelId,
                 delta.type,
                 JSON.stringify(delta.payload),
-                delta.timestamp || Date.now()
+                delta.timestamp || Date.now(),
+                ...extraValues
             ).run()
-        },
-        insertMany: async (deltas: ModelDelta<M>[], group: string) => {
-            const db = await getDB()
-
-            const sql = sqlSchema.generateInsert(deltas.length)
-
-            const bindables = deltas.flatMap(delta => [
-                group,
-                delta.modelId,
-                delta.type,
-                JSON.stringify(delta.payload),
-                delta.timestamp || Date.now()
-            ])
-
-            await db.prepare(sql).bind(...bindables).run()
-        },
-        dbPrepare: async (sql: string | ((tableName: string) => string)) => {
-            const db = await getDB()
-            sql = typeof sql === "string" ? sql : sql(sqlSchema.tableName)
-            return db.prepare(sql)
         }
     }
 }

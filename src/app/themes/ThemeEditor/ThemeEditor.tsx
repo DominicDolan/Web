@@ -1,9 +1,8 @@
 import {A, action, createAsync, json, query, useAction, useMatch, useNavigate, useSubmission,} from "@solidjs/router"
 import NavBarTemplate from "~/app/common/NavBarTemplate";
-import {useDatabaseForModel} from "~/data/DBService";
-import themeDefinitionSql from "~/schema/ThemeDefinitionSql";
+import {useDatabaseTable} from "~/data/DBService";
 import {deltaArrayToGroup, squashDeltasToSingle} from "~/packages/repository/DeltaReducer";
-import {ThemeDefinition, themeDefinitionSchema} from "~/data/ThemeDefinition";
+import {ThemeDefinition, themeDefinitionSchema} from "~/models/ThemeDefinition";
 import {For, onMount, Suspense} from "solid-js";
 import AddThemeButton from "~/app/themes/ThemeEditor/AddThemeButton";
 import {keyedDebounce} from "~/packages/utils/KeyedDebounce";
@@ -18,23 +17,21 @@ import {
     withDeltaAdapter
 } from "~/packages/deltaStoreUtils/CotextStoreDeltaAdapter";
 
-const tempUserId = "0"
-
 const getThemes = query(async () => {
     "use server"
 
-    const db = useDatabaseForModel(themeDefinitionSql)
+    const db = useDatabaseTable(themeDefinitionSchema)
 
-    const definitions = await db.getManyByGroup(tempUserId)
+    const definitions = await db.getAll()
 
     return deltaArrayToGroup(definitions)
 
 }, "getThemes")
 
-const pushThemeDeltaAction = action(async (delta: ModelDelta<ThemeDefinition>, userId: string) => {
+const pushThemeDeltaAction = action(async (delta: ModelDelta<ThemeDefinition>) => {
     "use server"
     const modelId = delta.modelId
-    const db = useDatabaseForModel(themeDefinitionSql)
+    const db = useDatabaseTable(themeDefinitionSchema)
 
     const existingDeltas = await db.getOne(modelId)
     const [_, push] = createModelStore({[modelId]: existingDeltas})
@@ -49,7 +46,7 @@ const pushThemeDeltaAction = action(async (delta: ModelDelta<ThemeDefinition>, u
 
         if (deltaToSave) {
             try {
-                await db.insert(deltaToSave, userId)
+                await db.insert(deltaToSave)
             } catch (e) {
                 console.error("Error saving color delta:", e)
                 return json({
@@ -73,9 +70,6 @@ export const [useThemeStore] = createContextStore(
 
 
         const save = keyedDebounce(async (id: string) => {
-            const userId = tempUserId
-            if (userId == null) return
-
             const deltas = timestampMarker.getStreamFromMarked(id)
 
             const mergedDeltas = squashDeltasToSingle(deltas)
@@ -83,7 +77,7 @@ export const [useThemeStore] = createContextStore(
             if (mergedDeltas == null) return
 
             themeSubmission.clear()
-            await deltaPushAction(mergedDeltas, userId)
+            await deltaPushAction(mergedDeltas)
 
             if (themeSubmission.result?.success && themeSubmission.result.updatedAt > timestampMarker.getTimestampsById(id)) {
                 timestampMarker.mark(id)
