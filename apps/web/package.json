@@ -1,0 +1,24 @@
+{
+  "name": "@theme-builder/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vinxi dev --port 3001",
+    "build": "vinxi build",
+    "start": "vinxi start",
+    "generate:schema": "tsx ../../packages/d1/src/generateSchema.ts src/models migrations",
+    "migrate:local": "wrangler d1 migrations apply DB --local --config ./wrangler.jsonc",
+    "migrate:prod": "npm run generate:schema && wrangler d1 migrations apply DB --remote --config ../../wrangler.jsonc",
+    "build:schema": "npm run generate:schema && npm run migrate:local"
+  },
+  "dependencies": {
+    "@theme-builder/common": "*",
+    "@theme-builder/d1": "*",
+    "@solidjs/router": "0.15.4",
+    "@solidjs/start": "1.2.0",
+    "solid-js": "1.9.10",
+    "vinxi": "0.5.8",
+    "vite-plugin-solid": "2.11.10"
+  }
+}

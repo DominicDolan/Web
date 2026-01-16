@@ -1,0 +1,10 @@
+/_build/assets/*
+  cache-control: public, immutable, max-age=31536000
+/_build/assets/*
+  cache-control: public, immutable, max-age=31536000
+/_build/assets/*
+  cache-control: public, immutable, max-age=31536000
+/_build/assets/*
+  cache-control: public, immutable, max-age=31536000
+/_build/assets/*
+  cache-control: public, immutable, max-age=31536000

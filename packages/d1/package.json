@@ -1,0 +1,20 @@
+{
+  "name": "@theme-builder/d1",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "generate-schema": "./src/generateSchema.ts"
+  },
+
+  "exports": {
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@theme-builder/common": "*",
+    "tsx": "^4.21.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.55.0"
+  }
+}

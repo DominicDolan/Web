@@ -1,0 +1,2 @@
+import{s as t,e as o,f as s,a}from"../nitro/nitro.mjs";var r=["<div",'><h1>Hello world!</h1><i>search</i><button class="increment" type="button">Clicks: \x3c!--$--\x3e','\x3c!--/--\x3e</button><p>Visit <a href="https://start.solidjs.com" target="_blank">start.solidjs.com</a> to learn how to build SolidStart apps.</p></div>'];function c(){const[i,e]=s(0);return t(r,a(),o(i()))}export{c};
+//# sourceMappingURL=Home-tcH7WyI5.mjs.map

@@ -1,0 +1,2 @@
+import{k as e,Z as r,K as o}from"../nitro/nitro.mjs";function E(n,t,s){if("function"!=typeof n)throw new Error("Export from a 'use server' module must be a function");return new Proxy(n,{get:(e,r,o)=>"url"===r?`/_server?id=${encodeURIComponent(t)}&name=${encodeURIComponent(s)}`:"GET"===r?o:e[r],apply(i,u,a){const c=e();if(!c)throw new Error("Cannot call server function outside of a request");const f=r(c);return f.locals.serverFunctionMeta={id:t+"#"+s},f.serverOnly=!0,o(f,()=>n.apply(u,a))}})}export{E};
+//# sourceMappingURL=server-fns-runtime-qCvhjG8-.mjs.map

@@ -13,7 +13,8 @@
     "types": ["vinxi/types/client", "vitest/globals", "@testing-library/jest-dom", "@cloudflare/workers-types"],
     "isolatedModules": true,
     "paths": {
-      "~/*": ["./src/*"]
-    },
+      "~/*": ["./apps/web/src/*"],
+      "@theme-builder/common/*": ["./packages/common/src/*"]
+    }
   }
 }

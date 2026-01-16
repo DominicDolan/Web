@@ -1,27 +1,23 @@
 {
-  "name": "example-bare",
+  "name": "theme-builder-monorepo",
+  "version": "0.0.0",
+  "private": true,
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:wrangler\"",
-    "dev:vite": "vinxi dev --port 3001",
+    "dev:vite": "npm run dev --workspace=@theme-builder/web",
     "dev:wrangler": "wrangler --cwd .output dev",
-    "migrate:local": "npx wrangler d1 migrations apply DB --local",
-    "migrate:prod": "tsx ./scripts/generateSchema.ts && npx wrangler d1 migrations apply DB --remote",
-    "build:schema": "tsx ./scripts/generateSchema.ts && npm run migrate:local",
-    "build": "vinxi build",
+    "migrate:local": "npm run migrate:local --workspace=@theme-builder/web",
+    "migrate:prod": "npm run migrate:prod --workspace=@theme-builder/web",
+    "build:schema": "npm run build:schema --workspace=@theme-builder/web",
+    "build": "npm run build --workspace=@theme-builder/web",
     "preview": "vinxi build && dev:wrangler",
-    "start": "vinxi start",
+    "start": "npm run start --workspace=@theme-builder/web",
     "test": "vitest"
-  },
-  "dependencies": {
-    "@paralleldrive/cuid2": "^2.2.2",
-    "@solidjs/router": "0.15.4",
-    "@solidjs/start": "1.2.0",
-    "solid-js": "1.9.10",
-    "unocss": "66.5.12",
-    "vinxi": "0.5.8",
-    "vite-plugin-solid": "2.11.10",
-    "zod": "4.1.12"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251218.0",
