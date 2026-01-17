@@ -1,2 +1,0 @@
-import{w as o}from"../_/fs.mjs";import"../nitro/nitro.mjs";import"node:process";import"cloudflare:workers";import"node:events";import"node:buffer";import"node:timers";import"node:async_hooks";import"node:url";async function s(r){const t=(await r.request.formData()).get("location");return null==t||await new Promise((r,e)=>{o(t.toString(),"Hello SOlid Start",o=>{o?e(o):r()})}),new Response}export{s as POST};
-//# sourceMappingURL=export42.mjs.map

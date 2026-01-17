@@ -14,7 +14,8 @@
     "isolatedModules": true,
     "paths": {
       "~/*": ["./apps/web/src/*"],
-      "@theme-builder/common/*": ["./packages/common/src/*"]
+      "@theme-builder/common/*": ["./packages/common/src/*"],
+      "@theme-builder/d1/*": ["./packages/d1/src/*"]
     }
   }
 }

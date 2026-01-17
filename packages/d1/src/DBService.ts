@@ -6,7 +6,7 @@ import {z, ZodType} from "zod";
 
 async function getDB(): Promise<D1Database> {
     const event = getRequestEvent();
-    const cloudflareContext = event?.nativeEvent.context.cloudflare
+    const cloudflareContext = (event as any)?.nativeEvent.context.cloudflare
     if (cloudflareContext != null) {
         return cloudflareContext.env.DB
     }

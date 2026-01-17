@@ -6,3 +6,6 @@
 package-lock.json
 bun.lock
 /.wrangler/
+/apps/**/.wrangler/
+/apps/**/.output/
+/apps/**/node_modules/
