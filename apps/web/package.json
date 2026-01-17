@@ -9,7 +9,7 @@
     "start": "vinxi start",
     "generate:schema": "tsx ../../packages/d1/src/generateSchema.ts src/models migrations",
     "migrate:local": "wrangler d1 migrations apply DB --local --config ./wrangler.jsonc",
-    "migrate:prod": "npm run generate:schema && wrangler d1 migrations apply DB --remote --config ../../wrangler.jsonc",
+    "migrate:prod": "npm run generate:schema && wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc",
     "build:schema": "npm run generate:schema && npm run migrate:local"
   },
   "dependencies": {
