@@ -52,9 +52,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
 
             const tablesQuery = `SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;`
             const {results: tables} = await db.prepare(tablesQuery).all<{ name: string }>()
-            console.log('Database tables:', tables.map(t => t.name))
 
-            console.log(db)
             const sql = `SELECT * FROM "${tableName}";`
 
             const {results} = await db.prepare(sql)
