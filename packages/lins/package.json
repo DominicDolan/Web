@@ -1,0 +1,9 @@
+{
+  "name": "@web/lins",
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./layout": "./layout/index.ts",
+    "./minimal.css": "./style/minimal/theme.css"
+  }
+}

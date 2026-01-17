@@ -1,6 +1,6 @@
 import {Navigate, Route, Router} from "@solidjs/router";
 import "virtual:uno.css"
-import "@theme-builder/common/style/theme/minimal/theme.css"
+import "@web/lins/minimal.css"
 import ContactUs from "~/app/contact/ContactUs/ContactUs"
 import ThemeEditor from "~/app/themes/ThemeEditor/ThemeEditor"
 import ThemeSettings from "~/app/themes/ThemeEditor/ThemeSettings";

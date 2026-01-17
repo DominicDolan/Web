@@ -1,6 +1,6 @@
 import {defineConfig, transformerAttributifyJsx} from "unocss"
 import presetAttributify from '@unocss/preset-attributify'
-import {layoutPreset} from "@theme-builder/common/style/layout"
+import {layoutPreset} from "@web/lins/layout"
 
 export default defineConfig({
     rules: [],

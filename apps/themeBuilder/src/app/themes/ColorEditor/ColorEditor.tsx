@@ -14,7 +14,7 @@ import {deltaArrayToGroup, squashDeltasToSingle} from "@theme-builder/common/pac
 import ColorItem from "~/app/themes/ColorEditor/ColorItem";
 import {ColorAddButton} from "~/app/themes/ColorEditor/ColorAddButton";
 import ExportCSSButton from "~/app/themes/ColorEditor/ExportCSSButton";
-import {useDatabaseTable} from "@theme-builder/d1/DBService";
+import {useDatabaseTable} from "@theme-builder/d1/DatabaseTable";
 import {createModelStore} from "@theme-builder/common/packages/repository/ModelStore";
 import {calculateDelta} from "@theme-builder/common/packages/repository/DeltaGenerator";
 import {zodResponse} from "@theme-builder/common/packages/utils/ZodResponse";

@@ -1,6 +1,6 @@
 import {A, action, createAsync, json, query, useAction, useMatch, useNavigate, useSubmission,} from "@solidjs/router"
 import NavBarTemplate from "~/app/common/NavBarTemplate";
-import {useDatabaseTable} from "@theme-builder/d1/DBService";
+import {useDatabaseTable} from "@theme-builder/d1/DatabaseTable";
 import {deltaArrayToGroup, squashDeltasToSingle} from "@theme-builder/common/packages/repository/DeltaReducer";
 import {For, onMount, Suspense} from "solid-js";
 import AddThemeButton from "~/app/themes/ThemeEditor/AddThemeButton";
