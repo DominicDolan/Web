@@ -1,9 +1,12 @@
+
+const customElements = []
+
 function defineBareElements(tags: readonly string[]): void {
     for (const tag of tags) {
-        if (customElements.get(tag)) continue;
+        if (window.customElements.get(tag)) continue;
 
         class Bare extends HTMLElement {}
-        customElements.define(tag, Bare);
+        window.customElements.define(tag, Bare);
     }
 }
 

@@ -7,7 +7,6 @@ import ThemeSettings from "~/app/themes/ThemeEditor/ThemeSettings";
 import ColorEditor from "~/app/themes/ColorEditor/ColorEditor";
 
 export default function App() {
-
     return (
         <Router
             root={(props: any) => (props.children)}

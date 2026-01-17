@@ -4,6 +4,7 @@
   "type": "module",
   "exports": {
     "./layout": "./layout/index.ts",
-    "./minimal.css": "./style/minimal/theme.css"
+    "./minimal.css": "./style/minimal/theme.css",
+    "./elements": "./elements/index.ts"
   }
 }
