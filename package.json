@@ -5,7 +5,6 @@
   "type": "module",
   "workspaces": [
     "apps/themeBuilder",
-    "packages/common",
     "packages/d1",
     "packages/delta",
     "packages/lins",
