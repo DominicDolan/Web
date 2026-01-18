@@ -1,5 +1,5 @@
 {
-  "name": "@theme-builder/web",
+  "name": "@web/theme-builder",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -13,11 +13,10 @@
     "build:schema": "npm run generate:schema && npm run migrate:local"
   },
   "dependencies": {
-    "@theme-builder/common": "*",
-    "@theme-builder/d1": "*",
-    "@web/lins": "*",
     "@solidjs/router": "0.15.4",
     "@solidjs/start": "1.2.0",
+    "@web/common": "*",
+    "@web/lins": "*",
     "solid-js": "1.9.10",
     "vinxi": "0.5.8",
     "vite-plugin-solid": "2.11.10"

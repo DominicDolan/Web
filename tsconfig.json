@@ -10,12 +10,12 @@
     "allowJs": true,
     "strict": true,
     "noEmit": true,
-    "types": ["vinxi/types/client", "vitest/globals", "@testing-library/jest-dom", "@cloudflare/workers-types"],
+    "types": ["vinxi/types/client", "vitest/globals", "@testing-library/jest-dom", "@cloudflare/workers-types", "node"],
     "isolatedModules": true,
     "paths": {
       "~/*": ["./apps/web/src/*"],
-      "@theme-builder/common/*": ["./packages/common/src/*"],
-      "@theme-builder/d1/*": ["./packages/d1/src/*"]
+      "@web/common/*": ["./packages/common/src/*"],
+      "@web/d1/*": ["./packages/d1/src/*"]
     }
   }
 }

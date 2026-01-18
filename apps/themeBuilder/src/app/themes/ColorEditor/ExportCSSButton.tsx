@@ -1,4 +1,4 @@
-import {ColorDefinition} from "@theme-builder/common/models/ColorDefinition";
+import {ColorDefinition} from "~/models/ColorDefinition";
 
 
 export default function ExportCSSButton(props: {colorModels: ColorDefinition[]}) {

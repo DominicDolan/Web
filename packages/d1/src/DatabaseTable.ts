@@ -1,8 +1,7 @@
-import {Model, ModelData} from "./Model";
 import {getRequestEvent} from "solid-js/web";
-import {ModelDelta} from "./ModelDelta";
-import {isDevelopment} from "@theme-builder/common/packages/utils/Environment";
+import {isDevelopment} from "@web/utils";
 import {z, ZodType} from "zod";
+import {Model, ModelData, ModelDelta} from "@web/delta";
 
 async function getDB(): Promise<D1Database> {
     const event = getRequestEvent();

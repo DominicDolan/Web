@@ -1,6 +1,6 @@
-import {modelSchema} from "../../../../packages/d1/src/Model";
 import {z} from "zod";
-import {createModelSchema} from "../../../../packages/d1/src/ModelSchemaBuilder";
+import {createModelSchema} from "@web/d1";
+import {modelSchema} from "@web/delta";
 
 export const themeDefinitionSchema = modelSchema.extend({
     name: z.string().trim(),

@@ -1,6 +1,6 @@
-import {modelSchema} from "../../../../packages/d1/src/Model";
 import {z} from "zod";
-import {createModelSchema} from "../../../../packages/d1/src/ModelSchemaBuilder";
+import {modelSchema} from "@web/delta";
+import {createModelSchema} from "@web/d1";
 
 export const colorDefinitionSchema = modelSchema.extend({
     hex: z.string(),

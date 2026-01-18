@@ -1,22 +1,27 @@
 {
-  "name": "theme-builder-monorepo",
+  "name": "web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/themeBuilder",
+    "packages/common",
+    "packages/d1",
+    "packages/delta",
+    "packages/lins",
+    "packages/utils",
+    "packages/components"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:wrangler\"",
-    "dev:vite": "npm run dev --workspace=@theme-builder/web",
+    "dev:vite": "npm run dev --workspace=@web/theme-builder",
     "dev:wrangler": "wrangler --cwd .output dev",
-    "migrate:local": "npm run migrate:local --workspace=@theme-builder/web",
-    "migrate:prod": "npm run migrate:prod --workspace=@theme-builder/web",
-    "build:schema": "npm run build:schema --workspace=@theme-builder/web",
-    "build": "npm run build --workspace=@theme-builder/web",
+    "migrate:local": "npm run migrate:local --workspace=@web/theme-builder",
+    "migrate:prod": "npm run migrate:prod --workspace=@web/theme-builder",
+    "build:schema": "npm run build:schema --workspace=@web/theme-builder",
+    "build": "npm run build --workspace=@web/theme-builder",
     "preview": "vinxi build && dev:wrangler",
-    "start": "npm run start --workspace=@theme-builder/web",
+    "start": "npm run start --workspace=@web/theme-builder",
     "test": "vitest"
   },
   "devDependencies": {

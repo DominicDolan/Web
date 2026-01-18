@@ -1,8 +1,8 @@
 import {A, useNavigate} from "@solidjs/router";
 import {createMemo, For, Show} from "solid-js";
 import {useThemeStore} from "~/app/themes/ThemeEditor/ThemeEditor";
-import {reduceDeltasToModel} from "@theme-builder/common/packages/repository/DeltaReducer";
-import Popover from "@theme-builder/common/packages/utils/Popover";
+import { Popover } from "@web/components";
+import {reduceDeltasToModel} from "@web/delta";
 
 export default function ThemeSettings(props: { children?: any, params: { themeId?: string }}) {
 

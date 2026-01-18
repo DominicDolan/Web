@@ -2,8 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "paths": {
-      "@theme-builder/common/*": ["../common/src/*"]
+      "@web/common/*": ["../common/src/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src/**/*"]
 }

@@ -1,8 +1,8 @@
 import {useSubmissions} from "@solidjs/router"
 import {createMemo} from "solid-js"
-import {ColorDefinition} from "@theme-builder/common/models/ColorDefinition";
 import {updateColors, useColorStore} from "~/app/themes/ColorEditor/ColorEditor";
 import {$ZodIssue} from "zod/v4/core";
+import {ColorDefinition} from "~/models/ColorDefinition";
 
 export default function ColorItem(props: { definition: ColorDefinition }) {
 
