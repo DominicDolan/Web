@@ -1,7 +1,6 @@
 import {A, useNavigate} from "@solidjs/router";
 import {createMemo, For, Show} from "solid-js";
 import {useThemeStore} from "~/app/themes/ThemeEditor/ThemeEditor";
-import { Popover } from "@web/components";
 import {reduceDeltasToModel} from "@web/delta";
 
 export default function ThemeSettings(props: { children?: any, params: { themeId?: string }}) {
@@ -71,23 +70,17 @@ export default function ThemeSettings(props: { children?: any, params: { themeId
                 <section sizing={"w-full"} flex={"col gap-4"} spacing={"mb-8"}>
                     <hgroup flex={"row center space-between"}>
                         <h2>Theme Settings</h2>
-                        <Popover
-                            placement="bottom-end"
-                            activator={(activatorProps) => (
-                                <button
-                                    class={"text"}
-                                    {...activatorProps}
-                                    flex={"row center"}
-                                    spacing={"pa-2"}
-                                    aria-label="Theme settings menu">
-                                    <i>more_vert</i>
-                                </button>)
-                        }>
-                            <ul class={"menu"}>
-                                <li onClick={onDeleteClick} flex={"row gap-2 center"}><i>delete</i>Delete</li>
-                            </ul>
-                        </Popover>
-
+                        <button
+                            class={"text"}
+                            popovertarget={"theme-settings-menu"}
+                            flex={"row center"}
+                            spacing={"pa-2"}
+                            aria-label="Theme settings menu">
+                            <i>more_vert</i>
+                        </button>
+                        <ul id={"theme-settings-menu"} popover role={"menu"} position-area={"[span-right,bottom]"}>
+                            <li onClick={onDeleteClick} flex={"row gap-2 center"}><i>delete</i>Delete</li>
+                        </ul>
                     </hgroup>
                     <form-field flex={"col gap-2"}>
                         <label>Name</label>

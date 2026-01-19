@@ -1,5 +1,5 @@
 
-type LayoutAttributeNames = "flex" | "grid" | "grid-area" | "grid-row" | "grid-col" | "spacing" | "sizing" | "display"
+type LayoutAttributeNames = "flex" | "grid" | "grid-area" | "grid-row" | "grid-col" | "spacing" | "sizing" | "display" | "position"
 
 export interface LayoutAttributes extends Partial<Record<LayoutAttributeNames, string | boolean>> {}
 

@@ -69,7 +69,7 @@
         }
     }
 
-    ul.menu {
+    ul.menu, ul[role="menu"] {
         list-style: none;
 
         border-radius: 0.5rem;

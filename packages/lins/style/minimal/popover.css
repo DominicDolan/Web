@@ -1,32 +1,14 @@
 
 @layer base {
-    popover-host {
-        position: relative;
-    }
+    [popover][role="menu"], [popover].menu {
+        position: fixed;
+        margin: 0;
+        border: none;
 
-    [popover][role="menu"] {
-        position: absolute;
-        right: 0;
-        top: 0;
-    }
-
-    @supports (position-anchor: --a) and (anchor-name: --a) {
-        [popover][role="menu"] {
-            position: fixed; /* commonly used with popovers */
-            right: auto;
-            top: auto;
-
-            inset-block-start: anchor(bottom);
-            inset-inline-end: anchor(right);
-            margin-block-start: 0.25rem;
-
+        &::backdrop {
+            background: transparent;
         }
     }
 
-
-
-    [popover][role="menu"]::backdrop {
-        background: transparent;
-    }
 
 }
