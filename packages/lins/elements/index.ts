@@ -21,6 +21,7 @@ const bareElementTags = [
     "form-field",
     "popover-host",
     "popover-activator",
+    "window-group"
 ] as const
 export type BareElementTag = typeof bareElementTags[number];
 defineBareElements(
@@ -41,6 +42,7 @@ declare module 'solid-js' {
             ["form-field"]: any
             ["popover-host"]: any
             ["popover-activator"]: any
+            ["window-group"]: any
         }
     }
 }

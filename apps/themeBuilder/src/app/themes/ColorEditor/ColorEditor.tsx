@@ -2,7 +2,7 @@ import {
     action,
     createAsync,
     json,
-    query,
+    query, RoutePreloadFuncArgs,
     RouteSectionProps,
     useAction,
     useSubmission
@@ -99,6 +99,15 @@ export const [useColorStore] = createContextStore(withDeltaAdapter((params: Delt
         pushColorDelta: params.push,
     }
 }))
+
+export const preloadColors = (args: RoutePreloadFuncArgs) => {
+    const themeId = args.params.themeId
+    if (themeId == null) return
+
+    colorQuery(themeId)
+
+    return undefined
+}
 
 export default function ColorEditor(props: RouteSectionProps<undefined>) {
 

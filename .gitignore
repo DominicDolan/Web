@@ -2,10 +2,10 @@
 /.idea/
 /.vinxi/
 /node_modules/
+**/node_modules/
 /data/
 package-lock.json
 bun.lock
 /.wrangler/
 /apps/**/.wrangler/
 /apps/**/.output/
-/apps/**/node_modules/

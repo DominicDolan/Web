@@ -115,7 +115,7 @@ export default function ThemeEditor(props: { children?: any }) {
     return <Suspense>
         <DeltaContextProvider deltas={themeDeltas()} useStore={useThemeStore}>
             {(store) => <div grid-cols={"[14rem,20rem,1fr]"} sizing={"w-full h-full"}>
-                    <NavBarTemplate>
+                    <NavBarTemplate class={"themeEditor"}>
                         <div sizing={"w-full"} flex={"col gap-6"}>
                             <AddThemeButton/>
                             <ul class="nav" flex={"col gap-4"} sizing={"w-full"} spacing={"pl-0"}>

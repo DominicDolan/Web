@@ -39,5 +39,6 @@ export const flex: Rule[] = [
     ['flex-stretch', { 'align-items': 'stretch' }],
     ['flex-space-around', { 'justify-content': 'space-around' }],
     ['flex-space-between', { 'justify-content': 'space-between' }],
+    ['flex-justify-center', { 'justify-content': 'center' }],
 
 ]

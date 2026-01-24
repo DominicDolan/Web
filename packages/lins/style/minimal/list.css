@@ -2,6 +2,9 @@
 
 @layer base {
     ul {
+        --active-color: var(--primary-color);
+        --on-active-color: var(--on-primary-color);
+
         --current-color: var(--active-color, var(--primary-color));
         --on-current-color: var(--on-active-color, var(--on-primary-color));
         padding: 0;
@@ -90,6 +93,36 @@
 
         &:hover {
             background: color-mix(in oklab, var(--surface-color) 90%, currentColor);
+        }
+    }
+
+    ul.tabs {
+        position: relative;
+        anchor-scope: all;
+
+        --underline-color: var(--active-color, var(--primary-color));
+        & > li {
+            padding-inline: 0.6rem;
+            padding-block: 0.4rem;
+            cursor: pointer;
+
+            &.active, &:has(.active) {
+                anchor-name: --active;
+            }
+        }
+
+        ::after {
+            transition-property: left, right;
+            transition-duration: 0.2s;
+            transition-timing-function: ease-in-out;
+            position: absolute;
+            bottom: 0;
+            content: "";
+            height: 2px;
+            background: var(--underline-color);
+            position-anchor: --active;
+            left: anchor(left);
+            right: anchor(right);
         }
     }
 }

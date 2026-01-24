@@ -1,4 +1,4 @@
-import {A, useNavigate} from "@solidjs/router";
+import {A, useNavigate, useLocation} from "@solidjs/router";
 import {createMemo, For, Show} from "solid-js";
 import {useThemeStore} from "~/app/themes/ThemeEditor/ThemeEditor";
 import {reduceDeltasToModel} from "@web/delta";
@@ -49,7 +49,6 @@ export default function ThemeSettings(props: { children?: any, params: { themeId
         flushSaveAction()
         navigate("/editor", { replace: true })
     }
-
 
     return <>
         <Show when={theme() != null} fallback={<skeleton-loader class={"themeSettings"} flex={"col gap-8"} spacing={"pa-8"}>
@@ -102,17 +101,23 @@ export default function ThemeSettings(props: { children?: any, params: { themeId
                 <section sizing={"w-full"} flex={"col gap-4"} spacing={"mt-10 mb-8"}>
                     <h2 spacing={"mb-2"}>Edit Theme</h2>
                     <ul class={"plain"} flex={"col"}>
-                        <li flex={"row space-between"}>
-                            <A href={"/editor"}>Edit Colors</A>
-                            <i>keyboard_arrow_right</i>
+                        <li>
+                            <A flex={"row space-between"} href={`/editor/${props.params.themeId}/colors`}>
+                                <span>Edit Colors</span>
+                                <i>keyboard_arrow_right</i>
+                            </A>
                         </li>
-                        <li flex={"row space-between"}>
-                            <A href={"/editor2"}>Edit Fonts</A>
-                            <i>keyboard_arrow_right</i>
+                        <li>
+                            <A flex={"row space-between"} href={`/editor/${props.params.themeId}/fonts`}>
+                                <span>Edit Fonts</span>
+                                <i>keyboard_arrow_right</i>
+                            </A>
                         </li>
-                        <li flex={"row space-between"}>
-                            <A href={"/editor3"}>Edit Elements</A>
-                            <i>keyboard_arrow_right</i>
+                        <li>
+                            <A flex={"row space-between"} href={`/editor/${props.params.themeId}/elements`}>
+                                <span>Edit Elements</span>
+                                <i>keyboard_arrow_right</i>
+                            </A>
                         </li>
                     </ul>
                 </section>

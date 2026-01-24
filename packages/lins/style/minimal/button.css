@@ -1,6 +1,9 @@
 
 @layer base {
     button {
+        --active-color: var(--primary-color);
+        --on-active-color: var(--on-primary-color);
+
         display: inline-block;
         font-weight: 500;
         text-align: center;
@@ -28,7 +31,7 @@
 }
 
 @layer elements {
-    button, .outlined {
+    button, button.outlined {
         --current-color: var(--active-color, var(--primary-color));
         color: var(--current-color);
         background: transparent;
@@ -55,7 +58,7 @@
     button.flat {
 
         &:hover, &:focus-visible {
-            background: oklab(from var(--current-color) calc(l + 0.15) a b);;
+            background: color-mix(in oklab, var(--on-current-color) 15%, var(--current-color));
         }
     }
 
@@ -87,5 +90,10 @@
         &:hover {
             background-color: color-mix(in oklab, var(--current-color) 15%, transparent);
         }
+    }
+
+    button.icon {
+        border-radius: 50%;
+        aspect-ratio: 1;
     }
 }
