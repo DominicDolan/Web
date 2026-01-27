@@ -108,8 +108,6 @@ async function loadSchemaModulesFromDir(dir: string, oldSchemas: Map<string, str
 
         // Look for exported schemas (variables ending with "Schema")
         for (const [exportName, exportValue] of Object.entries(mod)) {
-            if (!exportName.endsWith("Schema")) continue
-
             const schema = exportValue as any
             if (!schema || typeof schema !== "object") continue
 

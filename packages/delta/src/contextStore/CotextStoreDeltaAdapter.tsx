@@ -1,7 +1,7 @@
 import {Show, splitProps} from "solid-js";
 import {Model, ModelDelta} from "@web/schema";
 import {createModelStore, ModelStoreFunctions, ModelStorePush} from "../store/ModelStore";
-import {UseContextStore} from "./ContextStore";
+import {createContextStore, UseContextStore} from "./ContextStore";
 
 type InferModelFromProps<P> =
     P extends { deltas: Record<string, ModelDelta<infer MM>[]> } ? MM : never
@@ -54,5 +54,13 @@ export function DeltaContextProvider<
             </UseStoreComponent>
         </props.useStore.Provider>
     </Show>
+}
+
+export function createContextStoreWithDeltaAdapter<
+    Props extends {deltas: Record<string, ModelDelta<M>[]>},
+    Return,
+    M extends Model = InferModelFromProps<Props>,
+>(setup: (params: DeltaAdapterParams<Props, M>) => Return) {
+    return createContextStore(withDeltaAdapter(setup))
 }
 

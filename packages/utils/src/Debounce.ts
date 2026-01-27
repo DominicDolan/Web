@@ -61,7 +61,7 @@ export type DebouncedFunction<T extends (...args: any[]) => any> = {
  *
  * @since 1.0.0
  */
-function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: any[]) => any>(
     func: T,
     wait: number = 0,
     options: DebounceOptions = {}
@@ -193,4 +193,3 @@ function debounce<T extends (...args: any[]) => any>(
     return debounced;
 }
 
-export default debounce;

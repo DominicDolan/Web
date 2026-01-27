@@ -1,4 +1,4 @@
-import debounce, {DebouncedFunction, DebounceOptions} from "./Debounce"
+import {debounce, DebouncedFunction, DebounceOptions} from "./Debounce"
 
 
 export type KeyedDebouncedFunction<T extends (...args: any[]) => any> = {

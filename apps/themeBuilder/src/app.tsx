@@ -20,10 +20,7 @@ export default function App() {
                     <Route path={"/colors"} component={ColorEditor} preload={preloadColors}/>
                 </Route>
             </Route>
-            <Route path={"/editor/:themeId/elements"} component={ElementsEditor}>
-                <Route path={"/"} component={() => <Navigate href={"inputs"}/>}/>
-                <Route path={"/inputs"} component={Inputs}/>
-            </Route>
+            <Route path={"/editor/:themeId/elements"} component={ElementsEditor}></Route>
             <Route path={"/contact"} component={ContactUs} info={{title: "Contact Us"}}/>
         </Router>
     )

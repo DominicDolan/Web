@@ -17,6 +17,30 @@ export function useTabs() {
         }
     })
 
+    function onChangeTab(value: number) {
+        if (activeValue() === value) return
+
+        const oldValue = activeValue()
+
+        const targetTransition = value > oldValue ? "slide-right" : "slide-left"
+
+        const oldName = windowElement?.style.viewTransitionName
+        if (windowElement != null) {
+            windowElement.style.viewTransitionName = targetTransition
+        }
+        if (document.startViewTransition != null) {
+            document.startViewTransition(() => {
+                setActiveTab(value)
+            }).finished.then(() => {
+                if (windowElement != null) {
+                    windowElement.style.viewTransitionName = oldName ?? "none"
+                }
+            })
+        } else {
+            setActiveTab(value)
+        }
+    }
+
     return {
         matches(value: number) {
             return activeValue() === value
@@ -25,29 +49,12 @@ export function useTabs() {
             return {
                 class: activeValue() === value ? "active" : "",
                 onClick(){
-                    if (activeValue() === value) return
-
-                    const oldValue = activeValue()
-
-                    const targetTransition = value > oldValue ? "slide-right" : "slide-left"
-
-                    const oldName = windowElement?.style.viewTransitionName
-                    if (windowElement != null) {
-                        windowElement.style.viewTransitionName = targetTransition
-                    }
-                    if (document.startViewTransition != null) {
-                        document.startViewTransition(() => {
-                            setActiveTab(value)
-                        }).finished.then(() => {
-                            if (windowElement != null) {
-                                windowElement.style.viewTransitionName = oldName ?? "none"
-                            }
-                        })
-                    } else {
-                        setActiveTab(value)
-                    }
+                    onChangeTab(value)
                 }
             }
+        },
+        setActive(value: number) {
+            onChangeTab(value)
         },
         value: activeValue,
         windowProps

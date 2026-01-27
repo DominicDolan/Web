@@ -1,48 +1,54 @@
 import ElementsTemplate from "~/app/elements/components/ElementsTemplate";
 import ElementCssEditor from "~/app/elements/components/ElementCssEditor";
-import {createMemo, createSignal} from "solid-js";
+import {ElementStyleDefinition} from "~/models/ElementStyleDefinition";
+import {useElementStyleStore} from "~/app/elements/repository/ElementStyleStore";
+import {debounce} from "@web/utils";
 
 
-export function Inputs() {
+export function Inputs(props: { styles: ElementStyleDefinition[] }) {
+    const { updateCss } = useElementStyleStore()
 
-    const [tab, setTab] = createSignal(null as string | null)
+    const debouncedUpdateCss = debounce(updateCss, 1000)
 
-    const [css, setCss] = createSignal("")
+    function onCssChanged(value: string, style: ElementStyleDefinition) {
+        const lines = value.split('\n');
+        const trimmedValue = lines.slice(1, -1).join('\n');
 
-    const cssContents = createMemo(() => {
-
-    })
-    function onChange(value: string) {
-        console.log(value)
+        debouncedUpdateCss(style.id, trimmedValue)
     }
+
     return <div class={"surface"} flex={"col gap-8"}>
         <div spacing={"mx-8"}>
             <h3>Text Inputs</h3>
             <ElementsTemplate
-                variants={["Filled"]}
-                controls={(variant) => <>
+                styles={props.styles}
+                controls={(style) => <>
                         <div grid="cols-[1fr]" spacing="my-4">
-                            <ElementCssEditor selector={`.${variant.toLowerCase()}`} onChange={onChange}/>
+                            <ElementCssEditor
+                                selector={`.${style.variant}`}
+                                content={style.css}
+                                onChange={(value) => onCssChanged(value, style)}/>
                         </div>
                     </>}
-                example={
+                example={(style) => <>
                 <div flex={"col gap-4"}>
                     <div>
                         <div grid={"cols-[1fr,1fr]"}>
-                            <input class={"filled"}/>
-                            <input class={"filled"}/>
+                            <input class={style.variant}/>
+                            <input class={style.variant}/>
                         </div>
                     </div>
                     <div>
                         <div grid={"cols-[1fr,1fr]"}>
                             <form-field flex={"col gap-2"}>
                                 <label>Label</label>
-                                <input class={"filled"}/>
+                                <input class={style.variant}/>
                                 <feedback-message>Validation message</feedback-message>
                             </form-field>
                         </div>
                     </div>
-                </div>}
+                </div>
+                </>}
             />
         </div>
     </div>
