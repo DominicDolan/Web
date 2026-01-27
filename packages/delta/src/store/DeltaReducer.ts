@@ -1,5 +1,4 @@
-import {Model, ModelData, PartialModel} from "../models/Model";
-import {ModelDelta} from "../models/ModelDelta";
+import {Model, ModelData, PartialModel, ModelDelta} from "@web/schema";
 
 
 export function reduceMixedDeltas<M extends Model>(deltas: ModelDelta<M>[]): Record<string, Partial<M>> {

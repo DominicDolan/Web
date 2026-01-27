@@ -1,5 +1,4 @@
-import {Model} from "../models/Model";
-import {ModelDelta} from "../models/ModelDelta";
+import {Model, ModelDelta} from "@web/schema";
 
 export function sliceArrayAfter<M extends Model>(deltas: ModelDelta<M>[], timestamp: number) {
     if (deltas.length === 0) {

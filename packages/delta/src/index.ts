@@ -2,10 +2,6 @@
 export * from './contextStore/ContextStore';
 export * from './contextStore/CotextStoreDeltaAdapter';
 
-// Models
-export * from './models/Model';
-export * from './models/ModelDelta';
-
 // Store
 export * from './store/DeltaGenerator';
 export * from './store/DeltaMerger';

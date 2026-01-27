@@ -1,6 +1,5 @@
 import {isEqual} from "@web/utils"
-import {Model} from "../models/Model";
-import {ModelDelta} from "../models/ModelDelta";
+import {Model, ModelDelta} from "@web/schema";
 
 /**
  * Calculates the difference between two model instances and returns a delta object

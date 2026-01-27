@@ -1,0 +1,5 @@
+
+
+:global(.cm-focused) {
+    outline: none !important;
+}

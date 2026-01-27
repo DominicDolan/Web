@@ -17,18 +17,18 @@
         --current-color: var(--active-color, var(--primary-color));
         --on-current-color: var(--on-active-color, var(--on-primary-color));
 
-        &, &.flat, &.elevated {
+        :where(&), &.flat, &.elevated {
             background-color: var(--surface-color);
             color: var(--on-surface-color);
         }
 
-        &, &.elevated {
+        :where(&), &.elevated {
             box-shadow:
                     0 8px 12px -1px var(--shadow-color),
                     0 4px 6px -1px var(--shadow-color);
         }
 
-        & &, &.outlined {
+        :where(& &), &.outlined {
             border: 1px solid color-mix(in oklab, var(--current-color) 50%, transparent);
             box-shadow: none;
         }
@@ -38,6 +38,12 @@
             background-color: color-mix(in oklab, var(--current-color) 20%, transparent);
             color: var(--current-color);
             box-shadow: none;
+        }
+
+        &.inset {
+            background-color: var(--background-color);
+            box-shadow: inset 0 2px 4px -1px var(--shadow-color),
+            inset 0 1px 2px -1px var(--shadow-color);
         }
     }
 }

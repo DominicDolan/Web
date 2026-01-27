@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {calculateDelta} from "./DeltaGenerator";
-import {Model} from "../models/Model";
+import {Model} from "@web/schema";
 
 // Assuming the types and function are imported from your module
 // import { calculateDelta, Model, ModelDelta } from './your-module';

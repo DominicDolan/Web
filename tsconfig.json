@@ -14,7 +14,6 @@
     "isolatedModules": true,
     "paths": {
       "~/*": ["./apps/web/src/*"],
-      "@web/common/*": ["./packages/common/src/*"],
       "@web/d1/*": ["./packages/d1/src/*"]
     }
   }

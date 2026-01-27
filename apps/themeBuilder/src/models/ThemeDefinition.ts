@@ -1,6 +1,6 @@
 import {z} from "zod";
 import {createModelSchema} from "@web/d1";
-import {modelSchema} from "@web/delta";
+import {modelSchema} from "@web/schema";
 
 export const themeDefinitionSchema = modelSchema.extend({
     name: z.string().trim(),

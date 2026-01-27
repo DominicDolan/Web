@@ -87,6 +87,16 @@
 
     }
 
+    code {
+        background-color: color-mix(in oklab, var(--on-surface-color) 15%, var(--surface-color));
+        border-radius: 6px;
+        padding: 0.25rem;
+
+        &:focus-within {
+            outline: color-mix(in oklab, currentColor 25%, var(--surface-color)) 2px solid;
+        }
+    }
+
     li {
         list-style-type: none;
     }

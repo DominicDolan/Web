@@ -1,12 +1,10 @@
-import {defineConfig, transformerAttributifyJsx} from "unocss"
-import presetAttributify from '@unocss/preset-attributify'
+import {defineConfig, presetAttributify, transformerAttributifyJsx} from "unocss"
 import {layoutPreset} from "@web/lins/layout"
 
 export default defineConfig({
     rules: [],
     presets: [
         layoutPreset,
-        // @ts-ignore
         presetAttributify()
     ],
     transformers: [

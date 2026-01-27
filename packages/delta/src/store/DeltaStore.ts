@@ -1,9 +1,9 @@
 import {createStore, produce} from "solid-js/store"
-import {createEvent, createKeyedEvent, EventListener, KeyedEventListener} from "@web/utils"
+import {createKeyedEvent, EventListener, KeyedEventListener} from "@web/utils"
 import {createId} from "@paralleldrive/cuid2";
-import {Model, ModelData} from "../models/Model";
-import {ModelDelta} from "../models/ModelDelta";
+import {Model, ModelData, ModelDelta} from "@web/schema";
 import {deltaArrayToGroup} from "./DeltaReducer";
+import {createEvent} from "@web/utils"
 
 export type DeltaStore<M extends Model> = readonly [
     {

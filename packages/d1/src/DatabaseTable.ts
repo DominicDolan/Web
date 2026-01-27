@@ -1,16 +1,15 @@
-import {getRequestEvent} from "solid-js/web";
-import {isDevelopment} from "@web/utils";
 import {z, ZodType} from "zod";
-import {Model, ModelData, ModelDelta} from "@web/delta";
+import {Model, ModelData, ModelDelta} from "@web/schema";
 
 async function getDB(): Promise<D1Database> {
+    const {getRequestEvent} = await import("solid-js/web")
     const event = getRequestEvent();
     const cloudflareContext = (event as any)?.nativeEvent.context.cloudflare
     if (cloudflareContext != null) {
         return cloudflareContext.env.DB
     }
 
-    if (!isDevelopment()){
+    if (!import.meta.env.DEV){
         throw new Error("DB not found in Cloudflare context (and Wrangler platform proxy is dev-only).")
     }
 

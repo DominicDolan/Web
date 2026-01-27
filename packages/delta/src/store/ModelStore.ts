@@ -1,7 +1,6 @@
 import {createStore, produce, reconcile} from "solid-js/store"
 import {createEvent, createKeyedEvent, EventListener, KeyedEventListener} from "@web/utils"
-import {ModelDelta} from "../models/ModelDelta";
-import {Model, ModelData, PartialModel} from "../models/Model";
+import {Model, ModelData, PartialModel, ModelDelta} from "@web/schema";
 import {createDeltaStore, DeltaStore} from "./DeltaStore";
 import {reduceDeltasOntoModel, reduceDeltasToModel} from "./DeltaReducer";
 

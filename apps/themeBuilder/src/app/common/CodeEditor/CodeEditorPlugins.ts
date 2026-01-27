@@ -104,3 +104,11 @@ export function highlightReadOnlyLines(lines: number[], cssClass: string): Exten
         }
     );
 }
+
+export function onChangeExtension(cb: (value: string, view: EditorView) => void) {
+    return EditorView.updateListener.of((update) => {
+        if (!update.docChanged) return;
+        const value = update.state.doc.toString();
+        cb(value, update.view);
+    });
+}

@@ -9,10 +9,10 @@ import {
     createContextStore, createDeltaStoreTimestampMarker,
     createModelStore, DeltaAdapterParams,
     deltaArrayToGroup, DeltaContextProvider,
-    ModelDelta,
     squashDeltasToSingle, withDeltaAdapter
 } from "@web/delta";
 import {useDatabaseTable} from "@web/d1";
+import {ModelDelta} from "@web/schema";
 
 const getThemes = query(async () => {
     "use server"

@@ -1,6 +1,6 @@
 import {createStore} from "solid-js/store";
 import {batch} from "solid-js";
-import {Model} from "../models/Model";
+import {Model} from "@web/schema";
 import {DeltaStore} from "./DeltaStore";
 import {ModelStore} from "./ModelStore";
 

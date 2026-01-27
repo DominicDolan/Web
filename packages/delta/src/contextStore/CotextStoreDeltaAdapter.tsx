@@ -1,6 +1,5 @@
 import {Show, splitProps} from "solid-js";
-import {ModelDelta} from "../models/ModelDelta";
-import {Model} from "../models/Model";
+import {Model, ModelDelta} from "@web/schema";
 import {createModelStore, ModelStoreFunctions, ModelStorePush} from "../store/ModelStore";
 import {UseContextStore} from "./ContextStore";
 

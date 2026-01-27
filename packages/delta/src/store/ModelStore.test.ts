@@ -1,6 +1,6 @@
 import {describe, expect, test} from "vitest"
 import {createModelStore} from "./ModelStore";
-import {Model} from "../models/Model";
+import {Model} from "@web/schema";
 
 interface TestModel extends Model {
     name: string

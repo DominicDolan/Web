@@ -5,7 +5,7 @@ import ContactUs from "~/app/contact/ContactUs/ContactUs"
 import ThemeEditor from "~/app/themes/ThemeEditor/ThemeEditor"
 import ThemeSettings from "~/app/themes/ThemeEditor/ThemeSettings";
 import ColorEditor, {preloadColors} from "~/app/themes/ColorEditor/ColorEditor";
-import ElementsEditor from "~/app/themes/ElementsEditor/ElementsEditor";
+import ElementsEditor from "~/app/elements/ElementsEditor";
 import {Inputs} from "~/app/elements/Inputs/Inputs";
 
 export default function App() {

@@ -11,8 +11,9 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@web/common": "*",
-    "tsx": "^4.21.0"
+    "@web/utils": "*",
+    "tsx": "^4.21.0",
+    "zod": "4.3.6"
   },
   "devDependencies": {
     "@types/node": "25.0.9",

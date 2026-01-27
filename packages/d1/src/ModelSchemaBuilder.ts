@@ -1,6 +1,6 @@
 import { parseCreateTable, diffSchemas, generateAlterStatements } from "./SchemaDiffer";
 import { getSchemaContext } from "./SchemaContext";
-import {Model} from "@web/delta";
+import {Model} from "@web/schema";
 
 type ForeignKey = {
     column: string

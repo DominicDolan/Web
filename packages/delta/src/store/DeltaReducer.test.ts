@@ -1,6 +1,5 @@
 import {expect, test, describe} from "vitest"
-import {Model} from "../models/Model";
-import {ModelDelta} from "../models/ModelDelta";
+import {Model, ModelDelta} from "@web/schema";
 import {reduceDeltasToModelAfter, squashDeltasToSingle} from "./DeltaReducer";
 
 

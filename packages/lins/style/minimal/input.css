@@ -55,11 +55,13 @@ input-shell {
 }
 
 @layer elements {
-    input:not([type=radio]):not([type=checkbox]):not([type=range]), textarea, select, input-shell {
-        &, &.outlined {
-            --outline-color: oklab(from var(--current-color) 70% a b);
-            outline: 1px solid var(--outline-color);
-            background-color: transparent;
+    @scope (body) to (.elementsPreview) {
+        input:not([type=radio]):not([type=checkbox]):not([type=range]), textarea, select, input-shell {
+            &, &.outlined {
+                --outline-color: oklab(from var(--current-color) 70% a b);
+                outline: 1px solid var(--outline-color);
+                background-color: transparent;
+            }
         }
     }
 }
