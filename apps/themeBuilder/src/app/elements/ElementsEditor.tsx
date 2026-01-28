@@ -2,7 +2,7 @@ import {A, createAsync, RouteSectionProps, useNavigate} from "@solidjs/router";
 import NavBarTemplate from "~/app/common/NavBarTemplate";
 import {useElementStyleStore} from "~/app/elements/repository/ElementStyleStore";
 import {DeltaContextProvider} from "@web/delta";
-import {getElementStyles} from "~/app/elements/repository/ElementStyleRepository";
+import {getElementStylesQuery} from "~/app/elements/repository/ElementStyleRepository";
 import {Inputs} from "~/app/elements/Inputs/Inputs";
 
 
@@ -11,7 +11,7 @@ export default function ElementsEditor(props: RouteSectionProps<undefined>) {
     const themeId = props.params.themeId
     const elementStyleDeltas = createAsync(async () => {
         if (themeId == null) return undefined
-        return getElementStyles(themeId)
+        return getElementStylesQuery(themeId)
     })
 
     const navigate = useNavigate()

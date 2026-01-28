@@ -92,6 +92,21 @@
         }
     }
 
+    button.plain {
+        --current-color: var(--active-color, var(--primary-color));
+        --on-current-color: var(--on-active-color, var(--on-primary-color));
+        color: oklab(from var(--current-color) l a b / 0.6);
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+        transition: color 0.15s ease-in-out;
+
+        &:hover {
+            background-color: transparent;
+            color: var(--current-color);
+        }
+    }
+
     button.icon {
         border-radius: 50%;
         aspect-ratio: 1;

@@ -16,15 +16,20 @@ function CreateVariantButton(props: { onCreateVariant: (variantName: string) => 
         queueMicrotask(() => inputRef?.focus())
     }
 
-    function commit() {
-        console.log("commiting")
+    function commit(e: SubmitEvent) {
+        e.preventDefault()
         const name = draftName().trim()
         if (!name) {
-            setIsEditing(false)
+            setTimeout(() => {
+                setIsEditing(false)
+            })
             return
         }
         props.onCreateVariant(name)
-        setIsEditing(false)
+
+        setTimeout(() => {
+            setIsEditing(false)
+        })
     }
 
     function cancel() {
@@ -36,9 +41,9 @@ function CreateVariantButton(props: { onCreateVariant: (variantName: string) => 
             <Show
                 when={isEditing()}
                 fallback={
-                    <button flex={"row gap-1 center"} spacing={"px-2 py-1"} type="button" onClick={startEditing}>
+                    <button class={"plain"} flex={"row gap-1 center"} spacing={"px-2 py-1"} type="button" onClick={startEditing}>
                         <i>add</i>
-                        <span>Add Variant</span>
+                        <span>Add</span>
                     </button>
                 }
             >
@@ -48,9 +53,9 @@ function CreateVariantButton(props: { onCreateVariant: (variantName: string) => 
                         type="text"
                         value={draftName()}
                         onInput={e => setDraftName(e.currentTarget.value)}
+                        onBlur={cancel}
                         placeholder="New variant name"
                     />
-
                 </form>
             </Show>
         </div>
@@ -82,7 +87,10 @@ function VariantTabs(props: { styles: ElementStyleDefinition[], tabProps: (index
 
     function commitEdit() {
         const idx = editingIndex()
-        if (idx == null) return
+        if (idx == null) {
+            setEditingIndex(null)
+            return
+        }
         onNameChange(idx, draftName())
         setEditingIndex(null)
     }
@@ -155,35 +163,33 @@ export default function ElementsTemplate(props: {
 
     return (
         <div sizing={"h-full"}>
-            <div>
-                <Show
-                    when={hasVariants()}
-                    fallback={
-                        <CreateVariantButton onCreateVariant={addVariant}/>
-                    }
-                >
-                    <div flex={"row gap-16 center"}>
-                        <div>
-                            <VariantTabs styles={props.styles} tabProps={tabProps}/>
-                        </div>
+            <Show
+                when={hasVariants()}
+                fallback={
+                    <CreateVariantButton onCreateVariant={addVariant}/>
+                }
+            >
+                <div>
+                    <div flex={"row gap-2 center"} sizing="min-h-4rem">
+                        <VariantTabs styles={props.styles} tabProps={tabProps}/>
                         <CreateVariantButton onCreateVariant={addVariant}/>
                     </div>
-                    <window-group {...windowProps}>
-                        <Show when={hasVariants()}>
+                    <window-group grid-cols="[1fr,1fr]" gap="4" {...windowProps}>
+                        <section>
+                            <hgroup flex={"row gap-2 center"} spacing={"my-2"}><i>code</i><h4>CSS Properties</h4></hgroup>
                             {props.controls(props.styles[value()])}
-                        </Show>
+                        </section>
+                        <section>
+                            <hgroup flex={"row gap-2 center"} spacing={"my-2"}><i>photo_frame</i><h4>Live Preview</h4></hgroup>
+                            <article class={"elementsPreview inset"} sizing={"h-full"}>
+                                <article class={"elevated"} spacing={"mx-auto"} sizing={"w-fit"}>
+                                    {props.example(props.styles[value()])}
+                                </article>
+                            </article>
+                        </section>
                     </window-group>
-                </Show>
-            </div>
-            <div>
-            <article class={"elementsPreview inset"}>
-                    <article class={"elevated"} spacing={"mx-auto"} sizing={"w-fit"}>
-                        <Show when={hasVariants()}>
-                            {props.example(props.styles[value()])}
-                        </Show>
-                    </article>
-                </article>
-            </div>
+                </div>
+            </Show>
         </div>
     )
 }

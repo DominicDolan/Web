@@ -6,15 +6,17 @@ import {debounce} from "@web/utils";
 
 
 export function Inputs(props: { styles: ElementStyleDefinition[] }) {
-    const { updateCss } = useElementStyleStore()
+    const { updateCss, save } = useElementStyleStore()
 
     const debouncedUpdateCss = debounce(updateCss, 1000)
+    const debouncedSave = debounce(save, 4000)
 
     function onCssChanged(value: string, style: ElementStyleDefinition) {
         const lines = value.split('\n');
         const trimmedValue = lines.slice(1, -1).join('\n');
 
         debouncedUpdateCss(style.id, trimmedValue)
+        debouncedSave(style.id)
     }
 
     return <div class={"surface"} flex={"col gap-8"}>
@@ -23,11 +25,11 @@ export function Inputs(props: { styles: ElementStyleDefinition[] }) {
             <ElementsTemplate
                 styles={props.styles}
                 controls={(style) => <>
-                        <div grid="cols-[1fr]" spacing="my-4">
+                        <div grid="cols-[1fr]" sizing="h-full">
                             <ElementCssEditor
                                 selector={`.${style.variant}`}
                                 content={style.css}
-                                onChange={(value) => onCssChanged(value, style)}/>
+                                onChange={(value) => onCssChanged(value, style)} onBlur={() => save(style.id)}/>
                         </div>
                     </>}
                 example={(style) => <>

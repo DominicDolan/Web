@@ -10,7 +10,7 @@ import {action, json, query} from "@solidjs/router";
 import {zodResponse} from "@web/utils";
 import {ModelDelta} from "@web/schema";
 
-export const getElementStyles = query(async (themeId: string) => {
+export const getElementStylesQuery = query(async (themeId: string) => {
     "use server"
     const db = useDatabaseTable(elementStyleDefinition)
 
@@ -19,7 +19,7 @@ export const getElementStyles = query(async (themeId: string) => {
     return deltaArrayToGroup(definitions)
 }, "getElementStyles")
 
-export const updateElementStyle = action(async (delta: ModelDelta<ElementStyleDefinition>, themeId) => {
+export const updateElementStyleAction = action(async (delta: ModelDelta<ElementStyleDefinition>, themeId: string) => {
     "use server"
     const db = useDatabaseTable(elementStyleDefinition)
 

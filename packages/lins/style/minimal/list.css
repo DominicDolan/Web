@@ -100,14 +100,22 @@
         position: relative;
         anchor-scope: all;
 
-        --underline-color: var(--active-color, var(--primary-color));
+        --underline-color: var(--current-color, var(--primary-color));
+        color: oklab(from var(--current-color) l a b / 0.6);
+
         & > li {
             padding-inline: 0.6rem;
             padding-block: 0.4rem;
             cursor: pointer;
+            transition: color 0.15s ease-in-out;
 
             &.active, &:has(.active) {
+                color: var(--current-color);
                 anchor-name: --active;
+            }
+
+            &:hover:not(.active):not(:has(.active)) {
+                color: var(--current-color);
             }
         }
 

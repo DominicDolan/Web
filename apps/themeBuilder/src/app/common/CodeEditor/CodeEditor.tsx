@@ -9,7 +9,7 @@ function toExtensionArray(ext?: Extension | readonly Extension[]): readonly Exte
     return Array.isArray(ext) ? ext : [ext];
 }
 
-export default function CodeEditor(props: ConstructorParameters<typeof EditorView>[0] & { onChange?: (value: string) => void}) {
+export default function CodeEditor(props: ConstructorParameters<typeof EditorView>[0] & { onChange?: (value: string) => void, onBlur?: () => void}) {
 
     let ref: HTMLElement | undefined
 
@@ -23,6 +23,13 @@ export default function CodeEditor(props: ConstructorParameters<typeof EditorVie
                 autocompletion(),
                 closeBrackets(),
                 props.onChange ? onChangeExtension(props.onChange) : [],
+                props.onBlur
+                    ? EditorView.domEventHandlers({
+                        blur: (_event, v) => {
+                            props.onBlur?.();
+                        }
+                    })
+                    : [],
                 ...toExtensionArray(props?.extensions)
             ],
         })

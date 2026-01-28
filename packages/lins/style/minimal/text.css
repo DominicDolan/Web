@@ -88,7 +88,7 @@
     }
 
     code {
-        background-color: color-mix(in oklab, var(--on-surface-color) 15%, var(--surface-color));
+        background-color: var(--surface-color);
         border-radius: 6px;
         padding: 0.25rem;
 
