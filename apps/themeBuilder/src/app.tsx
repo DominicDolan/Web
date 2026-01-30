@@ -6,7 +6,6 @@ import ThemeEditor from "~/app/themes/ThemeEditor/ThemeEditor"
 import ThemeSettings from "~/app/themes/ThemeEditor/ThemeSettings";
 import ColorEditor, {preloadColors} from "~/app/themes/ColorEditor/ColorEditor";
 import ElementsEditor from "~/app/elements/ElementsEditor";
-import {Inputs} from "~/app/elements/Inputs/Inputs";
 
 export default function App() {
     return (

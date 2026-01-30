@@ -5,7 +5,7 @@ import {
     squashDeltasToSingle
 } from "@web/delta";
 import {ElementStyleDefinition} from "~/models/ElementStyleDefinition";
-import {ModelDelta} from "@web/schema";
+import {ModelData, ModelDelta} from "@web/schema";
 import {createMemo} from "solid-js";
 import {createId} from "@paralleldrive/cuid2";
 import {updateElementStyleAction} from "~/app/elements/repository/ElementStyleRepository";
@@ -44,19 +44,30 @@ export const [useElementStyleStore] = createContextStoreWithDeltaAdapter((params
         return `${element.element}.${element.variant} { ${element.css} }`
     }
 
+    function addVariant(payload: Partial<ModelData<ElementStyleDefinition>>) {
+        const id = createId()
+        params.push(id, payload)
+        setTimeout(async () => {
+            await save(id)
+        })
+    }
+
     const cssContent = createMemo(() => params.models.map(cssRule).join("\n"))
     return {
         elementStyles: params.models,
-        inputElements,
         addInputVariant(variantName: string) {
-            const id = createId()
-            params.push(id, {
+            addVariant({
                 element: "input",
                 variant: variantName,
                 css: "  border: 1px solid black;"
             })
-            setTimeout(async () => {
-                await save(id)
+        },
+        addButtonVariant(variantName: string) {
+            console.log("adding button variant:")
+            addVariant({
+                element: "button",
+                variant: variantName,
+                css: "  border-radius: 4px;\n  background-color: black;\n  color: white;"
             })
         },
         renameVariant(id: string, variantName: string) {

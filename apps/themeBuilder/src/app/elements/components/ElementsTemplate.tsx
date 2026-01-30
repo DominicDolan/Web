@@ -4,7 +4,7 @@ import {ElementStyleDefinition} from "~/models/ElementStyleDefinition";
 import {useElementStyleStore} from "~/app/elements/repository/ElementStyleStore";
 
 // Simple button that creates a variant with an inline editor
-function CreateVariantButton(props: { onCreateVariant: (variantName: string) => void }) {
+function CreateVariantButton(props: { onCreateVariant: (variantName: string) => void, text?: string }) {
     const [isEditing, setIsEditing] = createSignal(false)
     const [draftName, setDraftName] = createSignal("")
 
@@ -43,7 +43,7 @@ function CreateVariantButton(props: { onCreateVariant: (variantName: string) => 
                 fallback={
                     <button class={"plain"} flex={"row gap-1 center"} spacing={"px-2 py-1"} type="button" onClick={startEditing}>
                         <i>add</i>
-                        <span>Add</span>
+                        <span>{props.text ?? 'Add'}</span>
                     </button>
                 }
             >
@@ -146,14 +146,14 @@ export default function ElementsTemplate(props: {
     example: (style: ElementStyleDefinition) => any,
     controls: (style: ElementStyleDefinition) => any,
     styles: ElementStyleDefinition[],
+    onAddVariant: (name: string) => void,
     onVariantsChange?: (variants: string[]) => void
 }) {
 
     const {tabProps, windowProps, value, setActive} = useTabs()
-    const {addInputVariant} = useElementStyleStore()
 
     function addVariant(name: string) {
-        addInputVariant(name)
+        props.onAddVariant(name)
         setTimeout(() => {
             setActive(props.styles.length - 1)
         })
@@ -165,9 +165,12 @@ export default function ElementsTemplate(props: {
         <div sizing={"h-full"}>
             <Show
                 when={hasVariants()}
-                fallback={
-                    <CreateVariantButton onCreateVariant={addVariant}/>
-                }
+                fallback={<>
+                    <div sizing="h-full w-full" flex={"col center justify-center"}>
+                            <p>No variants yet</p>
+                            <CreateVariantButton onCreateVariant={addVariant} text={"Add Variant"}/>
+                    </div>
+                </>}
             >
                 <div>
                     <div flex={"row gap-2 center"} sizing="min-h-4rem">

@@ -5,8 +5,8 @@ import {useElementStyleStore} from "~/app/elements/repository/ElementStyleStore"
 import {debounce} from "@web/utils";
 
 
-export function Inputs(props: { styles: ElementStyleDefinition[] }) {
-    const { updateCss, save } = useElementStyleStore()
+export function ElementsEditorItems(props: { styles: ElementStyleDefinition[] }) {
+    const { updateCss, save, addInputVariant, addButtonVariant } = useElementStyleStore()
 
     const debouncedUpdateCss = debounce(updateCss, 1000)
     const debouncedSave = debounce(save, 4000)
@@ -20,10 +20,11 @@ export function Inputs(props: { styles: ElementStyleDefinition[] }) {
     }
 
     return <div class={"surface"} flex={"col gap-8"}>
-        <div spacing={"mx-8"}>
-            <h3>Text Inputs</h3>
+        <div spacing={"mx-8 my-6"}>
+            <h3>Input</h3>
             <ElementsTemplate
-                styles={props.styles}
+                styles={props.styles.filter(style => style.element === 'input')}
+                onAddVariant={(name) => { addInputVariant(name) }}
                 controls={(style) => <>
                         <div grid="cols-[1fr]" sizing="h-full">
                             <ElementCssEditor
@@ -37,18 +38,28 @@ export function Inputs(props: { styles: ElementStyleDefinition[] }) {
                     <div>
                         <div grid={"cols-[1fr,1fr]"}>
                             <input class={style.variant}/>
-                            <input class={style.variant}/>
                         </div>
                     </div>
-                    <div>
-                        <div grid={"cols-[1fr,1fr]"}>
-                            <form-field flex={"col gap-2"}>
-                                <label>Label</label>
-                                <input class={style.variant}/>
-                                <feedback-message>Validation message</feedback-message>
-                            </form-field>
+                </div>
+                </>}
+            />
+        </div>
+        <div spacing={"mx-8 my-6"}>
+            <h3>Button</h3>
+            <ElementsTemplate
+                styles={props.styles.filter(style => style.element === 'button')}
+                onAddVariant={(name) => { addButtonVariant(name) }}
+                controls={(style) => <>
+                        <div grid="cols-[1fr]" sizing="h-full">
+                            <ElementCssEditor
+                                selector={`.${style.variant}`}
+                                content={style.css}
+                                onChange={(value) => onCssChanged(value, style)} onBlur={() => save(style.id)}/>
                         </div>
-                    </div>
+                    </>}
+                example={(style) => <>
+                <div flex={"col gap-4"}>
+                    <button class={style.variant}>Button Text</button>
                 </div>
                 </>}
             />

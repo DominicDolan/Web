@@ -22,3 +22,9 @@
         -webkit-font-smoothing: antialiased;
     }
 }
+
+@layer elements {
+    i {
+        font-size: 1.3em;
+    }
+}
