@@ -162,14 +162,14 @@ export default function ElementsTemplate(props: {
     const hasVariants = () => props.styles.length > 0
 
     return (
-        <div sizing={"h-full"}>
+        <div>
             <Show
                 when={hasVariants()}
                 fallback={<>
-                    <div sizing="h-full w-full" flex={"col center justify-center"}>
+                    <place-holder class={"empty"} sizing="h-15rem w-full" flex={"col center justify-center"}>
                             <p>No variants yet</p>
                             <CreateVariantButton onCreateVariant={addVariant} text={"Add Variant"}/>
-                    </div>
+                    </place-holder>
                 </>}
             >
                 <div>
@@ -178,16 +178,16 @@ export default function ElementsTemplate(props: {
                         <CreateVariantButton onCreateVariant={addVariant}/>
                     </div>
                     <window-group grid-cols="[1fr,1fr]" gap="4" {...windowProps}>
-                        <section>
+                        <section grid-rows={"[auto,1fr]"}>
                             <hgroup flex={"row gap-2 center"} spacing={"my-2"}><i>code</i><h4>CSS Properties</h4></hgroup>
                             {props.controls(props.styles[value()])}
                         </section>
-                        <section>
+                        <section grid-rows={"[auto,1fr]"}>
                             <hgroup flex={"row gap-2 center"} spacing={"my-2"}><i>photo_frame</i><h4>Live Preview</h4></hgroup>
                             <article class={"elementsPreview inset"} sizing={"h-full"}>
-                                <article class={"elevated"} spacing={"mx-auto"} sizing={"w-fit"}>
+                                <div spacing={"mx-auto"} sizing={"w-fit"}>
                                     {props.example(props.styles[value()])}
-                                </article>
+                                </div>
                             </article>
                         </section>
                     </window-group>

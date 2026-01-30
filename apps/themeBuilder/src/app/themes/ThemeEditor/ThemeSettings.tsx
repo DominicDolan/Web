@@ -51,7 +51,7 @@ export default function ThemeSettings(props: { children?: any, params: { themeId
     }
 
     return <>
-        <Show when={theme() != null} fallback={<skeleton-loader class={"themeSettings"} flex={"col gap-8"} spacing={"pa-8"}>
+        <Show when={theme() != null} fallback={<place-holder class={"loader themeSettings"} flex={"col gap-8"} spacing={"pa-8"}>
             <div sizing={"w-full h-0.75rem"}></div>
             <For each={Array.from({length: 3})}>
                 {() => <div flex={"col gap-4"}>
@@ -60,7 +60,7 @@ export default function ThemeSettings(props: { children?: any, params: { themeId
                     </div>
                 }
             </For>
-        </skeleton-loader>}>
+        </place-holder>}>
 
             <div
                 class={"themeSettings"}

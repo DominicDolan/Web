@@ -16,13 +16,12 @@ import {zodResponse} from "@web/utils";
 import {ColorDefinition, colorDefinitionSchema} from "~/models/ColorDefinition";
 import {useDatabaseTable} from "@web/d1";
 import {
-    calculateDelta, createContextStore, createDeltaStoreTimestampMarker,
+    calculateDelta, createContextStoreWithDeltaAdapter, createDeltaStoreTimestampMarker,
     createModelStore, DeltaAdapterParams,
     deltaArrayToGroup, DeltaContextProvider,
-    ModelDelta,
     squashDeltasToSingle,
-    withDeltaAdapter
 } from "@web/delta";
+import {ModelDelta} from "@web/schema";
 
 const colorQuery = query(async (themeId: string) => {
     "use server"
@@ -64,10 +63,9 @@ export const updateColors = action(async (delta: ModelDelta<ColorDefinition>, th
     return zodResponse(result, { revalidate: [] })
 })
 
-export const [useColorStore] = createContextStore(withDeltaAdapter((params: DeltaAdapterParams<{ deltas: Record<string, ModelDelta<ColorDefinition>[]>, themeId?: string }>) => {
+export const [useColorStore] = createContextStoreWithDeltaAdapter((params: DeltaAdapterParams<{ deltas: Record<string, ModelDelta<ColorDefinition>[]>, themeId?: string }>) => {
     const saveAction = useAction(updateColors)
     const colorsSubmission = useSubmission(updateColors)
-
 
     const timestampMarker = createDeltaStoreTimestampMarker(params.store)
     timestampMarker.markAll()
@@ -98,7 +96,7 @@ export const [useColorStore] = createContextStore(withDeltaAdapter((params: Delt
         colors: params.models,
         pushColorDelta: params.push,
     }
-}))
+})
 
 export const preloadColors = (args: RoutePreloadFuncArgs) => {
     const themeId = args.params.themeId
@@ -120,7 +118,7 @@ export default function ColorEditor(props: RouteSectionProps<undefined>) {
     return <article sizing={"w-50rem"} spacing={"ma-auto"}>
         <Suspense
             fallback={
-                <skeleton-loader>
+                <place-holder class={"loader"}>
                     <div sizing={"h-2rem"} class={"sizing-w-20rem"}></div>
                     <div grid={"cols-[15rem,20rem]"} spacing={"my-3"}>
                         <div flex={"col gap-4"}>
@@ -131,7 +129,7 @@ export default function ColorEditor(props: RouteSectionProps<undefined>) {
                             <div sizing={"h-1rem w-20rem"}></div>
                         </div>
                     </div>
-                </skeleton-loader>
+                </place-holder>
             }>
             <DeltaContextProvider deltas={colorDeltas()} themeId={props.params.themeId} useStore={useColorStore}>
                 {({colors}) => <>

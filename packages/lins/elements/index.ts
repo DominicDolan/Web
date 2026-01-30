@@ -16,7 +16,7 @@ const bareElementTags = [
     "chip-group",
     "chip-item",
     "feedback-message",
-    "skeleton-loader",
+    "place-holder",
     "input-shell",
     "form-field",
     "popover-host",
@@ -37,7 +37,7 @@ declare module 'solid-js' {
             ["chip-group"]: any
             ["chip-item"]: any
             ["feedback-message"]: any
-            ["skeleton-loader"]: any
+            ["place-holder"]: any
             ["input-shell"]: any
             ["form-field"]: any
             ["popover-host"]: any

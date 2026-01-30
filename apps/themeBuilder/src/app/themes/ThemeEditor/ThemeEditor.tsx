@@ -6,10 +6,10 @@ import {keyedDebounce} from "@web/utils";
 import {ThemeDefinition, themeDefinitionSchema} from "~/models/ThemeDefinition";
 import {
     calculateDelta,
-    createContextStore, createDeltaStoreTimestampMarker,
+    createContextStoreWithDeltaAdapter, createDeltaStoreTimestampMarker,
     createModelStore, DeltaAdapterParams,
     deltaArrayToGroup, DeltaContextProvider,
-    squashDeltasToSingle, withDeltaAdapter
+    squashDeltasToSingle,
 } from "@web/delta";
 import {useDatabaseTable} from "@web/d1";
 import {ModelDelta} from "@web/schema";
@@ -57,46 +57,44 @@ const pushThemeDeltaAction = action(async (delta: ModelDelta<ThemeDefinition>) =
 })
 
 
-export const [useThemeStore] = createContextStore(
-    withDeltaAdapter((params: DeltaAdapterParams<{ deltas: Record<string, ModelDelta<ThemeDefinition>[]> }>) => {
-        const deltaPushAction = useAction(pushThemeDeltaAction)
-        const themeSubmission = useSubmission(pushThemeDeltaAction)
+export const [useThemeStore] = createContextStoreWithDeltaAdapter((params: DeltaAdapterParams<{ deltas: Record<string, ModelDelta<ThemeDefinition>[]> }>) => {
+    const deltaPushAction = useAction(pushThemeDeltaAction)
+    const themeSubmission = useSubmission(pushThemeDeltaAction)
 
-        const timestampMarker = createDeltaStoreTimestampMarker(params.store)
-        timestampMarker.markAll()
+    const timestampMarker = createDeltaStoreTimestampMarker(params.store)
+    timestampMarker.markAll()
 
 
-        const save = keyedDebounce(async (id: string) => {
-            const deltas = timestampMarker.getStreamFromMarked(id)
+    const save = keyedDebounce(async (id: string) => {
+        const deltas = timestampMarker.getStreamFromMarked(id)
 
-            const mergedDeltas = squashDeltasToSingle(deltas)
+        const mergedDeltas = squashDeltasToSingle(deltas)
 
-            if (mergedDeltas == null) return
+        if (mergedDeltas == null) return
 
-            themeSubmission.clear()
-            await deltaPushAction(mergedDeltas)
+        themeSubmission.clear()
+        await deltaPushAction(mergedDeltas)
 
-            if (themeSubmission.result?.success && themeSubmission.result.updatedAt > timestampMarker.getTimestampsById(id)) {
-                timestampMarker.mark(id)
-            }
-        }, 4000)
-
-        function flushSaveAction() {
-            save.flush()
+        if (themeSubmission.result?.success && themeSubmission.result.updatedAt > timestampMarker.getTimestampsById(id)) {
+            timestampMarker.mark(id)
         }
+    }, 4000)
 
-        params.store.onAnyDeltaPush((deltas: ModelDelta<ThemeDefinition>[]) => {
-            save(deltas[0].modelId)
-        })
+    function flushSaveAction() {
+        save.flush()
+    }
 
-        return {
-            themes: params.models,
-            pushThemeDelta: params.push,
-            getThemeDeltasByModelId: (modelId: string) => params.store.getStreamById(modelId),
-            flushSaveAction
-        }
+    params.store.onAnyDeltaPush((deltas: ModelDelta<ThemeDefinition>[]) => {
+        save(deltas[0].modelId)
     })
-)
+
+    return {
+        themes: params.models,
+        pushThemeDelta: params.push,
+        getThemeDeltasByModelId: (modelId: string) => params.store.getStreamById(modelId),
+        flushSaveAction
+    }
+})
 
 export default function ThemeEditor(props: { children?: any }) {
 

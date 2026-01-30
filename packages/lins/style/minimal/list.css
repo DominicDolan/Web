@@ -13,42 +13,74 @@
 
 @layer elements {
 
-    ul.nav {
-        & > li {
-            font-size: 0.975rem;
-            font-weight: 500;
-            line-height: 1.5;
-            border-radius: 0.5rem;
+    @scope (body) to (.elementsPreview) {
+        ul.nav {
+            & > li {
+                font-size: 0.975rem;
+                font-weight: 500;
+                line-height: 1.5;
+                border-radius: 0.5rem;
 
-            &:not(:has(> *)) {
-                padding: 0.5rem 0.9rem;
-            }
+                &:not(:has(> *)) {
+                    padding: 0.5rem 0.9rem;
+                }
 
-            & > * {
-                display: block;
-                padding: 0.5rem 0.9rem;
-            }
+                & > * {
+                    display: block;
+                    padding: 0.5rem 0.9rem;
+                }
 
-            border: none;
+                border: none;
 
-            &.active, &:has(.active) {
-                background: var(--current-color);
-                color: var(--on-current-color);
-            }
+                &.active, &:has(.active) {
+                    background: var(--current-color);
+                    color: var(--on-current-color);
+                }
 
-            &:hover:not(.active):not(:has(.active)) {
-                background: color-mix(in oklab, var(--current-color) 10%, transparent);
+                &:hover:not(.active):not(:has(.active)) {
+                    background: color-mix(in oklab, var(--current-color) 10%, transparent);
+                }
             }
         }
-    }
 
-    ul.plain {
-        list-style: none;
+        ul.plain {
+            list-style: none;
 
-        & > li {
-            --border-color: oklab(from currentColor 70% a b / 0.5);
-            border-bottom: 1px solid var(--border-color);
+            & > li {
+                --border-color: oklab(from currentColor 70% a b / 0.5);
+                border-bottom: 1px solid var(--border-color);
 
+
+                &:not(:has(> *)) {
+                    padding: 0.8rem 0.9rem;
+                }
+
+                & > * {
+                    display: block;
+                    padding: 0.8rem 0.9rem;
+                }
+
+
+                &.active, &:has(.active) {
+                    --background-color: color-mix(in oklab, var(--current-color) 5%, transparent);
+                    background: var(--background-color);
+                    color: var(--current-color);
+                }
+
+                &:hover {
+                    background: color-mix(in oklab, var(--current-color) 10%, transparent);
+                }
+            }
+        }
+
+        ul.menu, ul[role="menu"] {
+            list-style: none;
+
+            border-radius: 0.5rem;
+            background-color: var(--surface-color);
+            box-shadow:
+                    0 8px 12px -1px var(--shadow-color),
+                    0 4px 6px -1px var(--shadow-color);
 
             &:not(:has(> *)) {
                 padding: 0.8rem 0.9rem;
@@ -57,80 +89,50 @@
             & > * {
                 display: block;
                 padding: 0.8rem 0.9rem;
-            }
-
-
-            &.active, &:has(.active) {
-                --background-color: color-mix(in oklab, var(--current-color) 5%, transparent);
-                background: var(--background-color);
-                color: var(--current-color);
+                cursor: pointer;
             }
 
             &:hover {
-                background: color-mix(in oklab, var(--current-color) 10%, transparent);
-            }
-        }
-    }
-
-    ul.menu, ul[role="menu"] {
-        list-style: none;
-
-        border-radius: 0.5rem;
-        background-color: var(--surface-color);
-        box-shadow:
-                0 8px 12px -1px var(--shadow-color),
-                0 4px 6px -1px var(--shadow-color);
-
-        &:not(:has(> *)) {
-            padding: 0.8rem 0.9rem;
-        }
-
-        & > * {
-            display: block;
-            padding: 0.8rem 0.9rem;
-            cursor: pointer;
-        }
-
-        &:hover {
-            background: color-mix(in oklab, var(--surface-color) 90%, currentColor);
-        }
-    }
-
-    ul.tabs {
-        position: relative;
-        anchor-scope: all;
-
-        --underline-color: var(--current-color, var(--primary-color));
-        color: oklab(from var(--current-color) l a b / 0.6);
-
-        & > li {
-            padding-inline: 0.6rem;
-            padding-block: 0.4rem;
-            cursor: pointer;
-            transition: color 0.15s ease-in-out;
-
-            &.active, &:has(.active) {
-                color: var(--current-color);
-                anchor-name: --active;
-            }
-
-            &:hover:not(.active):not(:has(.active)) {
-                color: var(--current-color);
+                background: color-mix(in oklab, var(--surface-color) 90%, currentColor);
             }
         }
 
-        ::after {
-            transition-property: left, right;
-            transition-duration: 0.2s;
-            transition-timing-function: ease-in-out;
-            position: absolute;
-            bottom: 0;
-            content: "";
-            height: 2px;
-            background: var(--underline-color);
-            position-anchor: --active;
-            left: anchor(left);
-            right: anchor(right);
+        ul.tabs {
+            position: relative;
+            anchor-scope: all;
+
+            --underline-color: var(--current-color, var(--primary-color));
+            color: oklab(from var(--current-color) l a b / 0.6);
+
+            & > li {
+                padding-inline: 0.6rem;
+                padding-block: 0.4rem;
+                cursor: pointer;
+                transition: color 0.15s ease-in-out;
+
+                &.active, &:has(.active) {
+                    color: var(--current-color);
+                    anchor-name: --active;
+                }
+
+                &:hover:not(.active):not(:has(.active)) {
+                    color: var(--current-color);
+                }
+            }
+
+            ::after {
+                transition-property: left, right;
+                transition-duration: 0.2s;
+                transition-timing-function: ease-in-out;
+                position: absolute;
+                bottom: 0;
+                content: "";
+                height: 2px;
+                background: var(--underline-color);
+                position-anchor: --active;
+                left: anchor(left);
+                right: anchor(right);
+            }
         }
     }
 }

@@ -63,11 +63,33 @@ export const [useElementStyleStore] = createContextStoreWithDeltaAdapter((params
             })
         },
         addButtonVariant(variantName: string) {
-            console.log("adding button variant:")
             addVariant({
                 element: "button",
                 variant: variantName,
                 css: "  border-radius: 4px;\n  background-color: black;\n  color: white;"
+            })
+        },
+        addCardVariant(variantName: string) {
+            addVariant({
+                element: "card",
+                variant: variantName,
+                css: "  --shadow-color: rgba(0, 0, 0, 0.15)\n" +
+                    "  box-shadow:\n" +
+                    "    0 8px 12px -1px var(--shadow-color),\n" +
+                    "    0 4px 6px -1px var(--shadow-color);\n" +
+                    "  border-radius: 6px;\n"
+            })
+        },
+        addListVariant(variantName: string) {
+            addVariant({
+                element: "ul",
+                variant: variantName,
+                css: "  background-color: white;\n" +
+                    "  border-radius: 10px;\n" +
+                    "  & > li {\n" +
+                    "    padding: 0.5rem;\n" +
+                    "    border-bottom: 1px solid rgb(0 0 0 / 0.4);\n" +
+                    "  }\n"
             })
         },
         renameVariant(id: string, variantName: string) {

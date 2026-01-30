@@ -7,7 +7,7 @@
     }
 }
 
-skeleton-loader *:not(:has(> *)) {
+place-holder.loader *:not(:has(> *)) {
     background: linear-gradient(90deg,
     rgba(0, 0, 0, 0.06) 25%,
     rgba(0, 0, 0, 0.12) 37%,
@@ -18,4 +18,22 @@ skeleton-loader *:not(:has(> *)) {
     pointer-events: none;
     user-select: none;
     border-radius: 0.25rem;
+}
+
+place-holder.empty {
+
+    --current-color: var(--active-color, var(--surface-color));
+    --on-current-color: var(--on-active-color, var(--on-surface-color));
+    isolation: isolate;
+    position: relative;
+
+    ::after {
+        --border-color: color-mix(in oklab, var(--current-color) 15%, transparent);
+        content: "";
+        position: absolute;
+        inset: 1rem;
+        pointer-events: none;
+        border: 2px dashed var(--border-color);
+        border-radius: 1.5rem;
+    }
 }
