@@ -30,11 +30,16 @@ export const useTodoScope = defineScope(TodoProvider, (props) => {
         setTodos(todos.findIndex(todo => todo.id === id), "completed", complete)
     }
 
+    function removeTodo(id: string) {
+        setTodos(todos.filter(todo => todo.id !== id))
+    }
+
     return {
         todos,
         getTodoById,
         addTodo,
-        markCompleteState
+        markCompleteState,
+        removeTodo
     }
 })
 

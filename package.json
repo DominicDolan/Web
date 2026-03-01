@@ -13,7 +13,8 @@
     "packages/components",
     "packages/schema",
     "apps/testBench",
-    "apps/tailwindTest"
+    "apps/tailwindTest",
+    "packages/unoLayout"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:wrangler\"",
