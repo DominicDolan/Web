@@ -1,0 +1,26 @@
+{
+  "name": "@web/tailwind-test",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vinxi dev --port 3001",
+    "build": "vinxi build",
+    "start": "vinxi start"
+  },
+  "dependencies": {
+    "@solidjs/router": "0.15.4",
+    "@solidjs/start": "1.2.0",
+    "solid-js": "1.9.10",
+    "vinxi": "0.5.8",
+    "vite-plugin-solid": "2.11.10",
+    "@web/components": "*",
+    "@web/utils": "*",
+    "@web/schema": "*"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.1.0",
+    "postcss": "^8.4.49",
+    "autoprefixer": "^10.4.20"
+  }
+}

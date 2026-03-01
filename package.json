@@ -12,7 +12,8 @@
     "packages/utils",
     "packages/components",
     "packages/schema",
-    "apps/testBench"
+    "apps/testBench",
+    "apps/tailwindTest"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:wrangler\"",

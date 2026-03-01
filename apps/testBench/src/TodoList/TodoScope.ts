@@ -26,10 +26,15 @@ export const useTodoScope = defineScope(TodoProvider, (props) => {
         })
     }
 
+    function markCompleteState(id: string, complete: boolean) {
+        setTodos(todos.findIndex(todo => todo.id === id), "completed", complete)
+    }
+
     return {
         todos,
         getTodoById,
-        addTodo
+        addTodo,
+        markCompleteState
     }
 })
 

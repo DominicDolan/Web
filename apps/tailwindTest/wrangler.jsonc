@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "tailwind-test",
+  "main": "./.output/server/index.mjs",
+  "compatibility_date": "2025-12-17",
+  "compatibility_flags": [
+    "nodejs_compat",
+    "no_nodejs_compat_v2"
+  ],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./.output/public"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
