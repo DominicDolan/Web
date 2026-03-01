@@ -1,10 +1,12 @@
 import "virtual:uno.css";
+import {Route, Router} from "@solidjs/router";
 
 export default function App() {
   return (
     <main style={{ padding: "2rem", "font-family": "system-ui, sans-serif" }}>
-      <h1>New App</h1>
-      <p>Welcome to your new app.</p>
+        <Router root={(props: any) => (props.children)}>
+            <Route path={"/"} component={() => <div>Home</div>}/>
+        </Router>
     </main>
   );
 }

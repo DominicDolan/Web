@@ -1,21 +1,21 @@
 import {Context, createContext, useContext} from "solid-js";
 
 
-type ContextValue<Props> = {
+type ScopeContextValue<Props> = {
     props: Props
     data: Map<symbol, unknown>
 }
 
-type ContextStoreProvider<Props> = (props: Props & {children?: any}) => any
+type ScopeProvider<Props> = (props: Props & {children?: any}) => any
 
-type UseContextStore<Props, R> = (key: symbol, setup: (props: Props) => R) => R
+type UseScope<Props, R> = (key: symbol, setup: (props: Props) => R) => R
 
-export function createContextStoreProvider<Props extends Record<string, any>>(): ContextStoreProvider<Props> {
+export function createScopeProvider<Props extends Record<string, any>>(): ScopeProvider<Props> {
     const HMR_KEY = "createContextStore.storeContext";
 
-    const storeContext = (((import.meta as any).hot?.data?.[HMR_KEY] as Context<ContextValue<Props>> | undefined)
-        ?? ((globalThis as any)[HMR_KEY] as Context<ContextValue<Props>> | undefined)
-        ?? createContext<ContextValue<Props>>()) as Context<ContextValue<Props>>
+    const storeContext = (((import.meta as any).hot?.data?.[HMR_KEY] as Context<ScopeContextValue<Props>> | undefined)
+        ?? ((globalThis as any)[HMR_KEY] as Context<ScopeContextValue<Props>> | undefined)
+        ?? createContext<ScopeContextValue<Props>>()) as Context<ScopeContextValue<Props>>
 
     if ((import.meta as any).hot?.data) {
         (import.meta as any).hot.data[HMR_KEY] = storeContext;
@@ -32,7 +32,7 @@ export function createContextStoreProvider<Props extends Record<string, any>>():
     }
 
 
-    function useContextStore<R>(key: symbol, setup: (props: Props) => R): R {
+    function useScope<R>(key: symbol, setup: (props: Props) => R): R {
         const ctx = useContext(storeContext)
         if (ctx == null) {
             throw new Error(`Unable to retrieve props for context store with key: ${String(key)}`)
@@ -43,18 +43,18 @@ export function createContextStoreProvider<Props extends Record<string, any>>():
         return ctx.data.get(key) as R
     }
 
-    ContextStoreProvider._useContextStore = useContextStore
+    ContextStoreProvider._useContextStore = useScope
 
     return ContextStoreProvider
 }
 
-function defineContextStore<Props extends Record<string, any>, R>(provider: ContextStoreProvider<Props>, setup: (props: Props) => R) {
+export function defineScope<Props extends Record<string, any>, R>(provider: ScopeProvider<Props>, setup: (props: Props) => R) {
     const contextStoreKey = Symbol()
 
     if (!("_useContextStore" in provider)) {
-        throw new Error("defineContextStore expects a provider created by createContextStoreProvider")
+        throw new Error("defineScope expects a provider created by createScopeProvider")
     }
-    const useContextStore = provider._useContextStore as UseContextStore<Props, R>
+    const useContextStore = provider._useContextStore as UseScope<Props, R>
 
     const useStore = () => {
         return useContextStore(contextStoreKey, setup)
