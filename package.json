@@ -4,13 +4,15 @@
   "private": true,
   "type": "module",
   "workspaces": [
+    "apps/cli",
     "apps/themeBuilder",
     "packages/d1",
     "packages/delta",
     "packages/lins",
     "packages/utils",
     "packages/components",
-    "packages/schema"
+    "packages/schema",
+    "apps/testBench"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:wrangler\"",
