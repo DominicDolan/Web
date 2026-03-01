@@ -2,6 +2,7 @@
 export * from './contextStore/ContextStore';
 export * from './contextStore/CotextStoreDeltaAdapter';
 export * from "./scope/Scope"
+export * from "./scope/DeltaScope"
 
 // Store
 export * from './store/DeltaGenerator';

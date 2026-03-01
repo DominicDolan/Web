@@ -28,7 +28,9 @@ export type ModelStore<M extends Model> = [
     ModelStoreFunctions<M>
 ]
 
-export function createModelStore<M extends Model>(initialDeltas?: Record<string, ModelDelta<M>[]>): ModelStore<M> {
+export type ModelRecord<M extends Model> = Record<string, ModelDelta<M>[]>
+
+export function createModelStore<M extends Model>(initialDeltas?: ModelRecord<M>): ModelStore<M> {
     const [pushDelta, { getStreamById, pushMany, onCreateDeltaPush, onUpdateDeltaPushById, onAnyDeltaPush, getIds }] = createDeltaStore()
     const [modelsById, setModelsById] = createStore<Record<string, M>>({})
     const [modelsListStore, setModelListStore] = createStore<M[]>([])

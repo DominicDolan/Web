@@ -6,7 +6,7 @@ type ScopeContextValue<Props> = {
     data: Map<symbol, unknown>
 }
 
-type ScopeProvider<Props> = (props: Props & {children?: any}) => any
+export type ScopeProvider<Props> = (props: Props & {children?: any}) => any
 
 type UseScope<Props, R> = (key: symbol, setup: (props: Props) => R) => R
 
@@ -43,24 +43,24 @@ export function createScopeProvider<Props extends Record<string, any>>(): ScopeP
         return ctx.data.get(key) as R
     }
 
-    ContextStoreProvider._useContextStore = useScope
+    ContextStoreProvider._useContextScope = useScope
 
     return ContextStoreProvider
 }
 
-export function defineScope<Props extends Record<string, any>, R>(provider: ScopeProvider<Props>, setup: (props: Props) => R) {
+    export function defineScope<Props extends Record<string, any>, R>(provider: ScopeProvider<Props>, setup: (props: Props) => R) {
     const contextStoreKey = Symbol()
 
-    if (!("_useContextStore" in provider)) {
+    if (!("_useContextScope" in provider)) {
         throw new Error("defineScope expects a provider created by createScopeProvider")
     }
-    const useContextStore = provider._useContextStore as UseScope<Props, R>
+    const useContextScope = provider._useContextScope as UseScope<Props, R>
 
-    const useStore = () => {
-        return useContextStore(contextStoreKey, setup)
+    const useScope = () => {
+        return useContextScope(contextStoreKey, setup)
     }
 
-    useStore.Provider = provider
+    useScope.Provider = provider
 
-    return useStore
+    return useScope
 }

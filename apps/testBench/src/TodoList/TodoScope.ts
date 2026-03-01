@@ -1,41 +1,37 @@
-import {createScopeProvider, defineScope} from "@web/delta";
-import {createStore} from "solid-js/store";
-import {createId} from "@paralleldrive/cuid2"
+import {createScopeProvider, defineDeltaScope, ModelRecord} from "@web/delta";
 
 export type Todo = {
     id: string;
+    updatedAt: number;
     text: string;
     completed: boolean;
 }
 
-export const TodoProvider = createScopeProvider<{ todos?: Todo[] }>()
+export const TodoProvider = createScopeProvider<{ deltas: ModelRecord<Todo> }>()
 
-export const useTodoScope = defineScope(TodoProvider, (props) => {
-
-    const [todos, setTodos] = createStore(props.todos ?? [])
+export const useTodoScope = defineDeltaScope(TodoProvider, ({push, store, models}) => {
 
     function getTodoById(id: string) {
-        return todos.find(todo => todo.id === id)
+        return store.getModelById(id)
     }
 
     function addTodo(text: string) {
-        setTodos(todos.length, {
-            id: createId(),
+        push("create", {
             text,
             completed: false,
         })
     }
 
     function markCompleteState(id: string, complete: boolean) {
-        setTodos(todos.findIndex(todo => todo.id === id), "completed", complete)
+        push(id, { complete })
     }
 
     function removeTodo(id: string) {
-        setTodos(todos.filter(todo => todo.id !== id))
+        push("delete", id)
     }
 
     return {
-        todos,
+        todos: models,
         getTodoById,
         addTodo,
         markCompleteState,
