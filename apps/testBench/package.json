@@ -19,6 +19,8 @@
     "@web/components": "*",
     "@web/utils": "*",
     "@web/schema": "*",
-    "@web/unolayout": "*"
+    "@web/unolayout": "*",
+    "@web/solid-delta": "*",
+    "@web/solid-scope": "*"
   }
 }

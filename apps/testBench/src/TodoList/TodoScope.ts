@@ -1,4 +1,5 @@
-import {createScopeProvider, defineDeltaScope, ModelRecord} from "../../../../packages/solidDelta";
+import {createScopeProvider} from "@web/solid-scope";
+import {defineDeltaScope, ModelRecord} from "@web/solid-delta";
 
 export type Todo = {
     id: string;
@@ -22,8 +23,8 @@ export const useTodoScope = defineDeltaScope(TodoProvider, ({push, store, models
         })
     }
 
-    function markCompleteState(id: string, complete: boolean) {
-        push(id, { complete })
+    function markCompleteState(id: string, completed: boolean) {
+        push(id, { completed })
     }
 
     function removeTodo(id: string) {

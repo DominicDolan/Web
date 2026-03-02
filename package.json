@@ -7,7 +7,7 @@
     "apps/cli",
     "apps/themeBuilder",
     "packages/d1",
-    "packages/delta",
+    "packages/solidDelta",
     "packages/lins",
     "packages/utils",
     "packages/components",
