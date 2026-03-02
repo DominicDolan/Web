@@ -1,12 +1,12 @@
 import {useSubmissions} from "@solidjs/router"
 import {createMemo} from "solid-js"
-import {updateColors, useColorStore} from "~/app/themes/ColorEditor/ColorEditor";
+import {updateColors, useColorScope} from "~/app/themes/ColorEditor/ColorEditor";
 import {$ZodIssue} from "zod/v4/core";
 import {ColorDefinition} from "~/models/ColorDefinition";
 
 export default function ColorItem(props: { definition: ColorDefinition }) {
 
-    const { pushColorDelta } = useColorStore()
+    const { pushColorDelta } = useColorScope()
     const submissions = useSubmissions(updateColors, ([input]) => {
         return input.modelId === props.definition.id
     })

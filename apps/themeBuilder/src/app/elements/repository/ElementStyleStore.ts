@@ -1,25 +1,21 @@
 import {
-    createContextStoreWithDeltaAdapter,
-    createDeltaStoreTimestampMarker,
-    DeltaAdapterParams,
+    createDeltaStoreTimestampMarker, defineDeltaScope, ModelRecord,
     squashDeltasToSingle
-} from "../../../../../../packages/solidDelta";
+} from "@web/solid-delta";
 import {ElementStyleDefinition} from "~/models/ElementStyleDefinition";
 import {ModelData, ModelDelta} from "@web/schema";
 import {createMemo} from "solid-js";
 import {createId} from "@paralleldrive/cuid2";
 import {updateElementStyleAction} from "~/app/elements/repository/ElementStyleRepository";
 import {useAction, useSubmission} from "@solidjs/router";
+import {createScopeProvider} from "@web/solid-scope";
 
+export const ElementStyleProvider = createScopeProvider<{deltas: ModelRecord<ElementStyleDefinition>, themeId: string }>()
 
-export const [useElementStyleStore] = createContextStoreWithDeltaAdapter((params: DeltaAdapterParams<{
-    deltas: Record<string, ModelDelta<ElementStyleDefinition>[]>
-    themeId: string | undefined
-}, ElementStyleDefinition>) => {
+export const useElementStyleScope = defineDeltaScope(ElementStyleProvider, (props) => {
+    const inputElements = createMemo(() => props.models.filter(el => el.element === "input"))
 
-    const inputElements = createMemo(() => params.models.filter(el => el.element === "input"))
-
-    const timestampMarker = createDeltaStoreTimestampMarker(params.store)
+    const timestampMarker = createDeltaStoreTimestampMarker(props.store)
     timestampMarker.markAll()
     const updateElementStyle = useAction(updateElementStyleAction)
     const updateElementStyleSubmission = useSubmission(updateElementStyleAction)
@@ -29,7 +25,7 @@ export const [useElementStyleStore] = createContextStoreWithDeltaAdapter((params
         if (deltas.length === 0) return
 
         const delta = squashDeltasToSingle(deltas)
-        const themeId = params.props.themeId
+        const themeId = props.props.themeId
         if (delta == null || themeId == null) return
 
         updateElementStyleSubmission.clear()
@@ -46,15 +42,15 @@ export const [useElementStyleStore] = createContextStoreWithDeltaAdapter((params
 
     function addVariant(payload: Partial<ModelData<ElementStyleDefinition>>) {
         const id = createId()
-        params.push(id, payload)
+        props.push(id, payload)
         setTimeout(async () => {
             await save(id)
         })
     }
 
-    const cssContent = createMemo(() => params.models.map(cssRule).join("\n"))
+    const cssContent = createMemo(() => props.models.map(cssRule).join("\n"))
     return {
-        elementStyles: params.models,
+        elementStyles: props.models,
         addInputVariant(variantName: string) {
             addVariant({
                 element: "input",
@@ -93,11 +89,11 @@ export const [useElementStyleStore] = createContextStoreWithDeltaAdapter((params
             })
         },
         renameVariant(id: string, variantName: string) {
-            params.push(id, { variant: variantName })
+            props.push(id, { variant: variantName })
         },
         cssContent,
         updateCss(id: string, css: string) {
-            params.push(id, { css })
+            props.push(id, { css })
         },
         save
     }

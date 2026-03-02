@@ -1,7 +1,7 @@
 import {useTabs} from "@web/components";
 import {createSignal, For, Show} from "solid-js";
 import {ElementStyleDefinition} from "~/models/ElementStyleDefinition";
-import {useElementStyleStore} from "~/app/elements/repository/ElementStyleStore";
+import {useElementStyleScope} from "~/app/elements/repository/ElementStyleStore";
 
 // Simple button that creates a variant with an inline editor
 function CreateVariantButton(props: { onCreateVariant: (variantName: string) => void, text?: string }) {
@@ -68,7 +68,7 @@ function VariantTabs(props: { styles: ElementStyleDefinition[], tabProps: (index
     const [editingIndex, setEditingIndex] = createSignal<number | null>(null)
     const [draftName, setDraftName] = createSignal("")
 
-    const {renameVariant} = useElementStyleStore()
+    const {renameVariant} = useElementStyleScope()
 
     let editingInputRef: HTMLInputElement | undefined
 

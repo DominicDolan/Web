@@ -5,7 +5,7 @@ import {
     createModelStore,
     deltaArrayToGroup,
     squashDeltasToSingle
-} from "../../../../../../packages/solidDelta";
+} from "@web/solid-delta";
 import {action, json, query} from "@solidjs/router";
 import {zodResponse} from "@web/utils";
 import {ModelDelta} from "@web/schema";

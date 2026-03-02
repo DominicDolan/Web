@@ -1,30 +1,65 @@
-import {useTodoScope} from "~/TodoList/TodoScope";
-import {createSignal, For} from "solid-js";
+import {createAsync, query} from "@solidjs/router";
+import {Todo, TodoProvider, useTodoScope} from "~/TodoList/TodoScope";
+import {ModelRecord} from "@web/solid-delta";
+import {ModelDelta} from "@web/schema";
+import {createId} from "@paralleldrive/cuid2";
+import {For, Show, Suspense} from "solid-js";
 import {TodoItem} from "~/TodoList/TodoItem";
+import {NewTodoItem} from "~/TodoList/NewTodoItem";
+
+const retrieveTodos = query(() => {
+    return new Promise<ModelRecord<Todo>>((resolve, reject) => {
+        setTimeout(() => {
+            const deltas: ModelDelta<Todo>[] = [
+                {
+                    modelId: createId(),
+                    payload: {
+                        completed: false,
+                        text: "Sample Todo",
+                    },
+                    type: "create",
+                    timestamp: Date.now(),
+                },
+                {
+                    modelId: createId(),
+                    payload: {
+                        completed: false,
+                        text: "Sample Todo 2",
+                    },
+                    type: "create",
+                    timestamp: Date.now(),
+                },
+            ]
+            const record: ModelRecord<Todo> = deltas.reduce((acc, delta) => {
+                acc[delta.modelId] = [delta];
+                return acc;
+            }, {} as ModelRecord<Todo>)
+            resolve(record)
+        }, 1000)
+    })
+}, "get-todos")
 
 export const TodoList = () => {
-    const { todos, addTodo } = useTodoScope()
 
-    const [newTodoText, setNewTodoText] = createSignal<string>("")
-    function onAddTodoClicked(e: any) {
-        e.preventDefault()
-        const text = newTodoText()
-        if (text == null || text.trim().length === 0) {
-            throw new Error("Todo text cannot be empty")
-        }
-        addTodo(text)
-        setNewTodoText("")
-    }
+    const todoDeltas = createAsync(() => retrieveTodos(), { deferStream: true })
     return (
-        <div flex={"col gap-4"}>
-            <For each={todos}>{ (todo) => (
-                <TodoItem todo={todo}/>
-            )}
-            </For>
-            <form flex={"row gap-2"} onSubmit={onAddTodoClicked}>
-                <input value={newTodoText()} required={true} minlength={1} onInput={(e) => setNewTodoText(e.currentTarget.value)}/>
-                <input type={"submit"}>Add Todo</input>
-            </form>
+        <div>
+            <h1>TodoList</h1>
+            <Suspense fallback={<div>Loading...</div>}>
+                <Show when={todoDeltas() != null}>
+                    <TodoProvider deltas={todoDeltas()!!} use={useTodoScope}>{
+                        ({todos}) => <>
+                            <div flex={"col gap-4"}>
+                                <For each={todos}>{(todo) => (
+                                    <TodoItem todo={todo}/>
+                                )}
+                                </For>
+                                <NewTodoItem/>
+                            </div>
+                        </>
+                    }</TodoProvider>
+                </Show>
+            </Suspense>
         </div>
     )
 }

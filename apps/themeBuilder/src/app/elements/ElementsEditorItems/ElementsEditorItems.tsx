@@ -1,12 +1,12 @@
 import ElementsTemplate from "~/app/elements/components/ElementsTemplate";
 import ElementCssEditor from "~/app/elements/components/ElementCssEditor";
 import {ElementStyleDefinition} from "~/models/ElementStyleDefinition";
-import {useElementStyleStore} from "~/app/elements/repository/ElementStyleStore";
+import {useElementStyleScope} from "~/app/elements/repository/ElementStyleStore";
 import {debounce} from "@web/utils";
 
 
 export function ElementsEditorItems(props: { styles: ElementStyleDefinition[] }) {
-    const { updateCss, save, addInputVariant, addButtonVariant, addCardVariant, addListVariant } = useElementStyleStore()
+    const { updateCss, save, addInputVariant, addButtonVariant, addCardVariant, addListVariant } = useElementStyleScope()
 
     const debouncedUpdateCss = debounce(updateCss, 1000)
     const debouncedSave = debounce(save, 4000)

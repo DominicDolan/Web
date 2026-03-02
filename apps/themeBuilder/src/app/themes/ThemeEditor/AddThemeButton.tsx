@@ -1,9 +1,9 @@
-import {useThemeStore} from "~/app/themes/ThemeEditor/ThemeEditor";
+import {useThemeScope} from "~/app/themes/ThemeEditor/ThemeEditor";
 import {useNavigate} from "@solidjs/router";
 
 
 export default function AddThemeButton() {
-    const { pushThemeDelta } = useThemeStore()
+    const { pushThemeDelta } = useThemeScope()
     const navigate = useNavigate()
     function addTheme() {
         const theme = pushThemeDelta("create", {

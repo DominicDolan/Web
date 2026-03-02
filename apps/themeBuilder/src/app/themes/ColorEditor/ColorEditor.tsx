@@ -16,12 +16,11 @@ import {zodResponse} from "@web/utils";
 import {ColorDefinition, colorDefinitionSchema} from "~/models/ColorDefinition";
 import {useDatabaseTable} from "@web/d1";
 import {
-    calculateDelta, createContextStoreWithDeltaAdapter, createDeltaStoreTimestampMarker,
-    createModelStore, DeltaAdapterParams,
-    deltaArrayToGroup, DeltaContextProvider,
-    squashDeltasToSingle,
-} from "../../../../../../packages/solidDelta";
+    calculateDelta, createDeltaStoreTimestampMarker,
+    createModelStore, defineDeltaScope, deltaArrayToGroup, squashDeltasToSingle,
+} from "@web/solid-delta";
 import {ModelDelta} from "@web/schema";
+import {createScopeProvider} from "@web/solid-scope";
 
 const colorQuery = query(async (themeId: string) => {
     "use server"
@@ -62,16 +61,16 @@ export const updateColors = action(async (delta: ModelDelta<ColorDefinition>, th
 
     return zodResponse(result, { revalidate: [] })
 })
-
-export const [useColorStore] = createContextStoreWithDeltaAdapter((params: DeltaAdapterParams<{ deltas: Record<string, ModelDelta<ColorDefinition>[]>, themeId?: string }>) => {
+export const ColorProvider = createScopeProvider<{ deltas: Record<string, ModelDelta<ColorDefinition>[]>, themeId?: string }>()
+export const useColorScope = defineDeltaScope(ColorProvider, (props) => {
     const saveAction = useAction(updateColors)
     const colorsSubmission = useSubmission(updateColors)
 
-    const timestampMarker = createDeltaStoreTimestampMarker(params.store)
+    const timestampMarker = createDeltaStoreTimestampMarker(props.store)
     timestampMarker.markAll()
 
     const save = keyedDebounce(async (colorId: string) => {
-        const themeId = params.props.themeId
+        const themeId = props.props.themeId
         if (themeId == null) return
 
         const deltas = timestampMarker.getStreamFromMarked(colorId)
@@ -88,13 +87,13 @@ export const [useColorStore] = createContextStoreWithDeltaAdapter((params: Delta
     }, 300)
 
 
-    params.store.onAnyDeltaPush((deltas) => {
+    props.store.onAnyDeltaPush((deltas) => {
         save(deltas[0].modelId)
     })
 
     return {
-        colors: params.models,
-        pushColorDelta: params.push,
+        colors: props.models,
+        pushColorDelta: props.push,
     }
 })
 
@@ -131,8 +130,8 @@ export default function ColorEditor(props: RouteSectionProps<undefined>) {
                     </div>
                 </place-holder>
             }>
-            <DeltaContextProvider deltas={colorDeltas()} themeId={props.params.themeId} useStore={useColorStore}>
-                {({colors}) => <>
+            <ColorProvider deltas={colorDeltas()!!} use={useColorScope}>{
+                ({colors}) => <>
                     <hgroup flex={"row space-between"}>
                         <h3>Edit Colours</h3>
                         <ColorAddButton/>
@@ -151,8 +150,8 @@ export default function ColorEditor(props: RouteSectionProps<undefined>) {
                             </Show>
                         </div>
                     </div>
-                </>}
-            </DeltaContextProvider>
+                </>
+            }</ColorProvider>
         </Suspense>
     </article>
 }

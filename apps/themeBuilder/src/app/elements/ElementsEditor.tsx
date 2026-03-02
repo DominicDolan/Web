@@ -1,11 +1,9 @@
 import {A, createAsync, RouteSectionProps, useNavigate} from "@solidjs/router";
 import NavBarTemplate from "~/app/common/NavBarTemplate";
-import {useElementStyleStore} from "~/app/elements/repository/ElementStyleStore";
-import {DeltaContextProvider} from "../../../../../packages/solidDelta";
+import {ElementStyleProvider, useElementStyleScope} from "~/app/elements/repository/ElementStyleStore";
 import {getElementStylesQuery} from "~/app/elements/repository/ElementStyleRepository";
 import {ElementsEditorItems} from "~/app/elements/ElementsEditorItems/ElementsEditorItems";
 import {createEffect, createSignal, on, onCleanup, onMount} from "solid-js";
-
 
 export default function ElementsEditor(props: RouteSectionProps<undefined>) {
 
@@ -89,7 +87,7 @@ export default function ElementsEditor(props: RouteSectionProps<undefined>) {
         onCleanup(() => scrollContainer()?.removeEventListener("scroll", handleScroll));
     });
 
-    return <DeltaContextProvider themeId={themeId} deltas={elementStyleDeltas()} useStore={useElementStyleStore}>
+    return <ElementStyleProvider themeId={themeId!!} deltas={elementStyleDeltas()!!} use={useElementStyleScope}>
         {
             ({ elementStyles, cssContent }) => <div grid-cols={"[20rem,1fr]"} sizing={"h-full"}>
                 <NavBarTemplate
@@ -129,5 +127,5 @@ export default function ElementsEditor(props: RouteSectionProps<undefined>) {
                 </style>
             </div>
         }
-    </DeltaContextProvider>
+    </ElementStyleProvider>
 }
