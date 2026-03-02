@@ -5,7 +5,7 @@ import {
     createModelStore,
     deltaArrayToGroup,
     squashDeltasToSingle
-} from "@web/delta";
+} from "../../../../../../packages/solidDelta";
 import {action, json, query} from "@solidjs/router";
 import {zodResponse} from "@web/utils";
 import {ModelDelta} from "@web/schema";
@@ -39,7 +39,7 @@ export const updateElementStyleAction = action(async (delta: ModelDelta<ElementS
             try {
                 await db.insert(deltaToSave, { "theme": themeId})
             } catch (e) {
-                console.error("Error saving color delta:", e)
+                console.error("Error saving color solidDelta:", e)
                 return json({
                     success: false,
                     error: e,

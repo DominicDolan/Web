@@ -16,7 +16,7 @@ async function sleep(time: number) {
 }
 
 describe("ModelStore deltaStore reading", () => {
-    test("Update to delta store causes ReadModelStore to update", async () => {
+    test("Update to solidDelta store causes ReadModelStore to update", async () => {
         const store = createModelStore<TestModel>()
         const [values, pushDelta, { pushMany }] = store
 

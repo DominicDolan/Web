@@ -6,7 +6,7 @@ interface TestModel extends Model {
     name: string
 }
 
-test("DeltaStore stores pushed delta", () => {
+test("DeltaStore stores pushed solidDelta", () => {
     const store = createDeltaStore()
     const [pushDelta, { getStreamById }] = store
     const delta = pushDelta("create", { name: "test 1" })

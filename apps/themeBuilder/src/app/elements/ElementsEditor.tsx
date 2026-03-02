@@ -1,7 +1,7 @@
 import {A, createAsync, RouteSectionProps, useNavigate} from "@solidjs/router";
 import NavBarTemplate from "~/app/common/NavBarTemplate";
 import {useElementStyleStore} from "~/app/elements/repository/ElementStyleStore";
-import {DeltaContextProvider} from "@web/delta";
+import {DeltaContextProvider} from "../../../../../packages/solidDelta";
 import {getElementStylesQuery} from "~/app/elements/repository/ElementStyleRepository";
 import {ElementsEditorItems} from "~/app/elements/ElementsEditorItems/ElementsEditorItems";
 import {createEffect, createSignal, on, onCleanup, onMount} from "solid-js";

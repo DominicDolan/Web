@@ -2,7 +2,7 @@ import {isEqual} from "@web/utils"
 import {Model, ModelDelta} from "@web/schema";
 
 /**
- * Calculates the difference between two model instances and returns a delta object
+ * Calculates the difference between two model instances and returns a solidDelta object
  * containing only the changed fields.
  *
  * @template M - The model type extending the base Model interface
@@ -15,14 +15,14 @@ import {Model, ModelDelta} from "@web/schema";
  * ```typescript
  * const userBefore = { id: '1', updatedAt: new Date(), name: 'John', age: 30 };
  * const userAfter = { id: '1', updatedAt: new Date(), name: 'Jane', age: 30 };
- * const delta = calculateDelta(userBefore, userAfter);
+ * const solidDelta = calculateDelta(userBefore, userAfter);
  * // Returns: { modelId: '1', timestamp: Date, name: 'Jane' }
  * ```
  */
 export function calculateDelta<M extends Model>(before: M, after: M): ModelDelta<M> | null {
     // Ensure we're comparing the same model
     if (before.id !== after.id) {
-        throw new Error('Cannot calculate delta between different models');
+        throw new Error('Cannot calculate solidDelta between different models');
     }
 
     const changes: Partial<Omit<M, 'id' | 'updatedAt'>> = {};
@@ -57,7 +57,7 @@ export function calculateDelta<M extends Model>(before: M, after: M): ModelDelta
         return null;
     }
 
-    // Return the delta with required fields and changes
+    // Return the solidDelta with required fields and changes
     return {
         modelId: after.id,
         timestamp: Date.now(),

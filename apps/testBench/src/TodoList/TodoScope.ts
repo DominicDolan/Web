@@ -1,4 +1,4 @@
-import {createScopeProvider, defineDeltaScope, ModelRecord} from "@web/delta";
+import {createScopeProvider, defineDeltaScope, ModelRecord} from "../../../../packages/solidDelta";
 
 export type Todo = {
     id: string;

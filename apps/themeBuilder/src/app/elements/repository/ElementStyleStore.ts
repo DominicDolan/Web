@@ -3,7 +3,7 @@ import {
     createDeltaStoreTimestampMarker,
     DeltaAdapterParams,
     squashDeltasToSingle
-} from "@web/delta";
+} from "../../../../../../packages/solidDelta";
 import {ElementStyleDefinition} from "~/models/ElementStyleDefinition";
 import {ModelData, ModelDelta} from "@web/schema";
 import {createMemo} from "solid-js";

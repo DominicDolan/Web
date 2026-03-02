@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS themes (
 );
 
 -- 2. Color Events: The source of truth (Immutable History)
--- We track every delta/change here.
+-- We track every solidDelta/change here.
 CREATE TABLE IF NOT EXISTS color_events (
                                             id INTEGER PRIMARY KEY AUTOINCREMENT,
                                             theme_id TEXT NOT NULL,

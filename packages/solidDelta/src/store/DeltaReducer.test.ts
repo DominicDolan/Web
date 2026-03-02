@@ -8,7 +8,7 @@ interface TestModel extends Model {
 }
 
 describe("reduceDeltasAfter", () => {
-    test("list of single delta with name should reduce to model", () => {
+    test("list of single solidDelta with name should reduce to model", () => {
         const modelId = "someId"
         const name = "some name"
         const deltas: ModelDelta<TestModel>[] = [
@@ -111,7 +111,7 @@ describe("reduceDeltasAfter", () => {
 })
 
 describe("squashDeltasToSingle", () => {
-    test("Should be able to squash deltas to a single delta", () => {
+    test("Should be able to squash deltas to a single solidDelta", () => {
         const modelId = "someId"
         const name = "updated name"
         const lastName = "some last name"

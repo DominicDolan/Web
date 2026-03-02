@@ -1,6 +1,6 @@
 import {createAsync, query} from "@solidjs/router";
 import {Todo, TodoProvider} from "~/TodoList/TodoScope";
-import {ModelRecord} from "@web/delta";
+import {ModelRecord} from "../../../../packages/solidDelta";
 import {ModelDelta} from "@web/schema";
 import {createId} from "@paralleldrive/cuid2";
 import {Show, Suspense} from "solid-js";
@@ -34,14 +34,14 @@ const retrieveTodos = query(() => {
                 return acc;
             }, {} as ModelRecord<Todo>)
             resolve(record)
-        })
+        }, 1000)
     })
 }, "get-todos")
 
 
 export const TodoListPage = () => {
 
-    const todos = createAsync(() => retrieveTodos())
+    const todos = createAsync(() => retrieveTodos(), { deferStream: true })
     return (
         <div>
             <h1>TodoList</h1>

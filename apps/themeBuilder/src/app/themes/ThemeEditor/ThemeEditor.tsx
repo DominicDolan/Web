@@ -10,7 +10,7 @@ import {
     createModelStore, DeltaAdapterParams,
     deltaArrayToGroup, DeltaContextProvider,
     squashDeltasToSingle,
-} from "@web/delta";
+} from "../../../../../../packages/solidDelta";
 import {useDatabaseTable} from "@web/d1";
 import {ModelDelta} from "@web/schema";
 
@@ -45,7 +45,7 @@ const pushThemeDeltaAction = action(async (delta: ModelDelta<ThemeDefinition>) =
             try {
                 await db.insert(deltaToSave)
             } catch (e) {
-                console.error("Error saving color delta:", e)
+                console.error("Error saving color solidDelta:", e)
                 return json({
                     success: false,
                     error: e,

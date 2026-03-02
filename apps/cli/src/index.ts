@@ -104,7 +104,7 @@ async function updatePackageJson(
     }
 
     if (!includeDelta) {
-        delete pkg.dependencies["@web/delta"];
+        delete pkg.dependencies["@web/solidDelta"];
     }
 
     await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
@@ -236,7 +236,7 @@ async function main(): Promise<void> {
 
     const includeD1 = await promptYesNo(rl, "Include @web/d1?", true);
     const includeLins = await promptYesNo(rl, "Include @web/lins?", true);
-    const includeDelta = await promptYesNo(rl, "Include @web/delta?", true);
+    const includeDelta = await promptYesNo(rl, "Include @web/solidDelta?", true);
     const cssAnswer = (await rl.question("CSS framework (unocss/tailwind) [unocss]: ")).trim().toLowerCase();
     const cssFramework = cssAnswer === "tailwind" ? "tailwind" : "unocss";
 

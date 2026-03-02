@@ -1,6 +1,6 @@
 import "virtual:uno.css";
+import {Router, Route} from "@solidjs/router";
 import {TodoListPage} from "~/TodoList/TodoListPage";
-import {Route, Router} from "@solidjs/router";
 
 export default function App() {
   return (

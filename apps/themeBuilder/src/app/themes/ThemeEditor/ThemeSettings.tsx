@@ -1,7 +1,7 @@
 import {A, useNavigate, useLocation} from "@solidjs/router";
 import {createMemo, For, Show} from "solid-js";
 import {useThemeStore} from "~/app/themes/ThemeEditor/ThemeEditor";
-import {reduceDeltasToModel} from "@web/delta";
+import {reduceDeltasToModel} from "../../../../../../packages/solidDelta";
 
 export default function ThemeSettings(props: { children?: any, params: { themeId?: string }}) {
 

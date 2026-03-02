@@ -1,6 +1,6 @@
 import {Model} from "@web/schema";
-import {defineScope, ScopeProvider} from "./Scope";
 import {createModelStore, ModelRecord, ModelStoreFunctions, ModelStorePush} from "../store/ModelStore";
+import {defineScope, ScopeProvider} from "@web/solid-scope";
 
 export type DeltaScopeProps<M extends Model, Props extends { deltas: ModelRecord<M>}> = {
     models: M[],

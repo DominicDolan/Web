@@ -125,7 +125,7 @@ describe('calculateDelta', () => {
             };
 
             expect(() => calculateDelta(user1, user2)).toThrow(
-                'Cannot calculate delta between different models'
+                'Cannot calculate solidDelta between different models'
             );
         });
     });
