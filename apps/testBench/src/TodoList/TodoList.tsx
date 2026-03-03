@@ -8,6 +8,7 @@ import {TodoItem} from "~/TodoList/TodoItem";
 import {NewTodoItem} from "~/TodoList/NewTodoItem";
 
 const retrieveTodos = query(() => {
+    "use server"
     return new Promise<ModelRecord<Todo>>((resolve, reject) => {
         setTimeout(() => {
             const deltas: ModelDelta<Todo>[] = [
@@ -39,15 +40,14 @@ const retrieveTodos = query(() => {
     })
 }, "get-todos")
 
-export const TodoList = () => {
+export default () => {
 
     const todoDeltas = createAsync(() => retrieveTodos(), { deferStream: true })
     return (
         <div>
             <h1>TodoList</h1>
             <Suspense fallback={<div>Loading...</div>}>
-                <Show when={todoDeltas() != null}>
-                    <TodoProvider deltas={todoDeltas()!!} use={useTodoScope}>{
+                <Show when={todoDeltas()}>{(td) => <TodoProvider deltas={td()} use={useTodoScope}>{
                         ({todos}) => <>
                             <div flex={"col gap-4"}>
                                 <For each={todos}>{(todo) => (
@@ -57,7 +57,7 @@ export const TodoList = () => {
                                 <NewTodoItem/>
                             </div>
                         </>
-                    }</TodoProvider>
+                    }</TodoProvider>}
                 </Show>
             </Suspense>
         </div>

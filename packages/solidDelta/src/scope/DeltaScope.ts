@@ -18,6 +18,9 @@ export function defineDeltaScope<Props extends {deltas: ModelRecord<M>}, R, M ex
     setup: (props: DeltaScopeProps<Props, M>) => R
 ) {
     return defineScope(provider, (props) => {
+        if (props.deltas == null) {
+            throw new Error("DeltaScope requires a deltas prop")
+        }
         const modelStore = createModelStore(props.deltas)
 
         return setup({

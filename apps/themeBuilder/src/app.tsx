@@ -4,6 +4,7 @@ import "@web/lins/minimal.css"
 import ContactUs from "~/app/contact/ContactUs/ContactUs"
 import ThemeEditor from "~/app/themes/ThemeEditor/ThemeEditor"
 import ThemeSettings from "~/app/themes/ThemeEditor/ThemeSettings";
+import {lazy} from "solid-js";
 import ColorEditor, {preloadColors} from "~/app/themes/ColorEditor/ColorEditor";
 import ElementsEditor from "~/app/elements/ElementsEditor";
 
@@ -20,6 +21,7 @@ export default function App() {
                 </Route>
             </Route>
             <Route path={"/editor/:themeId/elements"} component={ElementsEditor}></Route>
+            <Route path={"/editor/:themeId/fonts"} component={lazy(() => import("~/app/themes/FontsEditor/FontsEditor"))}></Route>
             <Route path={"/contact"} component={ContactUs} info={{title: "Contact Us"}}/>
         </Router>
     )

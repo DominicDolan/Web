@@ -1,4 +1,4 @@
-import {A, useNavigate, useLocation} from "@solidjs/router";
+import {A, useNavigate} from "@solidjs/router";
 import {createMemo, For, Show} from "solid-js";
 import {useThemeScope} from "~/app/themes/ThemeEditor/ThemeEditor";
 import {reduceDeltasToModel} from "@web/solid-delta";

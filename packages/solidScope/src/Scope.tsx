@@ -1,4 +1,5 @@
-import {Context, createContext, useContext} from "solid-js";
+import {Context, createContext, onMount, useContext} from "solid-js";
+import {createId} from "@paralleldrive/cuid2";
 
 type ScopeContextValue<Props> = {
     props: Props
@@ -31,7 +32,7 @@ export function createScopeProvider<Props extends Record<string, any>>(): ScopeP
 
     function ProviderChildren(props: { use?: UseScope<Props, any>} & {children?: any}) {
         const scope = props.use?.() ?? null
-        return scope == null ? props.children : props.children(scope)
+        return <>{scope == null ? props.children : props.children(scope)}</>
     }
 
     function ContextStoreProvider(props: Props & { use?: UseScope<Props, any>} & {children?: any}) {

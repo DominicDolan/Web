@@ -1,6 +1,6 @@
 import {A, action, createAsync, json, query, useAction, useMatch, useNavigate, useSubmission,} from "@solidjs/router"
 import NavBarTemplate from "~/app/common/NavBarTemplate";
-import {For, onMount, Suspense} from "solid-js";
+import {For, onMount, Show, Suspense} from "solid-js";
 import AddThemeButton from "~/app/themes/ThemeEditor/AddThemeButton";
 import {keyedDebounce} from "@web/utils";
 import {ThemeDefinition, themeDefinitionSchema} from "~/models/ThemeDefinition";
@@ -91,7 +91,9 @@ export const useThemeScope = defineDeltaScope(ThemeProvider, (props) => {
     })
 
     return {
-        themes: props.models,
+        themes: () => {
+            return props.models
+        },
         pushThemeDelta: props.push,
         getThemeDeltasByModelId: (modelId: string) => props.store.getStreamById(modelId),
         flushSaveAction
@@ -113,22 +115,25 @@ export default function ThemeEditor(props: { children?: any }) {
     })
 
     return <Suspense>
-        <ThemeProvider deltas={themeDeltas()!!} use={useThemeScope}>{
-            (scope) => <div grid-cols={"[14rem,20rem,1fr]"} sizing={"w-full h-full"}>
-                <NavBarTemplate class={"themeEditor"}>
-                    <div sizing={"w-full"} flex={"col gap-6"}>
-                        <AddThemeButton/>
-                        <ul class="nav" flex={"col gap-4"} sizing={"w-full"} spacing={"pl-0"}>
-                            <For each={scope.themes}>
-                                {(theme) => <li>
-                                    <A href={`/editor/${theme.id}`} class={"display-block"}>{theme.name}</A>
-                                </li>}
-                            </For>
-                        </ul>
+        <Show when={themeDeltas()}>
+            {(td) => <ThemeProvider deltas={td()} use={useThemeScope}>{
+                    (scope) => <div grid-cols={"[14rem,20rem,1fr]"} sizing={"w-full h-full"}>
+                        <NavBarTemplate class={"themeEditor"}>
+                            <div sizing={"w-full"} flex={"col gap-6"}>
+                                <AddThemeButton/>
+                                <ul class="nav" flex={"col gap-4"} sizing={"w-full"} spacing={"pl-0"}>
+                                    <For each={scope.themes()}>
+                                        {(theme) => <li>
+                                            <A href={`/editor/${theme.id}`} class={"display-block"}>{theme.name}</A>
+                                        </li>}
+                                    </For>
+                                </ul>
+                            </div>
+                        </NavBarTemplate>
+                        {props.children}
                     </div>
-                </NavBarTemplate>
-                {props.children}
-            </div>
-        }</ThemeProvider>
+                }</ThemeProvider>
+            }
+        </Show>
     </Suspense>
 }
