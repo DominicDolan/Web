@@ -61,7 +61,7 @@ export const updateColors = action(async (delta: ModelDelta<ColorDefinition>, th
 
     return zodResponse(result, { revalidate: [] })
 })
-export const ColorProvider = createScopeProvider<{ deltas: Record<string, ModelDelta<ColorDefinition>[]>, themeId?: string }>()
+export const ColorProvider = createScopeProvider<{ deltas: Record<string, ModelDelta<ColorDefinition>[]> | undefined, themeId?: string }>()
 export const useColorScope = defineDeltaScope(ColorProvider, (props) => {
     const saveAction = useAction(updateColors)
     const colorsSubmission = useSubmission(updateColors)
@@ -130,7 +130,7 @@ export default function ColorEditor(props: RouteSectionProps<undefined>) {
                     </div>
                 </place-holder>
             }>
-            <ColorProvider deltas={colorDeltas()!!} use={useColorScope}>{
+            <ColorProvider deltas={colorDeltas()} use={useColorScope}>{
                 ({colors}) => <>
                     <hgroup flex={"row space-between"}>
                         <h3>Edit Colours</h3>

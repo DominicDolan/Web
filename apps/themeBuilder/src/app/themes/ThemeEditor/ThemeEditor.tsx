@@ -1,6 +1,6 @@
 import {A, action, createAsync, json, query, useAction, useMatch, useNavigate, useSubmission,} from "@solidjs/router"
 import NavBarTemplate from "~/app/common/NavBarTemplate";
-import {For, onMount, Show, Suspense} from "solid-js";
+import {createEffect, For, on, Suspense} from "solid-js";
 import AddThemeButton from "~/app/themes/ThemeEditor/AddThemeButton";
 import {keyedDebounce} from "@web/utils";
 import {ThemeDefinition, themeDefinitionSchema} from "~/models/ThemeDefinition";
@@ -58,7 +58,7 @@ const pushThemeDeltaAction = action(async (delta: ModelDelta<ThemeDefinition>) =
     }
 })
 
-export const ThemeProvider = createScopeProvider<{ deltas: Record<string, ModelDelta<ThemeDefinition>[]> }>()
+export const ThemeProvider = createScopeProvider<{ deltas: Record<string, ModelDelta<ThemeDefinition>[]> | undefined }>()
 export const useThemeScope = defineDeltaScope(ThemeProvider, (props) => {
     const deltaPushAction = useAction(pushThemeDeltaAction)
     const themeSubmission = useSubmission(pushThemeDeltaAction)
@@ -106,34 +106,31 @@ export default function ThemeEditor(props: { children?: any }) {
 
     const navigate = useNavigate()
     const matches = useMatch(() => "/editor/:themeId?/:subroute")
-    onMount(() => {
-        const deltas = themeDeltas()
-        if (deltas != null && Object.keys(deltas).length > 0 && (matches() == undefined || matches()?.params.themeId == null)) {
+
+    createEffect(on(themeDeltas, (deltas, prevDeltas, prev) => {
+        if (deltas != null && prevDeltas == null && Object.keys(deltas).length > 0 && (matches() == undefined || matches()?.params.themeId == null)) {
             const themeId = Object.keys(deltas)[0]
             navigate(`/editor/${themeId}`, { replace: true })
         }
-    })
+    }))
 
     return <Suspense>
-        <Show when={themeDeltas()}>
-            {(td) => <ThemeProvider deltas={td()} use={useThemeScope}>{
-                    (scope) => <div grid-cols={"[14rem,20rem,1fr]"} sizing={"w-full h-full"}>
-                        <NavBarTemplate class={"themeEditor"}>
-                            <div sizing={"w-full"} flex={"col gap-6"}>
-                                <AddThemeButton/>
-                                <ul class="nav" flex={"col gap-4"} sizing={"w-full"} spacing={"pl-0"}>
-                                    <For each={scope.themes()}>
-                                        {(theme) => <li>
-                                            <A href={`/editor/${theme.id}`} class={"display-block"}>{theme.name}</A>
-                                        </li>}
-                                    </For>
-                                </ul>
-                            </div>
-                        </NavBarTemplate>
-                        {props.children}
+        <ThemeProvider deltas={themeDeltas()} use={useThemeScope}>{
+            (scope) => <div grid-cols={"[14rem,20rem,1fr]"} sizing={"w-full h-full"}>
+                <NavBarTemplate class={"themeEditor"}>
+                    <div sizing={"w-full"} flex={"col gap-6"}>
+                        <AddThemeButton/>
+                        <ul class="nav" flex={"col gap-4"} sizing={"w-full"} spacing={"pl-0"}>
+                            <For each={scope.themes()}>
+                                {(theme) => <li>
+                                    <A href={`/editor/${theme.id}`} class={"display-block"}>{theme.name}</A>
+                                </li>}
+                            </For>
+                        </ul>
                     </div>
-                }</ThemeProvider>
-            }
-        </Show>
+                </NavBarTemplate>
+                {props.children}
+            </div>
+        }</ThemeProvider>
     </Suspense>
 }
