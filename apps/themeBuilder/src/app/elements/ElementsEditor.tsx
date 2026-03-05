@@ -3,7 +3,7 @@ import NavBarTemplate from "~/app/common/NavBarTemplate";
 import {ElementStyleProvider, useElementStyleScope} from "~/app/elements/repository/ElementStyleStore";
 import {getElementStylesQuery} from "~/app/elements/repository/ElementStyleRepository";
 import {ElementsEditorItems} from "~/app/elements/ElementsEditorItems/ElementsEditorItems";
-import {createEffect, createSignal, on, onCleanup, onMount, Show} from "solid-js";
+import {createEffect, createSignal, on, onCleanup, onMount, Show, Suspense} from "solid-js";
 
 export default function ElementsEditor(props: RouteSectionProps<undefined>) {
 
@@ -88,48 +88,45 @@ export default function ElementsEditor(props: RouteSectionProps<undefined>) {
         onCleanup(() => scrollContainer()?.removeEventListener("scroll", handleScroll));
     });
 
-    return <Show when={elementStyleDeltas()}>
-        {(esd) => <ElementStyleProvider themeId={themeId!!} deltas={esd()} use={useElementStyleScope}>
-            {
-                ({elementStyles, cssContent}) => <div grid-cols={"[20rem,1fr]"} sizing={"h-full"}>
-                    <NavBarTemplate
-                        prepend={<button class={"icon flat surface"} sizing={"w-2.5rem h-2.5rem"} spacing={"ma-0.5rem"}
-                                         flex={"row center justify-center"} onClick={goBack}>
-                            <i>arrow_back</i>
-                        </button>}>
+    return <Suspense>
+        <ElementStyleProvider themeId={themeId!!} deltas={elementStyleDeltas()} use={useElementStyleScope}>
+        {({elementStyles, cssContent}) => <div grid-cols={"[20rem,1fr]"} sizing={"h-full"}>
+            <NavBarTemplate prepend={<button class={"icon flat surface"} sizing={"w-2.5rem h-2.5rem"}
+                                             spacing={"ma-0.5rem"}
+                                             flex={"row center justify-center"} onClick={goBack}>
+                                <i>arrow_back</i>
+                            </button>}>
 
-                        <section spacing={"ml-0.75rem"} flex={"col gap-3"}>
-                            <h2>Elements Editor</h2>
-                            <ul class={"nav"} flex={"col gap-1"}>
-                                <li onClick={() => scrollToSection("inputStyles")} class={activeClass("inputStyles")}>
-                                    Inputs
-                                </li>
-                                <li onClick={() => scrollToSection("buttonStyles")} class={activeClass("buttonStyles")}>
-                                    Buttons
-                                </li>
-                                <li onClick={() => scrollToSection("cardStyles")} class={activeClass("cardStyles")}>
-                                    Cards
-                                </li>
-                                <li onClick={() => scrollToSection("listStyles")} class={activeClass("listStyles")}>
-                                    Lists
-                                </li>
-                            </ul>
-                        </section>
-                    </NavBarTemplate>
-                    <div ref={setScrollContainer} sizing={"h-full"} style={"overflow-y: auto"}>
-                        <ElementsEditorItems styles={elementStyles}/>
-                    </div>
-                    <style>
+                <section spacing={"ml-0.75rem"} flex={"col gap-3"}>
+                    <h2>Elements Editor</h2>
+                    <ul class={"nav"} flex={"col gap-1"}>
+                        <li onClick={() => scrollToSection("inputStyles")} class={activeClass("inputStyles")}>
+                            Inputs
+                        </li>
+                        <li onClick={() => scrollToSection("buttonStyles")} class={activeClass("buttonStyles")}>
+                            Buttons
+                        </li>
+                        <li onClick={() => scrollToSection("cardStyles")} class={activeClass("cardStyles")}>
+                            Cards
+                        </li>
+                        <li onClick={() => scrollToSection("listStyles")} class={activeClass("listStyles")}>
+                            Lists
+                        </li>
+                    </ul>
+                </section>
+            </NavBarTemplate>
+            <div ref={setScrollContainer} sizing={"h-full"} style={"overflow-y: auto"}>
+                <ElementsEditorItems styles={elementStyles}/>
+            </div>
+            <style>
 
-                        {// language=CSS
-                            `@scope (.elementsPreview) {
-                                 ${cssContent()}
-                             }
-                            `}
-                    </style>
-                </div>
-            }
-        </ElementStyleProvider>
-        }
-    </Show>
+                {// language=CSS
+                    `@scope (.elementsPreview) {
+                         ${cssContent()}
+                     }
+                    `}
+            </style>
+        </div>}
+    </ElementStyleProvider>
+    </Suspense>
 }

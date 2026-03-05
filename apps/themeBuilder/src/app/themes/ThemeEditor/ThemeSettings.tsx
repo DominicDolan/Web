@@ -1,5 +1,5 @@
 import {A, useNavigate} from "@solidjs/router";
-import {createMemo, For, Show} from "solid-js";
+import {createMemo, For, onMount, Show} from "solid-js";
 import {useThemeScope} from "~/app/themes/ThemeEditor/ThemeEditor";
 import {reduceDeltasToModel} from "@web/solid-delta";
 
@@ -15,16 +15,54 @@ export default function ThemeSettings(props: { children?: any, params: { themeId
         return reduceDeltasToModel(stream)
     })
 
+    let cssClassHasBeenEdited = theme()?.class != null
+    onMount(() => {
+        const t = theme()
+        if (t == null) return
+
+        cssClassHasBeenEdited = t.class != null
+        const name = t.name
+        if (!cssClassHasBeenEdited && name != null) {
+            pushThemeDelta(t.id, {class: getCssClassFromName(name)})
+        }
+    })
+
+    function getCssClassFromName(name: string) {
+        return name
+            .replace(/[^a-zA-Z0-9]/g, " ")
+            .split(" ")
+            .filter(word => word.length > 0)
+            .map((word, index) =>
+                index === 0
+                    ? word.toLowerCase()
+                    : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+            )
+            .join("")
+    }
+
     function onNameChange(e: Event) {
         const t = theme()
         if (t == null) return
-        pushThemeDelta(t.id, { name: (e.target as HTMLInputElement).value })
+        const name = (e.target as HTMLInputElement).value
+        if (!cssClassHasBeenEdited) {
+            const cssClass = getCssClassFromName(name)
+            pushThemeDelta(t.id, {name, class: cssClass})
+        } else {
+            pushThemeDelta(t.id, { name })
+        }
     }
 
     function onDescriptionChange(e: Event) {
         const t = theme()
         if (t == null) return
         pushThemeDelta(t.id, { description: (e.target as HTMLInputElement).value })
+    }
+
+    function onCssClassChange(e: Event) {
+        cssClassHasBeenEdited = true
+        const t = theme()
+        if (t == null) return
+        pushThemeDelta(t.id, { class: (e.target as HTMLInputElement).value })
     }
 
     function onBlur() {
@@ -83,6 +121,13 @@ export default function ThemeSettings(props: { children?: any, params: { themeId
                         <label>Name</label>
                         <input-shell>
                             <input type={"text"} value={theme()?.name ?? ""} onInput={onNameChange} onBlur={onBlur}
+                                   required/>
+                        </input-shell>
+                    </form-field>
+                    <form-field flex={"col gap-2"}>
+                        <label>CSS Class</label>
+                        <input-shell>
+                            <input type={"text"} value={theme()?.class ?? ""} onInput={onCssClassChange} onBlur={onBlur}
                                    required/>
                         </input-shell>
                     </form-field>

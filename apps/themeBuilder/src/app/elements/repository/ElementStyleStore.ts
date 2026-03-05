@@ -10,7 +10,7 @@ import {updateElementStyleAction} from "~/app/elements/repository/ElementStyleRe
 import {useAction, useSubmission} from "@solidjs/router";
 import {createScopeProvider} from "@web/solid-scope";
 
-export const ElementStyleProvider = createScopeProvider<{deltas: ModelRecord<ElementStyleDefinition>, themeId: string }>()
+export const ElementStyleProvider = createScopeProvider<{deltas: ModelRecord<ElementStyleDefinition> | undefined, themeId: string }>()
 
 export const useElementStyleScope = defineDeltaScope(ElementStyleProvider, (props) => {
     const inputElements = createMemo(() => props.models.filter(el => el.element === "input"))

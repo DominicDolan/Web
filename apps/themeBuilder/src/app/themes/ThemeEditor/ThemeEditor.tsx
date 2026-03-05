@@ -10,7 +10,7 @@ import {
     createModelStore,
     deltaArrayToGroup,
     squashDeltasToSingle,
-    defineDeltaScope
+    defineDeltaScope, ModelRecord
 } from "@web/solid-delta";
 import {useDatabaseTable} from "@web/d1";
 import {ModelDelta} from "@web/schema";
