@@ -1,20 +1,18 @@
 import {createStore} from "solid-js/store";
 import {batch} from "solid-js";
-import {Model} from "@web/schema";
+import {Model, ModelDelta} from "@web/schema";
 import {DeltaStore} from "./DeltaStore";
-import {DeltaMachine} from "./DeltaMachine";
 
-function createDeltaStoreTimestampMarker<M extends Model>(store: DeltaStore<M> | DeltaMachine<M> | DeltaStore<M>[1] | DeltaMachine<M>[2]) {
+function createDeltaStoreTimestampMarker<M extends Model>(store: DeltaStore<M> | DeltaStore<M>[1]) {
 
-    const storeFns: DeltaStore<M>[1] | DeltaMachine<M>[2] = (function () {
+    const storeFns: DeltaStore<M>[1] = (function () {
         if ("getStreamById" in store) {
             return store
         }
         if ("getStreamById" in store[1]) {
             return store[1] as DeltaStore<M>[1]
         }
-
-        return store[2] as DeltaMachine<M>[2]
+        throw new Error("Invalid store")
     })()
 
     const [timestampsById, setTimestampsById] = createStore<Record<string, number>>({})
@@ -48,9 +46,17 @@ function createDeltaStoreTimestampMarker<M extends Model>(store: DeltaStore<M> |
         return stream.slice()
     }
 
+    function isMarked(delta: ModelDelta<M>) {
+        const marked = timestampsById[delta.modelId]
+        if (marked == null) return false
+
+        return delta.timestamp >= marked
+    }
+
     return {
         mark,
         markAll,
+        isMarked,
         getStreamFromMarked,
         getTimestampsById: (id: string) => timestampsById[id] ?? 0
     }

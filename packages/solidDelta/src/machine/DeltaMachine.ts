@@ -3,6 +3,7 @@ import {createEvent, createKeyedEvent, EventListener, KeyedEventListener} from "
 import {Model, ModelData, PartialModel, ModelDelta} from "@web/schema";
 import {createDeltaStore, DeltaStore} from "./DeltaStore";
 import {reduceDeltasOntoModel, reduceDeltasToModel} from "./DeltaReducer";
+import {createDeltaStoreTimestampMarker} from "./DeltaStoreTimestampMarker";
 
 export type DeltaMachinePush<M extends Model> = {
     (action: "create", deltaPayload: Partial<ModelData<M>>): M;
@@ -22,16 +23,31 @@ export type DeltaMachineFunctions<M extends Model> = {
     onModelUpdateById: KeyedEventListener<[PartialModel<M>]>[0]
 }
 
-export type DeltaMachine<M extends Model> = [
-    modelsList: M[],
-    DeltaMachinePush<M>,
-    DeltaMachineFunctions<M>
-]
+export type DeltaMachine<M extends Model> = {
+    models: M[],
+    push: DeltaMachinePush<M>,
+    markOld: (id: string, timestamp?: number) => void,
+    markAllOld: (timestamp?: number) => void,
+    getModelById: (id: string) => M | undefined,
+    getStreamById: DeltaStore<M>[1]["getStreamById"],
+    getNewDeltasById: (id: string) => ModelDelta<M>[],
+    getIds: () => string[],
+    pushMany: DeltaStore<M>[1]["pushMany"],
+    on: {
+        modelCreate: EventListener<[PartialModel<M>]>[0]
+        modelUpdate: EventListener<[PartialModel<M>]>[0]
+        modelDelete: EventListener<[string]>[0]
+        anyDeltaPush: DeltaStore<M>[1]["onAnyDeltaPush"]
+        newDeltaPush: EventListener<[ModelDelta<M>[]]>[0]
+        modelUpdateById: KeyedEventListener<[PartialModel<M>]>[0]
+    }
+}
 
 export type ModelRecord<M extends Model> = Record<string, ModelDelta<M>[]>
 
 export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<M>): DeltaMachine<M> {
-    const [pushDelta, { getStreamById, pushMany, onCreateDeltaPush, onUpdateDeltaPushById, onAnyDeltaPush, getIds }] = createDeltaStore()
+    const deltaStore = createDeltaStore()
+    const [pushDelta, { getStreamById, pushMany, onCreateDeltaPush, onUpdateDeltaPushById, onAnyDeltaPush, getIds }] = deltaStore
     const [modelsById, setModelsById] = createStore<Record<string, M>>({})
     const [modelsListStore, setModelListStore] = createStore<M[]>([])
 
@@ -39,8 +55,11 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
     const [onModelUpdateById, triggerModelUpdateById] = createKeyedEvent<[PartialModel<M>]>()
     const [onModelCreate, triggerModelCreate] = createEvent<[PartialModel<M>]>()
     const [onCreateDeltaPushInternal, triggerCreateDeltaPush] = createEvent<[ModelDelta<M>[]]>()
+    const [onNewDeltaPush, triggerNewDeltaPush] = createEvent<[ModelDelta<M>[]]>()
 
     const [onModelDelete, triggerModelDelete] = createEvent<[string]>()
+
+    const deltaTimestampMarker = createDeltaStoreTimestampMarker(deltaStore)
 
     onCreateDeltaPush((values) => {
         triggerCreateDeltaPush(values)
@@ -80,6 +99,12 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
 
     })
 
+    onAnyDeltaPush((deltas) => {
+        const newDeltas = deltas.filter(d => deltaTimestampMarker.isMarked(d))
+        if (newDeltas.length === 0) return
+        triggerNewDeltaPush(newDeltas)
+    })
+
     if (initialDeltas != null) {
         for (const key in initialDeltas) {
             pushMany(initialDeltas[key])
@@ -114,21 +139,25 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
         return modelsById[delta.modelId]
     }
 
-    return [
-        modelsListStore,
-        pushDeltaAndGetModel,
-        {
-            getModelById(id: string): M | undefined {
-                return modelsById[id]
-            },
-            getIds,
-            pushMany,
-            getStreamById,
-            onModelUpdate,
-            onModelUpdateById,
-            onAnyDeltaPush,
-            onModelCreate,
-            onModelDelete
+    return {
+        models: modelsListStore,
+        push: pushDeltaAndGetModel,
+        getModelById(id: string): M | undefined {
+            return modelsById[id]
+        },
+        getStreamById,
+        getNewDeltasById: deltaTimestampMarker.getStreamFromMarked,
+        getIds,
+        pushMany,
+        markOld: deltaTimestampMarker.mark,
+        markAllOld: deltaTimestampMarker.markAll,
+        on: {
+            modelCreate: onModelCreate,
+            anyDeltaPush: onAnyDeltaPush,
+            modelUpdateById: onModelUpdateById,
+            modelDelete: onModelDelete,
+            modelUpdate: onModelUpdate,
+            newDeltaPush: onNewDeltaPush
         }
-    ] as DeltaMachine<M>
+    }
 }

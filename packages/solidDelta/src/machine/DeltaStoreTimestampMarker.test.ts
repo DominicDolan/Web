@@ -114,21 +114,4 @@ describe("createDeltaStoreTimestampMarker", () => {
         expect(marker.getStreamFromMarked("model-c").map(delta => delta.timestamp)).toEqual([8])
         expect(marker.getStreamFromMarked("model-d").map(delta => delta.timestamp)).toEqual([9])
     })
-
-    test("works when initialized with a DeltaMachine tuple", () => {
-        const deltaMachine = createDeltaMachine<TestModel>()
-        const [, , {pushMany}] = deltaMachine
-        const modelId = "model-ms"
-
-        pushMany([
-            { modelId, timestamp: 50, type: "create", payload: { name: "base" } },
-            { modelId, timestamp: 80, type: "update", payload: { age: 12 } },
-        ])
-
-        const marker = createDeltaStoreTimestampMarker(deltaMachine)
-        marker.mark(modelId)
-
-        expect(marker.getTimestampsById(modelId)).toBe(80)
-        expect(marker.getStreamFromMarked(modelId)).toEqual([])
-    })
 })
