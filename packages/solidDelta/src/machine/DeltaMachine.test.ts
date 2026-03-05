@@ -1,5 +1,5 @@
 import {describe, expect, test} from "vitest"
-import {createModelStore} from "./ModelStore";
+import {createDeltaMachine} from "./DeltaMachine";
 import {Model} from "@web/schema";
 
 interface TestModel extends Model {
@@ -15,9 +15,9 @@ async function sleep(time: number) {
     })
 }
 
-describe("ModelStore deltaStore reading", () => {
-    test("Update to solidDelta store causes ReadModelStore to update", async () => {
-        const store = createModelStore<TestModel>()
+describe("DeltaMachine deltaStore reading", () => {
+    test("Update to solidDelta machine causes ReadDeltaMachine to update", async () => {
+        const store = createDeltaMachine<TestModel>()
         const [values, pushDelta, { pushMany }] = store
 
         const modelId = "someId"
@@ -41,8 +41,8 @@ describe("ModelStore deltaStore reading", () => {
 
     })
 
-    test("Updating 2 properties separately causes ReadModelStore to update", async () => {
-        const store = createModelStore<TestModel>()
+    test("Updating 2 properties separately causes ReadDeltaMachine to update", async () => {
+        const store = createDeltaMachine<TestModel>()
         const [values, pushDelta, { pushMany }] = store
 
         const modelId = "someId"
@@ -80,8 +80,8 @@ describe("ModelStore deltaStore reading", () => {
 
     })
 
-    test("Updating 2 properties separately with the same timestamp causes ReadModelStore to update", async () => {
-        const store = createModelStore<TestModel>()
+    test("Updating 2 properties separately with the same timestamp causes ReadDeltaMachine to update", async () => {
+        const store = createDeltaMachine<TestModel>()
         const [values, _, { pushMany }] = store
 
         const modelId = "someId"
@@ -118,8 +118,8 @@ describe("ModelStore deltaStore reading", () => {
 
     })
 
-    test("Pushing to the model store returns the updated model", async () => {
-        const store = createModelStore<TestModel>()
+    test("Pushing to the model machine returns the updated model", async () => {
+        const store = createDeltaMachine<TestModel>()
         const [_, push, { pushMany }] = store
 
         const modelId = "someId"
@@ -137,8 +137,8 @@ describe("ModelStore deltaStore reading", () => {
         expect(newModel.name).toEqual(name)
     })
 
-    test("Deleting a record removes it from the store", () => {
-        const store = createModelStore<TestModel>()
+    test("Deleting a record removes it from the machine", () => {
+        const store = createDeltaMachine<TestModel>()
         const [values, push, { pushMany }] = store
 
         const modelId = "someId"

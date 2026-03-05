@@ -2,7 +2,7 @@ import {useDatabaseTable} from "@web/d1";
 import {ElementStyleDefinition, elementStyleDefinition} from "~/models/ElementStyleDefinition";
 import {
     calculateDelta,
-    createModelStore,
+    createDeltaMachine,
     deltaArrayToGroup,
     squashDeltasToSingle
 } from "@web/solid-delta";
@@ -26,7 +26,7 @@ export const updateElementStyleAction = action(async (delta: ModelDelta<ElementS
     const existingDeltas = await db.getOne(delta.modelId)
 
     const modelId = delta.modelId
-    const [_, push] = createModelStore({[modelId]: existingDeltas})
+    const [_, push] = createDeltaMachine({[modelId]: existingDeltas})
 
     const model = push(delta.modelId, delta.payload)
 

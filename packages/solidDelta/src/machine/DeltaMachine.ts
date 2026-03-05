@@ -4,13 +4,13 @@ import {Model, ModelData, PartialModel, ModelDelta} from "@web/schema";
 import {createDeltaStore, DeltaStore} from "./DeltaStore";
 import {reduceDeltasOntoModel, reduceDeltasToModel} from "./DeltaReducer";
 
-export type ModelStorePush<M extends Model> = {
+export type DeltaMachinePush<M extends Model> = {
     (action: "create", deltaPayload: Partial<ModelData<M>>): M;
     (action: "delete", modelId: string): M;
     (modelId: string, deltaPayload: Partial<ModelData<M>>): M;
 }
 
-export type ModelStoreFunctions<M extends Model> = {
+export type DeltaMachineFunctions<M extends Model> = {
     getModelById(id: string): M | undefined,
     getStreamById(id: string): ModelDelta<M>[] | undefined,
     getIds(): string[],
@@ -22,15 +22,15 @@ export type ModelStoreFunctions<M extends Model> = {
     onModelUpdateById: KeyedEventListener<[PartialModel<M>]>[0]
 }
 
-export type ModelStore<M extends Model> = [
+export type DeltaMachine<M extends Model> = [
     modelsList: M[],
-    ModelStorePush<M>,
-    ModelStoreFunctions<M>
+    DeltaMachinePush<M>,
+    DeltaMachineFunctions<M>
 ]
 
 export type ModelRecord<M extends Model> = Record<string, ModelDelta<M>[]>
 
-export function createModelStore<M extends Model>(initialDeltas?: ModelRecord<M>): ModelStore<M> {
+export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<M>): DeltaMachine<M> {
     const [pushDelta, { getStreamById, pushMany, onCreateDeltaPush, onUpdateDeltaPushById, onAnyDeltaPush, getIds }] = createDeltaStore()
     const [modelsById, setModelsById] = createStore<Record<string, M>>({})
     const [modelsListStore, setModelListStore] = createStore<M[]>([])
@@ -130,5 +130,5 @@ export function createModelStore<M extends Model>(initialDeltas?: ModelRecord<M>
             onModelCreate,
             onModelDelete
         }
-    ] as ModelStore<M>
+    ] as DeltaMachine<M>
 }

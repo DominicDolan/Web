@@ -2,11 +2,11 @@ import {createStore} from "solid-js/store";
 import {batch} from "solid-js";
 import {Model} from "@web/schema";
 import {DeltaStore} from "./DeltaStore";
-import {ModelStore} from "./ModelStore";
+import {DeltaMachine} from "./DeltaMachine";
 
-function createDeltaStoreTimestampMarker<M extends Model>(store: DeltaStore<M> | ModelStore<M> | DeltaStore<M>[1] | ModelStore<M>[2]) {
+function createDeltaStoreTimestampMarker<M extends Model>(store: DeltaStore<M> | DeltaMachine<M> | DeltaStore<M>[1] | DeltaMachine<M>[2]) {
 
-    const storeFns: DeltaStore<M>[1] | ModelStore<M>[2] = (function () {
+    const storeFns: DeltaStore<M>[1] | DeltaMachine<M>[2] = (function () {
         if ("getStreamById" in store) {
             return store
         }
@@ -14,7 +14,7 @@ function createDeltaStoreTimestampMarker<M extends Model>(store: DeltaStore<M> |
             return store[1] as DeltaStore<M>[1]
         }
 
-        return store[2] as ModelStore<M>[2]
+        return store[2] as DeltaMachine<M>[2]
     })()
 
     const [timestampsById, setTimestampsById] = createStore<Record<string, number>>({})

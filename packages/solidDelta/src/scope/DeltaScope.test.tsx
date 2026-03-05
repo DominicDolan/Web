@@ -6,7 +6,7 @@ import { Model, ModelDelta } from "@web/schema";
 import { createScopeProvider } from "@web/solid-scope";
 
 import { defineDeltaScope } from "./DeltaScope";
-import { ModelRecord } from "../store/ModelStore";
+import { ModelRecord } from "../machine/DeltaMachine";
 
 interface CounterModel extends Model {
   count: number;
@@ -23,7 +23,7 @@ function toRecord<M extends Model>(deltas: ModelDelta<M>[]): ModelRecord<M> {
 }
 
 describe("defineDeltaScope", () => {
-  it("hydrates models from deltas and exposes store updates", () => {
+  it("hydrates models from deltas and exposes machine updates", () => {
     const ScopeProvider = createScopeProvider<{
       deltas: ModelRecord<CounterModel>;
       multiplier: number;

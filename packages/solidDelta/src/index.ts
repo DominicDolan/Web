@@ -2,9 +2,9 @@
 export * from "./scope/DeltaScope"
 
 // Store
-export * from './store/DeltaGenerator';
-export * from './store/DeltaMerger';
-export * from './store/DeltaReducer';
-export * from './store/DeltaStore';
-export * from './store/DeltaStoreTimestampMarker';
-export * from './store/ModelStore';
+export * from './machine/DeltaGenerator';
+export * from './machine/DeltaMerger';
+export * from './machine/DeltaReducer';
+export * from './machine/DeltaStore';
+export * from './machine/DeltaStoreTimestampMarker';
+export * from './machine/DeltaMachine';

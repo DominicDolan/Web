@@ -17,7 +17,7 @@ import {ColorDefinition, colorDefinitionSchema} from "~/models/ColorDefinition";
 import {useDatabaseTable} from "@web/d1";
 import {
     calculateDelta, createDeltaStoreTimestampMarker,
-    createModelStore, defineDeltaScope, deltaArrayToGroup, squashDeltasToSingle,
+    createDeltaMachine, defineDeltaScope, deltaArrayToGroup, squashDeltasToSingle,
 } from "@web/solid-delta";
 import {ModelDelta} from "@web/schema";
 import {createScopeProvider} from "@web/solid-scope";
@@ -35,7 +35,7 @@ export const updateColors = action(async (delta: ModelDelta<ColorDefinition>, th
     const modelId = delta.modelId
     const db = useDatabaseTable(colorDefinitionSchema)
     const existingDeltas: ModelDelta<ColorDefinition>[] = await db.getOne(modelId)
-    const [_, push] = createModelStore({[modelId]: existingDeltas})
+    const [_, push] = createDeltaMachine({[modelId]: existingDeltas})
 
     const model = push(delta.modelId, delta.payload)
 

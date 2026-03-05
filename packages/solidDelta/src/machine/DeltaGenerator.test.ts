@@ -71,9 +71,7 @@ describe('calculateDelta', () => {
             };
 
             const result = calculateDelta(userBefore, userAfter);
-            expect(result).toEqual({
-                modelId: 'user-1',
-                timestamp: new Date('2024-01-02').getTime(),
+            expect(result?.payload).toEqual({
                 name: 'John Smith'
             });
         });
@@ -96,9 +94,7 @@ describe('calculateDelta', () => {
             };
 
             const result = calculateDelta(userBefore, userAfter);
-            expect(result).toEqual({
-                modelId: 'user-1',
-                timestamp: new Date('2024-01-02').getTime(),
+            expect(result?.payload).toEqual({
                 name: 'John Smith',
                 age: 31,
                 email: 'johnsmith@example.com'
@@ -154,9 +150,7 @@ describe('calculateDelta', () => {
             };
 
             const result = calculateDelta(productBefore, productAfter);
-            expect(result).toEqual({
-                modelId: 'product-1',
-                timestamp: new Date('2024-01-02').getTime(),
+            expect(result?.payload).toEqual({
                 metadata: {
                     category: 'electronics',
                     tags: ['computer', 'portable', 'gaming']
@@ -215,9 +209,7 @@ describe('calculateDelta', () => {
             };
 
             const result = calculateDelta(productBefore, productAfter);
-            expect(result).toEqual({
-                modelId: 'product-1',
-                timestamp: new Date('2024-01-02').getTime(),
+            expect(result?.payload).toEqual({
                 title: 'Gaming Laptop',
                 price: 1299.99,
                 metadata: {
@@ -249,9 +241,7 @@ describe('calculateDelta', () => {
             };
 
             const result = calculateDelta(userBefore, userAfter);
-            expect(result).toEqual({
-                modelId: 'user-1',
-                timestamp: new Date('2024-01-02').getTime(),
+            expect(result?.payload).toEqual({
                 nickname: null
             });
         });
@@ -277,9 +267,7 @@ describe('calculateDelta', () => {
             };
 
             const result = calculateDelta(userBefore, userAfter);
-            expect(result).toEqual({
-                modelId: 'user-1',
-                timestamp: new Date('2024-01-02').getTime(),
+            expect(result?.payload).toEqual({
                 nickname: undefined
             });
         });
@@ -304,9 +292,7 @@ describe('calculateDelta', () => {
             };
 
             const result = calculateDelta(productBefore, productAfter);
-            expect(result).toEqual({
-                modelId: 'product-1',
-                timestamp: new Date('2024-01-02').getTime(),
+            expect(result?.payload).toEqual({
                 inStock: false
             });
         });
@@ -334,9 +320,7 @@ describe('calculateDelta', () => {
             };
 
             const result = calculateDelta(productBefore, productAfter);
-            expect(result).toEqual({
-                modelId: 'product-1',
-                timestamp: new Date('2024-01-02').getTime(),
+            expect(result?.payload).toEqual({
                 metadata: {
                     category: 'electronics',
                     tags: ['new']

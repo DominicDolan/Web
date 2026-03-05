@@ -7,7 +7,7 @@ import {ThemeDefinition, themeDefinitionSchema} from "~/models/ThemeDefinition";
 import {
     calculateDelta,
     createDeltaStoreTimestampMarker,
-    createModelStore,
+    createDeltaMachine,
     deltaArrayToGroup,
     squashDeltasToSingle,
     defineDeltaScope, ModelRecord
@@ -33,7 +33,7 @@ const pushThemeDeltaAction = action(async (delta: ModelDelta<ThemeDefinition>) =
     const db = useDatabaseTable(themeDefinitionSchema)
 
     const existingDeltas = await db.getOne(modelId)
-    const [_, push] = createModelStore({[modelId]: existingDeltas})
+    const [_, push] = createDeltaMachine({[modelId]: existingDeltas})
 
     const model = push(delta.modelId, delta.payload)
 

@@ -1,6 +1,6 @@
 import {createEffect} from "solid-js";
 import {Model, ModelDelta} from "@web/schema";
-import {createModelStore, ModelRecord, ModelStoreFunctions, ModelStorePush} from "../store/ModelStore";
+import {createDeltaMachine, ModelRecord, DeltaMachineFunctions, DeltaMachinePush} from "../machine/DeltaMachine";
 import {defineScope, ScopeProvider} from "@web/solid-scope";
 
 
@@ -9,9 +9,9 @@ type InferModelFromProps<P> =
 
 export type DeltaScopeProps<Props extends { deltas: ModelRecord<M> | undefined}, M extends Model> = {
     models: M[],
-    push: ModelStorePush<M>,
+    push: DeltaMachinePush<M>,
     props: Props,
-    store: ModelStoreFunctions<M>
+    store: DeltaMachineFunctions<M>
 }
 
 export function defineDeltaScope<Props extends {deltas: ModelRecord<M> | undefined}, R, M extends Model = InferModelFromProps<Props>>(
@@ -24,7 +24,7 @@ export function defineDeltaScope<Props extends {deltas: ModelRecord<M> | undefin
         if (props.deltas == null && !supportsLateHydration) {
             throw new Error("DeltaScope requires a deltas prop that cannot be null or undefined")
         }
-        const modelStore = createModelStore<M>()
+        const deltaMachine = createDeltaMachine<M>()
         const seenByModel = new Map<string, Set<string>>()
 
         function toDeltaKey(delta: ModelDelta<M>): string {
@@ -46,7 +46,7 @@ export function defineDeltaScope<Props extends {deltas: ModelRecord<M> | undefin
             streamSet.add(key)
         }
 
-        modelStore[2].onAnyDeltaPush((incoming) => {
+        deltaMachine[2].onAnyDeltaPush((incoming) => {
             for (const delta of incoming) {
                 markSeen(delta)
             }
@@ -72,15 +72,15 @@ export function defineDeltaScope<Props extends {deltas: ModelRecord<M> | undefin
             }
 
             if (next.length > 0) {
-                modelStore[2].pushMany(next)
+                deltaMachine[2].pushMany(next)
             }
         })
 
         return setup({
-            models: modelStore[0],
-            push: modelStore[1],
+            models: deltaMachine[0],
+            push: deltaMachine[1],
             props,
-            store: modelStore[2]
+            store: deltaMachine[2]
         })
     })
 }

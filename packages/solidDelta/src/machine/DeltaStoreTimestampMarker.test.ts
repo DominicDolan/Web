@@ -1,7 +1,7 @@
 import {describe, expect, test} from "vitest"
 import {Model} from "@web/schema"
 import {createDeltaStore} from "./DeltaStore"
-import {createModelStore} from "./ModelStore"
+import {createDeltaMachine} from "./DeltaMachine"
 import {createDeltaStoreTimestampMarker} from "./DeltaStoreTimestampMarker"
 
 interface TestModel extends Model {
@@ -115,9 +115,9 @@ describe("createDeltaStoreTimestampMarker", () => {
         expect(marker.getStreamFromMarked("model-d").map(delta => delta.timestamp)).toEqual([9])
     })
 
-    test("works when initialized with a ModelStore tuple", () => {
-        const modelStore = createModelStore<TestModel>()
-        const [, , {pushMany}] = modelStore
+    test("works when initialized with a DeltaMachine tuple", () => {
+        const deltaMachine = createDeltaMachine<TestModel>()
+        const [, , {pushMany}] = deltaMachine
         const modelId = "model-ms"
 
         pushMany([
@@ -125,7 +125,7 @@ describe("createDeltaStoreTimestampMarker", () => {
             { modelId, timestamp: 80, type: "update", payload: { age: 12 } },
         ])
 
-        const marker = createDeltaStoreTimestampMarker(modelStore)
+        const marker = createDeltaStoreTimestampMarker(deltaMachine)
         marker.mark(modelId)
 
         expect(marker.getTimestampsById(modelId)).toBe(80)
