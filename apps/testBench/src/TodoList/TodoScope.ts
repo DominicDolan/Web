@@ -1,5 +1,7 @@
 import {createScopeProvider} from "@web/solid-scope";
-import {defineDeltaScope, ModelRecord} from "@web/solid-delta";
+import {defineDeltaScope, ModelRecord, squashDeltasToSingle} from "@web/solid-delta";
+import {action, useAction} from "@solidjs/router";
+import {ModelDelta} from "@web/schema";
 
 export type Todo = {
     id: string;
@@ -8,12 +10,25 @@ export type Todo = {
     completed: boolean;
 }
 
+const saveTodoAction = action(async (todoDelta: ModelDelta<Todo>) => {
+    console.log("Saving todo delta:", todoDelta)
+})
+
 export const TodoProvider = createScopeProvider<{ deltas: ModelRecord<Todo> }>()
 
-export const useTodoScope = defineDeltaScope(TodoProvider, ({push, store, models}) => {
+export const useTodoScope = defineDeltaScope(TodoProvider, ({push, models, getModelById, on}) => {
+
+    const saveTodo = useAction(saveTodoAction)
+
+    on.newDeltaPush(deltas => {
+        const delta = squashDeltasToSingle(deltas)
+        if (delta == null) return
+
+        saveTodo(delta)
+    })
 
     function getTodoById(id: string) {
-        return store.getModelById(id)
+        return getModelById(id)
     }
 
     function addTodo(text: string) {

@@ -2,15 +2,14 @@ import {A, action, createAsync, json, query, useAction, useMatch, useNavigate, u
 import NavBarTemplate from "~/app/common/NavBarTemplate";
 import {createEffect, For, on, Suspense} from "solid-js";
 import AddThemeButton from "~/app/themes/ThemeEditor/AddThemeButton";
-import {keyedDebounce} from "@web/utils";
+import {keyedDebounce, zodResponse} from "@web/utils";
 import {ThemeDefinition, themeDefinitionSchema} from "~/models/ThemeDefinition";
 import {
     calculateDelta,
-    createDeltaStoreTimestampMarker,
     createDeltaMachine,
     deltaArrayToGroup,
     squashDeltasToSingle,
-    defineDeltaScope, ModelRecord
+    defineDeltaScope,
 } from "@web/solid-delta";
 import {useDatabaseTable} from "@web/d1";
 import {ModelDelta} from "@web/schema";
@@ -33,7 +32,7 @@ const pushThemeDeltaAction = action(async (delta: ModelDelta<ThemeDefinition>) =
     const db = useDatabaseTable(themeDefinitionSchema)
 
     const existingDeltas = await db.getOne(modelId)
-    const [_, push] = createDeltaMachine({[modelId]: existingDeltas})
+    const {push} = createDeltaMachine({[modelId]: existingDeltas})
 
     const model = push(delta.modelId, delta.payload)
 
@@ -56,6 +55,8 @@ const pushThemeDeltaAction = action(async (delta: ModelDelta<ThemeDefinition>) =
             }
         }
     }
+
+    return zodResponse(result)
 })
 
 export const ThemeProvider = createScopeProvider<{ deltas: Record<string, ModelDelta<ThemeDefinition>[]> | undefined }>()
@@ -63,22 +64,23 @@ export const useThemeScope = defineDeltaScope(ThemeProvider, (props) => {
     const deltaPushAction = useAction(pushThemeDeltaAction)
     const themeSubmission = useSubmission(pushThemeDeltaAction)
 
-    const timestampMarker = createDeltaStoreTimestampMarker(props.store)
-    timestampMarker.markAll()
-
+    props.markAllOld()
 
     const save = keyedDebounce(async (id: string) => {
-        const deltas = timestampMarker.getStreamFromMarked(id)
+        console.log(new Error("saving theme").stack)
+        const deltas = props.getNewDeltasById(id)
 
+        console.log("deltas before", deltas)
         const mergedDeltas = squashDeltasToSingle(deltas)
+        console.log("mergedDeltas", mergedDeltas)
 
         if (mergedDeltas == null) return
 
         themeSubmission.clear()
         await deltaPushAction(mergedDeltas)
 
-        if (themeSubmission.result?.success && themeSubmission.result.updatedAt > timestampMarker.getTimestampsById(id)) {
-            timestampMarker.mark(id)
+        if (themeSubmission.result?.success) {
+            props.markOld(id, themeSubmission.result.updatedAt)
         }
     }, 4000)
 
@@ -86,7 +88,7 @@ export const useThemeScope = defineDeltaScope(ThemeProvider, (props) => {
         save.flush()
     }
 
-    props.store.onAnyDeltaPush((deltas: ModelDelta<ThemeDefinition>[]) => {
+    props.on.newDeltaPush((deltas: ModelDelta<ThemeDefinition>[]) => {
         save(deltas[0].modelId)
     })
 
@@ -95,7 +97,7 @@ export const useThemeScope = defineDeltaScope(ThemeProvider, (props) => {
             return props.models
         },
         pushThemeDelta: props.push,
-        getThemeDeltasByModelId: (modelId: string) => props.store.getStreamById(modelId),
+        getThemeDeltasByModelId: (modelId: string) => props.getStreamById(modelId),
         flushSaveAction
     }
 })

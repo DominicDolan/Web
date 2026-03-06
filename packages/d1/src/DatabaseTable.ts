@@ -41,8 +41,15 @@ function convertEventRowToModelDelta<M extends Model>(row: ModelEventRow): Model
 }
 
 export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
-    const tableInfo = z.globalRegistry.get(schema)?.table
-    const tableName =  (typeof tableInfo === "object" && tableInfo != null && "tableName" in tableInfo) ? tableInfo.tableName : undefined
+    let tableInfo: any;
+    let tableName: any;
+    try {
+        tableInfo = z.globalRegistry.get(schema)?.table;
+        tableName = (typeof tableInfo === "object" && tableInfo != null && "tableName" in tableInfo) ? tableInfo.tableName : undefined;
+    } catch (e) {
+        debugger
+        console.log(e)
+    }
 
     return {
         async getAll() {

@@ -1,18 +1,18 @@
-import {createEffect} from "solid-js";
+import {createEffect, on} from "solid-js";
 import {Model, ModelDelta} from "@web/schema";
-import {createDeltaMachine, ModelRecord, DeltaMachineFunctions, DeltaMachinePush} from "../machine/DeltaMachine";
+import {
+    createDeltaMachine,
+    ModelRecord,
+    DeltaMachine
+} from "../machine/DeltaMachine";
 import {defineScope, ScopeProvider} from "@web/solid-scope";
+import {maxBy} from "@web/utils";
 
 
 type InferModelFromProps<P> =
     P extends { deltas: ModelRecord<infer MM> | undefined } ? MM : never
 
-export type DeltaScopeProps<Props extends { deltas: ModelRecord<M> | undefined}, M extends Model> = {
-    models: M[],
-    push: DeltaMachinePush<M>,
-    props: Props,
-    store: DeltaMachineFunctions<M>
-}
+export type DeltaScopeProps<Props extends { deltas: ModelRecord<M> | undefined}, M extends Model> = { props: Props } & DeltaMachine<M>
 
 export function defineDeltaScope<Props extends {deltas: ModelRecord<M> | undefined}, R, M extends Model = InferModelFromProps<Props>>(
     provider: ScopeProvider<Props>,
@@ -46,16 +46,38 @@ export function defineDeltaScope<Props extends {deltas: ModelRecord<M> | undefin
             streamSet.add(key)
         }
 
-        deltaMachine[2].onAnyDeltaPush((incoming) => {
+        deltaMachine.on.anyDeltaPush((incoming) => {
             for (const delta of incoming) {
                 markSeen(delta)
             }
         })
 
+        function markEachStreamOld(deltas: ModelRecord<M>) {
+            for (const modelId in deltas) {
+                const delta = maxBy(deltas[modelId], delta => delta.timestamp)
+                if (delta != undefined) {
+                    deltaMachine.markOld(delta.modelId, delta.timestamp)
+                }
+            }
+        }
+
+        let deltasWereNull = false
+        if (props.deltas != null) {
+            markEachStreamOld(props.deltas)
+        } else {
+            deltasWereNull = true
+        }
+
         createEffect(() => {
             const incoming = props.deltas
             if (incoming == null) {
+                deltasWereNull = true
                 return
+            }
+
+            if (deltasWereNull) {
+                deltasWereNull = false
+                markEachStreamOld(incoming)
             }
 
             const next: ModelDelta<M>[] = []
@@ -72,15 +94,13 @@ export function defineDeltaScope<Props extends {deltas: ModelRecord<M> | undefin
             }
 
             if (next.length > 0) {
-                deltaMachine[2].pushMany(next)
+                deltaMachine.pushMany(next)
             }
         })
 
         return setup({
-            models: deltaMachine[0],
-            push: deltaMachine[1],
             props,
-            store: deltaMachine[2]
+            ...deltaMachine
         })
     })
 }

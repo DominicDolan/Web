@@ -5,3 +5,4 @@ export * from './ZodSanitize'
 export * from "./EventListener"
 export * from "./IsEqual"
 export * from "./KeyedDebounce"
+export * from "./MaxBy"

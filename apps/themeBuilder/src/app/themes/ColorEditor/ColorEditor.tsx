@@ -35,7 +35,7 @@ export const updateColors = action(async (delta: ModelDelta<ColorDefinition>, th
     const modelId = delta.modelId
     const db = useDatabaseTable(colorDefinitionSchema)
     const existingDeltas: ModelDelta<ColorDefinition>[] = await db.getOne(modelId)
-    const [_, push] = createDeltaMachine({[modelId]: existingDeltas})
+    const { push } = createDeltaMachine({[modelId]: existingDeltas})
 
     const model = push(delta.modelId, delta.payload)
 
@@ -66,14 +66,11 @@ export const useColorScope = defineDeltaScope(ColorProvider, (props) => {
     const saveAction = useAction(updateColors)
     const colorsSubmission = useSubmission(updateColors)
 
-    const timestampMarker = createDeltaStoreTimestampMarker(props.store)
-    timestampMarker.markAll()
-
     const save = keyedDebounce(async (colorId: string) => {
         const themeId = props.props.themeId
         if (themeId == null) return
 
-        const deltas = timestampMarker.getStreamFromMarked(colorId)
+        const deltas = props.getNewDeltasById(colorId)
         const mergedDeltas = squashDeltasToSingle(deltas)
 
         if (mergedDeltas == null) return
@@ -81,13 +78,13 @@ export const useColorScope = defineDeltaScope(ColorProvider, (props) => {
         colorsSubmission.clear()
         await saveAction(mergedDeltas, themeId)
 
-        if (colorsSubmission.result?.success && colorsSubmission.result.updatedAt > timestampMarker.getTimestampsById(colorId)) {
-            timestampMarker.mark(colorId)
+        if (colorsSubmission.result?.success) {
+            props.markOld(colorId, colorsSubmission.result.updatedAt)
         }
     }, 300)
 
 
-    props.store.onAnyDeltaPush((deltas) => {
+    props.on.newDeltaPush((deltas) => {
         save(deltas[0].modelId)
     })
 

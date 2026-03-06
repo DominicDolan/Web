@@ -156,7 +156,11 @@ export function debounce<T extends (...args: any[]) => any>(
     }
 
     function flush(): ReturnType<T> | undefined {
-        return timerId === undefined ? result : trailingEdge(Date.now());
+        if (timerId === undefined) {
+            return result;
+        }
+        cancelTimer(timerId);
+        return trailingEdge(Date.now());
     }
 
     function pending(): boolean {
@@ -192,4 +196,3 @@ export function debounce<T extends (...args: any[]) => any>(
 
     return debounced;
 }
-

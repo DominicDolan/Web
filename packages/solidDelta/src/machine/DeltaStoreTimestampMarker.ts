@@ -46,17 +46,23 @@ function createDeltaStoreTimestampMarker<M extends Model>(store: DeltaStore<M> |
         return stream.slice()
     }
 
-    function isMarked(delta: ModelDelta<M>) {
-        const marked = timestampsById[delta.modelId]
-        if (marked == null) return false
+    function isNew(id: string, timestamp: number): boolean
+    function isNew(delta: ModelDelta<M>): boolean
+    function isNew(arg1: ModelDelta<M> | string, timestamp: number | undefined = undefined) {
+        if (typeof arg1 === "string") {
+            if (timestampsById[arg1] == null) return true
+            return (timestamp ?? 0) > timestampsById[arg1]
+        }
+        const marked = timestampsById[arg1.modelId]
+        if (marked == null) return true
 
-        return delta.timestamp >= marked
+        return arg1.timestamp > marked
     }
 
     return {
         mark,
         markAll,
-        isMarked,
+        isNew,
         getStreamFromMarked,
         getTimestampsById: (id: string) => timestampsById[id] ?? 0
     }

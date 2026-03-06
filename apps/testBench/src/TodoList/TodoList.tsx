@@ -13,22 +13,22 @@ const retrieveTodos = query(() => {
         setTimeout(() => {
             const deltas: ModelDelta<Todo>[] = [
                 {
-                    modelId: createId(),
+                    modelId: "model-1",
                     payload: {
                         completed: false,
                         text: "Sample Todo",
                     },
                     type: "create",
-                    timestamp: Date.now(),
+                    timestamp: new Date("2026-05-03").getTime(),
                 },
                 {
-                    modelId: createId(),
+                    modelId: "model-2",
                     payload: {
                         completed: false,
                         text: "Sample Todo 2",
                     },
                     type: "create",
-                    timestamp: Date.now(),
+                    timestamp: new Date("2026-05-03").getTime(),
                 },
             ]
             const record: ModelRecord<Todo> = deltas.reduce((acc, delta) => {

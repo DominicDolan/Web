@@ -15,13 +15,11 @@ export const ElementStyleProvider = createScopeProvider<{deltas: ModelRecord<Ele
 export const useElementStyleScope = defineDeltaScope(ElementStyleProvider, (props) => {
     const inputElements = createMemo(() => props.models.filter(el => el.element === "input"))
 
-    const timestampMarker = createDeltaStoreTimestampMarker(props.store)
-    timestampMarker.markAll()
     const updateElementStyle = useAction(updateElementStyleAction)
     const updateElementStyleSubmission = useSubmission(updateElementStyleAction)
 
     async function save(id: string) {
-        const deltas = timestampMarker.getStreamFromMarked(id)
+        const deltas = props.getNewDeltasById(id)
         if (deltas.length === 0) return
 
         const delta = squashDeltasToSingle(deltas)
@@ -32,7 +30,7 @@ export const useElementStyleScope = defineDeltaScope(ElementStyleProvider, (prop
         await updateElementStyle(delta, themeId)
 
         if (updateElementStyleSubmission.result?.success) {
-            timestampMarker.mark(id)
+            props.markOld(id, updateElementStyleSubmission.result.updatedAt)
         }
     }
 

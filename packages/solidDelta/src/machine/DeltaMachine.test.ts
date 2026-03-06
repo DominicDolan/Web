@@ -7,26 +7,16 @@ interface TestModel extends Model {
     age: number
 }
 
-async function sleep(time: number) {
-    return new Promise<void>((res) => {
-        setTimeout(() => {
-            res()
-        }, time)
-    })
-}
-
 describe("DeltaMachine deltaStore reading", () => {
-    test("Update to solidDelta machine causes ReadDeltaMachine to update", async () => {
+    test("Update to solidDelta machine causes ReadDeltaMachine to update", () => {
         const store = createDeltaMachine<TestModel>()
-        const [values, pushDelta, { pushMany }] = store
+        const { models, pushMany } = store
 
         const modelId = "someId"
         const name = "some name"
 
-        const readModels = values
-
-        expect(readModels).not.toBeUndefined()
-        expect(readModels?.length).toBe(0)
+        expect(models).not.toBeUndefined()
+        expect(models.length).toBe(0)
         pushMany([{
             modelId,
             timestamp: 100,
@@ -36,23 +26,20 @@ describe("DeltaMachine deltaStore reading", () => {
             }
         }])
 
-        expect(readModels?.length).toBe(1)
-        expect(readModels?.[0].name).toEqual(name)
-
+        expect(models.length).toBe(1)
+        expect(models[0].name).toEqual(name)
     })
 
-    test("Updating 2 properties separately causes ReadDeltaMachine to update", async () => {
+    test("Updating 2 properties separately causes ReadDeltaMachine to update", () => {
         const store = createDeltaMachine<TestModel>()
-        const [values, pushDelta, { pushMany }] = store
+        const { models, pushMany } = store
 
         const modelId = "someId"
         const name = "some name"
         const age = 21
 
-        const readModels = values
-
-        expect(readModels).not.toBeUndefined()
-        expect(readModels?.length).toBe(0)
+        expect(models).not.toBeUndefined()
+        expect(models.length).toBe(0)
 
         pushMany([{
             modelId,
@@ -63,7 +50,7 @@ describe("DeltaMachine deltaStore reading", () => {
             }
         }])
 
-        expect(readModels?.length).toBe(1)
+        expect(models.length).toBe(1)
 
         pushMany([{
             modelId,
@@ -74,24 +61,21 @@ describe("DeltaMachine deltaStore reading", () => {
             }
         }])
 
-        expect(readModels?.length).toBe(1)
-        expect(readModels?.[0].name).toEqual(name)
-        expect(readModels?.[0].age).toEqual(age)
-
+        expect(models.length).toBe(1)
+        expect(models[0].name).toEqual(name)
+        expect(models[0].age).toEqual(age)
     })
 
-    test("Updating 2 properties separately with the same timestamp causes ReadDeltaMachine to update", async () => {
+    test("Updating 2 properties separately with the same timestamp causes ReadDeltaMachine to update", () => {
         const store = createDeltaMachine<TestModel>()
-        const [values, _, { pushMany }] = store
+        const { models, pushMany } = store
 
         const modelId = "someId"
         const name = "some name"
         const age = 21
 
-        const readModels = values
-
-        expect(readModels).not.toBeUndefined()
-        expect(readModels?.length).toBe(0)
+        expect(models).not.toBeUndefined()
+        expect(models.length).toBe(0)
 
         pushMany([
             {
@@ -112,15 +96,14 @@ describe("DeltaMachine deltaStore reading", () => {
             }
         ])
 
-        expect(readModels?.length).toBe(1)
-        expect(readModels?.[0].name).toEqual(name)
-        expect(readModels?.[0].age).toEqual(age)
-
+        expect(models.length).toBe(1)
+        expect(models[0].name).toEqual(name)
+        expect(models[0].age).toEqual(age)
     })
 
-    test("Pushing to the model machine returns the updated model", async () => {
+    test("Pushing to the model machine returns the updated model", () => {
         const store = createDeltaMachine<TestModel>()
-        const [_, push, { pushMany }] = store
+        const { push, pushMany } = store
 
         const modelId = "someId"
         const name = "some name"
@@ -139,7 +122,7 @@ describe("DeltaMachine deltaStore reading", () => {
 
     test("Deleting a record removes it from the machine", () => {
         const store = createDeltaMachine<TestModel>()
-        const [values, push, { pushMany }] = store
+        const { models, pushMany } = store
 
         const modelId = "someId"
         const name = "some name"
@@ -153,7 +136,7 @@ describe("DeltaMachine deltaStore reading", () => {
             }
         }])
 
-        expect(values?.length).toBe(1)
+        expect(models.length).toBe(1)
 
         pushMany([{
             modelId,
@@ -162,6 +145,67 @@ describe("DeltaMachine deltaStore reading", () => {
             payload: {}
         }])
 
-        expect(values?.length).toBe(0)
+        expect(models.length).toBe(0)
+    })
+})
+
+describe("DeltaMachine delta marking", () => {
+    test("markOld sets the baseline for getNewDeltasById and on.newDeltaPush", () => {
+        const store = createDeltaMachine<TestModel>()
+        const { pushMany, markOld, getNewDeltasById, on } = store
+        const modelId = "model-1"
+        const pushedTimestamps: number[] = []
+
+        on.newDeltaPush((deltas) => {
+            pushedTimestamps.push(...deltas.map(delta => delta.timestamp))
+        })
+
+        pushMany([
+            { modelId, timestamp: 10, type: "create", payload: { name: "alpha" } },
+            { modelId, timestamp: 20, type: "update", payload: { age: 10 } },
+        ])
+
+        expect(getNewDeltasById(modelId).map(delta => delta.timestamp)).toEqual([10, 20])
+        expect(pushedTimestamps).toEqual([])
+
+        markOld(modelId)
+
+        expect(getNewDeltasById(modelId)).toEqual([])
+
+        pushMany([
+            { modelId, timestamp: 30, type: "update", payload: { age: 11 } },
+        ])
+
+        expect(getNewDeltasById(modelId).map(delta => delta.timestamp)).toEqual([30])
+        expect(pushedTimestamps).toEqual([30])
+    })
+
+    test("markAllOld applies the baseline to all existing ids", () => {
+        const store = createDeltaMachine<TestModel>()
+        const { pushMany, markAllOld, getNewDeltasById, on } = store
+        const pushedTimestamps: number[] = []
+
+        on.newDeltaPush((deltas) => {
+            pushedTimestamps.push(...deltas.map(delta => delta.timestamp))
+        })
+
+        pushMany([
+            { modelId: "model-a", timestamp: 5, type: "create", payload: { name: "a" } },
+            { modelId: "model-b", timestamp: 7, type: "create", payload: { name: "b" } },
+        ])
+
+        markAllOld()
+
+        expect(getNewDeltasById("model-a")).toEqual([])
+        expect(getNewDeltasById("model-b")).toEqual([])
+
+        pushMany([
+            { modelId: "model-a", timestamp: 8, type: "update", payload: { age: 1 } },
+            { modelId: "model-b", timestamp: 9, type: "update", payload: { age: 2 } },
+        ])
+
+        expect(getNewDeltasById("model-a").map(delta => delta.timestamp)).toEqual([8])
+        expect(getNewDeltasById("model-b").map(delta => delta.timestamp)).toEqual([9])
+        expect(pushedTimestamps.sort((a, b) => a - b)).toEqual([8, 9])
     })
 })

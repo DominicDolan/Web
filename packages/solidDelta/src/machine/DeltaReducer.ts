@@ -97,6 +97,9 @@ export function squashDeltasToSingle<M extends Model>(deltas: ModelDelta<M>[]): 
 }
 
 export function reduceDeltasOntoModel<M extends Model>(model: PartialModel<M>, deltas: ModelDelta<M>[]): PartialModel<M> | null {
+    if (model == null) {
+        debugger
+    }
     const newModel = reduceDeltasToModelAfter(deltas, model.updatedAt)
     if (newModel == null) return null
 

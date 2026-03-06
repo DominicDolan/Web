@@ -28,6 +28,7 @@ export type DeltaMachine<M extends Model> = {
     push: DeltaMachinePush<M>,
     markOld: (id: string, timestamp?: number) => void,
     markAllOld: (timestamp?: number) => void,
+    isNew: ReturnType<typeof createDeltaStoreTimestampMarker>["isNew"]
     getModelById: (id: string) => M | undefined,
     getStreamById: DeltaStore<M>[1]["getStreamById"],
     getNewDeltasById: (id: string) => ModelDelta<M>[],
@@ -100,7 +101,7 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
     })
 
     onAnyDeltaPush((deltas) => {
-        const newDeltas = deltas.filter(d => deltaTimestampMarker.isMarked(d))
+        const newDeltas = deltas.filter(d => deltaTimestampMarker.isNew(d))
         if (newDeltas.length === 0) return
         triggerNewDeltaPush(newDeltas)
     })
@@ -116,6 +117,10 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
         if (stream == undefined) return
 
         const oldModel = modelsById[modelId]
+        if (oldModel == undefined) {
+            console.log(deltaStore[1].getStreamById(modelId))
+            debugger
+        }
         const newModel = reduceDeltasOntoModel(oldModel, stream)
 
         if (newModel == null) {
@@ -151,6 +156,7 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
         pushMany,
         markOld: deltaTimestampMarker.mark,
         markAllOld: deltaTimestampMarker.markAll,
+        isNew: deltaTimestampMarker.isNew,
         on: {
             modelCreate: onModelCreate,
             anyDeltaPush: onAnyDeltaPush,
