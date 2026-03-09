@@ -28,8 +28,7 @@ export function defineDeltaScope<Props extends {deltas: ModelRecord<M> | undefin
         const seenByModel = new Map<string, Set<string>>()
 
         function toDeltaKey(delta: ModelDelta<M>): string {
-            const payloadEntries = Object.entries(delta.payload).toSorted(([a], [b]) => a.localeCompare(b))
-            return `${delta.timestamp}|${delta.type}|${JSON.stringify(payloadEntries)}`
+            return `${delta.timestamp}|${delta.type}`
         }
 
         function hasSeen(delta: ModelDelta<M>): boolean {

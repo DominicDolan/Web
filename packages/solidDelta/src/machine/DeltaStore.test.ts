@@ -47,3 +47,76 @@ test("DeltaStore stores pushed deltas in order of timestamp", () => {
     expect(createElement?.payload.name).toEqual("create")
     expect(firstElement?.payload.name).toEqual("first")
 })
+
+test("DeltaStore throws for duplicate create events", () => {
+    const [, { pushMany }] = createDeltaStore<TestModel>()
+    const modelId = "test-duplicate-create"
+
+    expect(() => pushMany([
+        { modelId, type: "create", timestamp: 100, payload: { name: "first" } },
+        { modelId, type: "create", timestamp: 200, payload: { name: "second" } },
+    ])).toThrow(/Invalid delta stream/)
+})
+
+test("DeltaStore throws for duplicate delete events", () => {
+    const [, { pushMany }] = createDeltaStore<TestModel>()
+    const modelId = "test-duplicate-delete"
+
+    expect(() => pushMany([
+        { modelId, type: "create", timestamp: 100, payload: { name: "record" } },
+        { modelId, type: "delete", timestamp: 200, payload: {} },
+        { modelId, type: "delete", timestamp: 300, payload: {} },
+    ])).toThrow(/Invalid delta stream/)
+})
+
+test("DeltaStore throws for delete update delete sequence", () => {
+    const [, { pushMany }] = createDeltaStore<TestModel>()
+    const modelId = "test-delete-update-delete"
+
+    expect(() => pushMany([
+        { modelId, type: "create", timestamp: 100, payload: { name: "record" } },
+        { modelId, type: "delete", timestamp: 200, payload: {} },
+        { modelId, type: "update", timestamp: 300, payload: { name: "invalid" } },
+        { modelId, type: "delete", timestamp: 400, payload: {} },
+    ])).toThrow(/Invalid delta stream/)
+})
+
+test("DeltaStore throws for create update create sequence", () => {
+    const [, { pushMany }] = createDeltaStore<TestModel>()
+    const modelId = "test-create-update-create"
+
+    expect(() => pushMany([
+        { modelId, type: "create", timestamp: 100, payload: { name: "first" } },
+        { modelId, type: "update", timestamp: 200, payload: { name: "middle" } },
+        { modelId, type: "create", timestamp: 300, payload: { name: "second" } },
+    ])).toThrow(/Invalid delta stream/)
+})
+
+test("DeltaStore throws for update without create", () => {
+    const [, { pushMany }] = createDeltaStore<TestModel>()
+    const modelId = "test-update-without-create"
+
+    expect(() => pushMany([
+        { modelId, type: "update", timestamp: 100, payload: { name: "invalid" } },
+    ])).toThrow(/Invalid delta stream/)
+})
+
+test("DeltaStore throws for delete without create", () => {
+    const [, { pushMany }] = createDeltaStore<TestModel>()
+    const modelId = "test-delete-without-create"
+
+    expect(() => pushMany([
+        { modelId, type: "delete", timestamp: 100, payload: {} },
+    ])).toThrow(/Invalid delta stream/)
+})
+
+test("DeltaStore allows create after delete for the same id", () => {
+    const [, { pushMany }] = createDeltaStore<TestModel>()
+    const modelId = "test-create-after-delete"
+
+    expect(() => pushMany([
+        { modelId, type: "create", timestamp: 100, payload: { name: "record" } },
+        { modelId, type: "delete", timestamp: 200, payload: {} },
+        { modelId, type: "create", timestamp: 300, payload: { name: "recreated" } },
+    ])).not.toThrow()
+})

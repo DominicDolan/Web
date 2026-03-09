@@ -57,8 +57,19 @@ export type KeyedEventListener<P extends Array<unknown>, R = void> = [
     triggerEvent: (key: string | symbol, ...params: P) => void
 ]
 
+let eventCalls = 0
+let callbackCounts: Record<symbol, number> = {}
+setInterval(() => {
+    console.log("event calls:", eventCalls)
+    console.log("listener count:", Object.getOwnPropertySymbols(callbackCounts).length)
+    const values = Object.getOwnPropertySymbols(callbackCounts).map(s => callbackCounts[s]) as number[]
+    console.log("max listeners:", Math.max(...values))
+}, 1000)
+
 export function createKeyedEvent<P extends Array<unknown>, R = void>(): KeyedEventListener<P, R> {
     const callbacks: Record<string | symbol, Array<EventCallbacks<P, R>>> = {}
+    const listenerId = Symbol()
+    callbackCounts[listenerId] = 0
 
     function onEvent(key: string | symbol, callback: EventCallbacks<P, R>["callback"], options?: Partial<OnEventOptions>) {
         if (callbacks[key] == undefined) {
@@ -78,11 +89,13 @@ export function createKeyedEvent<P extends Array<unknown>, R = void>(): KeyedEve
             options: eventOptionsWithDefaults(options),
             clear
         })
+        callbackCounts[listenerId]++
 
         return clear
     }
 
     function triggerEvent(key: string | symbol, ...params: P) {
+        eventCalls++
         if (callbacks[key] == undefined) {
             return
         }

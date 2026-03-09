@@ -85,8 +85,10 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
 
             return results.map(convertEventRowToModelDelta<M>)
         },
-        async insert(delta: ModelDelta<M>, extra?: Record<string, unknown>) {
+        async insert(delta: ModelDelta<M> | ModelDelta<M>[], extra?: Record<string, unknown>) {
             const db = await getDB()
+
+            const deltaArray = Array.isArray(delta) ? delta : [delta]
 
             const extraColumns = extra ? Object.keys(extra) : []
             const extraValues = extra ? Object.values(extra) : []
@@ -94,15 +96,19 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
             const columns = ['model_id', 'event_type', 'payload', 'timestamp', ...extraColumns].join(', ')
             const placeholders = ['?', '?', '?', '?', ...extraColumns.map(() => '?')].join(', ')
 
-            const sql = `INSERT INTO "${tableName}" (${columns}) VALUES (${placeholders})`
+
+            const valueSets = deltaArray.map(() => `(${placeholders})`).join(', ')
+            const sql = `INSERT INTO "${tableName}" (${columns}) VALUES ${valueSets}`
 
             await db.prepare(sql).bind(
-                delta.modelId,
-                delta.type,
-                JSON.stringify(delta.payload),
-                delta.timestamp || Date.now(),
-                ...extraValues
+                ...deltaArray.flatMap(delta => [
+                    delta.modelId,
+                    delta.type,
+                    JSON.stringify(delta.payload),
+                    delta.timestamp || Date.now(),
+                    ...extraValues
+                ])
             ).run()
-        }
+        },
     }
 }

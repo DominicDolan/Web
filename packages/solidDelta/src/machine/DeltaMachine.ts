@@ -9,6 +9,7 @@ export type DeltaMachinePush<M extends Model> = {
     (action: "create", deltaPayload: Partial<ModelData<M>>): M;
     (action: "delete", modelId: string): M;
     (modelId: string, deltaPayload: Partial<ModelData<M>>): M;
+    (delta: ModelDelta<M>): M;
 }
 
 export type DeltaMachineFunctions<M extends Model> = {
@@ -52,7 +53,7 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
     const [modelsById, setModelsById] = createStore<Record<string, M>>({})
     const [modelsListStore, setModelListStore] = createStore<M[]>([])
 
-    const [onModelUpdate, triggerModelUpdate] = createEvent<[PartialModel<M>]>()
+    const [onModelUpdate, triggerModelUpdate] = createEvent<[PartialModel<M>, deltas: ModelDelta<M>[]]>()
     const [onModelUpdateById, triggerModelUpdateById] = createKeyedEvent<[PartialModel<M>]>()
     const [onModelCreate, triggerModelCreate] = createEvent<[PartialModel<M>]>()
     const [onCreateDeltaPushInternal, triggerCreateDeltaPush] = createEvent<[ModelDelta<M>[]]>()
@@ -73,11 +74,11 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
         const modelId = events[0].modelId
         setModelsById(modelFromEvents.id, modelFromEvents as M)
         triggerModelCreate(modelFromEvents)
-        triggerModelUpdate(modelFromEvents)
+        triggerModelUpdate(modelFromEvents, events)
         triggerModelUpdateById(modelId, modelFromEvents)
 
-        onUpdateDeltaPushById(modelId, (updates) => {
-            onModelUpdatedById(modelId)
+        onUpdateDeltaPushById(modelId, (deltas) => {
+            updateModelWithId(modelId, deltas)
         })
     })
 
@@ -112,16 +113,15 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
         }
     }
 
-    function onModelUpdatedById(modelId: string) {
+    function updateModelWithId(modelId: string, deltas: ModelDelta<Model>[]) {
         const stream = getStreamById(modelId)
         if (stream == undefined) return
 
         const oldModel = modelsById[modelId]
         if (oldModel == undefined) {
-            console.log(deltaStore[1].getStreamById(modelId))
             debugger
         }
-        const newModel = reduceDeltasOntoModel(oldModel, stream)
+        const newModel = reduceDeltasOntoModel(oldModel, deltas)
 
         if (newModel == null) {
             setModelsById(produce((models) => {
@@ -132,14 +132,22 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
         }
 
         setModelsById(modelId, reconcile(newModel as M))
-        triggerModelUpdate(newModel)
+        triggerModelUpdate(newModel, deltas)
         triggerModelUpdateById(modelId, newModel)
     }
 
+    function isDelta(deltaOrString: ModelDelta<M> | string): deltaOrString is ModelDelta<M> {
+        return (deltaOrString as ModelDelta<M>).type != undefined
+    }
     function pushDeltaAndGetModel(action: "delete", modelId: string): M
     function pushDeltaAndGetModel(action: "create", deltaPayload: Partial<ModelData<M>>): M
     function pushDeltaAndGetModel(modelId: string, deltaPayload: Partial<ModelData<M>>): M
-    function pushDeltaAndGetModel(arg1: string, arg2?: string | Partial<ModelData<M>> | ModelDelta<M>): M {
+    function pushDeltaAndGetModel(delta: ModelDelta<M>): M
+    function pushDeltaAndGetModel(arg1: string | ModelDelta<M>, arg2?: string | Partial<ModelData<M>> | ModelDelta<M>): M {
+        if (isDelta(arg1)) {
+            pushMany([arg1])
+            return modelsById[arg1.modelId]
+        }
         const delta = pushDelta(arg1, arg2 as string | Partial<ModelData<M>> | ModelDelta<M>)
         return modelsById[delta.modelId]
     }

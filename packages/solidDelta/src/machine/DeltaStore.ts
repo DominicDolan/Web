@@ -1,4 +1,4 @@
-import {createStore, produce} from "solid-js/store"
+import {createStore} from "solid-js/store"
 import {createKeyedEvent, EventListener, KeyedEventListener} from "@web/utils"
 import {createId} from "@paralleldrive/cuid2";
 import {Model, ModelData, ModelDelta} from "@web/schema";
@@ -23,6 +23,35 @@ export type DeltaStore<M extends Model> = readonly [
         onUpdateDeltaPushById: KeyedEventListener<[ModelDelta<M>[]]>[0]
     }
 ]
+
+function validateDeltaStream<M extends Model>(modelId: string, stream: ModelDelta<M>[]) {
+    let state: "uninitialized" | "active" | "deleted" = "uninitialized"
+
+    for (const delta of stream) {
+        if (delta.type === "create") {
+            if (state === "active") {
+                throw new Error(`Invalid delta stream for model '${modelId}': create after ${state}`)
+            }
+            state = "active"
+            continue
+        }
+
+        if (delta.type === "update") {
+            if (state !== "active") {
+                throw new Error(`Invalid delta stream for model '${modelId}': update before create or after delete.\ndeltas: ${JSON.stringify(stream, null, 2)}`)
+            }
+            continue
+        }
+
+        if (delta.type === "delete") {
+            if (state !== "active") {
+                debugger
+                throw new Error(`Invalid delta stream for model '${modelId}': delete before create or after delete`)
+            }
+            state = "deleted"
+        }
+    }
+}
 
 function insertValueByTimestamp<M extends Model>(arr: ModelDelta<M>[], el: ModelDelta<M>) {
     let left = 0;
@@ -53,16 +82,21 @@ export function createDeltaStore<M extends Model>() {
     function pushManyByModelId(modelId: string, deltas: ModelDelta<M>[]) {
         const deltaArray = deltas.toSorted((a, b) => a.timestamp - b.timestamp)
         const stream = deltaStreams[modelId] as ModelDelta<M>[] | null
+        const nextStream = stream == null ? [...deltaArray] : [...stream]
+        if (stream != null) {
+            for (const event of deltaArray) {
+                insertValueByTimestamp(nextStream, event)
+            }
+        }
+
+        validateDeltaStream(modelId, nextStream)
+
         if (stream == null) {
-            setDeltaStream(modelId, deltaArray)
+            setDeltaStream(modelId, nextStream)
             triggerCreateDeltaPush(deltaArray)
             triggerCreateDeltaPushById(modelId, deltaArray)
         } else {
-            setDeltaStream(modelId, produce((arr) => {
-                for (const event of deltaArray) {
-                    insertValueByTimestamp(arr, event)
-                }
-            }))
+            setDeltaStream(modelId, nextStream)
         }
         triggerUpdateDeltaPush(deltaArray)
         triggerUpdateDeltaPushById(modelId, deltaArray)

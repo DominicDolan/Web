@@ -2,7 +2,7 @@ import {A, action, createAsync, json, query, useAction, useMatch, useNavigate, u
 import NavBarTemplate from "~/app/common/NavBarTemplate";
 import {createEffect, For, on, Suspense} from "solid-js";
 import AddThemeButton from "~/app/themes/ThemeEditor/AddThemeButton";
-import {keyedDebounce, zodResponse} from "@web/utils";
+import {keyedDebounce, maxBy, zodResponse, minBy} from "@web/utils";
 import {ThemeDefinition, themeDefinitionSchema} from "~/models/ThemeDefinition";
 import {
     calculateDelta,
@@ -26,25 +26,34 @@ const getThemes = query(async () => {
 
 }, "getThemes")
 
-const pushThemeDeltaAction = action(async (delta: ModelDelta<ThemeDefinition>) => {
+const pushThemeDeltaAction = action(async (deltas: ModelDelta<ThemeDefinition>[]) => {
     "use server"
-    const modelId = delta.modelId
+    if (deltas.length === 0) {
+        return json({success: true, updatedAt: 0, error: new Error("No deltas provided")})
+    }
+
+    const modelId = deltas[0].modelId
     const db = useDatabaseTable(themeDefinitionSchema)
 
     const existingDeltas = await db.getOne(modelId)
-    const {push} = createDeltaMachine({[modelId]: existingDeltas})
+    const {pushMany, getModelById} = createDeltaMachine({[modelId]: existingDeltas})
 
-    const model = push(delta.modelId, delta.payload)
+    pushMany(deltas)
+    const model = getModelById(modelId)
+
+    if (model == null) {
+        return json({success: true, updatedAt: existingDeltas.at(-1)?.timestamp ?? 0})
+    }
 
     const result = await themeDefinitionSchema.spa(model)
 
     if (result.success) {
         const resultDelta = calculateDelta(model, result.data)
-        const deltaToSave = resultDelta == null ? delta : squashDeltasToSingle([delta, resultDelta])
+        const deltasToSave = resultDelta == null ? deltas : deltas.concat(resultDelta)
 
-        if (deltaToSave) {
+        if (deltasToSave) {
             try {
-                await db.insert(deltaToSave)
+                await db.insert(deltasToSave)
             } catch (e) {
                 console.error("Error saving color solidDelta:", e)
                 return json({
@@ -67,20 +76,26 @@ export const useThemeScope = defineDeltaScope(ThemeProvider, (props) => {
     props.markAllOld()
 
     const save = keyedDebounce(async (id: string) => {
-        console.log(new Error("saving theme").stack)
         const deltas = props.getNewDeltasById(id)
+        props.markOld(id, maxBy(deltas, (d) => d.timestamp)?.timestamp ?? 0)
 
-        console.log("deltas before", deltas)
-        const mergedDeltas = squashDeltasToSingle(deltas)
-        console.log("mergedDeltas", mergedDeltas)
-
-        if (mergedDeltas == null) return
+        if (deltas.length === 0) return
+        const oldestTimestamp = minBy(deltas, (d) => d.timestamp)?.timestamp ?? 0
 
         themeSubmission.clear()
-        await deltaPushAction(mergedDeltas)
+        let result: Awaited<ReturnType<typeof deltaPushAction>> | null
+        try {
+            result = await deltaPushAction(deltas)
+        } catch (e) {
+            result = { success: false, updatedAt: 0, error: e as any } as typeof result
+        }
 
-        if (themeSubmission.result?.success) {
-            props.markOld(id, themeSubmission.result.updatedAt)
+        if (result != null && !result.success) {
+            props.markOld(id, oldestTimestamp - 1)
+
+            if ("error" in result && result.error.name !== "ZodError") {
+                console.error("Error saving data:",deltas, result.error)
+            }
         }
     }, 4000)
 
