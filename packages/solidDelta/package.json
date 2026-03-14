@@ -6,6 +6,9 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "test:delta": "vitest DeltaMachine"
+  },
   "dependencies": {
     "@web/solid-scope": "*"
   }

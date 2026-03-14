@@ -377,13 +377,16 @@ describe("DeltaMachine - Delta marking system", () => {
         expect(unsaved[0].timestamp).toBe(300)
     })
 
-    test("getUnmarkedDeltas(label) returns deltas without label", () => {
+    test("getUnmarkedDeltas(label) returns deltas without label", async () => {
         const { push, mark, getUnmarkedDeltas } = createDeltaMachine<TestUser>()
 
         const user = push("create", { username: "alice" })
         const unmarked1 = getUnmarkedDeltas("saved")
 
         mark("saved")
+
+        // Wait a bit to ensure different timestamp
+        await new Promise(resolve => setTimeout(resolve, 10))
 
         push(user.id, { age: 30 })
         const unmarked2 = getUnmarkedDeltas("saved")

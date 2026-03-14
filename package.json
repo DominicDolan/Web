@@ -27,7 +27,8 @@
     "build": "npm run build --workspace=@web/theme-builder",
     "preview": "vinxi build && dev:wrangler",
     "start": "npm run start --workspace=@web/theme-builder",
-    "test": "vitest"
+    "test": "vitest",
+    "test:delta": "vitest DeltaMachine"
   },
   "dependencies": {
     "@solidjs/router": "0.15.4",
