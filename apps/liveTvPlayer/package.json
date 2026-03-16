@@ -1,0 +1,23 @@
+{
+  "name": "@web/live-tv-player",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --port 3001"
+  },
+  "dependencies": {
+    "solid-js": "2.0.0-beta.2",
+    "@solidjs/web": "2.0.0-beta.2",
+    "@web/components": "*",
+    "@web/utils": "*",
+    "@web/schema": "*"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.1.0",
+    "@tailwindcss/vite": "4.2.1",
+    "postcss": "^8.4.49",
+    "autoprefixer": "^10.4.20",
+    "vite-plugin-solid": "3.0.0-next.2"
+  }
+}

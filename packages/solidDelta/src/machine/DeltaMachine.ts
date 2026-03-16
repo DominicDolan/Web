@@ -1,7 +1,23 @@
 import {createStore, produce, reconcile} from "solid-js/store"
 import {createEvent, createKeyedEvent, EventListener, KeyedEventListener} from "@web/utils"
-import {Model, ModelData, PartialModel, ModelDelta} from "@web/schema";
+import {
+    Model,
+    ModelData,
+    PartialModel,
+    ModelDelta,
+    ModelDeltaCreate,
+    ModelDeltaDelete
+} from "@web/schema";
 import {createId} from "@paralleldrive/cuid2";
+
+export type ModelPushDeltaUpdate<M extends Model> = {
+    modelId: string
+    timestamp: number
+    type: "update"
+    payload: [keyof M, ...(string | number | object)[]] | Partial<M>
+}
+
+export type ModelPushDelta<M extends Model> = ModelDeltaCreate<M> | ModelPushDeltaUpdate<M> | ModelDeltaDelete<M>
 
 export type DeltaMachinePush<M extends Model> = {
     (action: "create", deltaPayload: Partial<ModelData<M>>): M;
@@ -18,7 +34,7 @@ export type DeltaMachine<M extends Model> = {
     getModelById: (id: string) => M | undefined,
     getStreamById: (id: string) => ModelDelta<M>[] | undefined,
     getIds: () => string[],
-    pushMany: (deltas: ModelDelta<M>[]) => void,
+    pushMany: (deltas: ModelPushDelta<M>[]) => void,
     on: {
         modelCreate: EventListener<[PartialModel<M>]>[0]
         modelUpdate: EventListener<[PartialModel<M>]>[0]
@@ -30,6 +46,7 @@ export type DeltaMachine<M extends Model> = {
 }
 
 export type ModelRecord<M extends Model> = Record<string, ModelDelta<M>[]>
+export type InitialModelRecord<M extends Model> = Record<string, ModelPushDelta<M>[]>
 
 function insertValueByTimestamp<M extends Model>(arr: ModelDelta<M>[], el: ModelDelta<M>) {
     let left = 0;
@@ -155,17 +172,17 @@ function reduceDeltasToModel<M extends Model>(deltas: ModelDelta<M>[]): M | null
         } else if (delta.type === "update") {
             if (model === null) continue;
 
-            const path = (delta as any).path;
-            if (path && Array.isArray(path)) {
+            const path = delta.payload as any;
+            if (Array.isArray(path)) {
                 model = applyPathToModel(model, path);
             } else {
-                // Legacy format - merge payload
+                // Legacy format - merge payload as object
                 model = {...model, ...delta.payload};
             }
             model.updatedAt = delta.timestamp;
         } else if (delta.type === "delete") {
-            const path = (delta as any).path;
-            if (!path || path.length === 0) {
+            const path = delta.payload as any;
+            if (!Array.isArray(path) || path.length === 0) {
                 model = null;
             } else {
                 model = deletePathFromModel(model, path);
@@ -177,7 +194,7 @@ function reduceDeltasToModel<M extends Model>(deltas: ModelDelta<M>[]): M | null
     return model as M;
 }
 
-export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<M>): DeltaMachine<M> {
+export function createDeltaMachine<M extends Model>(initialDeltas?: InitialModelRecord<M>): DeltaMachine<M> {
     const [deltaStreams, setDeltaStreams] = createStore<Record<string, ModelDelta<M>[]>>({});
     const [modelsById, setModelsById] = createStore<Record<string, M>>({});
     const [modelsList, setModelsList] = createStore<M[]>([]);
@@ -197,7 +214,8 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
     const markedTimestamps = new Map<string, number>(); // label -> timestamp
 
     function getDeltaId(delta: ModelDelta<M>): string {
-        const path = (delta as any).path;
+        // For update/delete, payload IS the path; for create, payload is the model
+        const path = (delta.type === "update" || delta.type === "delete") ? delta.payload : null;
         const pathStr = path ? JSON.stringify(path) : '';
         return `${delta.modelId}:${delta.timestamp}:${delta.type}:${pathStr}`;
     }
@@ -289,7 +307,7 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
                 modelId,
                 timestamp: Date.now(),
                 type: "create",
-                payload: {...payload, id: modelId} as Partial<ModelData<M>>
+                payload: {...payload, id: modelId} as Partial<M>
             };
 
             pushManyInternal([delta]);
@@ -309,9 +327,8 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
                 modelId,
                 timestamp: Date.now(),
                 type: "delete",
-                payload: {} as any,
-                path
-            } as any;
+                payload: path as any
+            };
 
             pushManyInternal([delta]);
             const model = modelsById[modelId];
@@ -340,16 +357,12 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
 
                 const timestamp = Date.now();
                 for (const path of paths) {
-                    // Extract the key and value from the path
-                    const key = path[path.length - 2];
-                    const value = path[path.length - 1];
                     const delta: ModelDelta<M> = {
                         modelId,
                         timestamp,
                         type: "update",
-                        payload: {[key]: value} as any,
-                        path
-                    } as any;
+                        payload: path as any
+                    };
                     deltas.push(delta);
                 }
             } else {
@@ -365,9 +378,8 @@ export function createDeltaMachine<M extends Model>(initialDeltas?: ModelRecord<
                         modelId,
                         timestamp,
                         type: "update",
-                        payload: {} as any,
-                        path: expandedPath
-                    } as any;
+                        payload: expandedPath as any
+                    };
                     deltas.push(delta);
                 }
             }
