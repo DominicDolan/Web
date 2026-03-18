@@ -1,4 +1,5 @@
 import {createProjection, createSignal, createStore} from "solid-js";
+import {Example} from "./Example/Example";
 
 export default function App() {
   const [store, setStore] = createStore({
@@ -13,9 +14,8 @@ export default function App() {
 
   const doubleCount = createProjection(() => ({ count: store.count * 2}))
   return (
-    <main style={{ padding: "2rem", "font-family": "system-ui, sans-serif" }}>
-      <button onClick={increment}>Increment</button>
-      <div>{doubleCount.count}</div>
+    <main style={{ "font-family": "system-ui, sans-serif" }}>
+      <Example />
     </main>
   );
 }
