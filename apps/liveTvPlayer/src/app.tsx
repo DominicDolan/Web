@@ -1,21 +1,11 @@
-import {createProjection, createSignal, createStore} from "solid-js";
-import {Example} from "./Example/Example";
+import {ProgrammeGuide} from "./ProgrammeGuide/ProgrammeGuide";
+import {PageNav} from "./PageNav/PageNave";
 
 export default function App() {
-  const [store, setStore] = createStore({
-    count: 0,
-  })
-
-  function increment() {
-    setStore(() => ({
-      count: store.count + 1,
-    }))
-  }
-
-  const doubleCount = createProjection(() => ({ count: store.count * 2}))
   return (
-    <main style={{ "font-family": "system-ui, sans-serif" }}>
-      <Example />
+    <main class={"grid grid-cols-[140px_calc(100%-140px)] grid-rows-[60px_calc(100%-60px)] h-screen w-screen"}>
+      <PageNav />
+      <ProgrammeGuide />
     </main>
   );
 }

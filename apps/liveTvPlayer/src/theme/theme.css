@@ -1,0 +1,107 @@
+@import "@web/lins/reset.css";
+@import "tailwindcss";
+
+:root {
+    color-scheme: dark;
+    /* Sleek Dark Theme Colors */
+    --background: #0f172a;
+
+    --surface: #1e293b;
+    --surface-hover: #334155;
+
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+
+    --border: #334155;
+    --timeline-indicator: #ef4444;
+
+}
+
+html {
+    background-color: var(--background);
+}
+
+.card, article, nav, aside {
+    background-color: var(--surface);
+    color: var(--text-main);
+}
+
+.row {
+    border-bottom: 1px solid var(--border);
+
+    &:first-child {
+        border-top: 1px solid var(--border);
+    }
+}
+
+aside .row {
+    i {
+        font-size: 1.25rem;
+    }
+}
+
+nav {
+    border-bottom: 1px solid var(--border);
+}
+
+aside {
+    border-right: 1px solid var(--border);
+}
+
+.card {
+    background-color: var(--surface);
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+        background-color: oklab(from var(--surface) calc(l*85%) a b);
+        border: solid 1px var(--border);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        z-index: 2;
+    }
+
+    &.active {
+        background-color: oklab(from var(--primary) calc(l*75%) a b);
+        border: solid 1px oklab(from var(--primary) calc(l*150%) a b);
+        color: oklab(from var(--primary) calc(l*150%) a b);
+        z-index: 2;
+    }
+}
+
+ul.chips {
+    li:has(> *) > *, li:not(:has(> *)) {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        padding: 6px 16px;
+
+        &.active, &:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+    }
+}
+
+h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    gap: 10px;
+    color: var(--primary);
+}
+
+h2 {
+    font-variant: small-caps;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--primary);
+}

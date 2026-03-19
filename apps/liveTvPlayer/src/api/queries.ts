@@ -45,10 +45,7 @@ export const queries = {
     },
     epg: {
         events: async function () {
-            return getJson<any>("/epg/events/grid", {
-                start: 0,
-                limit: 10,
-            })
+            return getJson<{ entries: TvHeadendEvent[] }>("/epg/events/grid")
         }
     },
     services: {

@@ -168,7 +168,7 @@ body {
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 200px; /* Example static position */
+    left: 200px; /* ProgrammeGuide static position */
     width: 2px;
     background-color: var(--timeline-indicator);
     z-index: 20;

@@ -5,6 +5,7 @@
   "exports": {
     "./layout": "./layout/index.ts",
     "./minimal.css": "./style/minimal/theme.css",
+    "./reset.css": "./style/reset.css",
     "./elements": "./elements/index.ts"
   }
 }

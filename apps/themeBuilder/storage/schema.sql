@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS color_events (
                                             event_type TEXT NOT NULL,        -- 'CREATED', 'UPDATED', 'DELETED'
 
     -- Store name, hex, and alpha as a JSON string
-    -- Example: '{"name":"Primary","hex":"#ff0000","alpha":1}'
+    -- ProgrammeGuide: '{"name":"Primary","hex":"#ff0000","alpha":1}'
                                             payload TEXT NOT NULL,
 
                                             timestamp INTEGER NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS theme_snapshots (
                                                theme_id TEXT PRIMARY KEY,
 
     -- A complete JSON object containing all current color values
-    -- Example: '{"primary-bg": {"hex": "#121212", "alpha": 1}, "text": {...}}'
+    -- ProgrammeGuide: '{"primary-bg": {"hex": "#121212", "alpha": 1}, "text": {...}}'
                                                full_state_json TEXT NOT NULL,
 
                                                last_event_id INTEGER NOT NULL,  -- Keep track of how "up to date" this is
