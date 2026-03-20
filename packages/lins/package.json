@@ -6,6 +6,7 @@
     "./layout": "./layout/index.ts",
     "./minimal.css": "./style/minimal/theme.css",
     "./reset.css": "./style/reset.css",
-    "./elements": "./elements/index.ts"
+    "./elements": "./elements/index.ts",
+    "./lumina.css": "./style/lumina/theme.css"
   }
 }

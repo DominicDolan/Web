@@ -1,0 +1,200 @@
+@layer defaults {
+  .theme.light {
+  }
+
+  .theme.dark {
+  }
+
+  .primary {
+  }
+
+  .secondary {
+  }
+
+  .success {
+  }
+
+  .warning {
+  }
+
+  .error {
+  }
+
+  .surface {
+  }
+}
+
+@layer base {
+  html {
+  }
+
+  body {
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+  }
+
+  p,
+  small,
+  strong,
+  em {
+  }
+
+  a {
+  }
+
+  button {
+  }
+
+  input:not([type="radio"]):not([type="checkbox"]):not([type="range"]),
+  textarea,
+  select {
+  }
+
+  article,
+  section,
+  aside,
+  dialog {
+  }
+
+  ul,
+  ol {
+  }
+}
+
+@layer elements {
+  /* Surface and emphasis variants */
+  .flat {
+  }
+
+  .elevated {
+  }
+
+  .outlined {
+  }
+
+  .tonal {
+  }
+
+  .inset {
+  }
+
+  .text {
+  }
+
+  .plain {
+  }
+
+  .icon {
+  }
+
+  /* Buttons */
+  button.outlined {
+  }
+
+  button.flat {
+  }
+
+  button.elevated {
+  }
+
+  button.text {
+  }
+
+  button.plain {
+  }
+
+  button.icon {
+  }
+
+  button:disabled {
+  }
+
+  button:hover {
+  }
+
+  button:focus-visible {
+  }
+
+  /* Inputs and form controls */
+  input:not([type="radio"]):not([type="checkbox"]):not([type="range"]).outlined,
+  textarea.outlined,
+  select.outlined {
+  }
+
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+  }
+
+  /* Cards and containers */
+  article,
+  .card {
+  }
+
+  article > header,
+  article > section,
+  article > footer {
+  }
+
+  article > div {
+  }
+
+  .card > header,
+  .card > section,
+  .card > footer {
+  }
+
+  /* Lists and navigation */
+  ul.nav > li {
+  }
+
+  ul.nav > li.active,
+  ul.nav > li:has(.active) {
+  }
+
+  ul.plain > li {
+  }
+
+  ul.menu,
+  ul[role="menu"] {
+  }
+
+  ul.tabs > li {
+  }
+
+  ul.tabs > li.active,
+  ul.tabs > li:has(.active) {
+  }
+
+  nav[aria-label="Breadcrumb"] {
+  }
+
+  nav[aria-label="Breadcrumb"] > ol {
+  }
+
+  /* Dialog and action areas */
+  dialog {
+  }
+
+  dialog > header {
+  }
+
+  dialog > section {
+  }
+
+  dialog > footer {
+  }
+
+  form > footer {
+  }
+}

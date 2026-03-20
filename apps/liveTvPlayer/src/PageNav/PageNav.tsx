@@ -5,7 +5,7 @@ export function PageNav() {
         <div class="h-full">
             <h1><i class="fa-solid fa-tv"></i>GuidePro</h1>
         </div>
-        <ul class="chips flex gap-2 px-4">
+        <ul class="flex gap-2 px-4">
             <li>
                 <button class="active">All</button>
             </li>
