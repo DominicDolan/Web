@@ -121,7 +121,7 @@ on.pathChange((delta) => {
 })
 ```
 
-### Complete Example
+### Complete ProgrammeGuide
 ```typescript
 const { models: users, push, on } = createDeltaMachine<User>(loadedDeltas)
 
@@ -154,7 +154,7 @@ on.newDeltas((deltas) => {
    - `push(modelId, ...path, value)` - single update delta (e.g., `push(id, "profile", "name", "John")`)
    - `push(modelId, object)` - auto-split object into multiple update deltas
    - `push(modelId, ...pathWithArrays, value)` - expand array indices into multiple deltas
-     - Example: `push(id, "userProfiles", [0, 2], "enabled", true)` → 2 deltas for `[0].enabled` and `[2].enabled`
+     - ProgrammeGuide: `push(id, "userProfiles", [0, 2], "enabled", true)` → 2 deltas for `[0].enabled` and `[2].enabled`
    - `push("delete", modelId, ...path)` - delete delta for model or specific path
    - Helpers:
      - Expand objects into path arrays: `{username: "a", location: "b"}` → 2 update deltas
@@ -180,10 +180,10 @@ on.newDeltas((deltas) => {
 
 6. **Implement Delta Marking System**
    - `mark(label: string, timestamp?: number)` - mark deltas older than timestamp with label
-     - Example: `mark("saved", Date.now())`, `mark("stale", oldTimestamp)`
+     - ProgrammeGuide: `mark("saved", Date.now())`, `mark("stale", oldTimestamp)`
    - `deleteMarked(label: string)` - delete all deltas with given label from memory
    - `getUnmarkedDeltas(label: string)` - get deltas without given label
-     - Example: `getUnmarkedDeltas("saved")` returns unsaved deltas
+     - ProgrammeGuide: `getUnmarkedDeltas("saved")` returns unsaved deltas
    - Internal tracking: each delta has `marks: Set<string>`
 
 7. **Optimize Storage & Persistence**

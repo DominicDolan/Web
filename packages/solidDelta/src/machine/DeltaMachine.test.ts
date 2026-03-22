@@ -68,7 +68,7 @@ describe("DeltaMachine - Push signature parsing", () => {
         const updateDeltas = stream.filter(d => d.type === "update")
 
         expect(updateDeltas.length).toBe(1)
-        expect(updateDeltas[0].path).toEqual(["profile", "name", "John"])
+        expect(updateDeltas[0].payload).toEqual(["profile", "name", "John"])
         expect(models[0].profile?.name).toBe("John")
     })
 
@@ -98,7 +98,7 @@ describe("DeltaMachine - Push signature parsing", () => {
 
         // Should create 2 deltas for indices 0 and 2
         const enabledDeltas = updateDeltas.filter(d =>
-            d.path && d.path.includes("enabled")
+            d.payload && d.payload.includes("enabled")
         )
         expect(enabledDeltas.length).toBe(2)
 
@@ -343,8 +343,8 @@ describe("DeltaMachine - Event listeners", () => {
 
         push(user.id, { age: 30 })
 
-        // Only the age update should fire
-        expect(newDeltas.some(d => d.payload?.age === 30)).toBe(true)
+        // Only the age update should fire - payload is the path ["age", 30]
+        expect(newDeltas.some(d => Array.isArray(d.payload) && d.payload[0] === "age" && d.payload[1] === 30)).toBe(true)
     })
 })
 

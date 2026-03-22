@@ -1,5 +1,4 @@
-import {Context, createContext, onMount, useContext} from "solid-js";
-import {createId} from "@paralleldrive/cuid2";
+import {Context, createContext, useContext} from "solid-js";
 
 type ScopeContextValue<Props> = {
     props: Props
@@ -20,14 +19,14 @@ type UseScope<Props, R> = {
 export function createScopeProvider<Props extends Record<string, any>>(): ScopeProvider<Props> {
     const HMR_KEY = "createContextStore.storeContext";
 
-    const storeContext = (((import.meta as any).hot?.data?.[HMR_KEY] as Context<ScopeContextValue<Props>> | undefined)
+    const StoreContext = (((import.meta as any).hot?.data?.[HMR_KEY] as Context<ScopeContextValue<Props>> | undefined)
         ?? ((globalThis as any)[HMR_KEY] as Context<ScopeContextValue<Props>> | undefined)
         ?? createContext<ScopeContextValue<Props>>()) as Context<ScopeContextValue<Props>>
 
     if ((import.meta as any).hot?.data) {
-        (import.meta as any).hot.data[HMR_KEY] = storeContext;
+        (import.meta as any).hot.data[HMR_KEY] = StoreContext;
     } else {
-        (globalThis as any)[HMR_KEY] = storeContext;
+        (globalThis as any)[HMR_KEY] = StoreContext;
     }
 
     function ProviderChildren(props: { use?: UseScope<Props, any>} & {children?: any}) {
@@ -38,14 +37,14 @@ export function createScopeProvider<Props extends Record<string, any>>(): ScopeP
     function ContextStoreProvider(props: Props & { use?: UseScope<Props, any>} & {children?: any}) {
         const data = new Map<symbol, unknown>()
 
-        return <storeContext.Provider value={{props, data}}>
+        return <StoreContext value={{props, data}}>
             <ProviderChildren use={props.use} children={props.children}/>
-        </storeContext.Provider>
+        </StoreContext>
     }
 
 
     function useScope<R>(key: symbol, setup: (props: Props) => R): R {
-        const ctx = useContext(storeContext)
+        const ctx = useContext(StoreContext)
         if (ctx == null) {
             throw new Error(`Unable to retrieve props for context store with key: ${String(key)}`)
         }

@@ -1,17 +1,25 @@
-import {Model, ModelData} from "./Model";
+import {Model} from "./Model";
 
-export type ModelDeltaBase = {
+export type ModelDeltaCreate<M extends Model> = {
     modelId: string
     timestamp: number
-    type: "create" | "update" | "delete"
+    type: "create"
+    payload: Partial<M>
 }
 
-export type ModelDeltaCreate<M extends Model> = Omit<ModelDeltaBase, "type"> & { type: "create", payload: Partial<ModelData<M>> }
-
-export type ModelDelta<M extends Model> = ModelDeltaBase & {
-    payload: Partial<ModelData<M>>
+export type ModelDeltaUpdate<M extends Model> = {
+    modelId: string
+    timestamp: number
+    type: "update"
+    payload: [keyof M, ...(string | number)[]]
 }
 
-export type PartialModelDelta<M extends Model> = Partial<ModelDeltaBase> & {
-    payload: Partial<ModelData<M>>
+export type ModelDeltaDelete<M extends Model> = {
+    modelId: string
+    timestamp: number
+    type: "delete"
+    payload: [keyof M, ...(string | number)[]]
 }
+
+export type ModelDelta<M extends Model> = ModelDeltaCreate<M> | ModelDeltaUpdate<M> | ModelDeltaDelete<M>
+

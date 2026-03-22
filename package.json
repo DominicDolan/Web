@@ -15,7 +15,9 @@
     "apps/testBench",
     "apps/tailwindTest",
     "packages/unoLayout",
-    "packages/solidScope"
+    "packages/solidScope",
+    "apps/liveTvPlayer",
+    "apps/solid2Example"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:wrangler\"",
