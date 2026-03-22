@@ -9,14 +9,16 @@ export default function App() {
                 <h1>New App</h1>
                 <A href={"/todo-delta"}>Todo With Delta</A>
                 <A href={"/todo-nodelta"}>Todo Without Delta</A>
+                <A href={"/todo-experiment"}>Todo Experiment</A>
                 <A href={"/test"}>Test Page</A>
             </div>
                 <Suspense>
                     {props.children}
                 </Suspense>
             </div>}>
-                <Route path={"/todo-delta"} component={lazy(() => import("~/TodoList/TodoList"))}/>
+                {/*<Route path={"/todo-delta"} component={lazy(() => import("~/TodoList/TodoList"))}/>*/}
                 <Route path={"/todo-nodelta"} component={lazy(() => import("~/TodoListNoDelta/TodoListNoDelta"))}/>
+                <Route path={"/todo-experiment"} component={lazy(() => import("~/TodoExperiment/TodoExperiment"))}/>
                 <Route path={"/test"} component={() => <div>Test Page Content</div>}/>
             </Router>
         </main>
