@@ -188,7 +188,7 @@
     color: var(--on-surface-color);
   }
 
-  button {
+  button, input[type="submit"] {
     --active-color: var(--primary-container-color);
     --on-active-color: var(--on-primary-container-color);
 
@@ -210,7 +210,7 @@
     cursor: pointer;
   }
 
-  input:not([type="radio"]):not([type="checkbox"]):not([type="range"]),
+  input:not([type="radio"]):not([type="checkbox"]):not([type="range"]):not([type="submit"]),
   textarea,
   select {
     --active-color: var(--primary-color);
@@ -344,112 +344,115 @@
   }
 
   /* Buttons */
-  button.outlined {
-    --current-color: var(--active-color, var(--primary-color));
-    color: var(--current-color);
-    background: transparent;
-    border-color: color-mix(in srgb, var(--current-color) 15%, transparent);
-    box-shadow: none;
-  }
+  button, input[type="submit"] {
 
-  button.flat {
-    --current-color: var(--active-color, var(--primary-color));
-    --on-current-color: var(--on-active-color, var(--on-primary-color));
-    color: var(--on-current-color);
-    background: var(--current-color);
-    border-color: transparent;
-    box-shadow:
-      0 4px 16px -12px var(--shadow-color),
-      0 0 16px -14px var(--ambient-shadow-color);
-  }
+    &.outlined {
+      --current-color: var(--active-color, var(--primary-color));
+      color: var(--current-color);
+      background: transparent;
+      border-color: color-mix(in srgb, var(--current-color) 15%, transparent);
+      box-shadow: none;
+    }
 
-  button.elevated {
-    --current-color: var(--active-color, var(--primary-color));
-    --on-current-color: var(--on-active-color, var(--on-primary-color));
-    color: var(--on-current-color);
-    background:
-      linear-gradient(120deg, color-mix(in srgb, var(--current-color) 78%, white), var(--current-color));
-    border-color: color-mix(in srgb, var(--current-color) 15%, transparent);
-    box-shadow:
-      0 14px 30px -20px var(--shadow-color),
-      0 0 24px -16px var(--ambient-shadow-color);
-  }
+    &.flat {
+      --current-color: var(--active-color, var(--primary-color));
+      --on-current-color: var(--on-active-color, var(--on-primary-color));
+      color: var(--on-current-color);
+      background: var(--current-color);
+      border-color: transparent;
+      box-shadow:
+        0 4px 16px -12px var(--shadow-color),
+        0 0 16px -14px var(--ambient-shadow-color);
+    }
 
-  button.text {
-    --current-color: var(--active-color, var(--primary-color));
-    color: var(--current-color);
-    border-color: transparent;
-    background: transparent;
-    box-shadow: none;
-  }
+    &.elevated {
+      --current-color: var(--active-color, var(--primary-color));
+      --on-current-color: var(--on-active-color, var(--on-primary-color));
+      color: var(--on-current-color);
+      background:
+        linear-gradient(120deg, color-mix(in srgb, var(--current-color) 78%, white), var(--current-color));
+      border-color: color-mix(in srgb, var(--current-color) 15%, transparent);
+      box-shadow:
+        0 14px 30px -20px var(--shadow-color),
+        0 0 24px -16px var(--ambient-shadow-color);
+    }
 
-  button.plain {
-    color: var(--on-surface-variant-color);
-    border-color: transparent;
-    background: transparent;
-    box-shadow: none;
-  }
+    &.text {
+      --current-color: var(--active-color, var(--primary-color));
+      color: var(--current-color);
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
+    }
 
-  button.icon {
-    width: 2.4rem;
-    min-height: 2.4rem;
-    border-radius: var(--radius-full);
-    border-color: transparent;
-    background: transparent;
-    color: var(--on-surface-variant-color);
-    box-shadow: none;
-  }
+    &.plain {
+      color: var(--on-surface-variant-color);
+      border-color: transparent;
+      background: transparent;
+      box-shadow: none;
+    }
 
-  button:not(.flat):not(.elevated):not(.text):not(.plain):not(.icon):not(.outlined) {
-    --current-color: var(--active-color, var(--primary-color));
-    color: var(--current-color);
-    background: transparent;
-    border-color: color-mix(in srgb, var(--current-color) 15%, transparent);
-  }
+    &.icon {
+      width: 2.4rem;
+      min-height: 2.4rem;
+      border-radius: var(--radius-full);
+      border-color: transparent;
+      background: transparent;
+      color: var(--on-surface-variant-color);
+      box-shadow: none;
+    }
 
-  button:hover {
-    transform: scale(1.02);
-  }
+    &:not(.flat):not(.elevated):not(.text):not(.plain):not(.icon):not(.outlined) {
+      --current-color: var(--active-color, var(--primary-color));
+      color: var(--current-color);
+      background: transparent;
+      border-color: color-mix(in srgb, var(--current-color) 15%, transparent);
+    }
 
-  button:active {
-    transform: scale(0.98);
-  }
+    &:hover {
+      transform: scale(1.02);
+    }
 
-  button:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    transform: none;
-  }
+    &:active {
+      transform: scale(0.98);
+    }
 
-  button.outlined:hover,
-  button:not(.flat):not(.elevated):not(.text):not(.plain):not(.icon):not(.outlined):hover {
-    background: color-mix(in srgb, currentColor 14%, transparent);
-  }
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+    }
 
-  button.flat:hover {
-    background: color-mix(in srgb, var(--current-color) 90%, white);
-  }
+    &.outlined:hover,
+    &:not(.flat):not(.elevated):not(.text):not(.plain):not(.icon):not(.outlined):hover {
+      background: color-mix(in srgb, currentColor 14%, transparent);
+    }
 
-  button.elevated:hover {
-    box-shadow:
-      0 18px 32px -20px var(--shadow-color),
-      0 0 28px -14px var(--ambient-shadow-color);
-  }
+    &.flat:hover {
+      background: color-mix(in srgb, var(--current-color) 90%, white);
+    }
 
-  button.text:hover,
-  button.icon:hover {
-    color: var(--on-surface-color);
-    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
-  }
+    &.elevated:hover {
+      box-shadow:
+        0 18px 32px -20px var(--shadow-color),
+        0 0 28px -14px var(--ambient-shadow-color);
+    }
 
-  button.plain:hover {
-    color: var(--on-surface-color);
-    background: color-mix(in srgb, var(--surface-highest-color) 60%, transparent);
-  }
+    &.text:hover,
+    &.icon:hover {
+      color: var(--on-surface-color);
+      background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    }
 
-  button:focus-visible {
-    outline: 2px solid var(--focus-ring-color);
-    outline-offset: 2px;
+    &.plain:hover {
+      color: var(--on-surface-color);
+      background: color-mix(in srgb, var(--surface-highest-color) 60%, transparent);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--focus-ring-color);
+      outline-offset: 2px;
+    }
   }
 
   /* Inputs and form controls */

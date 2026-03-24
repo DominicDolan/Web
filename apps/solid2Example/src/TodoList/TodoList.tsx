@@ -1,15 +1,39 @@
-import {For, Loading} from "solid-js";
-import {useTodoScope} from "./TodoScope";
+
+import {createMemo, For, Loading, refresh} from "solid-js";
+import {retrieveTodos, writeTodo} from "../mock/Todos";
+import {createDeltaStore} from "@web/solid-delta";
+import {TodoItem} from "./TodoItem";
+
+type ModelDelta<M> = { timestamp: number, id: string }
+
 
 export const TodoList = () => {
 
-    const {todos} = useTodoScope()
+
+    const deltas = createMemo(() => retrieveTodos())
+
+    const [todos, setTodos] = createDeltaStore(deltas)
+
+    function appendDelta() {
+        writeTodo({
+            id: "some-id-1",
+            path: ["completed"],
+            value: true,
+            timestamp: Date.now()
+        })
+        setTimeout(() => {
+            refresh(deltas)
+        })
+    }
     return (
         <div>
             <h1>TodoList</h1>
             <Loading fallback={<div>Loading...</div>}>
-                <div>
-                    <For each={todos}>{todo => <div>todo()</div>}</For>
+                <div class="flex flex-col gap-4 max-w-150">
+                    <For each={todos}>{todo => <TodoItem todo={todo()} setTodos={setTodos}/> }</For>
+                </div>
+                <div class={"flex flex-row gap-2"}>
+                    <button onClick={() => appendDelta()}>Append</button>
                 </div>
             </Loading>
         </div>

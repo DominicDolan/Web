@@ -7,9 +7,13 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test:delta": "vitest DeltaMachine"
+    "test": "vitest"
   },
   "dependencies": {
+    "vitest": "4.1.1",
+    "jsdom": "29.0.1",
+    "solid-js": "2.0.0-beta.4",
+    "@solidjs/web": "2.0.0-beta.4",
     "@web/solid-scope": "*"
   }
 }
