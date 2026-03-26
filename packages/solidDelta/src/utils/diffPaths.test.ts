@@ -78,5 +78,19 @@ describe('diffPaths function', () => {
                 { path: [], value: 'string2' }
             ]);
         });
+
+        it('should handle a new object being added at the root', () => {
+            const left = {};
+            const right = {
+                newObject: {
+                    newKey: 'newValue',
+                    otherKey: 'otherValue'
+                }
+            };
+            expect(diffPaths(left, right)).toEqual([
+                { path: ["newObject", 'newKey'], value: 'newValue' },
+                { path: ["newObject", 'otherKey'], value: 'otherValue' },
+            ]);
+        });
     });
 });

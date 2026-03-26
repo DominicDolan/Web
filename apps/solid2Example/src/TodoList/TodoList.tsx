@@ -4,9 +4,6 @@ import {retrieveTodos, writeTodo} from "../mock/Todos";
 import {createDeltaStore} from "@web/solid-delta";
 import {TodoItem} from "./TodoItem";
 
-type ModelDelta<M> = { timestamp: number, id: string }
-
-
 export const TodoList = () => {
 
 

@@ -32,13 +32,14 @@ function insertValueByTimestamp<M extends Model>(arr: ModelDelta<M>[], el: Model
     arr.splice(left, 0, el);
 }
 
-type SetModels<M extends Model> = StoreSetter<Record<string, PartialModel<M>>>
+export const InternalKey = Symbol("InternalKey")
+
+export type SetModels<M extends Model> = StoreSetter<Record<string, Partial<Omit<M, "id" | "updatedAt">>>>
 
 export function createDeltaStore<M extends Model>(initialData?: () => ModelDelta<M>[] | Promise<ModelDelta<M>[]>) {
     const deltas = createMemo(initialData ?? (() => ([] as ModelDelta<M>[])))
 
     const [deltasLocal, setDeltasLocal] = createStore((store: ModelDelta<M>[]) => {
-        console.log("store update")
         for (const delta of deltas()) {
             // TODO: use insertValueByTimestamp(store, delta) when there's no bug
             store.push(delta)
@@ -65,20 +66,31 @@ export function createDeltaStore<M extends Model>(initialData?: () => ModelDelta
 
         const paths = diffPaths(old, draft)
         const timestamp = Date.now()
-        const deltas = paths.map((path) => ({
-            id: path.path[0],
-            path: path.path.slice(1),
-            value: path.value,
-            timestamp
-        })) as ModelDelta<M>[]
+
+        const deltas = paths.map((path) => {
+            if (path.path.at(-1) === "updatedAt" || path.path.at(-1) === "id") return null
+
+            return ({
+                id: path.path[0],
+                path: path.path.slice(1),
+                value: path.value,
+                timestamp
+            });
+        }).filter(Boolean) as ModelDelta<M>[]
 
         setDeltasLocal((store) => {
             store.push(...deltas)
         })
     }
 
-    return [
+    const store = [
         models,
         setModels,
     ] as const
+
+    ;(store as unknown as any)[InternalKey] = { deltas: deltasLocal }
+
+    return store
 }
+
+export type DeltaStore<M extends Model> = ReturnType<typeof createDeltaStore<M>>

@@ -1,6 +1,7 @@
 import {createSignal, Show, storePath, StoreSetter} from "solid-js";
-import {Todo} from "./TodoScope";
 import {PartialModel} from "@web/schema";
+import {Todo} from "../mock/Todos";
+import {SetModels} from "@web/solid-delta";
 
 
 function EditingTodoItem(props: { todo: PartialModel<Todo>, onSave: (value: string) => void, onCancel: () => void }) {
@@ -17,13 +18,11 @@ function EditingTodoItem(props: { todo: PartialModel<Todo>, onSave: (value: stri
     </form>
 }
 
-export const TodoItem = (props: {todo: PartialModel<Todo>, setTodos: StoreSetter<Record<string, PartialModel<Todo>>>}) => {
+export const TodoItem = (props: {todo: PartialModel<Todo>, setTodos: SetModels<Todo>}) => {
 
     const [isEditing, setIsEditing] = createSignal(false)
 
     function onValueEdited(value: string) {
-        console.log("Todo", JSON.parse(JSON.stringify(props.todo)))
-        console.log("id", props.todo.id)
         props.setTodos(storePath(props.todo.id, "text", value))
         setIsEditing(false);
     }

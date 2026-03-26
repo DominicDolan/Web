@@ -1,5 +1,14 @@
 import {ModelDelta} from "@web/solid-delta";
-import {Todo} from "../TodoList/TodoScope";
+
+export type Todo = {
+    id: string;
+    updatedAt: number;
+    text: string;
+    completed: boolean;
+    user: {
+        name: string
+    }
+}
 
 export const databaseTodos: ModelDelta<Todo>[] = [
     {

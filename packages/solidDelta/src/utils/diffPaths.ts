@@ -1,4 +1,3 @@
-// diffPaths.ts
 
 function isPlainObject(value: any): value is Record<string, any> {
     return value !== null && typeof value === 'object' && value.constructor === Object;
@@ -15,7 +14,7 @@ export function diffPaths(left: any, right: any, currentPath: string[] = []): Di
         return [];
     }
 
-    // If either side is not a plain object, we've hit a leaf node (or root primitive)
+    // If either side is not a plain object at the root, we've hit a leaf node
     if (!isPlainObject(left) || !isPlainObject(right)) {
         return [{ path: currentPath, value: right }];
     }
@@ -27,21 +26,20 @@ export function diffPaths(left: any, right: any, currentPath: string[] = []): Di
         const nextPath = [...currentPath, key];
 
         if (!(key in right)) {
-            // Exists in left, absent in right
+            // Exists in left, absent in right (Deletion)
             paths.push({ path: nextPath, value: undefined });
-        } else if (!(key in left)) {
-            // Exists in right, absent in left
-            paths.push({ path: nextPath, value: right[key] });
         } else {
-            // Exists in both, so we compare them
             const leftVal = left[key];
             const rightVal = right[key];
 
-            if (isPlainObject(leftVal) && isPlainObject(rightVal)) {
-                // Recursively diff nested plain objects, merging the resulting path arrays
-                paths.push(...diffPaths(leftVal, rightVal, nextPath));
+            // If the right value is a plain object, we ALWAYS want deep leaf paths.
+            if (isPlainObject(rightVal)) {
+                // If leftVal isn't a plain object (e.g., it's missing, or it's a primitive),
+                // we diff against an empty object so all nested keys are treated as additions.
+                const leftCompare = isPlainObject(leftVal) ? leftVal : {};
+                paths.push(...diffPaths(leftCompare, rightVal, nextPath));
             } else if (!Object.is(leftVal, rightVal)) {
-                // For primitives, arrays, and other objects, record the diff
+                // For primitives, arrays, etc., just record the diff
                 paths.push({ path: nextPath, value: rightVal });
             }
         }
