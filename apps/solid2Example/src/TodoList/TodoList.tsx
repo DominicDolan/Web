@@ -6,7 +6,6 @@ import {TodoItem} from "./TodoItem";
 
 export const TodoList = () => {
 
-
     const deltas = createMemo(() => retrieveTodos())
 
     const [todos, setTodos] = createDeltaStore(deltas)

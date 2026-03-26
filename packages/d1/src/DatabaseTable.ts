@@ -1,5 +1,5 @@
 import {z, ZodType} from "zod";
-import {Model, ModelData, ModelDelta} from "@web/schema";
+import {Model, ModelData} from "@web/schema";
 
 async function getDB(): Promise<D1Database> {
     const {getRequestEvent} = await import("solid-js/web")

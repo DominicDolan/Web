@@ -4,13 +4,6 @@ import {createEffect, For, on, Suspense} from "solid-js";
 import AddThemeButton from "~/app/themes/ThemeEditor/AddThemeButton";
 import {keyedDebounce, maxBy, zodResponse, minBy} from "@web/utils";
 import {ThemeDefinition, themeDefinitionSchema} from "~/models/ThemeDefinition";
-import {
-    calculateDelta,
-    createDeltaMachine,
-    deltaArrayToGroup,
-    squashDeltasToSingle,
-    defineDeltaScope,
-} from "@web/solid-delta";
 import {useDatabaseTable} from "@web/d1";
 import {ModelDelta} from "@web/schema";
 import {createScopeProvider} from "@web/solid-scope";

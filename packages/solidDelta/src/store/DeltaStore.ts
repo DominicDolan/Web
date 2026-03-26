@@ -53,7 +53,8 @@ export function createDeltaStore<M extends Model>(initialData?: () => ModelDelta
             if (model == null) {
                 store[delta.id] = { id: delta.id, updatedAt } as PartialModel<M>
             }
-            setByPath(store, [delta.id, ...delta.path as any], delta.value)
+
+            setByPath(store, [delta.id, ...delta.path.split(".") as any], delta.value)
         }
     }, {} as Record<string, PartialModel<M>>)
 
@@ -72,7 +73,7 @@ export function createDeltaStore<M extends Model>(initialData?: () => ModelDelta
 
             return ({
                 id: path.path[0],
-                path: path.path.slice(1),
+                path: path.path.slice(1).join("."),
                 value: path.value,
                 timestamp
             });

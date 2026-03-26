@@ -1,7 +1,10 @@
+import {Model} from "@web/schema";
 
-export type ModelDelta<T> = {
+type KeySanitize<Type extends string | number | symbol> = Type extends string ? Type : Type extends number ? `${Type}` : Type extends symbol ? string : never
+
+export type ModelDelta<T extends Model> = {
     id: string
-    path: [keyof T, ...(string | number)[]],
+    path: KeySanitize<keyof T> | `${KeySanitize<keyof T>}.${string}`,
     value: any
     timestamp: number
 }

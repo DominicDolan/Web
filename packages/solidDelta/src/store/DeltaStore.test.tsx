@@ -28,7 +28,7 @@ describe('DeltaStore reading', () => {
             {
                 id: "some-id",
                 timestamp: 100,
-                path: ["username"],
+                path: "username",
                 value: "newUsername"
             }
         ]
@@ -43,7 +43,7 @@ describe('DeltaStore reading', () => {
             {
                 id: "some-id",
                 timestamp: 100,
-                path: ["profile", "name"],
+                path: "profile.name",
                 value: "newName"
             }
         ]
@@ -57,7 +57,7 @@ describe('DeltaStore reading', () => {
             {
                 id: "some-id",
                 timestamp: 100,
-                path: ["userProfiles", 0, "name"],
+                path: "userProfiles.0.name",
                 value: "newName"
             }
         ]
@@ -71,7 +71,7 @@ describe('DeltaStore reading', () => {
             {
                 id: "some-id",
                 timestamp: 100,
-                path: ["username"],
+                path: "username",
                 value: "newUsername"
             }
         ];
@@ -86,7 +86,7 @@ describe('DeltaStore reading', () => {
         deltas.push({
             id: "some-id",
             timestamp: 200,
-            path: ["username"],
+            path: "username",
             value: "newerUsername"
         });
 
@@ -101,7 +101,7 @@ describe('DeltaStore reading', () => {
             {
                 id: "some-id",
                 timestamp: 100,
-                path: ["username"],
+                path: "username",
                 value: "newUsername"
             }
         ];
@@ -124,7 +124,7 @@ describe('DeltaStore reading', () => {
         deltas.push({
             id: "some-id",
             timestamp: 200,
-            path: ["username"],
+            path: "username",
             value: "newerUsername"
         });
 
@@ -144,7 +144,7 @@ describe('DeltaStore writing', () => {
             {
                 id: "some-id",
                 timestamp: 100,
-                path: ["username"],
+                path: "username",
                 value: "newUsername"
             }
         ];
@@ -190,7 +190,7 @@ describe("createMarker", () => {
             {
                 id: "some-id",
                 timestamp: 100,
-                path: ["username"],
+                path: "username",
                 value: "newUsername"
             }
         ];
@@ -209,7 +209,7 @@ describe("createMarker", () => {
             {
                 id: "some-id",
                 timestamp: 100,
-                path: ["username"],
+                path: "username",
                 value: "newUsername"
             }
         ];
