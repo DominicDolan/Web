@@ -1,0 +1,14 @@
+{
+  "name": "@web/vinxi",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "./config": "./src/config.ts",
+    "./server": "./src/server.ts"
+  },
+  "devDependencies": {
+    "vite-plugin-solid": "3.0.0-next.3",
+    "vinxi": "0.5.11",
+    "@vinxi/server-functions": "0.5.1"
+  }
+}

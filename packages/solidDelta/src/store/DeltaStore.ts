@@ -36,7 +36,7 @@ export const InternalKey = Symbol("InternalKey")
 
 export type SetModels<M extends Model> = StoreSetter<Record<string, Partial<Omit<M, "id" | "updatedAt">>>>
 
-export function createDeltaStore<M extends Model>(initialData?: () => ModelDelta<M>[] | Promise<ModelDelta<M>[]>) {
+export function createDeltaStore<M extends Model, Valid extends boolean = true>(initialData?: () => ModelDelta<M>[] | Promise<ModelDelta<M>[]>, opts?: { assumeValid: Valid }) {
     const deltas = createMemo(initialData ?? (() => ([] as ModelDelta<M>[])))
 
     const [deltasLocal, setDeltasLocal] = createStore((store: ModelDelta<M>[]) => {
@@ -56,9 +56,9 @@ export function createDeltaStore<M extends Model>(initialData?: () => ModelDelta
 
             setByPath(store, [delta.id, ...delta.path.split(".") as any], delta.value)
         }
-    }, {} as Record<string, PartialModel<M>>)
+    }, {} as Record<string, Valid extends true ? M : PartialModel<M>>)
 
-    const models = createProjection(() => Object.values(modelsById), [] as PartialModel<M>[])
+    const models = createProjection(() => Object.values(modelsById) as Array<Valid extends true ? M : PartialModel<M>>, [])
 
     const setModels: SetModels<M> = (fn) => {
         const old = JSON.parse(JSON.stringify(modelsById))

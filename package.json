@@ -6,6 +6,7 @@
   "workspaces": [
     "apps/cli",
     "apps/themeBuilder",
+    "apps/appTemplate",
     "packages/d1",
     "packages/solidDelta",
     "packages/lins",
@@ -17,7 +18,7 @@
     "packages/unoLayout",
     "packages/solidScope",
     "apps/liveTvPlayer",
-    "apps/solid2Example"
+    "packages/solid2Vinxi"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:wrangler\"",

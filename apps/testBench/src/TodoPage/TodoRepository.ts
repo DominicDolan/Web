@@ -1,3 +1,5 @@
+"use server"
+
 import {ModelDelta} from "@web/solid-delta";
 
 export type Todo = {
@@ -13,37 +15,37 @@ export type Todo = {
 export const databaseTodos: ModelDelta<Todo>[] = [
     {
         id: "some-id-1",
-        path: ["completed"],
+        path: "completed",
         value: false,
         timestamp: 100
     },
     {
         id: "some-id-1",
-        path: ["text"],
+        path: "text",
         value: "Sample Todo 1",
         timestamp: 100
     },
     {
         id: "some-id-1",
-        path: ["user", "name"],
+        path: "user.name",
         value: "John Doe",
         timestamp: 100
     },
     {
         id: "some-id-2",
-        path: ["completed"],
+        path: "completed",
         value: false,
         timestamp: 200,
     },
     {
         id: "some-id-2",
-        path: ["completed"],
+        path: "completed",
         value: true,
         timestamp: 250
     },
     {
         id: "some-id-2",
-        path: ["text"],
+        path: "text",
         value: "Sample Todo 2",
         timestamp: 200
     },
@@ -52,7 +54,6 @@ export const databaseTodos: ModelDelta<Todo>[] = [
 export const retrieveTodos = () => {
     return new Promise<ModelDelta<Todo>[]>((resolve, reject) => {
         setTimeout(() => {
-            console.log("retrieving todos")
             resolve([...databaseTodos])
         }, 1000)
     })

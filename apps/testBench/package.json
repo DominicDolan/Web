@@ -10,19 +10,16 @@
   },
   "dependencies": {
     "@paralleldrive/cuid2": "3.3.0",
-    "@solidjs/start": "2.0.0-alpha.2",
-    "@vinxi/server-functions": "0.5.1",
     "@web/components": "*",
     "@web/schema": "*",
     "@web/solid-delta": "*",
     "@web/solid-scope": "*",
     "@web/unolayout": "*",
     "@web/utils": "*",
+    "@web/vinxi": "*",
     "solid-js": "2.0.0-beta.4",
     "@solidjs/web": "2.0.0-beta.4",
     "unocss": "66.6.0",
-    "vinxi": "^0.5.11",
-    "vite-plugin-solid": "3.0.0-next.3"
   },
   "devDependencies": {
     "vite-tsconfig-paths": "6.1.1"

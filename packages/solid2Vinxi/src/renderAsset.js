@@ -23,7 +23,7 @@ const assetMap = {
     },
 };
 
-export function renderAsset(asset) {
+export function renderAssetToString(asset) {
     let {tag, attrs: {key, ...attrs} = {key: undefined}, children} = asset;
     return assetMap[tag]({attrs, key, children});
 }
