@@ -9,18 +9,22 @@
     "start": "vinxi start"
   },
   "dependencies": {
-    "@solidjs/router": "0.15.4",
-    "@solidjs/start": "1.3.2",
     "@paralleldrive/cuid2": "3.3.0",
-    "solid-js": "1.9.11",
-    "unocss": "66.6.0",
-    "vinxi": "0.5.11",
-    "vite-plugin-solid": "2.11.10",
+    "@solidjs/start": "2.0.0-alpha.2",
+    "@vinxi/server-functions": "0.5.1",
     "@web/components": "*",
-    "@web/utils": "*",
     "@web/schema": "*",
-    "@web/unolayout": "*",
     "@web/solid-delta": "*",
-    "@web/solid-scope": "*"
+    "@web/solid-scope": "*",
+    "@web/unolayout": "*",
+    "@web/utils": "*",
+    "solid-js": "2.0.0-beta.4",
+    "@solidjs/web": "2.0.0-beta.4",
+    "unocss": "66.6.0",
+    "vinxi": "^0.5.11",
+    "vite-plugin-solid": "3.0.0-next.3"
+  },
+  "devDependencies": {
+    "vite-tsconfig-paths": "6.1.1"
   }
 }
