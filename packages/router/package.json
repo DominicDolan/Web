@@ -1,0 +1,16 @@
+{
+  "name": "@web/router",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "./src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "scripts": {
+    "test": "vitest"
+  },
+  "dependencies": {
+    "solid-js": "2.0.0-beta.4",
+    "@solidjs/web": "2.0.0-beta.4"
+  }
+}
