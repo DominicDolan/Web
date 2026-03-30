@@ -6,6 +6,7 @@ export const themeDefinitionSchema = modelSchema.extend({
     name: z.string().trim(),
     class: z.string().trim(),
     description: z.string().optional(),
+    mode: z.enum(["light", "dark"]).default("light"),
 }).meta({
     table: createModelSchema("theme_events", { recreate: true }).build(),
 })

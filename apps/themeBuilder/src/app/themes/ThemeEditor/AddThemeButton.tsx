@@ -1,16 +1,13 @@
-import {useThemeScope} from "~/app/themes/ThemeEditor/ThemeEditor";
-import {useNavigate} from "@solidjs/router";
-
 
 export default function AddThemeButton() {
-    const { pushThemeDelta } = useThemeScope()
-    const navigate = useNavigate()
+    // const { pushThemeDelta } = useThemeScope()
+    // const navigate = useNavigate()
     function addTheme() {
-        const theme = pushThemeDelta("create", {
-            name: "New Theme",
-        })
-
-        navigate(`/editor/${theme.id}`)
+        // const theme = pushThemeDelta("create", {
+        //     name: "New Theme",
+        // })
+        //
+        // navigate(`/editor/${theme.id}`)
     }
 
     return  <button onClick={addTheme} flex={"row gap-2 center"}><i>add</i><span>Add Theme</span></button>

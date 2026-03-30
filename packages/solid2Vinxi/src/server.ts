@@ -1,4 +1,3 @@
-
 import {eventHandler} from "vinxi/server";
 // @ts-ignore
 import {getManifest} from "vinxi/manifest";

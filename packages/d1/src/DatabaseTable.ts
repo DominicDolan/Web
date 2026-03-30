@@ -1,27 +1,8 @@
 import {z, ZodType} from "zod";
 import {Model, ModelData} from "@web/schema";
+import {ModelDelta} from "@web/solid-delta";
+import {getDB} from "./Database";
 
-async function getDB(): Promise<D1Database> {
-    const {getRequestEvent} = await import("solid-js/web")
-    const event = getRequestEvent();
-    const cloudflareContext = (event as any)?.nativeEvent.context.cloudflare
-    if (cloudflareContext != null) {
-        return cloudflareContext.env.DB
-    }
-
-    if (!import.meta.env.DEV){
-        throw new Error("DB not found in Cloudflare context (and Wrangler platform proxy is dev-only).")
-    }
-
-    const wrangler = await import("wrangler")
-
-    const platformProxy = await wrangler.getPlatformProxy()
-
-    if (platformProxy.env.DB == null) {
-        throw new Error("DB not found in env. Tried Cloudflare context and Wrangler platform proxy.")
-    }
-    return platformProxy.env.DB as D1Database
-}
 
 type ModelEventRow = {
     id: string
@@ -53,7 +34,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
 
     return {
         async getAll() {
-            const db = await getDB()
+            const db = getDB()
 
             const tablesQuery = `SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;`
             const {results: tables} = await db.prepare(tablesQuery).all<{ name: string }>()

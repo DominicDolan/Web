@@ -6,12 +6,16 @@
   "bin": {
     "generate-schema": "./src/generateSchema.ts"
   },
-  "main": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./plugin": "./src/NitroD1Plugin.ts"
   },
   "dependencies": {
     "@web/utils": "*",
+    "@web/schema": "*",
+    "@web/solid-delta": "*",
+    "nitro": "3.0.260311-beta",
+    "vinxi": "0.5.11",
     "tsx": "^4.21.0",
     "zod": "4.3.6"
   },

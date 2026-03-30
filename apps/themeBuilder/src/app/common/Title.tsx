@@ -1,5 +1,4 @@
-import {A} from "@solidjs/router";
-
+import {A} from "@web/router";
 
 export default function Title() {
 

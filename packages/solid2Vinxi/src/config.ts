@@ -14,7 +14,8 @@ export type Solid2VinxiConfig = {
     server?: {
         plugins?: Array<any>
     },
-    serverFunctions?: Parameters<typeof serverFunctions.router>[0]
+    serverFunctions?: Parameters<typeof serverFunctions.router>[0],
+    nitroPlugins?: Array<string>
 }
 
 export function createSolid2VinxiApp(config: Solid2VinxiConfig) {
@@ -47,9 +48,13 @@ export function createSolid2VinxiApp(config: Solid2VinxiConfig) {
             })
         ],
         server: {
-            preset: "cloudflare_module",
+            preset: "cloudflare-module",
             rollupConfig: {
                 external: ["__STATIC_CONTENT_MANIFEST", "node:async_hooks"],
+            },
+            plugins: config.nitroPlugins ?? [],
+            experimental: {
+                asyncContext: true,
             },
         },
     });
