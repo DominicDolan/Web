@@ -1,22 +1,20 @@
-import {A, useNavigate} from "@solidjs/router";
-import {createMemo, For, onMount, Show} from "solid-js";
-import {useThemeScope} from "~/app/themes/ThemeEditor/ThemeEditor";
-import {reduceDeltasToModel} from "@web/solid-delta";
+import {createMemo, For, onSettled, Show} from "solid-js";
+import {A} from "@web/router";
 
-export default function ThemeSettings(props: { children?: any, params: { themeId?: string }}) {
+export default function ThemeSettings(props: { children?: any, themeId?: string }) {
 
     const {pushThemeDelta, getThemeDeltasByModelId, flushSaveAction} = useThemeScope()
 
     const theme = createMemo(() => {
-        if (props.params.themeId == null) return undefined
-        const stream = getThemeDeltasByModelId(props.params.themeId);
+        if (props.themeId == null) return undefined
+        const stream = getThemeDeltasByModelId(props.themeId);
         if (stream == null) return undefined
 
         return reduceDeltasToModel(stream)
     })
 
     let cssClassHasBeenEdited = theme()?.class != null
-    onMount(() => {
+    onSettled(() => {
         const t = theme()
         if (t == null) return
 

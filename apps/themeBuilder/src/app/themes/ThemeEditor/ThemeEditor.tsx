@@ -1,10 +1,9 @@
 import NavBarTemplate from "~/app/common/NavBarTemplate";
-import {createMemo, For, Loading} from "solid-js";
+import {createMemo, For, Loading, Show} from "solid-js";
 import AddThemeButton from "~/app/themes/ThemeEditor/AddThemeButton";
-import {ThemeDefinition, themeDefinitionSchema} from "~/models/ThemeDefinition";
-import {A} from "@web/router";
-import {ModelDelta} from "@web/solid-delta";
+import {A, useLocation} from "@web/router";
 import {getThemesMocked} from "~/app/themes/ThemeEditor/ThemeRepository";
+import ThemeSettings from "~/app/themes/ThemeEditor/ThemeSettings";
 
 // async function getThemes(): Promise<ModelDelta<ThemeDefinition>[]> {
 //     const db = useDatabaseTable(themeDefinitionSchema)
@@ -16,6 +15,7 @@ export default function ThemeEditor(props: { children?: any }) {
 
     const themes = createMemo(() => getThemesMocked())
 
+    const location = useLocation()
     // const navigate = useNavigate()
     // const matches = useMatch(() => "/editor/:themeId?/:subroute")
     //
@@ -40,7 +40,9 @@ export default function ThemeEditor(props: { children?: any }) {
                     </ul>
                 </div>
             </NavBarTemplate>
-            {props.children}
+            <Show when={location.segments()[1] != null}>
+                <ThemeSettings themeId={location.segments()[1]}></ThemeSettings>
+            </Show>
         </div>
     </Loading>
 }
