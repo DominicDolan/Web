@@ -33,12 +33,12 @@ export function createModelSchema<T extends Model>(
     const foreignKeys: ForeignKey[] = []
     const indexes: IndexDef[] = []
 
-    columns.push(`id INTEGER PRIMARY KEY AUTOINCREMENT`)
-    columns.push(`model_id TEXT NOT NULL`)
-    columns.push(`payload TEXT NOT NULL`)
-    columns.push(`event_type TEXT NOT NULL`)
+    columns.push(`id TEXT NOT NULL`)
+    columns.push(`path TEXT NOT NULL`)
+    columns.push(`value TEXT`)
     columns.push(`timestamp INTEGER NOT NULL`)
 
+    indexes.push({ columns: ["id"]})
     indexes.push({ columns: ["timestamp"]})
     const api = {
         addColumnRaw(sql: string) {
@@ -94,17 +94,16 @@ export function createModelSchema<T extends Model>(
 
             let sql: string
 
-            // Check for oldSql in options or from global context
+            // Check for oldSchema from global context
             const context = getSchemaContext()
-            const oldSql = options?.oldSql ?? context?.oldSchemas.get(tableName)
+            const oldSchema = context?.oldSchemas.get(tableName)
 
-            // If oldSql is provided, try to generate ALTER TABLE statements
-            if (oldSql) {
+            // If oldSchema is provided, try to generate ALTER TABLE statements
+            if (oldSchema) {
                 const newFullSql = [createTable, ...createIndexes].join("\n")
-                const oldSchema = parseCreateTable(oldSql)
                 const newSchema = parseCreateTable(newFullSql)
 
-                if (oldSchema && newSchema) {
+                if (newSchema) {
                     const diff = diffSchemas(oldSchema, newSchema)
 
                     if (diff.needsRecreate || options?.recreate) {

@@ -8,8 +8,8 @@
     "build": "vinxi build",
     "start": "vinxi start",
     "generate:schema": "generate-schema src/models migrations",
-    "migrate:local": "npm run generate:schema && wrangler d1 migrations apply DB --local --config ./wrangler.jsonc",
-    "migrate:prod": "npm run generate:schema && wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc"
+    "apply:schema": "wrangler d1 migrations apply DB --local --config ./wrangler.jsonc",
+    "apply:schema:prod": "wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc"
   },
   "dependencies": {
     "@codemirror/lang-css": "^6.3.1",

@@ -2,6 +2,7 @@
 
 import {ThemeDefinition, themeDefinitionSchema} from "~/models/ThemeDefinition";
 import {useDatabaseTable} from "@web/d1";
+import {ModelDelta} from "@web/solid-delta";
 
 export function getThemesMocked(): Promise<ThemeDefinition[]> {
 
@@ -29,5 +30,5 @@ export function getThemesMocked(): Promise<ThemeDefinition[]> {
 export async function getThemesDeltas() {
     const db = useDatabaseTable(themeDefinitionSchema)
 
-    return db.getAll()
+    return (await db.getAll()) as ModelDelta<ThemeDefinition>[]
 }

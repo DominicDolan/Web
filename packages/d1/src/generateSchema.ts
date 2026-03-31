@@ -4,8 +4,9 @@ import fs from "node:fs"
 import path from "node:path"
 import crypto from "node:crypto"
 import { pathToFileURL } from "node:url"
+import { DatabaseSync } from "node:sqlite"
 import type { ModelSchema } from "./ModelSchemaBuilder"
-import { parseCreateTable } from "./SchemaDiffer"
+import { type TableSchema, type ColumnDef, parseCreateTable } from "./SchemaDiffer"
 import { setSchemaContext, clearSchemaContext } from "./SchemaContext"
 
 // Accept models and migrations directories as command-line arguments
@@ -20,6 +21,7 @@ function sha256(text: string) {
 
 function walk(dir: string): string[] {
     const out: string[] = []
+    if (!fs.existsSync(dir)) return out
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
         const full = path.join(dir, entry.name)
         if (entry.isDirectory()) out.push(...walk(full))
@@ -49,49 +51,79 @@ function latestGeneratedMigration(files: string[]) {
 }
 
 /**
- * Extract table schemas from the latest migration file
+ * Extract table schemas from all migration files using a temporary SQLite database
  */
-function extractOldSchemas(latestMigrationPath: string | null): Map<string, string> {
-    const schemas = new Map<string, string>()
+function extractOldSchemas(migrationFiles: string[]): Map<string, TableSchema> {
+    const schemas = new Map<string, TableSchema>()
+    const db = new DatabaseSync(":memory:")
 
-    if (!latestMigrationPath) return schemas
-
-    const content = fs.readFileSync(latestMigrationPath, "utf8")
-    const lines = content.split("\n")
-
-    let currentTableSql = ""
-    let inTable = false
-
-    for (const line of lines) {
-        // Start of a new table or DROP statement
-        if (line.match(/^(DROP TABLE|CREATE TABLE)/i)) {
-            inTable = true
-            currentTableSql = line + "\n"
-        } else if (inTable) {
-            currentTableSql += line + "\n"
-
-            // End of CREATE TABLE or CREATE INDEX
-            if (line.trim().endsWith(";")) {
-                const parsed = parseCreateTable(currentTableSql)
-                if (parsed) {
-                    // Store by table name
-                    if (!schemas.has(parsed.tableName)) {
-                        schemas.set(parsed.tableName, currentTableSql)
-                    } else {
-                        // Append indexes to existing table schema
-                        schemas.set(parsed.tableName, schemas.get(parsed.tableName)! + currentTableSql)
-                    }
-                }
-                inTable = false
-                currentTableSql = ""
-            }
+    // Apply all migration files in order
+    for (const file of migrationFiles) {
+        const content = fs.readFileSync(path.join(MIGRATIONS_DIR, file), "utf8")
+        try {
+            // SQLite exec can handle multiple statements
+            db.exec(content)
+        } catch (e) {
+            console.warn(`Warning: Error applying migration ${file}:`, e)
         }
+    }
+
+    // Query tables
+    const tables = db.prepare("SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'").all() as { name: string, sql: string }[]
+
+    for (const { name: tableName, sql: tableSql } of tables) {
+        const columns: ColumnDef[] = []
+        const tableInfo = db.prepare(`PRAGMA table_info("${tableName}")`).all() as any[]
+        
+        const isAutoIncrement = tableSql.toUpperCase().includes("AUTOINCREMENT")
+
+        for (const col of tableInfo) {
+            columns.push({
+                name: col.name,
+                type: col.type,
+                notNull: !!col.notnull,
+                primaryKey: !!col.pk,
+                autoIncrement: !!col.pk && isAutoIncrement && tableSql.toUpperCase().includes(`"${col.name}"`) // Simple heuristic
+            })
+        }
+
+        const indexes: TableSchema['indexes'] = []
+        const indexList = db.prepare(`PRAGMA index_list("${tableName}")`).all() as any[]
+        for (const idx of indexList) {
+            // Skip implicit indexes (like those for PRIMARY KEY)
+            if (idx.origin === 'pk') continue
+            
+            const indexInfo = db.prepare(`PRAGMA index_info("${idx.name}")`).all() as any[]
+            indexes.push({
+                name: idx.name,
+                unique: !!idx.unique,
+                columns: indexInfo.map(c => c.name)
+            })
+        }
+
+        const foreignKeys: TableSchema['foreignKeys'] = []
+        const fkList = db.prepare(`PRAGMA foreign_key_list("${tableName}")`).all() as any[]
+        for (const fk of fkList) {
+            foreignKeys.push({
+                column: fk.from,
+                references: `${fk.table}(${fk.to})`,
+                onDelete: fk.on_delete,
+                onUpdate: fk.on_update
+            })
+        }
+
+        schemas.set(tableName, {
+            tableName,
+            columns,
+            indexes,
+            foreignKeys
+        })
     }
 
     return schemas
 }
 
-async function loadSchemaModulesFromDir(dir: string, oldSchemas: Map<string, string>) {
+async function loadSchemaModulesFromDir(dir: string) {
     if (!fs.existsSync(dir)) {
         throw new Error(`Models directory does not exist: ${dir}`)
     }
@@ -104,7 +136,8 @@ async function loadSchemaModulesFromDir(dir: string, oldSchemas: Map<string, str
 
     for (const file of files) {
         const url = pathToFileURL(file).href
-        const mod = await import(url)
+        // Use a cache buster to ensure we reload the modules with the new context
+        const mod = await import(`${url}?t=${Date.now()}`)
 
         // Look for exported schemas (variables ending with "Schema")
         for (const [exportName, exportValue] of Object.entries(mod)) {
@@ -158,18 +191,15 @@ function buildMigrationSql(loaded: Array<{ file: string; sql: string }>) {
 async function main() {
     fs.mkdirSync(MIGRATIONS_DIR, { recursive: true })
 
-    // Get the latest migration to extract old schemas
+    // Get all migrations to extract old schemas
     const migrationFiles = listMigrationFiles()
-    const latestGenerated = latestGeneratedMigration(migrationFiles)
-    const latestMigrationPath = latestGenerated ? path.join(MIGRATIONS_DIR, latestGenerated) : null
-
+    
     // Extract old schemas and set context
-    const oldSchemas = extractOldSchemas(latestMigrationPath)
+    const oldSchemas = extractOldSchemas(migrationFiles)
     setSchemaContext({ oldSchemas })
 
     try {
-        // Clear module cache to force re-import with new context
-        const loaded = await loadSchemaModulesFromDir(MODELS_DIR, oldSchemas)
+        const loaded = await loadSchemaModulesFromDir(MODELS_DIR)
         if (loaded.length === 0) {
             console.log(`No schema modules found in ${MODELS_DIR}`)
             return
@@ -178,6 +208,7 @@ async function main() {
         const sql = buildMigrationSql(loaded)
         const sqlHash = sha256(sql)
 
+        const latestGenerated = latestGeneratedMigration(migrationFiles)
         if (latestGenerated) {
             const latestContents = fs.readFileSync(path.join(MIGRATIONS_DIR, latestGenerated), "utf8")
             if (sha256(latestContents) === sqlHash) {

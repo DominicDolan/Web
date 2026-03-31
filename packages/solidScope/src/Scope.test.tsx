@@ -1,5 +1,5 @@
-import {children, createRoot, createSignal} from "solid-js";
-import {render} from "solid-js/web";
+import {createRoot, createSignal} from "solid-js";
+import { render } from '@solidjs/web';
 import {describe, expect, it} from "vitest";
 
 import {createScopeProvider, defineScope} from "./Scope";
@@ -48,30 +48,33 @@ describe("createScopeProvider", () => {
         }).toThrow(/Unable to retrieve props for context store/);
     });
 
-    it("updates scoped reactive values when provider props change", () => {
+    it("updates scoped reactive values when provider props change", async () => {
         const ScopeProvider = createScopeProvider<{ count: number }>();
         const useCounterScope = defineScope(ScopeProvider, (props) => ({
             doubled: () => props.count * 2,
         }));
 
         const [count, setCount] = createSignal(1);
-        let readDoubled: (() => number) | undefined;
+
+        function ChildComponent() {
+            const {doubled} = useCounterScope();
+            return <div>Double Count: {doubled()}</div>;
+        }
 
         const host = document.createElement("div");
         const dispose = render(() => (<ScopeProvider
-                count={count()}
-                use={useCounterScope}>
-            {(scope) => {
-                readDoubled = scope.doubled;
-                return null;
-            }}
+                count={count()}>
+                <ChildComponent/>
             </ScopeProvider>), host,);
 
-        expect(readDoubled?.()).toBe(2);
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        expect(host.outerHTML).toContain("Double Count: 2");
 
         setCount(5);
+        await new Promise(resolve => setTimeout(resolve, 0));
 
-        expect(readDoubled?.()).toBe(10);
+        expect(host.outerHTML).toContain("Double Count: 10");
 
         dispose();
     });

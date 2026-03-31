@@ -44,14 +44,16 @@ export function createScopeProvider<Props extends Record<string, any>>(): ScopeP
 
 
     function useScope<R>(key: symbol, setup: (props: Props) => R): R {
-        const ctx = useContext(StoreContext)
-        if (ctx == null) {
-            throw new Error(`Unable to retrieve props for context store with key: ${String(key)}`)
+        try {
+            const ctx = useContext(StoreContext)
+
+            if (!ctx.data.has(key)) {
+                ctx.data.set(key, setup(ctx.props))
+            }
+            return ctx.data.get(key) as R
+        } catch (e) {
+            throw new Error(`Unable to retrieve props for context store with key: ${String(key)}. useScope must be called within a ScopeProvider.`)
         }
-        if (!ctx.data.has(key)) {
-            ctx.data.set(key, setup(ctx.props))
-        }
-        return ctx.data.get(key) as R
     }
 
     ContextStoreProvider._useContextScope = useScope

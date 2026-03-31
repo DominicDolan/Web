@@ -1,45 +1,47 @@
 import {z, ZodType} from "zod";
-import {Model, ModelData} from "@web/schema";
+import {Model} from "@web/schema";
 import {ModelDelta} from "@web/solid-delta";
 import {getDB} from "./Database";
 
 
 type ModelEventRow = {
     id: string
-    model_id: string
-    event_type: string
-    payload: string
+    path: string
+    value: any
     timestamp: number
 }
 
 function convertEventRowToModelDelta<M extends Model>(row: ModelEventRow): ModelDelta<M> {
+    let value = row.value;
+    if (typeof value === "string") {
+        try {
+            value = JSON.parse(value);
+        } catch {
+            // keep as string if not valid JSON
+        }
+    }
     return {
-        modelId: row.model_id,
-        type: row.event_type as ModelDelta<M>["type"],
-        payload: JSON.parse(row.payload) as ModelData<M>,
+        id: row.id,
+        path: row.path as ModelDelta<M>["path"],
+        value,
         timestamp: row.timestamp
     }
 }
 
 export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
+    const db = getDB()
     let tableInfo: any;
     let tableName: any;
     try {
         tableInfo = z.globalRegistry.get(schema)?.table;
         tableName = (typeof tableInfo === "object" && tableInfo != null && "tableName" in tableInfo) ? tableInfo.tableName : undefined;
     } catch (e) {
-        debugger
         console.log(e)
     }
 
     return {
         async getAll() {
-            const db = getDB()
-
-            const tablesQuery = `SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;`
-            const {results: tables} = await db.prepare(tablesQuery).all<{ name: string }>()
-
-            const sql = `SELECT * FROM "${tableName}";`
+            const sql = `SELECT id, path, value, MAX(timestamp) as timestamp FROM "${tableName}" GROUP BY id, path;`
 
             const {results} = await db.prepare(sql)
                 .all<ModelEventRow>()
@@ -47,8 +49,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
             return results.map(convertEventRowToModelDelta<M>)
         },
         async getOne(id: string) {
-            const db = await getDB()
-            const sql = `SELECT * FROM "${tableName}" WHERE model_id = ?;`
+            const sql = `SELECT id, path, value, MAX(timestamp) as timestamp FROM "${tableName}" WHERE id = ? GROUP BY path;`
 
             const {results} = await db.prepare(sql)
                 .bind(id)
@@ -57,8 +58,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
             return results.map(convertEventRowToModelDelta<M>)
         },
         async getManyBy(column: string, value: string) {
-            const db = await getDB()
-            const sql = `SELECT * FROM "${tableName}" WHERE ${column} = ? ORDER BY timestamp ASC;`
+            const sql = `SELECT id, path, value, MAX(timestamp) as timestamp FROM "${tableName}" WHERE "${column}" = ? GROUP BY id, path;`
 
             const {results} = await db.prepare(sql)
                 .bind(value)
@@ -67,14 +67,13 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
             return results.map(convertEventRowToModelDelta<M>)
         },
         async insert(delta: ModelDelta<M> | ModelDelta<M>[], extra?: Record<string, unknown>) {
-            const db = await getDB()
 
             const deltaArray = Array.isArray(delta) ? delta : [delta]
 
             const extraColumns = extra ? Object.keys(extra) : []
             const extraValues = extra ? Object.values(extra) : []
 
-            const columns = ['model_id', 'event_type', 'payload', 'timestamp', ...extraColumns].join(', ')
+            const columns = ['id', 'path', 'value', 'timestamp', ...extraColumns].join(', ')
             const placeholders = ['?', '?', '?', '?', ...extraColumns.map(() => '?')].join(', ')
 
 
@@ -83,9 +82,9 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
 
             await db.prepare(sql).bind(
                 ...deltaArray.flatMap(delta => [
-                    delta.modelId,
-                    delta.type,
-                    JSON.stringify(delta.payload),
+                    delta.id,
+                    delta.path,
+                    typeof delta.value === 'object' ? JSON.stringify(delta.value) : delta.value,
                     delta.timestamp || Date.now(),
                     ...extraValues
                 ])

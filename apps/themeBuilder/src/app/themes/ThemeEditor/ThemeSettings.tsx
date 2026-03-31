@@ -1,29 +1,35 @@
-import {createMemo, For, onSettled, Show} from "solid-js";
-import {A} from "@web/router";
+import {For, Loading, Show} from "solid-js";
+import {A, useNavigate} from "@web/router";
+import {useThemeScope} from "~/app/themes/ThemeEditor/ThemeScope";
+import {useThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
+import {ThemeDefinition} from "~/models/ThemeDefinition";
 
-export default function ThemeSettings(props: { children?: any, themeId?: string }) {
+export default function ThemeSettings(props: { children?: any, theme: ThemeDefinition }) {
 
-    const {pushThemeDelta, getThemeDeltasByModelId, flushSaveAction} = useThemeScope()
+    const {themes, renameTheme, removeTheme, changeThemeDescription} = useThemesListScope()
 
-    const theme = createMemo(() => {
-        if (props.themeId == null) return undefined
-        const stream = getThemeDeltasByModelId(props.themeId);
-        if (stream == null) return undefined
+    const navigate = useNavigate()
 
-        return reduceDeltasToModel(stream)
-    })
+    function rename(newName: string) {
+        renameTheme(props.theme.id, newName)
+    }
 
-    let cssClassHasBeenEdited = theme()?.class != null
-    onSettled(() => {
-        const t = theme()
-        if (t == null) return
+    function remove() {
+        const themeIndex = themes.findIndex(t => t.id === props.theme.id)
+        if (themeIndex === -1) return
 
-        cssClassHasBeenEdited = t.class != null
-        const name = t.name
-        if (!cssClassHasBeenEdited && name != null) {
-            pushThemeDelta(t.id, {class: getCssClassFromName(name)})
+        const newTheme = themes[themeIndex + 1] ?? themes[themeIndex - 1]
+        removeTheme(props.theme.id)
+        if (newTheme != null) {
+            navigate("/editor/" + (newTheme.id))
+        } else {
+            navigate("/editor")
         }
-    })
+    }
+
+    function changeDescription(newDescription: string) {
+        changeThemeDescription(props.theme.id, newDescription)
+    }
 
     function getCssClassFromName(name: string) {
         return name
@@ -38,65 +44,105 @@ export default function ThemeSettings(props: { children?: any, themeId?: string 
             .join("")
     }
 
-    function onNameChange(e: Event) {
-        const t = theme()
-        if (t == null) return
-        const name = (e.target as HTMLInputElement).value
-        if (!cssClassHasBeenEdited) {
-            const cssClass = getCssClassFromName(name)
-            pushThemeDelta(t.id, {name, class: cssClass})
-        } else {
-            pushThemeDelta(t.id, { name })
-        }
-    }
-
-    function onDescriptionChange(e: Event) {
-        const t = theme()
-        if (t == null) return
-        pushThemeDelta(t.id, { description: (e.target as HTMLInputElement).value })
-    }
-
-    function onCssClassChange(e: Event) {
-        cssClassHasBeenEdited = true
-        const t = theme()
-        if (t == null) return
-        pushThemeDelta(t.id, { class: (e.target as HTMLInputElement).value })
-    }
-
-    function onBlur() {
-        flushSaveAction()
-    }
-
-    const navigate = useNavigate()
-    function onDeleteClick(e: MouseEvent) {
-        const t = theme()
-        if (t == null) return
-
-        // close the popover
-        const popover = (e.currentTarget as HTMLElement).closest("[popover]") as any
-        popover?.hidePopover?.()
-
-        const ok = window.confirm(`Delete theme "${t.name}"?`)
-        if (!ok) return
-
-        pushThemeDelta("delete", t.id)
-        flushSaveAction()
-        navigate("/editor", { replace: true })
-    }
+    // function onNameChange(e: Event) {
+    //     const t = theme()
+    //     if (t == null) return
+    //     const name = (e.target as HTMLInputElement).value
+    //     if (!cssClassHasBeenEdited) {
+    //         const cssClass = getCssClassFromName(name)
+    //         pushThemeDelta(t.id, {name, class: cssClass})
+    //     } else {
+    //         pushThemeDelta(t.id, { name })
+    //     }
+    // }
+    //
+    // function onDescriptionChange(e: Event) {
+    //     const t = theme()
+    //     if (t == null) return
+    //     pushThemeDelta(t.id, { description: (e.target as HTMLInputElement).value })
+    // }
+    //
+    // function onCssClassChange(e: Event) {
+    //     cssClassHasBeenEdited = true
+    //     const t = theme()
+    //     if (t == null) return
+    //     pushThemeDelta(t.id, { class: (e.target as HTMLInputElement).value })
+    // }
+    //
+    // function onBlur() {
+    //     flushSaveAction()
+    // }
+    //
+    // function onDeleteClick(e: MouseEvent) {
+    //     const t = theme()
+    //     if (t == null) return
+    //
+    //     // close the popover
+    //     const popover = (e.currentTarget as HTMLElement).closest("[popover]") as any
+    //     popover?.hidePopover?.()
+    //
+    //     const ok = window.confirm(`Delete theme "${t.name}"?`)
+    //     if (!ok) return
+    //
+    //     pushThemeDelta("delete", t.id)
+    //     flushSaveAction()
+    //     // navigate("/editor", { replace: true })
+    // }
 
     return <>
-        <Show when={theme() != null} fallback={<place-holder class={"loader themeSettings"} flex={"col gap-8"} spacing={"pa-8"}>
+        <Loading fallback={<place-holder class={"loader themeSettings"} flex={"col gap-8"} spacing={"pa-8"}>
             <div sizing={"w-full h-0.75rem"}></div>
             <For each={Array.from({length: 3})}>
                 {() => <div flex={"col gap-4"}>
-                        <div sizing={"w-6rem h-1rem"}></div>
-                        <div sizing={"w-full h-1.25rem"}></div>
-                    </div>
+                    <div sizing={"w-6rem h-1rem"}></div>
+                    <div sizing={"w-full h-1.25rem"}></div>
+                </div>
                 }
             </For>
         </place-holder>}>
-
             <div
+                class={"themeSettings"}
+                spacing={"py-6 px-6"}
+                flex={"col center"}>
+                <section sizing={"w-full"} flex={"col gap-4"} spacing={"mb-8"}>
+                    <hgroup flex={"row center space-between"}>
+                        <h2>Theme Settings</h2>
+                        <button
+                            class={"text"}
+                            popovertarget={"theme-settings-menu"}
+                            flex={"row center"}
+                            spacing={"pa-2"}
+                            aria-label="Theme settings menu">
+                            <i>more_vert</i>
+                        </button>
+                        <ul id={"theme-settings-menu"} popover role={"menu"} position-area={"[span-right,bottom]"}>
+                            <li onClick={() => remove()} flex={"row gap-2 center"}><i>delete</i>Delete</li>
+                        </ul>
+                    </hgroup>
+                    <form-field flex={"col gap-2"}>
+                        <label>Name</label>
+                        <input-shell>
+                            <input type={"text"} value={props.theme.name ?? ""} onInput={(e) => rename(e.target.value)}
+                                   required/>
+                        </input-shell>
+                    </form-field>
+                    {/*<form-field flex={"col gap-2"}>*/}
+                    {/*    <label>CSS Class</label>*/}
+                    {/*    <input-shell>*/}
+                    {/*        <input type={"text"} value={theme()?.class ?? ""} onInput={onCssClassChange} onBlur={onBlur}*/}
+                    {/*               required/>*/}
+                    {/*    </input-shell>*/}
+                    {/*</form-field>*/}
+                    <form-field flex={"col gap-2"}>
+                        <label>Description</label>
+                        <textarea onInput={(e) => changeDescription(e.target.value)}>{props.theme.description ?? ""}</textarea>
+                    </form-field>
+                </section>
+            </div>
+        </Loading>
+        </>
+
+            return <><Show when={false}><div
                 class={"themeSettings"}
                 spacing={"py-6 px-6"}
                 flex={"col center"}>

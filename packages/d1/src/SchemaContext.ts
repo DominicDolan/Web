@@ -2,8 +2,10 @@
  * Global context for schema generation that can be set by the build script
  */
 
+import { TableSchema } from "./SchemaDiffer"
+
 export type SchemaGenerationContext = {
-    oldSchemas: Map<string, string>
+    oldSchemas: Map<string, TableSchema>
 }
 
 let context: SchemaGenerationContext | null = null

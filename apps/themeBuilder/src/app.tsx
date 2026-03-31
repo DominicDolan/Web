@@ -1,9 +1,10 @@
 import "virtual:uno.css"
 import "@web/lins/minimal.css"
 import ThemeEditor from "~/app/themes/ThemeEditor/ThemeEditor"
-import {lazy, Loading, Match, Show, Switch} from "solid-js";
+import {Match, Show, Switch} from "solid-js";
 import {Navigate, useLocation} from "@web/router";
 import ContactUs from "~/app/contact/ContactUs/ContactUs";
+import {ThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 
 // export default function App() {
 //     return (
@@ -34,7 +35,9 @@ export default function App() {
                     <Show when={location.path() === "/"}>
                         <Navigate to="/editor"/>
                     </Show>
-                    <ThemeEditor></ThemeEditor>
+                    <ThemesListScope>
+                        <ThemeEditor/>
+                    </ThemesListScope>
                 </Match>
                 <Match when={location.segments()[0] === "contactus"}>
                     <ContactUs/>
