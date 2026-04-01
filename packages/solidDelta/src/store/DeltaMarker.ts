@@ -1,6 +1,7 @@
 import {DeltaStore, InternalKey} from "./DeltaStore";
 import {Model} from "@web/schema";
 import {ModelDelta} from "../model/ModelDelta";
+import {createMemo, resolve} from "solid-js";
 
 
 /**
@@ -45,23 +46,26 @@ export function createMarker<M extends Model>(store: DeltaStore<M>) {
     }
 
     const set = new Map<string, number>()
-    function getDeltas() {
+    const getDeltas = createMemo(() => {
         return (store as any)[InternalKey].deltas as ModelDelta<M>[]
-    }
+    })
+
+    const initFn = (store as any)[InternalKey].initFn
 
     let timestampRef: number | undefined
     function mark(timestamp?: number) {
         timestampRef = timestamp
         set.clear()
-        const deltas = getDeltas()
-
-        for (const delta of deltas) {
-            const key = delta.id + "." + delta.path
-            const timestamp = set.get(key)
-            if (timestamp == null || timestamp < delta.timestamp) {
-                set.set(key, delta.timestamp)
+        resolve(() => initFn()).then(() => {
+            for (const delta of getDeltas()) {
+                const key = delta.id + "." + delta.path
+                const timestamp = set.get(key)
+                if (timestamp == null || timestamp < delta.timestamp) {
+                    set.set(key, delta.timestamp)
+                }
             }
-        }
+        })
+
     }
 
     function getMarked() {

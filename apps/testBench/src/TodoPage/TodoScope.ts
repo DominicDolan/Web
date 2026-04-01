@@ -18,9 +18,18 @@ export const useTodoScope = defineScope(UserScope, (props) => {
     function updateTodo(id: string, text: string) {
         setTodos(storePath(id, "text", text))
     }
+
+    function addTodo(text: string) {
+        setTodos((draft) => {
+            const newId = "some-new-id"
+            draft[newId] = {text, completed: false}
+        })
+    }
+
     return {
         todos,
         markCompleteState,
         updateTodo,
+        addTodo
     }
 })

@@ -1,4 +1,4 @@
-import {Context, createContext, useContext, createMemo, omit} from "solid-js";
+import {createContext, useContext, omit} from "solid-js";
 
 type ScopeContextValue<Props> = {
     props: Props

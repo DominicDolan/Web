@@ -32,3 +32,8 @@ export async function getThemesDeltas() {
 
     return (await db.getAll()) as ModelDelta<ThemeDefinition>[]
 }
+
+export async function saveTheme(themeDeltas: ModelDelta<ThemeDefinition>[]) {
+    const db = useDatabaseTable(themeDefinitionSchema)
+    await db.insert(themeDeltas)
+}

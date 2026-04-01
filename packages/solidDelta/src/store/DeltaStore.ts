@@ -89,7 +89,7 @@ export function createDeltaStore<M extends Model, Valid extends boolean = true>(
         setModels,
     ] as const
 
-    ;(store as unknown as any)[InternalKey] = { deltas: deltasLocal }
+    ;(store as unknown as any)[InternalKey] = { deltas: deltasLocal, initFn: deltas }
 
     return store
 }
