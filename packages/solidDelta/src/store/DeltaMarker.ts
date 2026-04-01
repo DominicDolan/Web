@@ -53,22 +53,22 @@ export function createMarker<M extends Model>(store: DeltaStore<M>) {
     const initFn = (store as any)[InternalKey].initFn
 
     let timestampRef: number | undefined
-    function mark(timestamp?: number) {
+    async function mark(timestamp?: number) {
         timestampRef = timestamp
         set.clear()
-        resolve(() => initFn()).then(() => {
-            for (const delta of getDeltas()) {
-                const key = delta.id + "." + delta.path
-                const timestamp = set.get(key)
-                if (timestamp == null || timestamp < delta.timestamp) {
-                    set.set(key, delta.timestamp)
-                }
+        await resolve(() => initFn())
+        for (const delta of getDeltas()) {
+            const key = delta.id + "." + delta.path
+            const timestamp = set.get(key)
+            if (timestamp == null || timestamp < delta.timestamp) {
+                set.set(key, delta.timestamp)
             }
-        })
-
+        }
     }
 
-    function getMarked() {
+    async function getMarked() {
+        await new Promise(resolve => setTimeout(resolve, 0))
+
         const deltas = getDeltas()
         const result: ModelDelta<M>[] = []
         for (const delta of deltas) {

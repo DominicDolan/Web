@@ -5,6 +5,7 @@ import {useNavigate} from "@web/router";
 import {createDeltaStore} from "@web/solid-delta";
 import {createId} from "@paralleldrive/cuid2";
 import {createMarker} from "@web/solid-delta";
+import {debounce} from "@web/utils/Debounce.js";
 
 
 export const ThemesListScope = createScopeProvider();
@@ -33,10 +34,12 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
     }
 
     async function save() {
-        const uncommitted = getUncommitted()
+        const uncommitted = await getUncommitted()
 
         await saveTheme(uncommitted)
     }
+
+    const debounceSave = debounce(save, 1000)
 
     return {
         themes,
@@ -45,16 +48,19 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
             setThemes(old => {
                 old[id].name = newName
             })
+            debounceSave()
         },
         removeTheme: (id: string) => {
             setThemes(old => {
                 delete old[id]
             })
+            save()
         },
         changeThemeDescription: (id: string, newDescription: string) => {
             setThemes(old => {
                 old[id].description = newDescription
             })
+            debounceSave()
         }
     }
 })
