@@ -7,7 +7,8 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "check": "tsc --noEmit"
   },
   "dependencies": {
     "vitest": "4.1.1",
@@ -15,5 +16,10 @@
     "solid-js": "2.0.0-beta.4",
     "@solidjs/web": "2.0.0-beta.4",
     "@web/solid-scope": "*"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.9.1",
+    "@cloudflare/workers-types": "4.20260331.1",
+    "typescript": "5.5.4"
   }
 }

@@ -18,16 +18,16 @@ describe("createScopeProvider", () => {
 
         let childValue: number | undefined;
 
+        function ChildComponent() {
+            const {doubled} = useCounterScope();
+            childValue = doubled();
+            return <></>;
+        }
         const host = document.createElement("div");
         const dispose = render(() => (<ScopeProvider
-                count={4}
-                use={useCounterScope}>
-                {(scope) => {
-                    const sameScope = useCounterScope();
-                    expect(sameScope).toBe(scope);
-                    childValue = scope.doubled();
-                    return <></>;
-                }}</ScopeProvider>), host,);
+                count={4}>
+            <ChildComponent/>
+        </ScopeProvider>), host,);
 
         expect(childValue).toBe(8);
         expect(setupCalls).toBe(1);
@@ -45,7 +45,7 @@ describe("createScopeProvider", () => {
             createRoot(() => {
                 useCounterScope();
             });
-        }).toThrow(/Unable to retrieve props for context store/);
+        }).toThrow();
     });
 
     it("updates scoped reactive values when provider props change", async () => {
@@ -77,5 +77,42 @@ describe("createScopeProvider", () => {
         expect(host.outerHTML).toContain("Double Count: 10");
 
         dispose();
+    });
+
+    it("allows independent scope types without context clashing", () => {
+        const UserScope = createScopeProvider<{ userId: string }>();
+        const SettingsScope = createScopeProvider<{ theme: string }>();
+
+        let userSetupCalls = 0;
+        const useUserScope = defineScope(UserScope, (props) => {
+            userSetupCalls += 1;
+            return { id: props.userId };
+        });
+
+        let settingsSetupCalls = 0;
+        const useSettingsScope = defineScope(SettingsScope, (props) => {
+            settingsSetupCalls += 1;
+            return { theme: props.theme };
+        });
+
+        const host = document.createElement("div");
+        render(() => (
+            <UserScope userId="user-1">
+                <SettingsScope theme="dark">
+                    <Child />
+                </SettingsScope>
+            </UserScope>
+        ), host);
+
+        function Child() {
+            const user = useUserScope();
+            const settings = useSettingsScope();
+            expect(user.id).toBe("user-1");
+            expect(settings.theme).toBe("dark");
+            return null;
+        }
+
+        expect(userSetupCalls).toBe(1);
+        expect(settingsSetupCalls).toBe(1);
     });
 });

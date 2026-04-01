@@ -1,9 +1,10 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
 import {createMemo} from "solid-js";
 import {getThemesDeltas} from "~/app/themes/ThemeEditor/ThemeRepository";
-import {useLocation, useNavigate} from "@web/router";
+import {useNavigate} from "@web/router";
 import {createDeltaStore} from "@web/solid-delta";
 import {createId} from "@paralleldrive/cuid2";
+import {createMarker} from "@web/solid-delta";
 
 
 export const ThemesListScope = createScopeProvider();
@@ -14,7 +15,9 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
         return getThemesDeltas();
     })
 
-    const [themes, setThemes] = createDeltaStore(() => themesDeltas())
+    const store = createDeltaStore(() => themesDeltas())
+    const [themes, setThemes] = store
+    const [marker, setMarker] = createMarker(store)
 
     const navigate = useNavigate()
     function addNewTheme() {

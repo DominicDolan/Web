@@ -10,10 +10,12 @@
     "allowJs": true,
     "strict": true,
     "noEmit": true,
+    "skipLibCheck": true,
     "types": ["vinxi/types/client", "vitest/globals", "@testing-library/jest-dom", "@cloudflare/workers-types", "node"],
     "isolatedModules": true,
     "paths": {
       "~/*": ["./src/*"]
     }
-  }
+  },
+  "exclude": ["node_modules", "dist"]
 }

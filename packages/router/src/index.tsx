@@ -3,7 +3,7 @@ import {
     createContext,
     createMemo,
     createSignal,
-    JSX,
+    JSX, omit,
     onSettled,
     useContext
 } from "solid-js";
@@ -65,7 +65,7 @@ function isExternalHref(href: string): boolean {
 }
 
 export function A(props: AProps) {
-    const { replace: _replace, onClick: _onClick, href: _href, ...anchorProps } = props;
+    const anchorProps = omit(props, "onClick", "replace", "href")
 
     const navigate = useNavigate();
 

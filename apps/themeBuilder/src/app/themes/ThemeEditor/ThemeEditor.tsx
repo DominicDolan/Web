@@ -5,7 +5,7 @@ import ThemeSettings from "~/app/themes/ThemeEditor/ThemeSettings";
 import {ThemeScope} from "~/app/themes/ThemeEditor/ThemeScope";
 import {useThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 
-export default function ThemeEditor(props: { children?: any }) {
+export default function ThemeEditor() {
 
     const location = useLocation()
     const {themes, addNewTheme} = useThemesListScope()

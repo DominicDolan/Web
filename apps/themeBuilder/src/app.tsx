@@ -24,7 +24,6 @@ import {ThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 //         </Router>
 //     )
 // }
-
 export default function App() {
     const location = useLocation();
 
