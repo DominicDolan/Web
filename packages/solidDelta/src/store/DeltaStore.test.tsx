@@ -3,7 +3,6 @@ import {Model} from "@web/schema";
 import {createDeltaStore} from "./DeltaStore";
 import {describe, it, expect} from "vitest";
 import {createMemo, flush, refresh} from "solid-js";
-import {createMarker} from "./DeltaMarker";
 
 interface TestUser extends Model {
     username?: string
@@ -204,6 +203,58 @@ describe('DeltaStore writing', () => {
             store["id-2"] = { username: "user2" }
         })
         flush()
+
+        expect(users.length).toBe(2);
+    });
+
+    it('for an async factory function new models should be added after the factory completes', async () => {
+        const [users, setUsers] = createDeltaStore<TestUser>(() => {
+            return new Promise<ModelDelta<TestUser>[]>(resolve => {
+                setTimeout(() => {
+                    resolve([{
+                        id: "id-1",
+                        timestamp: 100,
+                        path: "username",
+                        value: "user1"
+                    }])
+                }, 50)
+            })
+        });
+
+        await new Promise<void>((resolve) => setTimeout(resolve, 60))
+
+        setUsers((store) => {
+            store["id-2"] = { username: "user1" }
+        })
+        flush()
+
+        await new Promise<void>((resolve) => setTimeout(resolve, 60))
+
+        expect(users.length).toBe(2);
+    });
+
+    it('for an async factory function new models should be added when added while the factory completes', async () => {
+        const [users, setUsers] = createDeltaStore<TestUser>(() => {
+            return new Promise<ModelDelta<TestUser>[]>(resolve => {
+                setTimeout(() => {
+                    resolve([{
+                        id: "id-1",
+                        timestamp: 100,
+                        path: "username",
+                        value: "user1"
+                    }])
+                }, 50)
+            })
+        });
+
+        await new Promise<void>((resolve) => setTimeout(resolve, 10))
+
+        setUsers((store) => {
+            store["id-2"] = { username: "user1" }
+        })
+        flush()
+
+        await new Promise<void>((resolve) => setTimeout(resolve, 60))
 
         expect(users.length).toBe(2);
     });

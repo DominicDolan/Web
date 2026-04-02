@@ -34,6 +34,7 @@ export async function getThemesDeltas() {
 }
 
 export async function saveTheme(themeDeltas: ModelDelta<ThemeDefinition>[]) {
+    if (themeDeltas.length === 0) return
     const db = useDatabaseTable(themeDefinitionSchema)
     await db.insert(themeDeltas)
 }

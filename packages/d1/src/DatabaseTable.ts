@@ -69,6 +69,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
         async insert(delta: ModelDelta<M> | ModelDelta<M>[], extra?: Record<string, unknown>) {
 
             const deltaArray = Array.isArray(delta) ? delta : [delta]
+            if (deltaArray.length === 0) return
 
             const extraColumns = extra ? Object.keys(extra) : []
             const extraValues = extra ? Object.values(extra) : []

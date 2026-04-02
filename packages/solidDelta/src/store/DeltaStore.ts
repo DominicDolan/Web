@@ -1,5 +1,5 @@
 import {Model, PartialModel} from "@web/schema";
-import {createMemo, createProjection, createStore, StoreSetter} from "solid-js";
+import {createMemo, createProjection, createStore, refresh, snapshot, StoreSetter} from "solid-js";
 import {diffPaths} from "../utils/diffPaths";
 import {ModelDelta} from "../model/ModelDelta";
 
@@ -142,6 +142,10 @@ export function createDeltaStore<M extends Model, Valid extends boolean = true>(
 
         setDeltasLocal((store) => {
             store.push(...deltas)
+        })
+
+        setTimeout(() => {
+            refresh(models)
         })
     }
 
