@@ -36,6 +36,67 @@ export const InternalKey = Symbol("InternalKey")
 
 export type SetModels<M extends Model> = StoreSetter<Record<string, Partial<Omit<M, "id" | "updatedAt">>>>
 
+/**
+ * Creates a reactive delta-based store for managing a collection of models.
+ *
+ * A DeltaStore maintains a reactive state derived from a sequence of changes (deltas).
+ * It is particularly useful for synchronization, undo/redo, and offline-first
+ * applications where state is represented as a stream of immutable events.
+ *
+ * The store provides:
+ * 1. A reactive accessor for the current state (an array of models).
+ * 2. A draft-based setter that automatically computes and records new deltas by diffing
+ *    changes made to the current state.
+ *
+ * @template M - The model type, which must extend {@link Model}.
+ * @template Valid - A boolean flag indicating if the store should assume models are complete.
+ *                   Defaults to `true`.
+ *
+ * @param {() => ModelDelta<M>[] | Promise<ModelDelta<M>[]>} [initialData] - A function or memo
+ *        that returns the initial set of deltas. Supports both synchronous and asynchronous
+ *        resolution.
+ * @param {Object} [opts] - Configuration options.
+ * @param {Valid} [opts.assumeValid=true] - If true, models are typed as `M`. If false,
+ *        they are typed as {@link PartialModel<M>}.
+ *
+ * @returns {DeltaStore<M>} A tuple-like object containing:
+ *          - `[0]`: A reactive accessor (signal) returning the array of models.
+ *          - `[1]`: A setter function `(fn: (draft: Record<string, M>) => void) => void`
+ *                   which allows mutating a draft to generate new deltas.
+ *
+ * @example
+ * ```typescript
+ * interface Todo extends Model {
+ *   title: string;
+ *   completed: boolean;
+ * }
+ *
+ * // Initialize store with an optional delta source
+ * const [todos, setTodos] = createDeltaStore<Todo>(() => fetchTodoDeltas());
+ *
+ * // Adding a new model via the draft-based setter
+ * const addTodo = (title: string) => {
+ *   const id = createId();
+ *   setTodos(draft => {
+ *     draft[id] = { title, completed: false };
+ *   });
+ * };
+ *
+ * // Updating a model (automatically computes path-based deltas)
+ * const toggleTodo = (id: string) => {
+ *   setTodos(draft => {
+ *     draft[id].completed = !draft[id].completed;
+ *   });
+ * };
+ *
+ * // Accessing the reactive state
+ * return (
+ *   <For each={todos()}>
+ *     {(todo) => <li>{todo.title}</li>}
+ *   </For>
+ * );
+ * ```
+ */
 export function createDeltaStore<M extends Model, Valid extends boolean = true>(initialData?: () => ModelDelta<M>[] | Promise<ModelDelta<M>[]>, opts?: { assumeValid: Valid }) {
     const deltas = createMemo(initialData ?? (() => ([] as ModelDelta<M>[])))
 
