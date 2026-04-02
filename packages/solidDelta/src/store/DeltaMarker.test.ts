@@ -30,9 +30,7 @@ describe('createMarker', () => {
             const [getMarked, mark] = createMarker(store);
             mark();
 
-            await milliseconds(0)
-
-            expect(getMarked()).toHaveLength(0);
+            expect(await getMarked()).toHaveLength(0);
         });
 
         it('should return only deltas added after being marked', async () => {
@@ -43,26 +41,24 @@ describe('createMarker', () => {
             const [, setUsers] = store;
             const [getMarked, mark] = createMarker(store);
 
-            mark();
-
-            await milliseconds(0)
+            await mark();
 
             setUsers((s) => {
                 s["user-1"].username = "bob";
             });
             flush();
 
-            const marked = getMarked();
+            const marked = await getMarked();
             expect(marked).toHaveLength(1);
             expect(marked[0].value).toBe("bob");
         });
 
-        it('should return multiple new deltas across different IDs and paths', () => {
+        it('should return multiple new deltas across different IDs and paths', async () => {
             const store = createDeltaStore<TestUser>(() => []);
             const [, setUsers] = store;
             const [getMarked, mark] = createMarker(store);
 
-            mark();
+            await mark();
 
             setUsers((s) => {
                 s["user-1"] = { username: "alice", location: "wonderland" };
@@ -70,29 +66,47 @@ describe('createMarker', () => {
             });
             flush();
 
-            const marked = getMarked();
+            const marked = await getMarked();
             // user-1: username, location; user-2: username. Total 3 deltas.
             expect(marked).toHaveLength(3);
         });
 
-        it('should return all subsequent deltas for the same path if multiple are added after mark()', async () => {
+        it('should return only the most recent delta for the same path if multiple are added after mark()', async () => {
             const store = createDeltaStore<TestUser>(() => []);
             const [, setUsers] = store;
             const [getMarked, mark] = createMarker(store);
 
-            mark();
+            await mark();
 
-            await milliseconds(0)
             setUsers((s) => { s["user-1"] = { username: "alice" }; });
             flush();
-
-            await milliseconds(1);
 
             setUsers((s) => { s["user-1"].username = "bob"; });
             flush();
 
-            const marked = getMarked();
-            expect(marked).toHaveLength(2); // "alice" and "bob"
+            const marked = await getMarked();
+            expect(marked).toHaveLength(1);
+            expect(marked[0].value).toBe("bob");
+        });
+
+        it('should return the most recent delta for each unique id and path in Snapshot mode', async () => {
+            const store = createDeltaStore<TestUser>(() => []);
+            const [, setUsers] = store;
+            const [getMarked, mark] = createMarker(store);
+
+            await mark();
+
+            setUsers((s) => {
+                s["user-1"] = { username: "alice", location: "wonderland" };
+                s["user-1"].username = "bob";
+                s["user-2"] = { username: "charlie" };
+            });
+            flush();
+
+            const marked = await getMarked();
+            // user-1.username (bob), user-1.location (wonderland), user-2.username (charlie)
+            expect(marked).toHaveLength(3);
+            expect(marked.find(d => d.id === "user-1" && d.path === "username")?.value).toBe("bob");
         });
 
         it('should handle re-marking correctly', async () => {
@@ -100,70 +114,69 @@ describe('createMarker', () => {
             const [, setUsers] = store;
             const [getMarked, mark] = createMarker(store);
 
-            mark();
+            await mark();
 
-            await milliseconds(0)
             setUsers((s) => { s["user-1"] = { username: "alice" }; });
             flush();
 
-            expect(getMarked()).toHaveLength(1);
+            expect(await getMarked()).toHaveLength(1);
 
-            await milliseconds(1);
+            await mark(); // Record current state
 
-            mark(); // Record current state
-
-            await milliseconds(0)
-
-            expect(getMarked()).toHaveLength(0);
+            expect(await getMarked()).toHaveLength(0);
 
             setUsers((s) => { s["user-1"].username = "bob"; });
             flush();
 
-            const secondMarked = getMarked();
+            const secondMarked = await getMarked();
             expect(secondMarked).toHaveLength(1);
             expect(secondMarked[0].value).toBe("bob");
         });
 
-        it('should return all deltas if mark() was never called (baseline is 0)', () => {
+        it('should return only the latest delta if mark() was never called (baseline is 0)', async () => {
              const deltas: ModelDelta<TestUser>[] = [
-                { id: "user-1", timestamp: 100, path: "username", value: "alice" }
+                { id: "user-1", timestamp: 100, path: "username", value: "alice" },
+                { id: "user-1", timestamp: 200, path: "username", value: "bob" }
             ];
             const store = createDeltaStore(() => deltas);
             const [getMarked] = createMarker(store);
 
-            expect(getMarked()).toHaveLength(1);
+            const marked = await getMarked();
+            expect(marked).toHaveLength(1);
+            expect(marked[0].value).toBe("bob");
         });
     });
 
     describe('Timestamp mode (mark with timestamp)', () => {
-        it('should return only deltas with timestamp greater than the baseline', () => {
+        it('should return only the most recent delta for each path with timestamp greater than the baseline', async () => {
             const deltas: ModelDelta<TestUser>[] = [
                 { id: "user-1", timestamp: 100, path: "username", value: "alice" },
-                { id: "user-1", timestamp: 200, path: "location", value: "wonderland" },
-                { id: "user-1", timestamp: 300, path: "age", value: 25 },
+                { id: "user-1", timestamp: 200, path: "username", value: "bob" },
+                { id: "user-1", timestamp: 300, path: "username", value: "charlie" },
             ];
             const store = createDeltaStore(() => deltas);
             const [getMarked, mark] = createMarker(store);
 
-            mark(150);
-            const marked = getMarked();
+            await mark(150);
+            const marked = await getMarked();
 
-            expect(marked).toHaveLength(2);
+            expect(marked).toHaveLength(1);
+            expect(marked[0].value).toBe("charlie");
             expect(marked.every(d => d.timestamp > 150)).toBe(true);
         });
 
-        it('should return nothing if all deltas are older than or equal to the baseline', () => {
+        it('should return nothing if all deltas are older than or equal to the baseline', async () => {
             const deltas: ModelDelta<TestUser>[] = [
                 { id: "user-1", timestamp: 100, path: "username", value: "alice" }
             ];
             const store = createDeltaStore(() => deltas);
             const [getMarked, mark] = createMarker(store);
 
-            mark(100);
-            expect(getMarked()).toHaveLength(0);
+            await mark(100);
+            expect(await getMarked()).toHaveLength(0);
 
-            mark(150);
-            expect(getMarked()).toHaveLength(0);
+            await mark(150);
+            expect(await getMarked()).toHaveLength(0);
         });
 
         it('should switch back to snapshot mode if mark() is called without arguments', async () => {
@@ -173,13 +186,11 @@ describe('createMarker', () => {
             const store = createDeltaStore(() => deltas);
             const [getMarked, mark] = createMarker(store);
 
-            mark(50); // Timestamp mode
-            await milliseconds(0)
-            expect(getMarked()).toHaveLength(1);
+            await mark(50); // Timestamp mode
+            expect(await getMarked()).toHaveLength(1);
 
-            mark(); // Switch to Snapshot mode
-            await milliseconds(0)
-            expect(getMarked()).toHaveLength(0);
+            await mark(); // Switch to Snapshot mode
+            expect(await getMarked()).toHaveLength(0);
         });
     });
 });
@@ -202,10 +213,9 @@ describe('createMarker with async store', () => {
         await milliseconds(60)
         flush();
 
-        mark();
+        await mark();
 
-        await milliseconds(0)
-        expect(getMarked()).toHaveLength(0);
+        expect(await getMarked()).toHaveLength(0);
 
         // Add a new delta after marking
         const [, setUsers] = store;
@@ -214,7 +224,7 @@ describe('createMarker with async store', () => {
         });
         flush();
 
-        expect(getMarked()).toHaveLength(1);
+        expect(await getMarked()).toHaveLength(1);
     });
 
     it('should work when store is initialized with an async factory and mark is called immediately', async () => {
@@ -227,10 +237,10 @@ describe('createMarker with async store', () => {
 
         const [getMarked, mark] = createMarker(store);
 
-        mark()
+        await mark()
 
         await new Promise(resolve => setTimeout(resolve, 60));
-        expect(getMarked()).toHaveLength(0);
+        expect(await getMarked()).toHaveLength(0);
 
         // Add a new delta after marking
         const [, setUsers] = store;
@@ -239,6 +249,6 @@ describe('createMarker with async store', () => {
         });
         flush();
 
-        expect(getMarked()).toHaveLength(1);
+        expect(await getMarked()).toHaveLength(1);
     });
 })

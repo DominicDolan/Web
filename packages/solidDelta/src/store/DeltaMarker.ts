@@ -12,10 +12,10 @@ import {createMemo, resolve} from "solid-js";
  *
  * It supports two modes:
  * 1. **Snapshot mode**: Calling `mark()` without arguments records the latest timestamp for every
- *    unique `id` and `path` combination currently in the store. `getMarked()` then returns any
- *    deltas that have a strictly newer timestamp for their respective path.
+ *    unique `id` and `path` combination currently in the store. `getMarked()` then returns the
+ *    most recent delta for each unique `id` and `path` that has a strictly newer timestamp than the snapshot.
  * 2. **Timestamp mode**: Calling `mark(timestamp)` sets a fixed baseline. `getMarked()` will
- *    then return all deltas with a timestamp greater than the baseline.
+ *    then return the most recent delta for each unique `id` and `path` with a timestamp greater than the baseline.
  *
  * @template M - The model type managed by the store.
  * @param store - The {@link DeltaStore} instance to monitor.
@@ -59,8 +59,8 @@ export function createMarker<M extends Model>(store: DeltaStore<M>) {
         await resolve(() => initFn())
         for (const delta of getDeltas()) {
             const key = delta.id + "." + delta.path
-            const timestamp = set.get(key)
-            if (timestamp == null || timestamp < delta.timestamp) {
+            const lastTimestamp = set.get(key)
+            if (lastTimestamp == null || lastTimestamp <= delta.timestamp) {
                 set.set(key, delta.timestamp)
             }
         }
@@ -70,22 +70,31 @@ export function createMarker<M extends Model>(store: DeltaStore<M>) {
         await new Promise(resolve => setTimeout(resolve, 0))
 
         const deltas = getDeltas()
-        const result: ModelDelta<M>[] = []
+        const latestDeltas = new Map<string, ModelDelta<M>>()
+
         for (const delta of deltas) {
+            const key = delta.id + "." + delta.path
+
+            let isNewer = false
             if (timestampRef != null) {
                 if (timestampRef < delta.timestamp) {
-                    result.push(delta)
+                    isNewer = true
                 }
-                continue
+            } else {
+                const lastMarkedTimestamp = set.get(key)
+                if ((lastMarkedTimestamp ?? 0) < delta.timestamp) {
+                    isNewer = true
+                }
             }
 
-            const key = delta.id + "." + delta.path
-            const timestamp = set.get(key)
-            if ((timestamp ?? 0) < delta.timestamp) {
-                result.push(delta)
+            if (isNewer) {
+                const existing = latestDeltas.get(key)
+                if (!existing || existing.timestamp <= delta.timestamp) {
+                    latestDeltas.set(key, delta)
+                }
             }
         }
-        return result
+        return Array.from(latestDeltas.values())
     }
 
     return [ getMarked, mark ] as const
