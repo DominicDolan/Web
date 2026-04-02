@@ -4,7 +4,7 @@ type KeySanitize<Type extends string | number | symbol> = Type extends string ? 
 
 export type ModelDelta<T extends Model> = {
     id: string
-    path: KeySanitize<keyof T> | `${KeySanitize<keyof T>}.${string}`,
+    path: KeySanitize<keyof T> | `${KeySanitize<keyof T>}.${string}` | "",
     value: any
     timestamp: number
 }

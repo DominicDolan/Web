@@ -345,4 +345,26 @@ describe('DeltaStore writing', () => {
         expect(users.length).toBe(1);
         expect(users[0].username).toBe("user1-new");
     })
+
+    it("should acknowledge deleted item when a deleted path is passed to the factory function", async () => {
+        const [users, setUsers] = createDeltaStore<TestUser>(() => [
+            { id: "id-1", timestamp: 100, path: "username", value: "user1" },
+            { id: "id-1", timestamp: 200, path: "", value: undefined }
+        ]);
+        flush()
+
+        expect(users.length).toBe(0);
+    })
+
+    it("should acknowledge deleted item and all its properties when a deleted path is passed to the factory function", async () => {
+        const [users, setUsers] = createDeltaStore<TestUser>(() => [
+            { id: "id-1", timestamp: 100, path: "username", value: "user1" },
+            { id: "id-2", timestamp: 100, path: "username", value: "user2" },
+            { id: "id-1", timestamp: 150, path: "age", value: 40 },
+            { id: "id-1", timestamp: 200, path: "", value: undefined }
+        ] as const);
+        flush()
+
+        expect(users.length).toBe(1);
+    })
 })

@@ -20,6 +20,11 @@ function convertEventRowToModelDelta<M extends Model>(row: ModelEventRow): Model
             // keep as string if not valid JSON
         }
     }
+
+    if (value === null) {
+        value = undefined
+    }
+
     return {
         id: row.id,
         path: row.path as ModelDelta<M>["path"],
@@ -46,7 +51,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
             const {results} = await db.prepare(sql)
                 .all<ModelEventRow>()
 
-            return results.map(convertEventRowToModelDelta<M>)
+            return results.map(convertEventRowToModelDelta<M>).toSorted((a, b) => a.timestamp - b.timestamp)
         },
         async getOne(id: string) {
             const sql = `SELECT id, path, value, MAX(timestamp) as timestamp FROM "${tableName}" WHERE id = ? GROUP BY path;`
@@ -55,7 +60,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
                 .bind(id)
                 .all<ModelEventRow>()
 
-            return results.map(convertEventRowToModelDelta<M>)
+            return results.map(convertEventRowToModelDelta<M>).toSorted((a, b) => a.timestamp - b.timestamp)
         },
         async getManyBy(column: string, value: string) {
             const sql = `SELECT id, path, value, MAX(timestamp) as timestamp FROM "${tableName}" WHERE "${column}" = ? GROUP BY id, path;`
@@ -64,7 +69,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
                 .bind(value)
                 .all<ModelEventRow>()
 
-            return results.map(convertEventRowToModelDelta<M>)
+            return results.map(convertEventRowToModelDelta<M>).toSorted((a, b) => a.timestamp - b.timestamp)
         },
         async insert(delta: ModelDelta<M> | ModelDelta<M>[], extra?: Record<string, unknown>) {
 
@@ -85,7 +90,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
                 ...deltaArray.flatMap(delta => [
                     delta.id,
                     delta.path,
-                    typeof delta.value === 'object' ? JSON.stringify(delta.value) : delta.value,
+                    delta.value === undefined ? null : (typeof delta.value === 'object' ? JSON.stringify(delta.value) : delta.value),
                     delta.timestamp || Date.now(),
                     ...extraValues
                 ])
