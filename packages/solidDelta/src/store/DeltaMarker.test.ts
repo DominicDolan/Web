@@ -252,3 +252,132 @@ describe('createMarker with async store', () => {
         expect(await getMarked()).toHaveLength(1);
     });
 })
+
+describe('createMarker with deletions', () => {
+    it('should track deletion of a single property', async () => {
+        const store = createDeltaStore<TestUser>(() => []);
+        const [, setUsers] = store;
+        const [getMarked, mark] = createMarker(store);
+
+        setUsers((s) => {
+            s["user-1"] = {username: "alice", location: "wonderland"};
+        });
+        flush();
+
+        await mark();
+
+        setUsers((s) => {
+            delete s["user-1"].location;
+        });
+        flush();
+
+        const marked = await getMarked();
+        expect(marked).toHaveLength(1);
+        expect(marked[0].id).toBe("user-1");
+        expect(marked[0].path).toBe("location");
+        expect(marked[0].value).toBe(undefined);
+    });
+
+    it('should track deletion of an entire model', async () => {
+        const store = createDeltaStore<TestUser>(() => []);
+        const [, setUsers] = store;
+        const [getMarked, mark] = createMarker(store);
+
+        setUsers((s) => {
+            s["user-1"] = {username: "alice"};
+        });
+        flush();
+
+        await mark();
+
+        setUsers((s) => {
+            delete s["user-1"];
+        });
+        flush();
+
+        const marked = await getMarked();
+        expect(marked).toHaveLength(1);
+        expect(marked[0].id).toBe("user-1");
+        expect(marked[0].path).toBe("");
+        expect(marked[0].value).toBe(undefined);
+    });
+
+    it('should return deletion deltas only after mark() is called', async () => {
+        const deltas: ModelDelta<TestUser>[] = [
+            {id: "user-1", timestamp: 100, path: "username", value: "alice"}
+        ];
+        const store = createDeltaStore(() => deltas);
+        const [, setUsers] = store;
+        const [getMarked, mark] = createMarker(store);
+
+        await mark();
+
+        setUsers((s) => {
+            delete s["user-1"];
+        });
+        flush();
+
+        const marked = await getMarked();
+        expect(marked).toHaveLength(1);
+        expect(marked[0].value).toBe(undefined);
+    });
+
+    it('should track multiple deletions across different models', async () => {
+        const store = createDeltaStore<TestUser>(() => []);
+        const [, setUsers] = store;
+        const [getMarked, mark] = createMarker(store);
+
+        setUsers((s) => {
+            s["user-1"] = {username: "alice", location: "wonderland"};
+            s["user-2"] = {username: "bob", age: 30};
+        });
+        flush();
+
+        await mark();
+
+        setUsers((s) => {
+            delete s["user-1"].location;
+            delete s["user-2"].age;
+        });
+        flush();
+
+        const marked = await getMarked();
+        expect(marked).toHaveLength(2);
+        expect(marked.every(d => d.value === undefined)).toBe(true);
+    });
+
+    it('should handle deletion followed by re-creation correctly', async () => {
+        const store = createDeltaStore<TestUser>(() => []);
+        const [, setUsers] = store;
+        const [getMarked, mark] = createMarker(store);
+
+        setUsers((s) => {
+            s["user-1"] = {username: "alice"};
+        });
+        flush();
+
+        await mark();
+
+        setUsers((s) => {
+            delete s["user-1"];
+        });
+        flush();
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        setUsers((s) => {
+            s["user-1"] = {username: "bob"};
+        });
+        flush();
+
+        const marked = await getMarked();
+        // Should have deletion delta and then re-creation delta, but only most recent per path
+
+        await new Promise(resolve => setTimeout(resolve, 10));
+        expect(marked).toHaveLength(2);
+        expect(marked[1].path).toBe("username");
+        expect(marked[1].value).toBe("bob");
+    });
+});
+
+

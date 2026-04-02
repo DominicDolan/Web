@@ -64,6 +64,8 @@ export function createMarker<M extends Model>(store: DeltaStore<M>) {
                 set.set(key, delta.timestamp)
             }
         }
+
+        await new Promise(resolve => setTimeout(resolve, 0));
     }
 
     async function getMarked() {
