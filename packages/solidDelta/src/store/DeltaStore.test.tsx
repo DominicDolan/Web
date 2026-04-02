@@ -182,4 +182,58 @@ describe('DeltaStore writing', () => {
 
         expect(users[0].id).toBe("new-id");
     });
+
+    it('should add two new models when added in the same call', () => {
+        const [users, setUsers] = createDeltaStore<TestUser>(() => []);
+        setUsers((store) => {
+            store["id-1"] = { username: "user1" }
+            store["id-2"] = { username: "user2" }
+        })
+        flush()
+
+        expect(users.length).toBe(2);
+    });
+
+    it('should add two new models when added in separate calls', () => {
+        const [users, setUsers] = createDeltaStore<TestUser>(() => []);
+        setUsers((store) => {
+            store["id-1"] = { username: "user1" }
+        })
+        flush()
+        setUsers((store) => {
+            store["id-2"] = { username: "user2" }
+        })
+        flush()
+
+        expect(users.length).toBe(2);
+    });
+
+    it('should add two new models when added in separate calls with a wait inbetween', async () => {
+        const [users, setUsers] = createDeltaStore<TestUser>(() => []);
+        await new Promise<void>((resolve) => setTimeout(resolve, 100))
+        setUsers((store) => {
+            store["id-1"] = { username: "user1" }
+        })
+
+        await new Promise<void>((resolve) => setTimeout(resolve, 100))
+        setUsers((store) => {
+            store["id-2"] = { username: "user2" }
+        })
+        await new Promise<void>((resolve) => setTimeout(resolve, 0))
+
+        expect(users.length).toBe(2);
+    });
+
+    it('should add two new models and they should have correct IDs', () => {
+        const [users, setUsers] = createDeltaStore<TestUser>(() => []);
+        setUsers((store) => {
+            store["id-1"] = { username: "user1" }
+            store["id-2"] = { username: "user2" }
+        })
+        flush()
+
+        const ids = users.map(u => u.id);
+        expect(ids).toContain("id-1");
+        expect(ids).toContain("id-2");
+    });
 })
