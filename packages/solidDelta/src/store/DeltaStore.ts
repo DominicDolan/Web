@@ -9,11 +9,17 @@ export function setByPath(obj: Record<string, any>, path: string[], value: any) 
     let nestedObj = obj
     for (let i = 0; i < path.length - 1; i++) {
         if (nestedObj[path[i]] == null) {
+            if (value === undefined) return
             nestedObj[path[i]] = {}
         }
         nestedObj = nestedObj[path[i]]
     }
-    nestedObj[path.at(-1)!] = value
+
+    if (value === undefined) {
+        if (nestedObj) delete nestedObj[path.at(-1)!]
+    } else {
+        nestedObj[path.at(-1)!] = value
+    }
 }
 
 function insertValueByTimestamp<M extends Model>(arr: ModelDelta<M>[], el: ModelDelta<M>) {
@@ -109,13 +115,21 @@ export function createDeltaStore<M extends Model, Valid extends boolean = true>(
 
     const modelsById = createProjection<Record<string, PartialModel<M>>>((store) => {
         for (const delta of deltasLocal) {
+            const pathParts = delta.path.split(".").filter(Boolean)
+            const fullPath = [delta.id, ...pathParts]
+
+            if (pathParts.length === 0 && delta.value === undefined) {
+                delete store[delta.id]
+                continue
+            }
+
             const model = store[delta.id]
             const updatedAt = model?.updatedAt > delta.timestamp ? model.updatedAt : delta.timestamp
             if (model == null) {
                 store[delta.id] = { id: delta.id, updatedAt } as PartialModel<M>
             }
 
-            setByPath(store, [delta.id, ...delta.path.split(".") as any], delta.value)
+            setByPath(store, fullPath, delta.value)
         }
     }, {} as Record<string, Valid extends true ? M : PartialModel<M>>)
 

@@ -287,4 +287,62 @@ describe('DeltaStore writing', () => {
         expect(ids).toContain("id-1");
         expect(ids).toContain("id-2");
     });
+
+    it('should delete a record when it is removed from the draft', () => {
+        const [users, setUsers] = createDeltaStore<TestUser>(() => [
+            { id: "id-1", timestamp: 100, path: "username", value: "user1" },
+            { id: "id-2", timestamp: 100, path: "username", value: "user2" }
+        ]);
+        flush()
+
+        expect(users.length).toBe(2);
+
+        setUsers((store) => {
+            delete store["id-1"]
+        })
+        flush()
+
+        expect(users.length).toBe(1);
+        expect(users[0].id).toBe("id-2");
+    })
+
+    it('should delete a nested property when it is removed from the draft', () => {
+        const [users, setUsers] = createDeltaStore<TestUser>(() => [
+            { id: "id-1", timestamp: 100, path: "profile.name", value: "John" },
+            { id: "id-1", timestamp: 100, path: "profile.settings.theme", value: "dark" }
+        ]);
+        flush()
+
+        expect(users[0].profile?.settings?.theme).toBe("dark");
+
+        setUsers((store) => {
+            delete (store["id-1"].profile?.settings as any).theme
+        })
+        flush()
+
+        expect(users[0].profile?.settings?.theme).toBeUndefined();
+        expect(users[0].profile?.name).toBe("John");
+    })
+
+    it('should allow re-adding a record after it was deleted', () => {
+        const [users, setUsers] = createDeltaStore<TestUser>(() => []);
+        setUsers((store) => {
+            store["id-1"] = { username: "user1" }
+        })
+        flush()
+        expect(users.length).toBe(1);
+
+        setUsers((store) => {
+            delete store["id-1"]
+        })
+        flush()
+        expect(users.length).toBe(0);
+
+        setUsers((store) => {
+            store["id-1"] = { username: "user1-new" }
+        })
+        flush()
+        expect(users.length).toBe(1);
+        expect(users[0].username).toBe("user1-new");
+    })
 })
