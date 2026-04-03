@@ -1,6 +1,6 @@
 import {createSolid2VinxiApp} from "@web/vinxi/config";
 import tsconfigPaths from "vite-tsconfig-paths";
-import UnoCSS from "unocss/vite";
+import tailwindcss from "@tailwindcss/vite";
 
 
 export default createSolid2VinxiApp({
@@ -8,7 +8,7 @@ export default createSolid2VinxiApp({
   serverEntry: "./src/server.tsx",
   solid: { refresh: { disabled: true }},
   client: {
-    plugins: [UnoCSS(), tsconfigPaths()]
+    plugins: [ tailwindcss(), tsconfigPaths()]
   },
   server: {
     plugins: [tsconfigPaths()]

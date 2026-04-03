@@ -50,6 +50,20 @@ const bareElementTags = [
     "progress-bar"
 ] as const
 export type BareElementTag = typeof bareElementTags[number];
+
+export interface BareElements {
+    ["feedback-message"]: any
+    ["place-holder"]: any
+    ["input-shell"]: any
+    ["form-field"]: any
+    ["popover-host"]: any
+    ["popover-activator"]: any
+    ["window-group"]: any
+    ["empty-state"]: any
+    ["toast-stack"]: any
+    ["progress-bar"]: any
+}
+
 defineBareElements(
     bareElementTags
 );

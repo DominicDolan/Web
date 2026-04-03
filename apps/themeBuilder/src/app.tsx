@@ -1,5 +1,3 @@
-import "virtual:uno.css"
-import "@web/lins/minimal.css"
 import ThemeEditor from "~/app/themes/ThemeEditor/ThemeEditor"
 import {Match, Show, Switch} from "solid-js";
 import {Navigate, useLocation} from "@web/router";

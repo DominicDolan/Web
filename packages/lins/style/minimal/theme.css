@@ -1,12 +1,12 @@
 @import "../reset.css";
-@import "button.css";
-@import "text.css";
-@import "card.css";
-@import "input.css";
-@import "list.css";
-@import "icon.css";
-@import "loader.css";
-@import "popover.css";
+@import "./button.css";
+@import "./text.css";
+@import "./card.css";
+@import "./input.css";
+@import "./list.css";
+@import "./icon.css";
+@import "./loader.css";
+@import "./popover.css";
 
 @layer defaults {
 

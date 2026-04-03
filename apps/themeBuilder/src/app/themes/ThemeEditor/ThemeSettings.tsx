@@ -1,6 +1,5 @@
 import {For, Loading, Show} from "solid-js";
 import {A, useNavigate} from "@web/router";
-import {useThemeScope} from "~/app/themes/ThemeEditor/ThemeScope";
 import {useThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 import {ThemeDefinition} from "~/models/ThemeDefinition";
 
@@ -90,50 +89,46 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
     // }
 
     return <>
-        <Loading fallback={<place-holder class={"loader themeSettings"} flex={"col gap-8"} spacing={"pa-8"}>
-            <div sizing={"w-full h-0.75rem"}></div>
+        <Loading fallback={<place-holder class={"loader themeSettings flex flex-col gap-8 p-8"}>
+            <div class={"w-full h-3"}></div>
             <For each={Array.from({length: 3})}>
-                {() => <div flex={"col gap-4"}>
-                    <div sizing={"w-6rem h-1rem"}></div>
-                    <div sizing={"w-full h-1.25rem"}></div>
+                {() => <div class={"flex flex-col gap-4"}>
+                    <div class={"w-24 h-4"}></div>
+                    <div class={"w-full h-5"}></div>
                 </div>
                 }
             </For>
         </place-holder>}>
             <div
-                class={"themeSettings"}
-                spacing={"py-6 px-6"}
-                flex={"col center"}>
-                <section sizing={"w-full"} flex={"col gap-4"} spacing={"mb-8"}>
-                    <hgroup flex={"row center space-between"}>
+                class={"themeSettings py-6 px-6 flex flex-col items-center"}>
+                <section class={"w-full flex flex-col gap-4 mb-8"}>
+                    <hgroup class={"flex flex-row items-center justify-between"}>
                         <h2>Theme Settings</h2>
                         <button
-                            class={"text"}
+                            class={"text flex flex-row items-center justify-center p-2"}
                             popovertarget={"theme-settings-menu"}
-                            flex={"row center"}
-                            spacing={"pa-2"}
                             aria-label="Theme settings menu">
                             <i>more_vert</i>
                         </button>
-                        <ul id={"theme-settings-menu"} popover role={"menu"} position-area={"[span-right,bottom]"}>
-                            <li onClick={() => remove()} flex={"row gap-2 center"}><i>delete</i>Delete</li>
+                        <ul id={"theme-settings-menu"} class={"[position-area:span-right_bottom]"} popover role={"menu"}>
+                            <li onClick={() => remove()} class={"flex flex-row gap-2 items-center justify-center"}><i>delete</i>Delete</li>
                         </ul>
                     </hgroup>
-                    <form-field flex={"col gap-2"}>
-                        <label>Name</label>
+                    <form-field class={"flex flex-col gap-2"}>
+                        <label>gedName</label>
                         <input-shell>
                             <input type={"text"} value={props.theme.name ?? ""} onInput={(e) => rename(e.target.value)}
                                    required/>
                         </input-shell>
                     </form-field>
-                    {/*<form-field flex={"col gap-2"}>*/}
+                    {/*<form-field class={"flex flex-col gap-2"}>*/}
                     {/*    <label>CSS Class</label>*/}
                     {/*    <input-shell>*/}
                     {/*        <input type={"text"} value={theme()?.class ?? ""} onInput={onCssClassChange} onBlur={onBlur}*/}
                     {/*               required/>*/}
                     {/*    </input-shell>*/}
                     {/*</form-field>*/}
-                    <form-field flex={"col gap-2"}>
+                    <form-field class={"flex flex-col gap-2"}>
                         <label>Description</label>
                         <textarea onInput={(e) => changeDescription(e.target.value)}>{props.theme.description ?? ""}</textarea>
                     </form-field>
@@ -142,74 +137,70 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
         </Loading>
         </>
 
-            return <><Show when={false}><div
-                class={"themeSettings"}
-                spacing={"py-6 px-6"}
-                flex={"col center"}>
-                <section sizing={"w-full"} flex={"col gap-4"} spacing={"mb-8"}>
-                    <hgroup flex={"row center space-between"}>
-                        <h2>Theme Settings</h2>
-                        <button
-                            class={"text"}
-                            popovertarget={"theme-settings-menu"}
-                            flex={"row center"}
-                            spacing={"pa-2"}
-                            aria-label="Theme settings menu">
-                            <i>more_vert</i>
-                        </button>
-                        <ul id={"theme-settings-menu"} popover role={"menu"} position-area={"[span-right,bottom]"}>
-                            <li onClick={onDeleteClick} flex={"row gap-2 center"}><i>delete</i>Delete</li>
-                        </ul>
-                    </hgroup>
-                    <form-field flex={"col gap-2"}>
-                        <label>Name</label>
-                        <input-shell>
-                            <input type={"text"} value={theme()?.name ?? ""} onInput={onNameChange} onBlur={onBlur}
-                                   required/>
-                        </input-shell>
-                    </form-field>
-                    <form-field flex={"col gap-2"}>
-                        <label>CSS Class</label>
-                        <input-shell>
-                            <input type={"text"} value={theme()?.class ?? ""} onInput={onCssClassChange} onBlur={onBlur}
-                                   required/>
-                        </input-shell>
-                    </form-field>
-                    <form-field flex={"col gap-2"}>
-                        <label>Description</label>
-                        <textarea onInput={onDescriptionChange} onBlur={onBlur}>{theme()?.description ?? ""}</textarea>
-                    </form-field>
-                    <form-field flex={"col gap-2"}>
-                        <label>Tags</label>
-                        <select/>
-                    </form-field>
-                </section>
-                <hr sizing={"w-full"}/>
-                <section sizing={"w-full"} flex={"col gap-4"} spacing={"mt-10 mb-8"}>
-                    <h2 spacing={"mb-2"}>Edit Theme</h2>
-                    <ul class={"plain"} flex={"col"}>
-                        <li>
-                            <A flex={"row space-between"} href={`/editor/${props.params.themeId}/colors`}>
-                                <span>Edit Colors</span>
-                                <i>keyboard_arrow_right</i>
-                            </A>
-                        </li>
-                        <li>
-                            <A flex={"row space-between"} href={`/editor/${props.params.themeId}/fonts`}>
-                                <span>Edit Fonts</span>
-                                <i>keyboard_arrow_right</i>
-                            </A>
-                        </li>
-                        <li>
-                            <A flex={"row space-between"} href={`/editor/${props.params.themeId}/elements`}>
-                                <span>Edit Elements</span>
-                                <i>keyboard_arrow_right</i>
-                            </A>
-                        </li>
-                    </ul>
-                </section>
-            </div>
-            {props.children}
-        </Show>
-    </>
+    //         return <><Show when={false}><div
+    //             class={"themeSettings py-6 px-6 flex flex-col items-center justify-center"}>
+    //             <section class={"w-full flex flex-col gap-4 mb-8"}>
+    //                 <hgroup class={"flex flex-row items-center justify-between"}>
+    //                     <h2>Theme Settings</h2>
+    //                     <button
+    //                         class={"text flex flex-row items-center justify-center p-2"}
+    //                         popovertarget={"theme-settings-menu"}
+    //                         aria-label="Theme settings menu">
+    //                         <i>more_vert</i>
+    //                     </button>
+    //                     <ul id={"theme-settings-menu"} popover role={"menu"} position-area={"[span-right,bottom]"}>
+    //                         <li onClick={onDeleteClick} class={"flex flex-row gap-2 items-center justify-center"}><i>delete</i>Delete</li>
+    //                     </ul>
+    //                 </hgroup>
+    //                 <form-field class={"flex flex-col gap-2"}>
+    //                     <label>Name</label>
+    //                     <input-shell>
+    //                         <input type={"text"} value={theme()?.name ?? ""} onInput={onNameChange} onBlur={onBlur}
+    //                                required/>
+    //                     </input-shell>
+    //                 </form-field>
+    //                 <form-field class={"flex flex-col gap-2"}>
+    //                     <label>CSS Class</label>
+    //                     <input-shell>
+    //                         <input type={"text"} value={theme()?.class ?? ""} onInput={onCssClassChange} onBlur={onBlur}
+    //                                required/>
+    //                     </input-shell>
+    //                 </form-field>
+    //                 <form-field class={"flex flex-col gap-2"}>
+    //                     <label>Description</label>
+    //                     <textarea onInput={onDescriptionChange} onBlur={onBlur}>{theme()?.description ?? ""}</textarea>
+    //                 </form-field>
+    //                 <form-field class={"flex flex-col gap-2"}>
+    //                     <label>Tags</label>
+    //                     <select/>
+    //                 </form-field>
+    //             </section>
+    //             <hr class={"w-full"}/>
+    //             <section class={"w-full flex flex-col gap-4 mt-10 mb-8"}>
+    //                 <h2 class={"mb-2"}>Edit Theme</h2>
+    //                 <ul class={"plain flex flex-col"}>
+    //                     <li>
+    //                         <A class={"flex flex-row justify-between"} href={`/editor/${props.params.themeId}/colors`}>
+    //                             <span>Edit Colors</span>
+    //                             <i>keyboard_arrow_right</i>
+    //                         </A>
+    //                     </li>
+    //                     <li>
+    //                         <A class={"flex flex-row justify-between"} href={`/editor/${props.params.themeId}/fonts`}>
+    //                             <span>Edit Fonts</span>
+    //                             <i>keyboard_arrow_right</i>
+    //             </A>
+    //                     </li>
+    //                     <li>
+    //                         <A class={"flex flex-row justify-between"} href={`/editor/${props.params.themeId}/elements`}>
+    //                             <span>Edit Elements</span>
+    //                             <i>keyboard_arrow_right</i>
+    //                         </A>
+    //                     </li>
+    //                 </ul>
+    //             </section>
+    //         </div>
+    //         {props.children}
+    //     </Show>
+    // </>
 }
