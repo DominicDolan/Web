@@ -1,0 +1,14 @@
+
+@layer base {
+    empty-state {
+        display: block;
+    }
+}
+
+@layer elements {
+
+    empty-state {
+        border-radius: 0.5rem;
+        border: 4px dotted oklab(from currentColor l a b / 0.2);
+    }
+}

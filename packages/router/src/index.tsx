@@ -17,6 +17,21 @@ const LocationContextProvider = createContext<{
     navigate: (to: string, replace?: boolean) => void
 }>();
 
+export function createLocation(path: Accessor<string>) {
+    const url = createMemo(() => new URL(path(), window.location.origin))
+    const params = createMemo(() => Object.fromEntries(url().searchParams.entries()))
+
+    const segments = createMemo(() => {
+        return url().pathname.split('/').filter(segment => segment !== '');
+    })
+
+    return {
+        path,
+        segments,
+        params
+    }
+}
+
 export function LocationContext(props: { children: any }) {
     const [path, setPath] = createSignal(window.location.pathname);
 
@@ -26,13 +41,6 @@ export function LocationContext(props: { children: any }) {
         window.addEventListener("popstate", handleLocationChange);
 
         return () => window.removeEventListener("popstate", handleLocationChange)
-    })
-
-    const url = createMemo(() => new URL(path(), window.location.origin))
-    const params = createMemo(() => Object.fromEntries(url().searchParams.entries()))
-
-    const segments = createMemo(() => {
-        return url().pathname.split('/').filter(segment => segment !== '');
     })
 
     const navigate = (to: string, replace: boolean = false) => {
@@ -45,11 +53,7 @@ export function LocationContext(props: { children: any }) {
         setPath(to);
     };
 
-    const location = {
-        path,
-        segments,
-        params,
-    };
+    const location = createLocation(path)
 
     return <LocationContextProvider value={{location, navigate}}>{props.children}</LocationContextProvider>
 }
@@ -57,6 +61,7 @@ export function LocationContext(props: { children: any }) {
 interface AProps extends JSX.AnchorHTMLAttributes<HTMLAnchorElement> {
     href: string;
     replace?: boolean;
+    matches?: (location: ReturnType<typeof createLocation>) => boolean;
 }
 
 
@@ -68,6 +73,21 @@ export function A(props: AProps) {
     const anchorProps = omit(props, "onClick", "replace", "href")
 
     const navigate = useNavigate();
+
+    const currentLocation = useLocation();
+    const hrefLocation = createLocation(() => props.href);
+    function matches() {
+        if (props.matches != null) {
+            return props.matches(hrefLocation);
+        } else {
+            const hrefSegments = hrefLocation.segments()
+            const locationSegments = currentLocation.segments()
+            for (let index = 0; index < hrefSegments.length; index++) {
+                if (hrefSegments[index] !== locationSegments[index]) return false
+            }
+            return true
+        }
+    }
 
     const userOnClick = props.onClick as JSX.EventHandler<HTMLAnchorElement, MouseEvent> | undefined;
 
@@ -85,9 +105,16 @@ export function A(props: AProps) {
         event.preventDefault();
         navigate(target, props.replace ?? false);
     };
+
+    const classList = () => {
+        const passedClass = Array.isArray(props.class) ? props.class : [props.class]
+        return [...passedClass, { active: matches() }]
+    }
+    
     return (
         <a
             {...anchorProps}
+            class={classList()}
             href={props.href}
             onClick={onClick}
         />

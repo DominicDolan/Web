@@ -1,0 +1,15 @@
+@property --presentation-color {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: white;
+}
+
+.colorPresentation {
+    border-radius: 5px;
+    padding: 16px;
+    background-color: var(--presentation-color);
+
+    code {
+        background-color: transparent;
+    }
+}

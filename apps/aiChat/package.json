@@ -1,0 +1,25 @@
+{
+  "name": "@web/aichat",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vinxi dev --port 3001",
+    "build": "vinxi build",
+    "start": "vinxi start"
+  },
+  "dependencies": {
+    "@paralleldrive/cuid2": "3.3.0",
+    "node-llama-cpp": "3.18.1",
+    "@web/components": "*",
+    "@web/schema": "*",
+    "@web/solid-delta": "*",
+    "@web/solid-scope": "*",
+    "@web/unolayout": "*",
+    "@web/utils": "*",
+    "@web/vinxi": "*",
+    "solid-js": "2.0.0-beta.4",
+    "@solidjs/web": "2.0.0-beta.4",
+    "tailwindcss": "4.2.2"
+  },
+  "devDependencies": {}
+}

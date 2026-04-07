@@ -24,7 +24,13 @@
 }
 
 @layer elements {
-    i {
+    i, i.medium {
         font-size: 1.3em;
+    }
+    i.large {
+        font-size: 1.5em;
+    }
+    i.xlarge {
+        font-size: 2em;
     }
 }

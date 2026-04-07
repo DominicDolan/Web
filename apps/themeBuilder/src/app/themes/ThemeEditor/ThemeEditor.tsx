@@ -31,7 +31,7 @@ export default function ThemeEditor() {
                     </ul>
                 </div>
             </NavBarTemplate>
-            <Show when={selectedTheme() != null}>{}
+            <Show when={selectedTheme() != null}>
                 <ThemeScope theme={selectedTheme()!}>
                     <ThemeSettings theme={selectedTheme()!}></ThemeSettings>
                 </ThemeScope>

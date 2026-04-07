@@ -7,6 +7,7 @@
 @import "./icon.css";
 @import "./loader.css";
 @import "./popover.css";
+@import "./emptyState.css";
 
 @layer defaults {
 
@@ -27,7 +28,9 @@
         --on-success-color: white;
 
         --warning-color: #f5c211;
+        --on-warning-color: black;
         --error-color: #c01c28;
+        --on-error-color: white;
 
         --shadow-color: oklab(from black l a b / 0.3);
 
@@ -47,7 +50,16 @@
 
     .success {
         --active-color: var(--success-color);
-        --on-active-color: var(--on-primary-color);
+        --on-active-color: var(--on-success-color);
+    }
+
+    .warning {
+        --active-color: var(--warning-color);
+        --on-active-color: var(--on-warning-color);
+    }
+    .error {
+        --active-color: var(--error-color);
+        --on-active-color: var(--on-error-color);
     }
 
     .surface {

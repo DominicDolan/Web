@@ -7,7 +7,7 @@
     }
 }
 
-place-holder.loader *:not(:has(> *)) {
+empty-state.loader *:not(:has(> *)) {
     background: linear-gradient(90deg,
     rgba(0, 0, 0, 0.06) 25%,
     rgba(0, 0, 0, 0.12) 37%,
@@ -20,7 +20,7 @@ place-holder.loader *:not(:has(> *)) {
     border-radius: 0.25rem;
 }
 
-place-holder.empty {
+empty-state.empty {
 
     --current-color: var(--active-color, var(--surface-color));
     --on-current-color: var(--on-active-color, var(--on-surface-color));

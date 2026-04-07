@@ -166,10 +166,10 @@ export default function ElementsTemplate(props: {
             <Show
                 when={hasVariants()}
                 fallback={<>
-                    <place-holder class={"empty"} sizing="h-15rem w-full" flex={"col center justify-center"}>
+                    <empty-state class={"empty"} sizing="h-15rem w-full" flex={"col center justify-center"}>
                             <p>No variants yet</p>
                             <CreateVariantButton onCreateVariant={addVariant} text={"Add Variant"}/>
-                    </place-holder>
+                    </empty-state>
                 </>}
             >
                 <div>
@@ -177,7 +177,7 @@ export default function ElementsTemplate(props: {
                         <VariantTabs styles={props.styles} tabProps={tabProps}/>
                         <CreateVariantButton onCreateVariant={addVariant}/>
                     </div>
-                    <window-group grid-cols="[1fr,1fr]" gap="4" {...windowProps}>
+                    <div grid-cols="[1fr,1fr]" gap="4" {...windowProps}>
                         <section grid-rows={"[auto,1fr]"}>
                             <hgroup flex={"row gap-2 center"} spacing={"my-2"}><i>code</i><h4>CSS Properties</h4></hgroup>
                             {props.controls(props.styles[value()])}
@@ -190,7 +190,7 @@ export default function ElementsTemplate(props: {
                                 </div>
                             </article>
                         </section>
-                    </window-group>
+                    </div>
                 </div>
             </Show>
         </div>

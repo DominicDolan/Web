@@ -1,14 +1,15 @@
 import type {BareElementTag} from "@web/lins/elements"
+
+interface SolidClassAttribute {
+    class: string | JSX.ClassList //Record<string | boolean> | Array<string | Record<string | boolean>>
+}
 declare module 'solid-js' {
     namespace JSX {
+        interface HTMLAttributes<T> extends SolidClassAttribute {}
+
         interface IntrinsicElements {
-            ["feedback-message"]: any
-            ["place-holder"]: any
             ["input-shell"]: any
             ["form-field"]: any
-            ["popover-host"]: any
-            ["popover-activator"]: any
-            ["window-group"]: any
             ["empty-state"]: any
             ["toast-stack"]: any
             ["progress-bar"]: any

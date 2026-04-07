@@ -34,6 +34,7 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
     }
 
     async function save() {
+        debounceSave.cancel()
         const uncommitted = await getUncommitted()
 
         await saveTheme(uncommitted)
@@ -61,6 +62,13 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
                 old[id].description = newDescription
             })
             debounceSave()
-        }
+        },
+        changeThemeClass: (id: string, newClassName: string) => {
+            setThemes(old => {
+                old[id].class = newClassName
+            })
+            debounceSave()
+        },
+        saveChanges: save
     }
 })

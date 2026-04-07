@@ -34,8 +34,7 @@
         }
 
         &.tonal {
-            border: 1px solid color-mix(in oklab, var(--current-color) 50%, transparent);
-            background-color: color-mix(in oklab, var(--current-color) 20%, transparent);
+            background-color: color-mix(in oklab, var(--current-color) 5%, transparent);
             color: var(--current-color);
             box-shadow: none;
         }

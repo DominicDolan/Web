@@ -19,7 +19,8 @@
     "packages/unoLayout",
     "packages/solidScope",
     "packages/solid2Vinxi",
-    "packages/router"
+    "packages/router",
+    "apps/aiChat"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:vite\" \"npm run dev:wrangler\"",
