@@ -7,6 +7,7 @@ import { serverFunctions } from "@vinxi/server-functions/plugin";
 export type Solid2VinxiConfig = {
     clientEntry: string
     serverEntry: string
+    apiEntry: string
     solid?: Parameters<typeof solid>[0]
     client?: {
         plugins?: Array<any>
@@ -37,6 +38,13 @@ export function createSolid2VinxiApp(config: Solid2VinxiConfig) {
                 base: "/base",
             },
             {
+                name: "api",
+                type: "http",
+                handler: config.apiEntry, // This is required but can be empty
+                target: "server",
+                base: "/api",
+            },
+            {
                 name: "server",
                 type: "http",
                 handler: config.serverEntry, // This is required but can be empty
@@ -45,7 +53,7 @@ export function createSolid2VinxiApp(config: Solid2VinxiConfig) {
             },
             serverFunctions.router({
                 plugins: () => config.serverFunctions?.plugins ?? [],
-            })
+            }),
         ],
         server: {
             preset: "cloudflare-module",
