@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@paralleldrive/cuid2": "3.3.0",
-    "node-llama-cpp": "3.18.1",
+    "@solidjs/web": "2.0.0-beta.4",
     "@web/components": "*",
     "@web/schema": "*",
     "@web/solid-delta": "*",
@@ -17,9 +17,11 @@
     "@web/unolayout": "*",
     "@web/utils": "*",
     "@web/vinxi": "*",
+    "katex": "^0.16.45",
+    "marked": "18.0.0",
+    "marked-katex-extension": "^5.1.8",
+    "node-llama-cpp": "3.18.1",
     "solid-js": "2.0.0-beta.4",
-    "@solidjs/web": "2.0.0-beta.4",
     "tailwindcss": "4.2.2"
-  },
-  "devDependencies": {}
+  }
 }

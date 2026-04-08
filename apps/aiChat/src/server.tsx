@@ -5,7 +5,8 @@ export default createServer(({scripts, assets}) => {
     <html lang="en">
         <head>
             <meta charset="UTF-8"/>
-            <title>Title</title>
+            <title>Gemma 4 Chat</title>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
             ${assets}
         </head>
         <body>
