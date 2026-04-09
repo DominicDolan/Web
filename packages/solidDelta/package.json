@@ -13,8 +13,8 @@
   "dependencies": {
     "vitest": "4.1.1",
     "jsdom": "29.0.1",
-    "solid-js": "2.0.0-beta.4",
-    "@solidjs/web": "2.0.0-beta.4",
+    "solid-js": "2.0.0-beta.5",
+    "@solidjs/web": "2.0.0-beta.5",
     "@web/solid-scope": "*"
   },
   "devDependencies": {

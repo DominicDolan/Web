@@ -8,6 +8,7 @@
 @import "./loader.css";
 @import "./popover.css";
 @import "./emptyState.css";
+@import "./nav.css";
 
 @layer defaults {
 

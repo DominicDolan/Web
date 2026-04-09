@@ -2,7 +2,7 @@ import {For, Loading, Show} from "solid-js";
 import {A, useLocation, useNavigate} from "@web/router";
 import {useThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 import {ThemeDefinition} from "~/models/ThemeDefinition";
-import ColorEditor from "~/app/themes/ColorEditor/ColorEditor";
+import ColorList from "~/app/themes/ColorEditor/ColorList";
 
 export default function ThemeSettings(props: { children?: any, theme: ThemeDefinition }) {
 
@@ -145,7 +145,7 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                 </section>
             </div>
             <Show when={location.segments()[2] === "colors"}>
-                <ColorEditor/>
+                <ColorList/>
             </Show>
         </Loading>
         </>

@@ -6,7 +6,6 @@
 
 .colorPresentation {
     border-radius: 5px;
-    padding: 16px;
     background-color: var(--presentation-color);
 
     code {

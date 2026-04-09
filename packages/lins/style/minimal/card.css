@@ -17,6 +17,8 @@
         --current-color: var(--active-color, var(--primary-color));
         --on-current-color: var(--on-active-color, var(--on-primary-color));
 
+        transition: box-shadow 0.2s ease-in-out;
+
         :where(&), &.flat, &.elevated {
             background-color: var(--surface-color);
             color: var(--on-surface-color);
@@ -37,6 +39,11 @@
             background-color: color-mix(in oklab, var(--current-color) 5%, transparent);
             color: var(--current-color);
             box-shadow: none;
+
+            &[role="button"]:hover {
+                box-shadow:
+                        0 4px 10px -1px var(--shadow-color);
+            }
         }
 
         &.inset {

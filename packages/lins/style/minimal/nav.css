@@ -1,0 +1,8 @@
+
+
+@layer elements {
+
+    nav.top {
+        border-bottom: 1px solid oklab(from currentColor 70% a b / 0.5);
+    }
+}

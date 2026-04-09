@@ -37,13 +37,15 @@ export function createSolid2VinxiApp(config: Solid2VinxiConfig) {
                 plugins: () => [serverFunctions.client(), solid(solidConfig), ...config.client?.plugins ?? []],
                 base: "/base",
             },
-            {
-                name: "api",
-                type: "http",
-                handler: config.apiEntry, // This is required but can be empty
-                target: "server",
-                base: "/api",
-            },
+            ...((function () {
+                return config.apiEntry ? [{
+                    name: "api",
+                    type: "http",
+                    handler: config.apiEntry,
+                    target: "server",
+                    base: "/api",
+                }] : []
+            })()),
             {
                 name: "server",
                 type: "http",

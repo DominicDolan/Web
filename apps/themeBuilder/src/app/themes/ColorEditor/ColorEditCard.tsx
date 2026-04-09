@@ -8,7 +8,7 @@ import {
 } from "@web/utils/Colors.js"
 import { createMemo } from "solid-js"
 
-export function ColorEditCard(props: { name: string, color: string }) {
+export function ColorEditCard(props: { name: string, color: string, onClick: () => void }) {
     const rgb = createMemo(() => hexToRgb(props.color));
     const hsl = createMemo(() => {
         const val = rgb();
@@ -48,9 +48,9 @@ export function ColorEditCard(props: { name: string, color: string }) {
         "error": smallTextError(),
     })
 
-    return <article class={"tonal flex flex-col gap-4"}>
+    return <article class={"tonal flex flex-col gap-4"} onClick={props.onClick} role="button">
         <hgroup>
-            <h3>{props.name}</h3>
+            <h3>{props.name}&nbsp;</h3>
         </hgroup>
         <div class={[style.colorPresentation, "w-full h-30 relative flex items-center justify-center font-bold text-xl"]}
              style={`--presentation-color: ${props.color}; color: ${bestContrast()}`}>

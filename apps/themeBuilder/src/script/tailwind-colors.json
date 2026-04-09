@@ -1,0 +1,2018 @@
+[
+  {
+    "key": "--color-red-50",
+    "name": "Red 50",
+    "hex": "#FEF2F2",
+    "group": "red",
+    "shade": "50"
+  },
+  {
+    "key": "--color-red-100",
+    "name": "Red 100",
+    "hex": "#FFE2E2",
+    "group": "red",
+    "shade": "100"
+  },
+  {
+    "key": "--color-red-200",
+    "name": "Red 200",
+    "hex": "#FFCACA",
+    "group": "red",
+    "shade": "200"
+  },
+  {
+    "key": "--color-red-300",
+    "name": "Red 300",
+    "hex": "#FFA3A3",
+    "group": "red",
+    "shade": "300"
+  },
+  {
+    "key": "--color-red-400",
+    "name": "Red 400",
+    "hex": "#FF6568",
+    "group": "red",
+    "shade": "400"
+  },
+  {
+    "key": "--color-red-500",
+    "name": "Red 500",
+    "hex": "#FB2C36",
+    "group": "red",
+    "shade": "500"
+  },
+  {
+    "key": "--color-red-600",
+    "name": "Red 600",
+    "hex": "#E40014",
+    "group": "red",
+    "shade": "600"
+  },
+  {
+    "key": "--color-red-700",
+    "name": "Red 700",
+    "hex": "#BF000F",
+    "group": "red",
+    "shade": "700"
+  },
+  {
+    "key": "--color-red-800",
+    "name": "Red 800",
+    "hex": "#9F0712",
+    "group": "red",
+    "shade": "800"
+  },
+  {
+    "key": "--color-red-900",
+    "name": "Red 900",
+    "hex": "#82181A",
+    "group": "red",
+    "shade": "900"
+  },
+  {
+    "key": "--color-red-950",
+    "name": "Red 950",
+    "hex": "#460809",
+    "group": "red",
+    "shade": "950"
+  },
+  {
+    "key": "--color-orange-50",
+    "name": "Orange 50",
+    "hex": "#FFF7ED",
+    "group": "orange",
+    "shade": "50"
+  },
+  {
+    "key": "--color-orange-100",
+    "name": "Orange 100",
+    "hex": "#FFEDD5",
+    "group": "orange",
+    "shade": "100"
+  },
+  {
+    "key": "--color-orange-200",
+    "name": "Orange 200",
+    "hex": "#FFD7A8",
+    "group": "orange",
+    "shade": "200"
+  },
+  {
+    "key": "--color-orange-300",
+    "name": "Orange 300",
+    "hex": "#FFB96D",
+    "group": "orange",
+    "shade": "300"
+  },
+  {
+    "key": "--color-orange-400",
+    "name": "Orange 400",
+    "hex": "#FF8B1A",
+    "group": "orange",
+    "shade": "400"
+  },
+  {
+    "key": "--color-orange-500",
+    "name": "Orange 500",
+    "hex": "#FE6E00",
+    "group": "orange",
+    "shade": "500"
+  },
+  {
+    "key": "--color-orange-600",
+    "name": "Orange 600",
+    "hex": "#F05100",
+    "group": "orange",
+    "shade": "600"
+  },
+  {
+    "key": "--color-orange-700",
+    "name": "Orange 700",
+    "hex": "#C53C00",
+    "group": "orange",
+    "shade": "700"
+  },
+  {
+    "key": "--color-orange-800",
+    "name": "Orange 800",
+    "hex": "#9F2D00",
+    "group": "orange",
+    "shade": "800"
+  },
+  {
+    "key": "--color-orange-900",
+    "name": "Orange 900",
+    "hex": "#7E2A0C",
+    "group": "orange",
+    "shade": "900"
+  },
+  {
+    "key": "--color-orange-950",
+    "name": "Orange 950",
+    "hex": "#441306",
+    "group": "orange",
+    "shade": "950"
+  },
+  {
+    "key": "--color-amber-50",
+    "name": "Amber 50",
+    "hex": "#FFFBEB",
+    "group": "amber",
+    "shade": "50"
+  },
+  {
+    "key": "--color-amber-100",
+    "name": "Amber 100",
+    "hex": "#FEF3C6",
+    "group": "amber",
+    "shade": "100"
+  },
+  {
+    "key": "--color-amber-200",
+    "name": "Amber 200",
+    "hex": "#FEE685",
+    "group": "amber",
+    "shade": "200"
+  },
+  {
+    "key": "--color-amber-300",
+    "name": "Amber 300",
+    "hex": "#FFD236",
+    "group": "amber",
+    "shade": "300"
+  },
+  {
+    "key": "--color-amber-400",
+    "name": "Amber 400",
+    "hex": "#FCBB00",
+    "group": "amber",
+    "shade": "400"
+  },
+  {
+    "key": "--color-amber-500",
+    "name": "Amber 500",
+    "hex": "#F99C00",
+    "group": "amber",
+    "shade": "500"
+  },
+  {
+    "key": "--color-amber-600",
+    "name": "Amber 600",
+    "hex": "#DD7400",
+    "group": "amber",
+    "shade": "600"
+  },
+  {
+    "key": "--color-amber-700",
+    "name": "Amber 700",
+    "hex": "#B75000",
+    "group": "amber",
+    "shade": "700"
+  },
+  {
+    "key": "--color-amber-800",
+    "name": "Amber 800",
+    "hex": "#953D00",
+    "group": "amber",
+    "shade": "800"
+  },
+  {
+    "key": "--color-amber-900",
+    "name": "Amber 900",
+    "hex": "#7B3306",
+    "group": "amber",
+    "shade": "900"
+  },
+  {
+    "key": "--color-amber-950",
+    "name": "Amber 950",
+    "hex": "#461901",
+    "group": "amber",
+    "shade": "950"
+  },
+  {
+    "key": "--color-yellow-50",
+    "name": "Yellow 50",
+    "hex": "#FEFCE8",
+    "group": "yellow",
+    "shade": "50"
+  },
+  {
+    "key": "--color-yellow-100",
+    "name": "Yellow 100",
+    "hex": "#FEF9C2",
+    "group": "yellow",
+    "shade": "100"
+  },
+  {
+    "key": "--color-yellow-200",
+    "name": "Yellow 200",
+    "hex": "#FFF085",
+    "group": "yellow",
+    "shade": "200"
+  },
+  {
+    "key": "--color-yellow-300",
+    "name": "Yellow 300",
+    "hex": "#FFE02A",
+    "group": "yellow",
+    "shade": "300"
+  },
+  {
+    "key": "--color-yellow-400",
+    "name": "Yellow 400",
+    "hex": "#FAC800",
+    "group": "yellow",
+    "shade": "400"
+  },
+  {
+    "key": "--color-yellow-500",
+    "name": "Yellow 500",
+    "hex": "#EDB200",
+    "group": "yellow",
+    "shade": "500"
+  },
+  {
+    "key": "--color-yellow-600",
+    "name": "Yellow 600",
+    "hex": "#CD8900",
+    "group": "yellow",
+    "shade": "600"
+  },
+  {
+    "key": "--color-yellow-700",
+    "name": "Yellow 700",
+    "hex": "#A36100",
+    "group": "yellow",
+    "shade": "700"
+  },
+  {
+    "key": "--color-yellow-800",
+    "name": "Yellow 800",
+    "hex": "#874B00",
+    "group": "yellow",
+    "shade": "800"
+  },
+  {
+    "key": "--color-yellow-900",
+    "name": "Yellow 900",
+    "hex": "#733E0A",
+    "group": "yellow",
+    "shade": "900"
+  },
+  {
+    "key": "--color-yellow-950",
+    "name": "Yellow 950",
+    "hex": "#432004",
+    "group": "yellow",
+    "shade": "950"
+  },
+  {
+    "key": "--color-lime-50",
+    "name": "Lime 50",
+    "hex": "#F7FEE7",
+    "group": "lime",
+    "shade": "50"
+  },
+  {
+    "key": "--color-lime-100",
+    "name": "Lime 100",
+    "hex": "#ECFCCA",
+    "group": "lime",
+    "shade": "100"
+  },
+  {
+    "key": "--color-lime-200",
+    "name": "Lime 200",
+    "hex": "#D8F999",
+    "group": "lime",
+    "shade": "200"
+  },
+  {
+    "key": "--color-lime-300",
+    "name": "Lime 300",
+    "hex": "#BBF451",
+    "group": "lime",
+    "shade": "300"
+  },
+  {
+    "key": "--color-lime-400",
+    "name": "Lime 400",
+    "hex": "#9DE500",
+    "group": "lime",
+    "shade": "400"
+  },
+  {
+    "key": "--color-lime-500",
+    "name": "Lime 500",
+    "hex": "#80CD00",
+    "group": "lime",
+    "shade": "500"
+  },
+  {
+    "key": "--color-lime-600",
+    "name": "Lime 600",
+    "hex": "#62A400",
+    "group": "lime",
+    "shade": "600"
+  },
+  {
+    "key": "--color-lime-700",
+    "name": "Lime 700",
+    "hex": "#4B7D00",
+    "group": "lime",
+    "shade": "700"
+  },
+  {
+    "key": "--color-lime-800",
+    "name": "Lime 800",
+    "hex": "#3D6300",
+    "group": "lime",
+    "shade": "800"
+  },
+  {
+    "key": "--color-lime-900",
+    "name": "Lime 900",
+    "hex": "#35530E",
+    "group": "lime",
+    "shade": "900"
+  },
+  {
+    "key": "--color-lime-950",
+    "name": "Lime 950",
+    "hex": "#192E03",
+    "group": "lime",
+    "shade": "950"
+  },
+  {
+    "key": "--color-green-50",
+    "name": "Green 50",
+    "hex": "#F0FDF4",
+    "group": "green",
+    "shade": "50"
+  },
+  {
+    "key": "--color-green-100",
+    "name": "Green 100",
+    "hex": "#DCFCE7",
+    "group": "green",
+    "shade": "100"
+  },
+  {
+    "key": "--color-green-200",
+    "name": "Green 200",
+    "hex": "#B9F8CF",
+    "group": "green",
+    "shade": "200"
+  },
+  {
+    "key": "--color-green-300",
+    "name": "Green 300",
+    "hex": "#7BF1A8",
+    "group": "green",
+    "shade": "300"
+  },
+  {
+    "key": "--color-green-400",
+    "name": "Green 400",
+    "hex": "#05DF72",
+    "group": "green",
+    "shade": "400"
+  },
+  {
+    "key": "--color-green-500",
+    "name": "Green 500",
+    "hex": "#00C758",
+    "group": "green",
+    "shade": "500"
+  },
+  {
+    "key": "--color-green-600",
+    "name": "Green 600",
+    "hex": "#00A544",
+    "group": "green",
+    "shade": "600"
+  },
+  {
+    "key": "--color-green-700",
+    "name": "Green 700",
+    "hex": "#008138",
+    "group": "green",
+    "shade": "700"
+  },
+  {
+    "key": "--color-green-800",
+    "name": "Green 800",
+    "hex": "#016630",
+    "group": "green",
+    "shade": "800"
+  },
+  {
+    "key": "--color-green-900",
+    "name": "Green 900",
+    "hex": "#0D542B",
+    "group": "green",
+    "shade": "900"
+  },
+  {
+    "key": "--color-green-950",
+    "name": "Green 950",
+    "hex": "#032E15",
+    "group": "green",
+    "shade": "950"
+  },
+  {
+    "key": "--color-emerald-50",
+    "name": "Emerald 50",
+    "hex": "#ECFDF5",
+    "group": "emerald",
+    "shade": "50"
+  },
+  {
+    "key": "--color-emerald-100",
+    "name": "Emerald 100",
+    "hex": "#D0FAE5",
+    "group": "emerald",
+    "shade": "100"
+  },
+  {
+    "key": "--color-emerald-200",
+    "name": "Emerald 200",
+    "hex": "#A4F4CF",
+    "group": "emerald",
+    "shade": "200"
+  },
+  {
+    "key": "--color-emerald-300",
+    "name": "Emerald 300",
+    "hex": "#5EE9B5",
+    "group": "emerald",
+    "shade": "300"
+  },
+  {
+    "key": "--color-emerald-400",
+    "name": "Emerald 400",
+    "hex": "#00D294",
+    "group": "emerald",
+    "shade": "400"
+  },
+  {
+    "key": "--color-emerald-500",
+    "name": "Emerald 500",
+    "hex": "#00BB7F",
+    "group": "emerald",
+    "shade": "500"
+  },
+  {
+    "key": "--color-emerald-600",
+    "name": "Emerald 600",
+    "hex": "#009767",
+    "group": "emerald",
+    "shade": "600"
+  },
+  {
+    "key": "--color-emerald-700",
+    "name": "Emerald 700",
+    "hex": "#007956",
+    "group": "emerald",
+    "shade": "700"
+  },
+  {
+    "key": "--color-emerald-800",
+    "name": "Emerald 800",
+    "hex": "#005F46",
+    "group": "emerald",
+    "shade": "800"
+  },
+  {
+    "key": "--color-emerald-900",
+    "name": "Emerald 900",
+    "hex": "#004E3B",
+    "group": "emerald",
+    "shade": "900"
+  },
+  {
+    "key": "--color-emerald-950",
+    "name": "Emerald 950",
+    "hex": "#002C22",
+    "group": "emerald",
+    "shade": "950"
+  },
+  {
+    "key": "--color-teal-50",
+    "name": "Teal 50",
+    "hex": "#F0FDFA",
+    "group": "teal",
+    "shade": "50"
+  },
+  {
+    "key": "--color-teal-100",
+    "name": "Teal 100",
+    "hex": "#CBFBF1",
+    "group": "teal",
+    "shade": "100"
+  },
+  {
+    "key": "--color-teal-200",
+    "name": "Teal 200",
+    "hex": "#96F7E4",
+    "group": "teal",
+    "shade": "200"
+  },
+  {
+    "key": "--color-teal-300",
+    "name": "Teal 300",
+    "hex": "#46ECD5",
+    "group": "teal",
+    "shade": "300"
+  },
+  {
+    "key": "--color-teal-400",
+    "name": "Teal 400",
+    "hex": "#00D3BD",
+    "group": "teal",
+    "shade": "400"
+  },
+  {
+    "key": "--color-teal-500",
+    "name": "Teal 500",
+    "hex": "#00BAA7",
+    "group": "teal",
+    "shade": "500"
+  },
+  {
+    "key": "--color-teal-600",
+    "name": "Teal 600",
+    "hex": "#009588",
+    "group": "teal",
+    "shade": "600"
+  },
+  {
+    "key": "--color-teal-700",
+    "name": "Teal 700",
+    "hex": "#00776E",
+    "group": "teal",
+    "shade": "700"
+  },
+  {
+    "key": "--color-teal-800",
+    "name": "Teal 800",
+    "hex": "#005F5A",
+    "group": "teal",
+    "shade": "800"
+  },
+  {
+    "key": "--color-teal-900",
+    "name": "Teal 900",
+    "hex": "#0B4F4A",
+    "group": "teal",
+    "shade": "900"
+  },
+  {
+    "key": "--color-teal-950",
+    "name": "Teal 950",
+    "hex": "#022F2E",
+    "group": "teal",
+    "shade": "950"
+  },
+  {
+    "key": "--color-cyan-50",
+    "name": "Cyan 50",
+    "hex": "#ECFEFF",
+    "group": "cyan",
+    "shade": "50"
+  },
+  {
+    "key": "--color-cyan-100",
+    "name": "Cyan 100",
+    "hex": "#CEFAFE",
+    "group": "cyan",
+    "shade": "100"
+  },
+  {
+    "key": "--color-cyan-200",
+    "name": "Cyan 200",
+    "hex": "#A2F4FD",
+    "group": "cyan",
+    "shade": "200"
+  },
+  {
+    "key": "--color-cyan-300",
+    "name": "Cyan 300",
+    "hex": "#53EAFD",
+    "group": "cyan",
+    "shade": "300"
+  },
+  {
+    "key": "--color-cyan-400",
+    "name": "Cyan 400",
+    "hex": "#00D2EF",
+    "group": "cyan",
+    "shade": "400"
+  },
+  {
+    "key": "--color-cyan-500",
+    "name": "Cyan 500",
+    "hex": "#00B7D7",
+    "group": "cyan",
+    "shade": "500"
+  },
+  {
+    "key": "--color-cyan-600",
+    "name": "Cyan 600",
+    "hex": "#0092B5",
+    "group": "cyan",
+    "shade": "600"
+  },
+  {
+    "key": "--color-cyan-700",
+    "name": "Cyan 700",
+    "hex": "#007492",
+    "group": "cyan",
+    "shade": "700"
+  },
+  {
+    "key": "--color-cyan-800",
+    "name": "Cyan 800",
+    "hex": "#005F78",
+    "group": "cyan",
+    "shade": "800"
+  },
+  {
+    "key": "--color-cyan-900",
+    "name": "Cyan 900",
+    "hex": "#104E64",
+    "group": "cyan",
+    "shade": "900"
+  },
+  {
+    "key": "--color-cyan-950",
+    "name": "Cyan 950",
+    "hex": "#053345",
+    "group": "cyan",
+    "shade": "950"
+  },
+  {
+    "key": "--color-sky-50",
+    "name": "Sky 50",
+    "hex": "#F0F9FF",
+    "group": "sky",
+    "shade": "50"
+  },
+  {
+    "key": "--color-sky-100",
+    "name": "Sky 100",
+    "hex": "#DFF2FE",
+    "group": "sky",
+    "shade": "100"
+  },
+  {
+    "key": "--color-sky-200",
+    "name": "Sky 200",
+    "hex": "#B8E6FE",
+    "group": "sky",
+    "shade": "200"
+  },
+  {
+    "key": "--color-sky-300",
+    "name": "Sky 300",
+    "hex": "#77D4FF",
+    "group": "sky",
+    "shade": "300"
+  },
+  {
+    "key": "--color-sky-400",
+    "name": "Sky 400",
+    "hex": "#00BCFE",
+    "group": "sky",
+    "shade": "400"
+  },
+  {
+    "key": "--color-sky-500",
+    "name": "Sky 500",
+    "hex": "#00A5EF",
+    "group": "sky",
+    "shade": "500"
+  },
+  {
+    "key": "--color-sky-600",
+    "name": "Sky 600",
+    "hex": "#0084CC",
+    "group": "sky",
+    "shade": "600"
+  },
+  {
+    "key": "--color-sky-700",
+    "name": "Sky 700",
+    "hex": "#0069A4",
+    "group": "sky",
+    "shade": "700"
+  },
+  {
+    "key": "--color-sky-800",
+    "name": "Sky 800",
+    "hex": "#005986",
+    "group": "sky",
+    "shade": "800"
+  },
+  {
+    "key": "--color-sky-900",
+    "name": "Sky 900",
+    "hex": "#024A70",
+    "group": "sky",
+    "shade": "900"
+  },
+  {
+    "key": "--color-sky-950",
+    "name": "Sky 950",
+    "hex": "#052F4A",
+    "group": "sky",
+    "shade": "950"
+  },
+  {
+    "key": "--color-blue-50",
+    "name": "Blue 50",
+    "hex": "#EFF6FF",
+    "group": "blue",
+    "shade": "50"
+  },
+  {
+    "key": "--color-blue-100",
+    "name": "Blue 100",
+    "hex": "#DBEAFE",
+    "group": "blue",
+    "shade": "100"
+  },
+  {
+    "key": "--color-blue-200",
+    "name": "Blue 200",
+    "hex": "#BEDBFF",
+    "group": "blue",
+    "shade": "200"
+  },
+  {
+    "key": "--color-blue-300",
+    "name": "Blue 300",
+    "hex": "#90C5FF",
+    "group": "blue",
+    "shade": "300"
+  },
+  {
+    "key": "--color-blue-400",
+    "name": "Blue 400",
+    "hex": "#54A2FF",
+    "group": "blue",
+    "shade": "400"
+  },
+  {
+    "key": "--color-blue-500",
+    "name": "Blue 500",
+    "hex": "#3080FF",
+    "group": "blue",
+    "shade": "500"
+  },
+  {
+    "key": "--color-blue-600",
+    "name": "Blue 600",
+    "hex": "#155DFC",
+    "group": "blue",
+    "shade": "600"
+  },
+  {
+    "key": "--color-blue-700",
+    "name": "Blue 700",
+    "hex": "#1447E6",
+    "group": "blue",
+    "shade": "700"
+  },
+  {
+    "key": "--color-blue-800",
+    "name": "Blue 800",
+    "hex": "#193CB8",
+    "group": "blue",
+    "shade": "800"
+  },
+  {
+    "key": "--color-blue-900",
+    "name": "Blue 900",
+    "hex": "#1C398E",
+    "group": "blue",
+    "shade": "900"
+  },
+  {
+    "key": "--color-blue-950",
+    "name": "Blue 950",
+    "hex": "#162456",
+    "group": "blue",
+    "shade": "950"
+  },
+  {
+    "key": "--color-indigo-50",
+    "name": "Indigo 50",
+    "hex": "#EEF2FF",
+    "group": "indigo",
+    "shade": "50"
+  },
+  {
+    "key": "--color-indigo-100",
+    "name": "Indigo 100",
+    "hex": "#E0E7FF",
+    "group": "indigo",
+    "shade": "100"
+  },
+  {
+    "key": "--color-indigo-200",
+    "name": "Indigo 200",
+    "hex": "#C7D2FF",
+    "group": "indigo",
+    "shade": "200"
+  },
+  {
+    "key": "--color-indigo-300",
+    "name": "Indigo 300",
+    "hex": "#A4B3FF",
+    "group": "indigo",
+    "shade": "300"
+  },
+  {
+    "key": "--color-indigo-400",
+    "name": "Indigo 400",
+    "hex": "#7D87FF",
+    "group": "indigo",
+    "shade": "400"
+  },
+  {
+    "key": "--color-indigo-500",
+    "name": "Indigo 500",
+    "hex": "#625FFF",
+    "group": "indigo",
+    "shade": "500"
+  },
+  {
+    "key": "--color-indigo-600",
+    "name": "Indigo 600",
+    "hex": "#4F39F6",
+    "group": "indigo",
+    "shade": "600"
+  },
+  {
+    "key": "--color-indigo-700",
+    "name": "Indigo 700",
+    "hex": "#432DD7",
+    "group": "indigo",
+    "shade": "700"
+  },
+  {
+    "key": "--color-indigo-800",
+    "name": "Indigo 800",
+    "hex": "#372AAC",
+    "group": "indigo",
+    "shade": "800"
+  },
+  {
+    "key": "--color-indigo-900",
+    "name": "Indigo 900",
+    "hex": "#312C85",
+    "group": "indigo",
+    "shade": "900"
+  },
+  {
+    "key": "--color-indigo-950",
+    "name": "Indigo 950",
+    "hex": "#1E1A4D",
+    "group": "indigo",
+    "shade": "950"
+  },
+  {
+    "key": "--color-violet-50",
+    "name": "Violet 50",
+    "hex": "#F5F3FF",
+    "group": "violet",
+    "shade": "50"
+  },
+  {
+    "key": "--color-violet-100",
+    "name": "Violet 100",
+    "hex": "#EDE9FE",
+    "group": "violet",
+    "shade": "100"
+  },
+  {
+    "key": "--color-violet-200",
+    "name": "Violet 200",
+    "hex": "#DDD6FF",
+    "group": "violet",
+    "shade": "200"
+  },
+  {
+    "key": "--color-violet-300",
+    "name": "Violet 300",
+    "hex": "#C4B4FF",
+    "group": "violet",
+    "shade": "300"
+  },
+  {
+    "key": "--color-violet-400",
+    "name": "Violet 400",
+    "hex": "#A685FF",
+    "group": "violet",
+    "shade": "400"
+  },
+  {
+    "key": "--color-violet-500",
+    "name": "Violet 500",
+    "hex": "#8D54FF",
+    "group": "violet",
+    "shade": "500"
+  },
+  {
+    "key": "--color-violet-600",
+    "name": "Violet 600",
+    "hex": "#7F22FE",
+    "group": "violet",
+    "shade": "600"
+  },
+  {
+    "key": "--color-violet-700",
+    "name": "Violet 700",
+    "hex": "#7008E7",
+    "group": "violet",
+    "shade": "700"
+  },
+  {
+    "key": "--color-violet-800",
+    "name": "Violet 800",
+    "hex": "#5D0EC0",
+    "group": "violet",
+    "shade": "800"
+  },
+  {
+    "key": "--color-violet-900",
+    "name": "Violet 900",
+    "hex": "#4D179A",
+    "group": "violet",
+    "shade": "900"
+  },
+  {
+    "key": "--color-violet-950",
+    "name": "Violet 950",
+    "hex": "#2F0D68",
+    "group": "violet",
+    "shade": "950"
+  },
+  {
+    "key": "--color-purple-50",
+    "name": "Purple 50",
+    "hex": "#FAF5FF",
+    "group": "purple",
+    "shade": "50"
+  },
+  {
+    "key": "--color-purple-100",
+    "name": "Purple 100",
+    "hex": "#F3E8FF",
+    "group": "purple",
+    "shade": "100"
+  },
+  {
+    "key": "--color-purple-200",
+    "name": "Purple 200",
+    "hex": "#E9D5FF",
+    "group": "purple",
+    "shade": "200"
+  },
+  {
+    "key": "--color-purple-300",
+    "name": "Purple 300",
+    "hex": "#D9B3FF",
+    "group": "purple",
+    "shade": "300"
+  },
+  {
+    "key": "--color-purple-400",
+    "name": "Purple 400",
+    "hex": "#C07EFF",
+    "group": "purple",
+    "shade": "400"
+  },
+  {
+    "key": "--color-purple-500",
+    "name": "Purple 500",
+    "hex": "#AC4BFF",
+    "group": "purple",
+    "shade": "500"
+  },
+  {
+    "key": "--color-purple-600",
+    "name": "Purple 600",
+    "hex": "#9810FA",
+    "group": "purple",
+    "shade": "600"
+  },
+  {
+    "key": "--color-purple-700",
+    "name": "Purple 700",
+    "hex": "#8200DA",
+    "group": "purple",
+    "shade": "700"
+  },
+  {
+    "key": "--color-purple-800",
+    "name": "Purple 800",
+    "hex": "#6E11B0",
+    "group": "purple",
+    "shade": "800"
+  },
+  {
+    "key": "--color-purple-900",
+    "name": "Purple 900",
+    "hex": "#59168B",
+    "group": "purple",
+    "shade": "900"
+  },
+  {
+    "key": "--color-purple-950",
+    "name": "Purple 950",
+    "hex": "#3C0366",
+    "group": "purple",
+    "shade": "950"
+  },
+  {
+    "key": "--color-fuchsia-50",
+    "name": "Fuchsia 50",
+    "hex": "#FDF4FF",
+    "group": "fuchsia",
+    "shade": "50"
+  },
+  {
+    "key": "--color-fuchsia-100",
+    "name": "Fuchsia 100",
+    "hex": "#FAE8FF",
+    "group": "fuchsia",
+    "shade": "100"
+  },
+  {
+    "key": "--color-fuchsia-200",
+    "name": "Fuchsia 200",
+    "hex": "#F6CFFF",
+    "group": "fuchsia",
+    "shade": "200"
+  },
+  {
+    "key": "--color-fuchsia-300",
+    "name": "Fuchsia 300",
+    "hex": "#F2A9FF",
+    "group": "fuchsia",
+    "shade": "300"
+  },
+  {
+    "key": "--color-fuchsia-400",
+    "name": "Fuchsia 400",
+    "hex": "#EC6CFF",
+    "group": "fuchsia",
+    "shade": "400"
+  },
+  {
+    "key": "--color-fuchsia-500",
+    "name": "Fuchsia 500",
+    "hex": "#E12AFB",
+    "group": "fuchsia",
+    "shade": "500"
+  },
+  {
+    "key": "--color-fuchsia-600",
+    "name": "Fuchsia 600",
+    "hex": "#C600DB",
+    "group": "fuchsia",
+    "shade": "600"
+  },
+  {
+    "key": "--color-fuchsia-700",
+    "name": "Fuchsia 700",
+    "hex": "#A600B5",
+    "group": "fuchsia",
+    "shade": "700"
+  },
+  {
+    "key": "--color-fuchsia-800",
+    "name": "Fuchsia 800",
+    "hex": "#8A0194",
+    "group": "fuchsia",
+    "shade": "800"
+  },
+  {
+    "key": "--color-fuchsia-900",
+    "name": "Fuchsia 900",
+    "hex": "#721378",
+    "group": "fuchsia",
+    "shade": "900"
+  },
+  {
+    "key": "--color-fuchsia-950",
+    "name": "Fuchsia 950",
+    "hex": "#4B004F",
+    "group": "fuchsia",
+    "shade": "950"
+  },
+  {
+    "key": "--color-pink-50",
+    "name": "Pink 50",
+    "hex": "#FDF2F8",
+    "group": "pink",
+    "shade": "50"
+  },
+  {
+    "key": "--color-pink-100",
+    "name": "Pink 100",
+    "hex": "#FCE7F3",
+    "group": "pink",
+    "shade": "100"
+  },
+  {
+    "key": "--color-pink-200",
+    "name": "Pink 200",
+    "hex": "#FCCEE8",
+    "group": "pink",
+    "shade": "200"
+  },
+  {
+    "key": "--color-pink-300",
+    "name": "Pink 300",
+    "hex": "#FDA5D5",
+    "group": "pink",
+    "shade": "300"
+  },
+  {
+    "key": "--color-pink-400",
+    "name": "Pink 400",
+    "hex": "#FB64B6",
+    "group": "pink",
+    "shade": "400"
+  },
+  {
+    "key": "--color-pink-500",
+    "name": "Pink 500",
+    "hex": "#F6339A",
+    "group": "pink",
+    "shade": "500"
+  },
+  {
+    "key": "--color-pink-600",
+    "name": "Pink 600",
+    "hex": "#E30076",
+    "group": "pink",
+    "shade": "600"
+  },
+  {
+    "key": "--color-pink-700",
+    "name": "Pink 700",
+    "hex": "#C4005C",
+    "group": "pink",
+    "shade": "700"
+  },
+  {
+    "key": "--color-pink-800",
+    "name": "Pink 800",
+    "hex": "#A2004C",
+    "group": "pink",
+    "shade": "800"
+  },
+  {
+    "key": "--color-pink-900",
+    "name": "Pink 900",
+    "hex": "#861043",
+    "group": "pink",
+    "shade": "900"
+  },
+  {
+    "key": "--color-pink-950",
+    "name": "Pink 950",
+    "hex": "#510424",
+    "group": "pink",
+    "shade": "950"
+  },
+  {
+    "key": "--color-rose-50",
+    "name": "Rose 50",
+    "hex": "#FFF1F2",
+    "group": "rose",
+    "shade": "50"
+  },
+  {
+    "key": "--color-rose-100",
+    "name": "Rose 100",
+    "hex": "#FFE4E6",
+    "group": "rose",
+    "shade": "100"
+  },
+  {
+    "key": "--color-rose-200",
+    "name": "Rose 200",
+    "hex": "#FFCCD3",
+    "group": "rose",
+    "shade": "200"
+  },
+  {
+    "key": "--color-rose-300",
+    "name": "Rose 300",
+    "hex": "#FFA2AE",
+    "group": "rose",
+    "shade": "300"
+  },
+  {
+    "key": "--color-rose-400",
+    "name": "Rose 400",
+    "hex": "#FF667F",
+    "group": "rose",
+    "shade": "400"
+  },
+  {
+    "key": "--color-rose-500",
+    "name": "Rose 500",
+    "hex": "#FF2357",
+    "group": "rose",
+    "shade": "500"
+  },
+  {
+    "key": "--color-rose-600",
+    "name": "Rose 600",
+    "hex": "#E70044",
+    "group": "rose",
+    "shade": "600"
+  },
+  {
+    "key": "--color-rose-700",
+    "name": "Rose 700",
+    "hex": "#C20039",
+    "group": "rose",
+    "shade": "700"
+  },
+  {
+    "key": "--color-rose-800",
+    "name": "Rose 800",
+    "hex": "#A30037",
+    "group": "rose",
+    "shade": "800"
+  },
+  {
+    "key": "--color-rose-900",
+    "name": "Rose 900",
+    "hex": "#8B0836",
+    "group": "rose",
+    "shade": "900"
+  },
+  {
+    "key": "--color-rose-950",
+    "name": "Rose 950",
+    "hex": "#4D0218",
+    "group": "rose",
+    "shade": "950"
+  },
+  {
+    "key": "--color-slate-50",
+    "name": "Slate 50",
+    "hex": "#F8FAFC",
+    "group": "slate",
+    "shade": "50"
+  },
+  {
+    "key": "--color-slate-100",
+    "name": "Slate 100",
+    "hex": "#F1F5F9",
+    "group": "slate",
+    "shade": "100"
+  },
+  {
+    "key": "--color-slate-200",
+    "name": "Slate 200",
+    "hex": "#E2E8F0",
+    "group": "slate",
+    "shade": "200"
+  },
+  {
+    "key": "--color-slate-300",
+    "name": "Slate 300",
+    "hex": "#CAD5E2",
+    "group": "slate",
+    "shade": "300"
+  },
+  {
+    "key": "--color-slate-400",
+    "name": "Slate 400",
+    "hex": "#90A1B9",
+    "group": "slate",
+    "shade": "400"
+  },
+  {
+    "key": "--color-slate-500",
+    "name": "Slate 500",
+    "hex": "#62748E",
+    "group": "slate",
+    "shade": "500"
+  },
+  {
+    "key": "--color-slate-600",
+    "name": "Slate 600",
+    "hex": "#45556C",
+    "group": "slate",
+    "shade": "600"
+  },
+  {
+    "key": "--color-slate-700",
+    "name": "Slate 700",
+    "hex": "#314158",
+    "group": "slate",
+    "shade": "700"
+  },
+  {
+    "key": "--color-slate-800",
+    "name": "Slate 800",
+    "hex": "#1D293D",
+    "group": "slate",
+    "shade": "800"
+  },
+  {
+    "key": "--color-slate-900",
+    "name": "Slate 900",
+    "hex": "#0F172B",
+    "group": "slate",
+    "shade": "900"
+  },
+  {
+    "key": "--color-slate-950",
+    "name": "Slate 950",
+    "hex": "#020618",
+    "group": "slate",
+    "shade": "950"
+  },
+  {
+    "key": "--color-gray-50",
+    "name": "Gray 50",
+    "hex": "#F9FAFB",
+    "group": "gray",
+    "shade": "50"
+  },
+  {
+    "key": "--color-gray-100",
+    "name": "Gray 100",
+    "hex": "#F3F4F6",
+    "group": "gray",
+    "shade": "100"
+  },
+  {
+    "key": "--color-gray-200",
+    "name": "Gray 200",
+    "hex": "#E5E7EB",
+    "group": "gray",
+    "shade": "200"
+  },
+  {
+    "key": "--color-gray-300",
+    "name": "Gray 300",
+    "hex": "#D1D5DC",
+    "group": "gray",
+    "shade": "300"
+  },
+  {
+    "key": "--color-gray-400",
+    "name": "Gray 400",
+    "hex": "#99A1AF",
+    "group": "gray",
+    "shade": "400"
+  },
+  {
+    "key": "--color-gray-500",
+    "name": "Gray 500",
+    "hex": "#6A7282",
+    "group": "gray",
+    "shade": "500"
+  },
+  {
+    "key": "--color-gray-600",
+    "name": "Gray 600",
+    "hex": "#4A5565",
+    "group": "gray",
+    "shade": "600"
+  },
+  {
+    "key": "--color-gray-700",
+    "name": "Gray 700",
+    "hex": "#364153",
+    "group": "gray",
+    "shade": "700"
+  },
+  {
+    "key": "--color-gray-800",
+    "name": "Gray 800",
+    "hex": "#1E2939",
+    "group": "gray",
+    "shade": "800"
+  },
+  {
+    "key": "--color-gray-900",
+    "name": "Gray 900",
+    "hex": "#101828",
+    "group": "gray",
+    "shade": "900"
+  },
+  {
+    "key": "--color-gray-950",
+    "name": "Gray 950",
+    "hex": "#030712",
+    "group": "gray",
+    "shade": "950"
+  },
+  {
+    "key": "--color-zinc-50",
+    "name": "Zinc 50",
+    "hex": "#FAFAFA",
+    "group": "zinc",
+    "shade": "50"
+  },
+  {
+    "key": "--color-zinc-100",
+    "name": "Zinc 100",
+    "hex": "#F4F4F5",
+    "group": "zinc",
+    "shade": "100"
+  },
+  {
+    "key": "--color-zinc-200",
+    "name": "Zinc 200",
+    "hex": "#E4E4E7",
+    "group": "zinc",
+    "shade": "200"
+  },
+  {
+    "key": "--color-zinc-300",
+    "name": "Zinc 300",
+    "hex": "#D4D4D8",
+    "group": "zinc",
+    "shade": "300"
+  },
+  {
+    "key": "--color-zinc-400",
+    "name": "Zinc 400",
+    "hex": "#9F9FA9",
+    "group": "zinc",
+    "shade": "400"
+  },
+  {
+    "key": "--color-zinc-500",
+    "name": "Zinc 500",
+    "hex": "#71717B",
+    "group": "zinc",
+    "shade": "500"
+  },
+  {
+    "key": "--color-zinc-600",
+    "name": "Zinc 600",
+    "hex": "#52525C",
+    "group": "zinc",
+    "shade": "600"
+  },
+  {
+    "key": "--color-zinc-700",
+    "name": "Zinc 700",
+    "hex": "#3F3F46",
+    "group": "zinc",
+    "shade": "700"
+  },
+  {
+    "key": "--color-zinc-800",
+    "name": "Zinc 800",
+    "hex": "#27272A",
+    "group": "zinc",
+    "shade": "800"
+  },
+  {
+    "key": "--color-zinc-900",
+    "name": "Zinc 900",
+    "hex": "#18181B",
+    "group": "zinc",
+    "shade": "900"
+  },
+  {
+    "key": "--color-zinc-950",
+    "name": "Zinc 950",
+    "hex": "#09090B",
+    "group": "zinc",
+    "shade": "950"
+  },
+  {
+    "key": "--color-neutral-50",
+    "name": "Neutral 50",
+    "hex": "#FAFAFA",
+    "group": "neutral",
+    "shade": "50"
+  },
+  {
+    "key": "--color-neutral-100",
+    "name": "Neutral 100",
+    "hex": "#F5F5F5",
+    "group": "neutral",
+    "shade": "100"
+  },
+  {
+    "key": "--color-neutral-200",
+    "name": "Neutral 200",
+    "hex": "#E5E5E5",
+    "group": "neutral",
+    "shade": "200"
+  },
+  {
+    "key": "--color-neutral-300",
+    "name": "Neutral 300",
+    "hex": "#D4D4D4",
+    "group": "neutral",
+    "shade": "300"
+  },
+  {
+    "key": "--color-neutral-400",
+    "name": "Neutral 400",
+    "hex": "#A1A1A1",
+    "group": "neutral",
+    "shade": "400"
+  },
+  {
+    "key": "--color-neutral-500",
+    "name": "Neutral 500",
+    "hex": "#737373",
+    "group": "neutral",
+    "shade": "500"
+  },
+  {
+    "key": "--color-neutral-600",
+    "name": "Neutral 600",
+    "hex": "#525252",
+    "group": "neutral",
+    "shade": "600"
+  },
+  {
+    "key": "--color-neutral-700",
+    "name": "Neutral 700",
+    "hex": "#404040",
+    "group": "neutral",
+    "shade": "700"
+  },
+  {
+    "key": "--color-neutral-800",
+    "name": "Neutral 800",
+    "hex": "#262626",
+    "group": "neutral",
+    "shade": "800"
+  },
+  {
+    "key": "--color-neutral-900",
+    "name": "Neutral 900",
+    "hex": "#171717",
+    "group": "neutral",
+    "shade": "900"
+  },
+  {
+    "key": "--color-neutral-950",
+    "name": "Neutral 950",
+    "hex": "#0A0A0A",
+    "group": "neutral",
+    "shade": "950"
+  },
+  {
+    "key": "--color-stone-50",
+    "name": "Stone 50",
+    "hex": "#FAFAF9",
+    "group": "stone",
+    "shade": "50"
+  },
+  {
+    "key": "--color-stone-100",
+    "name": "Stone 100",
+    "hex": "#F5F5F4",
+    "group": "stone",
+    "shade": "100"
+  },
+  {
+    "key": "--color-stone-200",
+    "name": "Stone 200",
+    "hex": "#E7E5E4",
+    "group": "stone",
+    "shade": "200"
+  },
+  {
+    "key": "--color-stone-300",
+    "name": "Stone 300",
+    "hex": "#D6D3D1",
+    "group": "stone",
+    "shade": "300"
+  },
+  {
+    "key": "--color-stone-400",
+    "name": "Stone 400",
+    "hex": "#A6A09B",
+    "group": "stone",
+    "shade": "400"
+  },
+  {
+    "key": "--color-stone-500",
+    "name": "Stone 500",
+    "hex": "#79716B",
+    "group": "stone",
+    "shade": "500"
+  },
+  {
+    "key": "--color-stone-600",
+    "name": "Stone 600",
+    "hex": "#57534D",
+    "group": "stone",
+    "shade": "600"
+  },
+  {
+    "key": "--color-stone-700",
+    "name": "Stone 700",
+    "hex": "#44403B",
+    "group": "stone",
+    "shade": "700"
+  },
+  {
+    "key": "--color-stone-800",
+    "name": "Stone 800",
+    "hex": "#292524",
+    "group": "stone",
+    "shade": "800"
+  },
+  {
+    "key": "--color-stone-900",
+    "name": "Stone 900",
+    "hex": "#1C1917",
+    "group": "stone",
+    "shade": "900"
+  },
+  {
+    "key": "--color-stone-950",
+    "name": "Stone 950",
+    "hex": "#0C0A09",
+    "group": "stone",
+    "shade": "950"
+  },
+  {
+    "key": "--color-mauve-50",
+    "name": "Mauve 50",
+    "hex": "#FAFAFA",
+    "group": "mauve",
+    "shade": "50"
+  },
+  {
+    "key": "--color-mauve-100",
+    "name": "Mauve 100",
+    "hex": "#F3F1F3",
+    "group": "mauve",
+    "shade": "100"
+  },
+  {
+    "key": "--color-mauve-200",
+    "name": "Mauve 200",
+    "hex": "#E7E4E7",
+    "group": "mauve",
+    "shade": "200"
+  },
+  {
+    "key": "--color-mauve-300",
+    "name": "Mauve 300",
+    "hex": "#D7D0D7",
+    "group": "mauve",
+    "shade": "300"
+  },
+  {
+    "key": "--color-mauve-400",
+    "name": "Mauve 400",
+    "hex": "#A89EA9",
+    "group": "mauve",
+    "shade": "400"
+  },
+  {
+    "key": "--color-mauve-500",
+    "name": "Mauve 500",
+    "hex": "#79697B",
+    "group": "mauve",
+    "shade": "500"
+  },
+  {
+    "key": "--color-mauve-600",
+    "name": "Mauve 600",
+    "hex": "#594C5B",
+    "group": "mauve",
+    "shade": "600"
+  },
+  {
+    "key": "--color-mauve-700",
+    "name": "Mauve 700",
+    "hex": "#463947",
+    "group": "mauve",
+    "shade": "700"
+  },
+  {
+    "key": "--color-mauve-800",
+    "name": "Mauve 800",
+    "hex": "#2A212C",
+    "group": "mauve",
+    "shade": "800"
+  },
+  {
+    "key": "--color-mauve-900",
+    "name": "Mauve 900",
+    "hex": "#1D161E",
+    "group": "mauve",
+    "shade": "900"
+  },
+  {
+    "key": "--color-mauve-950",
+    "name": "Mauve 950",
+    "hex": "#0C090C",
+    "group": "mauve",
+    "shade": "950"
+  },
+  {
+    "key": "--color-olive-50",
+    "name": "Olive 50",
+    "hex": "#FBFBF9",
+    "group": "olive",
+    "shade": "50"
+  },
+  {
+    "key": "--color-olive-100",
+    "name": "Olive 100",
+    "hex": "#F4F4F0",
+    "group": "olive",
+    "shade": "100"
+  },
+  {
+    "key": "--color-olive-200",
+    "name": "Olive 200",
+    "hex": "#E8E8E3",
+    "group": "olive",
+    "shade": "200"
+  },
+  {
+    "key": "--color-olive-300",
+    "name": "Olive 300",
+    "hex": "#D8D8D0",
+    "group": "olive",
+    "shade": "300"
+  },
+  {
+    "key": "--color-olive-400",
+    "name": "Olive 400",
+    "hex": "#ABAB9C",
+    "group": "olive",
+    "shade": "400"
+  },
+  {
+    "key": "--color-olive-500",
+    "name": "Olive 500",
+    "hex": "#7C7C67",
+    "group": "olive",
+    "shade": "500"
+  },
+  {
+    "key": "--color-olive-600",
+    "name": "Olive 600",
+    "hex": "#5B5B4B",
+    "group": "olive",
+    "shade": "600"
+  },
+  {
+    "key": "--color-olive-700",
+    "name": "Olive 700",
+    "hex": "#474739",
+    "group": "olive",
+    "shade": "700"
+  },
+  {
+    "key": "--color-olive-800",
+    "name": "Olive 800",
+    "hex": "#2B2B22",
+    "group": "olive",
+    "shade": "800"
+  },
+  {
+    "key": "--color-olive-900",
+    "name": "Olive 900",
+    "hex": "#1D1D16",
+    "group": "olive",
+    "shade": "900"
+  },
+  {
+    "key": "--color-olive-950",
+    "name": "Olive 950",
+    "hex": "#0C0C09",
+    "group": "olive",
+    "shade": "950"
+  },
+  {
+    "key": "--color-mist-50",
+    "name": "Mist 50",
+    "hex": "#F9FBFB",
+    "group": "mist",
+    "shade": "50"
+  },
+  {
+    "key": "--color-mist-100",
+    "name": "Mist 100",
+    "hex": "#F1F3F3",
+    "group": "mist",
+    "shade": "100"
+  },
+  {
+    "key": "--color-mist-200",
+    "name": "Mist 200",
+    "hex": "#E3E7E8",
+    "group": "mist",
+    "shade": "200"
+  },
+  {
+    "key": "--color-mist-300",
+    "name": "Mist 300",
+    "hex": "#D0D6D8",
+    "group": "mist",
+    "shade": "300"
+  },
+  {
+    "key": "--color-mist-400",
+    "name": "Mist 400",
+    "hex": "#9CA8AB",
+    "group": "mist",
+    "shade": "400"
+  },
+  {
+    "key": "--color-mist-500",
+    "name": "Mist 500",
+    "hex": "#67787C",
+    "group": "mist",
+    "shade": "500"
+  },
+  {
+    "key": "--color-mist-600",
+    "name": "Mist 600",
+    "hex": "#4B585B",
+    "group": "mist",
+    "shade": "600"
+  },
+  {
+    "key": "--color-mist-700",
+    "name": "Mist 700",
+    "hex": "#394447",
+    "group": "mist",
+    "shade": "700"
+  },
+  {
+    "key": "--color-mist-800",
+    "name": "Mist 800",
+    "hex": "#22292B",
+    "group": "mist",
+    "shade": "800"
+  },
+  {
+    "key": "--color-mist-900",
+    "name": "Mist 900",
+    "hex": "#161B1D",
+    "group": "mist",
+    "shade": "900"
+  },
+  {
+    "key": "--color-mist-950",
+    "name": "Mist 950",
+    "hex": "#090B0C",
+    "group": "mist",
+    "shade": "950"
+  },
+  {
+    "key": "--color-taupe-50",
+    "name": "Taupe 50",
+    "hex": "#FBFAF9",
+    "group": "taupe",
+    "shade": "50"
+  },
+  {
+    "key": "--color-taupe-100",
+    "name": "Taupe 100",
+    "hex": "#F3F1F1",
+    "group": "taupe",
+    "shade": "100"
+  },
+  {
+    "key": "--color-taupe-200",
+    "name": "Taupe 200",
+    "hex": "#E8E4E3",
+    "group": "taupe",
+    "shade": "200"
+  },
+  {
+    "key": "--color-taupe-300",
+    "name": "Taupe 300",
+    "hex": "#D8D2D0",
+    "group": "taupe",
+    "shade": "300"
+  },
+  {
+    "key": "--color-taupe-400",
+    "name": "Taupe 400",
+    "hex": "#ABA09C",
+    "group": "taupe",
+    "shade": "400"
+  },
+  {
+    "key": "--color-taupe-500",
+    "name": "Taupe 500",
+    "hex": "#7C6D67",
+    "group": "taupe",
+    "shade": "500"
+  },
+  {
+    "key": "--color-taupe-600",
+    "name": "Taupe 600",
+    "hex": "#5B4F4B",
+    "group": "taupe",
+    "shade": "600"
+  },
+  {
+    "key": "--color-taupe-700",
+    "name": "Taupe 700",
+    "hex": "#473C39",
+    "group": "taupe",
+    "shade": "700"
+  },
+  {
+    "key": "--color-taupe-800",
+    "name": "Taupe 800",
+    "hex": "#2B2422",
+    "group": "taupe",
+    "shade": "800"
+  },
+  {
+    "key": "--color-taupe-900",
+    "name": "Taupe 900",
+    "hex": "#1D1816",
+    "group": "taupe",
+    "shade": "900"
+  },
+  {
+    "key": "--color-taupe-950",
+    "name": "Taupe 950",
+    "hex": "#0C0A09",
+    "group": "taupe",
+    "shade": "950"
+  },
+  {
+    "key": "--color-black",
+    "name": "Black",
+    "hex": "#000",
+    "group": "black",
+    "shade": null
+  },
+  {
+    "key": "--color-white",
+    "name": "White",
+    "hex": "#FFF",
+    "group": "white",
+    "shade": null
+  }
+]
