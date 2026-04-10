@@ -47,6 +47,8 @@ input-shell {
         outline: none;
         padding: 0;
         background-color: transparent;
+        height: 100%;
+        width: 100%;
 
         &:focus-visible {
             outline: none;
@@ -57,10 +59,20 @@ input-shell {
 @layer elements {
     @scope (body) to (.elementsPreview) {
         input:not([type=radio]):not([type=checkbox]):not([type=range]), textarea, select, input-shell {
-            &, &.outlined {
+            :where(&), &.outlined {
                 --outline-color: oklab(from var(--current-color) 70% a b);
                 outline: 1px solid var(--outline-color);
                 background-color: transparent;
+            }
+
+            &.elevated {
+                box-shadow:
+                        0 3px 8px -1px var(--shadow-color);
+                outline: none;
+            }
+
+            &.tonal {
+                background-color: color-mix(in srgb, var(--current-color) 10%, var(--surface-color));
             }
         }
     }

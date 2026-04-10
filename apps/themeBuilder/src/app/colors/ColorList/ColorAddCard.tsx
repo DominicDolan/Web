@@ -1,4 +1,4 @@
-import {useColorListScope} from "~/app/themes/ColorEditor/ColorListScope";
+import {useColorListScope} from "~/app/colors/ColorList/ColorListScope";
 
 export function ColorAddCard() {
 

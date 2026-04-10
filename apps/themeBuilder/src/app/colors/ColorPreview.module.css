@@ -12,3 +12,9 @@
         background-color: transparent;
     }
 }
+
+.colorPresentationCompact {
+    border-radius: 3px;
+    background-color: var(--presentation-color);
+    cursor: pointer;
+}

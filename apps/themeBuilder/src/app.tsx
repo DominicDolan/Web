@@ -3,27 +3,9 @@ import {Match, Show, Switch} from "solid-js";
 import {Navigate, useLocation} from "@web/router";
 import ContactUs from "~/app/contact/ContactUs/ContactUs";
 import {ThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
-import {ColorScope} from "~/app/themes/ColorEditor/ColorScope";
-import {ColorEditor} from "~/app/themes/ColorEditor/ColorEditor";
+import {ColorScope} from "~/app/colors/ColorEditor/ColorScope";
+import {ColorEditor} from "~/app/colors/ColorEditor/ColorEditor";
 
-// export default function App() {
-//     return (
-//         <Router
-//             root={(props: any) => <><nav>Nav Bar</nav><div>{props.children}</div></>}
-//         >
-//             <Route path={["/editor", "/"]} component={ThemeEditor}>
-//                 <Route path={"/"}></Route>
-//                 <Route path={"/:themeId?"} component={ThemeSettings}>
-//                     <Route path={"/"} component={() => <Navigate href={"colors"}/>}/>
-//                     <Route path={"/colors"} component={ColorList} preload={preloadColors}/>
-//                 </Route>
-//             </Route>
-//             <Route path={"/editor/:themeId/elements"} component={ElementsEditor}></Route>
-//             <Route path={"/editor/:themeId/fonts"} component={lazy(() => import("~/app/themes/FontsEditor/FontsEditor"))}></Route>
-//             <Route path={"/contact"} component={ContactUs} info={{title: "Contact Us"}}/>
-//         </Router>
-//     )
-// }
 export default function App() {
     const location = useLocation();
 

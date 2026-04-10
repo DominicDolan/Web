@@ -68,6 +68,11 @@
         --on-active-color: var(--on-surface-color);
     }
 
+    .background {
+        --active-color: var(--background-color);
+        --on-active-color: var(--on-background);
+    }
+
     html {
         background: var(--background-color);
         background-size: cover;

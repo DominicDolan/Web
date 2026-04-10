@@ -1,2 +1,71 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg fill="#000000" width="800px" height="800px" viewBox="0 0 24 24" role="img" xmlns="http://www.w3.org/2000/svg"><title>Material Design icon</title><path d="M12 0C5.377 0 0 5.377 0 12s5.377 12 12 12 12-5.377 12-12S18.623 0 12 0zm0 .75c2.871 0 5.482 1.082 7.469 2.85H4.53A11.197 11.197 0 0 1 12 .75zm-7.186 3.6h14.372L12 18.723 4.814 4.35zM3.6 4.53V19.47A11.197 11.197 0 0 1 .75 12c0-2.87 1.082-5.481 2.85-7.468zm16.8 0A11.197 11.197 0 0 1 23.25 12c0 2.871-1.082 5.482-2.85 7.469V4.53zM4.35 5.1l7.275 14.55H4.35V5.1zm15.3 0v14.55h-7.275L19.651 5.1zM4.533 20.4H19.469A11.197 11.197 0 0 1 12 23.25a11.197 11.197 0 0 1-7.468-2.85z"/></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="800px"
+   height="800px"
+   viewBox="0 0 73 73"
+   version="1.1"
+   id="svg2"
+   sodipodi:docname="material-design-svgrepo-com (1).svg"
+   inkscape:version="1.4 (e7c3feb, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview2"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.83625"
+     inkscape:cx="-89.088191"
+     inkscape:cy="550.07474"
+     inkscape:window-width="3822"
+     inkscape:window-height="1560"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="design-and-ux/material-design" />
+  <title
+     id="title1">design-and-ux/material-design</title>
+  <desc
+     id="desc1">Created with Sketch.</desc>
+  <defs
+     id="defs1" />
+  <g
+     id="design-and-ux/material-design"
+     stroke="none"
+     stroke-width="1"
+     fill="none"
+     fill-rule="evenodd">
+    <g
+       id="Google_Material_Design_Logo"
+       transform="matrix(1.3753662,0,0,1.3753662,2.6158445,2.6158445)">
+      <circle
+         id="Oval"
+         fill="#757575"
+         fill-rule="nonzero"
+         cx="25"
+         cy="25"
+         r="25" />
+      <polygon
+         id="Shape"
+         fill="#bdbdbd"
+         fill-rule="nonzero"
+         points="42.5,7.5 42.5,42.5 7.5,42.5 7.5,7.5 " />
+      <polygon
+         id="polygon1"
+         fill="#ffffff"
+         fill-rule="nonzero"
+         points="25,42.5 7.5,7.5 42.5,7.5 " />
+      <polygon
+         id="polygon2"
+         points="50,0 50,50 0,50 0,0 " />
+    </g>
+  </g>
+</svg>

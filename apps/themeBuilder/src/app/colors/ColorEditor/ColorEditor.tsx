@@ -1,15 +1,16 @@
-import {useColorScope} from "~/app/themes/ColorEditor/ColorScope";
+import {useColorScope} from "~/app/colors/ColorEditor/ColorScope";
 import {createMemo, createSignal, Loading} from "solid-js";
-import style from "./ColorEditCard.module.css"
-import {useColorNameUtils} from "~/app/themes/ColorEditor/ColorNameUtils";
+import style from "../ColorPreview.module.css"
+import {useColorNameUtils} from "~/app/colors/ColorNameUtils";
 import {useNavigate} from "@web/router";
+import {getColorPalette} from "~/app/colors/ColorRepository";
+import {ColorPalette} from "~/app/colors/ColorPalette/ColorPalette";
 
 export function ColorEditor() {
 
     const {color, updateName, updateHex, themeId} = useColorScope()
 
     const {variableNameToTitle} = useColorNameUtils()
-    const [selectedFilter, setFilter] = createSignal<"tailwind" | "material" | null>("tailwind")
     const navigate = useNavigate()
 
     const colorName = createMemo(() => variableNameToTitle(color().name))
@@ -19,7 +20,7 @@ export function ColorEditor() {
     }
 
     return <Loading>
-        <div class="grid grid-cols-[1fr_2fr] gap-x-8 gap-y-8">
+        <div class="grid grid-cols-[1fr_2fr] grid-rows-[min-content_1fr] gap-x-8 gap-y-8 h-full">
             <nav class="top flex flex-row items-center gap-4 col-span-full p-4">
                 <button class="text flex items-center gap-2" onClick={onBackClicked}><i>arrow_back</i> Back to Palette</button>
                 <hr class="w-px h-full" />
@@ -58,28 +59,8 @@ export function ColorEditor() {
                     </section>
                 </div>
             </div>
-            <div class="px-4">
-                <article class="elevated h-full">
-                    <hgroup class="flex flex-row justify-between items-center">
-                        <h2>Color Library</h2>
-                        <div class="flex items-center gap-2">
-                            <button class="text flex items-center gap-2" onClick={() => setFilter(null)}>
-                                <i>palette</i>
-                                <span>All</span>
-                            </button>
-                            <ul role="radiogroup" class="flex flex-row gap-2 px-3 py-2">
-                                <li role="button" class={`px-4 py-2 flex gap-1 items-center ${ selectedFilter() === "tailwind" ? 'active' : ''}`} onClick={() => setFilter("tailwind")}>
-                                    <img src="/img/tailwind-icon.svg" alt="Tailwind CSS Icon" class="aspect-square w-5"/>
-                                    <span>Tailwind</span>
-                                </li>
-                                <li role="button" class={`px-4 py-2 flex gap-1 items-center ${ selectedFilter() === "material" ? 'active' : ''}`} onClick={() => setFilter("material")}>
-                                    <img src="/img/material-design-icon.svg" alt="Material Design Icon" class="aspect-square w-5"/>
-                                    <span>Material</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </hgroup>
-                </article>
+            <div class="px-4 h-full min-h-0 pb-6">
+                <ColorPalette selected={color()}/>
             </div>
         </div>
     </Loading>

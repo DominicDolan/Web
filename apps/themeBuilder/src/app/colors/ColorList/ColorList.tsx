@@ -1,10 +1,10 @@
-import {ColorEditCard} from "~/app/themes/ColorEditor/ColorEditCard";
-import {ColorAddCard} from "~/app/themes/ColorEditor/ColorAddCard";
-import {useColorListScope} from "~/app/themes/ColorEditor/ColorListScope";
+import {ColorEditCard} from "~/app/colors/ColorList/ColorEditCard";
+import {ColorAddCard} from "~/app/colors/ColorList/ColorAddCard";
+import {useColorListScope} from "~/app/colors/ColorList/ColorListScope";
 import {For, Loading} from "solid-js";
 import {ColorDefinition} from "~/models/ColorDefinition";
 import {useNavigate} from "@web/router";
-import {useColorNameUtils} from "~/app/themes/ColorEditor/ColorNameUtils";
+import {useColorNameUtils} from "~/app/colors/ColorNameUtils";
 
 export default function ColorList() {
 

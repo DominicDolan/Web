@@ -2,7 +2,7 @@ import {For, Loading, Show} from "solid-js";
 import {A, useLocation, useNavigate} from "@web/router";
 import {useThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 import {ThemeDefinition} from "~/models/ThemeDefinition";
-import ColorList from "~/app/themes/ColorEditor/ColorList";
+import ColorList from "~/app/colors/ColorList/ColorList";
 
 export default function ThemeSettings(props: { children?: any, theme: ThemeDefinition }) {
 
@@ -148,36 +148,5 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                 <ColorList/>
             </Show>
         </Loading>
-        </>
-
-    //         return <><Show when={false}><div
-    //
-    //             <hr class={"w-full"}/>
-    //             <section class={"w-full flex flex-col gap-4 mt-10 mb-8"}>
-    //                 <h2 class={"mb-2"}>Edit Theme</h2>
-    //                 <ul class={"plain flex flex-col"}>
-    //                     <li>
-    //                         <A class={"flex flex-row justify-between"} href={`/editor/${props.params.themeId}/colors`}>
-    //                             <span>Edit Colors</span>
-    //                             <i>keyboard_arrow_right</i>
-    //                         </A>
-    //                     </li>
-    //                     <li>
-    //                         <A class={"flex flex-row justify-between"} href={`/editor/${props.params.themeId}/fonts`}>
-    //                             <span>Edit Fonts</span>
-    //                             <i>keyboard_arrow_right</i>
-    //             </A>
-    //                     </li>
-    //                     <li>
-    //                         <A class={"flex flex-row justify-between"} href={`/editor/${props.params.themeId}/elements`}>
-    //                             <span>Edit Elements</span>
-    //                             <i>keyboard_arrow_right</i>
-    //                         </A>
-    //                     </li>
-    //                 </ul>
-    //             </section>
-    //         </div>
-    //         {props.children}
-    //     </Show>
-    // </>
+    </>
 }

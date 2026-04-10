@@ -1,4 +1,4 @@
-import style from "./ColorEditCard.module.css"
+import style from "../ColorPreview.module.css"
 import {
     getBestContrastColor,
     getContrastRatio,
