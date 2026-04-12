@@ -1,32 +1,9 @@
 import style from "../ColorPreview.module.css"
-import {
-    getBestContrastColor,
-    getContrastRatio,
-    getRelativeLuminance,
-    hexToRgb,
-    rgbToHsl
-} from "@web/utils/Colors.js"
 import { createMemo } from "solid-js"
+import {useColorUtils} from "~/app/colors/ColorUtils";
 
 export function ColorEditCard(props: { name: string, color: string, onClick: () => void }) {
-    const rgb = createMemo(() => hexToRgb(props.color));
-    const hsl = createMemo(() => {
-        const val = rgb();
-        return val ? rgbToHsl(val.r, val.g, val.b) : null;
-    });
-
-    const bestContrast = createMemo(() => {
-        const val = rgb();
-        return val ? getBestContrastColor(val.r, val.g, val.b) : "black";
-    });
-
-    const contrastRatio = createMemo(() => {
-        const val = rgb();
-        if (!val) return 0;
-        const luminance = getRelativeLuminance(val.r, val.g, val.b);
-        const contrastLuminance = bestContrast() === "white" ? 1.0 : 0.0;
-        return getContrastRatio(luminance, contrastLuminance);
-    });
+    const {rgb, hsl, contrastRatio, bestContrast} = useColorUtils(() => props.color)
 
     const largeTextSuccess = createMemo(() => contrastRatio() >= 4.5)
     const largeTextWarning = createMemo(() => contrastRatio() < 4.5 && contrastRatio() >= 3)

@@ -3,14 +3,44 @@
     inherits: false;
     initial-value: white;
 }
+@property --on-presentation-color {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: white;
+}
+@property --alpha {
+    syntax: '<number>';
+    inherits: false;
+    initial-value: 1;
+}
 
 .colorPresentation {
     border-radius: 5px;
-    background-color: var(--presentation-color);
+    background-color: oklab(from var(--presentation-color) l a b / var(--alpha));
+    color: var(--on-presentation-color);
+    position: relative;
+
 
     code {
         background-color: transparent;
     }
+
+    &::before {
+        position: absolute;
+        inset: 0;
+        content: '';
+        border-radius: inherit;
+        background-image: radial-gradient(circle, black 1px, white 1px);
+        background-size: 30px 30px;
+        z-index: -1;
+    }
+}
+
+.hexPresentation {
+    font-size: 3rem;
+    font-weight: 700;
+    position: absolute;
+    inset: 0;
 }
 
 .colorPresentationCompact {

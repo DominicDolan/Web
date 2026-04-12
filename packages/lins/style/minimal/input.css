@@ -28,6 +28,11 @@
         &::placeholder {
             opacity: 0.8;
         }
+
+        &[disabled] {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
     }
 
     input[type=color] {
@@ -41,22 +46,23 @@
 
 }
 
-input-shell {
-    & input, & select, & textarea, &::part(default-control) {
-        border: none;
-        outline: none;
-        padding: 0;
-        background-color: transparent;
-        height: 100%;
-        width: 100%;
-
-        &:focus-visible {
-            outline: none;
-        }
-    }
-}
 
 @layer elements {
+    input-shell {
+        & input, & select, & textarea, &::part(default-control) {
+            border: none;
+            outline: none;
+            padding: 0;
+            background-color: transparent;
+            height: 100%;
+            width: 100%;
+
+            &:focus-visible {
+                outline: none;
+            }
+        }
+    }
+
     @scope (body) to (.elementsPreview) {
         input:not([type=radio]):not([type=checkbox]):not([type=range]), textarea, select, input-shell {
             :where(&), &.outlined {

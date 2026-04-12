@@ -4,7 +4,7 @@ import style from "../ColorPreview.module.css"
 import {ColorDefinition} from "~/models/ColorDefinition";
 
 
-export function ColorPalette(props: { selected: ColorDefinition }) {
+export function ColorPalette(props: { selected: ColorDefinition, onColorClicked: (color: string) => void, onColorShiftClicked: (color: string) => void }) {
 
     const colorPalette = createMemo(() => getColorPalette())
     const [selectedFilter, setFilter] = createSignal<"tailwind" | "material" | null>("tailwind")
@@ -53,6 +53,14 @@ export function ColorPalette(props: { selected: ColorDefinition }) {
         return filteredColors().filter(color => color.color_name.toLowerCase().includes(searchTerm().toLowerCase()))
     })
 
+    function onColorClicked(color: ColorPaletteRow, e: MouseEvent) {
+        if (e.shiftKey) {
+            props.onColorShiftClicked(color.hex_value)
+        } else {
+            props.onColorClicked(color.hex_value)
+        }
+    }
+
     return <article class="elevated h-full flex flex-col gap-2">
         <hgroup class="flex flex-row gap-18 items-center">
             <input-shell class="tonal h-12 py-2 flex-1 flex flex-row gap-2 items-center">
@@ -93,7 +101,7 @@ export function ColorPalette(props: { selected: ColorDefinition }) {
                         <h3 class={"sectionHeading"}>{group()}</h3>
                         <div class="flex flex-row gap-4">
                             <For each={groupedColors()[group()]}>{(color) => (<>
-                                <div class={["w-10 h-10", style.colorPresentationCompact]} style={{ ["background-color"]: color().hex_value }}>
+                                <div onClick={(event) => onColorClicked(color(), event)} class={["w-10 h-10", style.colorPresentationCompact]} style={{ ["background-color"]: color().hex_value }}>
                                     <Show when={color().hex_value === props.selected.hex}>
                                         <i>check</i>
                                     </Show>
@@ -105,12 +113,13 @@ export function ColorPalette(props: { selected: ColorDefinition }) {
                     <ul class="flex flex-col gap-4">
                         <For each={searchedColors()}>{(color) => <>
                             <li class="flex flex-row gap-6 items-center">
-                                <div class={["aspect-square w-10", style.colorPresentationCompact]} style={{ ["background-color"]: color().hex_value }}></div>
+                                <div onClick={(event) => onColorClicked(color(), event)} class={["aspect-square w-10", style.colorPresentationCompact]} style={{ ["background-color"]: color().hex_value }}></div>
                                 <hgroup>
                                     <h4 class="titleMd">{color().color_name}</h4>
                                     <span>{color().hex_value}</span>
                                 </hgroup>
                             </li>
+                            <hr/>
                         </>}
                         </For>
                     </ul>

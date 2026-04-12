@@ -37,12 +37,19 @@
     button, button.outlined {
         --current-color: var(--active-color, var(--primary-color));
         color: var(--current-color);
+
+        --outline-color: oklab(from var(--current-color) 70% a b);
         background: transparent;
-        border: 1px solid var(--current-color);
+        border: 1px solid var(--outline-color);
         box-shadow: none;
 
         &:hover {
             background-color: color-mix(in oklab, var(--current-color) 15%, transparent);
+        }
+
+        &.active {
+            background-color: oklab(from var(--current-color) 80% a b);
+            --outline-color: oklab(from var(--current-color) 60% a b);
         }
     }
 

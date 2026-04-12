@@ -4,7 +4,7 @@ import {useColorListScope} from "~/app/colors/ColorList/ColorListScope";
 import {For, Loading} from "solid-js";
 import {ColorDefinition} from "~/models/ColorDefinition";
 import {useNavigate} from "@web/router";
-import {useColorNameUtils} from "~/app/colors/ColorNameUtils";
+import {useColorNameUtils} from "~/app/colors/ColorUtils";
 
 export default function ColorList() {
 

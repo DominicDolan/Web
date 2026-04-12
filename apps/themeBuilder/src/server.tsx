@@ -5,7 +5,7 @@ export default createServer(({scripts, assets}) => {
     <html lang="en">
         <head>
             <meta charset="UTF-8"/>
-            <title>Title</title>
+            <title>Theme.Build</title>
             ${assets}
         </head>
         <body>

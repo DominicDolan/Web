@@ -13,9 +13,6 @@ export const useColorScope = defineScope(ColorScope, (props) => {
     const store = createDeltaStore(() => colorDeltas())
     const [color, setColor] = store
     const [getUncommitted, markCommitted] = createMarker(store)
-    createEffect(() => color, (newValue) => {
-        console.log("color", newValue)
-    })
     markCommitted()
 
     async function save() {
@@ -26,30 +23,54 @@ export const useColorScope = defineScope(ColorScope, (props) => {
 
     const debounceSave = debounce(save, 1000)
 
-    function updateName(newName: string) {
+    function updateName(newName: string, debounce = false) {
         setColor(old => {
             old[props.colorId].name = newName
         })
-        debounceSave()
+        if (debounce) {
+            debounceSave()
+        } else {
+            save()
+        }
     }
 
-    function updateHex(newHex: string) {
+    function updateHex(newHex: string, debounce = false) {
         setColor(old => {
             old[props.colorId].hex = newHex
         })
-        debounceSave()
+        if (debounce) {
+            debounceSave()
+        } else {
+            save()
+        }
     }
 
-    function updateAlpha(newAlpha: number) {
+    function updateAlpha(newAlpha: number, debounce = false) {
         setColor(old => {
             old[props.colorId].alpha = newAlpha
         })
-        debounceSave()
+        if (debounce) {
+            debounceSave()
+        } else {
+            save()
+        }
+    }
+
+    function updateOnHex(hex: string, debounce = false) {
+        setColor(old => {
+            old[props.colorId].onHex = hex
+        })
+        if (debounce) {
+            debounceSave()
+        } else {
+            save()
+        }
     }
     return {
         updateName,
         updateHex,
         updateAlpha,
+        updateOnHex,
         color: () => color[0],
         themeId: () => props.themeId,
     }
