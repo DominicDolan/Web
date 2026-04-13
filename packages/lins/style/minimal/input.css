@@ -77,6 +77,12 @@
                 outline: none;
             }
 
+            &.flat {
+                background-color: var(--on-current-color);
+                color: var(--current-color);
+                outline: none;
+            }
+
             &.tonal {
                 background-color: color-mix(in srgb, var(--current-color) 10%, var(--surface-color));
             }

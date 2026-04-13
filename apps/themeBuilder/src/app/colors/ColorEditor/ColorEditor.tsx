@@ -1,6 +1,6 @@
 import {useColorScope} from "~/app/colors/ColorEditor/ColorScope";
 import {createMemo, createSignal, Loading} from "solid-js";
-import style from "../ColorPreview.module.css"
+import style from "../colors.module.css"
 import {useColorNameUtils, useColorUtils} from "~/app/colors/ColorUtils";
 import {useNavigate} from "@web/router";
 import {ColorPalette} from "~/app/colors/ColorPalette/ColorPalette";
