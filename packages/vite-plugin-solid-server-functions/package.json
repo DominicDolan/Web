@@ -1,0 +1,41 @@
+{
+  "name": "@vite-server/solid-server-functions",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "import": "./src/index.ts"
+    },
+    "./client": {
+      "types": "./src/client.ts",
+      "import": "./src/client.ts"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "import": "./src/server.ts"
+    },
+    "./vite": {
+      "types": "./src/vite-plugin.ts",
+      "import": "./src/vite-plugin.ts"
+    },
+    "./runtime": {
+      "types": "./src/runtime/index.ts",
+      "import": "./src/runtime/index.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "typescript": "~6.0.2"
+  },
+  "peerDependencies": {
+    "vite": "^8.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0"
+  }
+}
+
