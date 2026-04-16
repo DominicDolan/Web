@@ -7,7 +7,7 @@ import { serverFunctions } from "@vinxi/server-functions/plugin";
 export type Solid2VinxiConfig = {
     clientEntry: string
     serverEntry: string
-    apiEntry: string
+    apiEntry?: string
     solid?: Parameters<typeof solid>[0]
     client?: {
         plugins?: Array<any>

@@ -1,8 +1,9 @@
-import {For, Loading, Show} from "solid-js";
+import {For, Loading, Match, Show, Switch} from "solid-js";
 import {A, useLocation, useNavigate} from "@web/router";
 import {useThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 import {ThemeDefinition} from "~/models/ThemeDefinition";
 import ColorList from "~/app/colors/ColorList/ColorList";
+import {TypographyList} from "~/app/typography/TypographyList/TypographyList";
 
 export default function ThemeSettings(props: { children?: any, theme: ThemeDefinition }) {
 
@@ -144,9 +145,17 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                     </ul>
                 </section>
             </div>
-            <Show when={location.segments()[2] === "colors"}>
-                <ColorList/>
-            </Show>
+            <Switch>
+                <Match when={location.segments()[2] === "fonts"}>
+                    <TypographyList/>
+                </Match>
+                <Match when={location.segments()[2] === "elements"}>
+                    <div>Elements</div>
+                </Match>
+                <Match when={location.segments()[2] === "colors"}>
+                    <ColorList/>
+                </Match>
+            </Switch>
         </Loading>
     </>
 }
