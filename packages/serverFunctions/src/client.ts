@@ -8,5 +8,5 @@ export {
   type ServerFunctionRequestPayload,
   type ServerFunctionResponse,
   type ServerFunctionSuccess,
-} from './runtime/server-functions.ts'
+} from './runtime/server-functions'
 

@@ -7,7 +7,7 @@ import { serverFunctions } from 'virtual:solid-server-functions/server-manifest'
 import {
   createServerFunctionEvent,
   handleServerFunctionRequest,
-} from './runtime/index.ts'
+} from './runtime'
 
 const textTypes = new Set([
   'application/javascript',

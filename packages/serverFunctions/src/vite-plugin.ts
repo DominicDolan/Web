@@ -8,8 +8,7 @@ import {
   type Plugin,
   type ViteDevServer,
 } from 'vite'
-import { createServerFunctionEvent } from './runtime/event.ts'
-import { handleServerFunctionRequest } from './runtime/request.ts'
+import { createServerFunctionEvent, handleServerFunctionRequest } from './runtime'
 
 const CLIENT_PROXY_PREFIX = '\0solid-server-function-client:'
 const SERVER_MANIFEST_ID = 'virtual:solid-server-functions/server-manifest'

@@ -1,5 +1,5 @@
 {
-  "name": "@vite-server/solid-server-functions",
+  "name": "@web/server-functions",
   "private": true,
   "version": "0.1.0",
   "type": "module",

@@ -20,6 +20,7 @@
     "packages/solidScope",
     "packages/solid2Vinxi",
     "packages/router",
+    "packages/serverFunctions",
     "apps/aiChat"
   ],
   "scripts": {

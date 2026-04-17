@@ -8,21 +8,21 @@ export {
   type ServerFunctionRequestPayload,
   type ServerFunctionResponse,
   type ServerFunctionSuccess,
-} from './runtime/server-functions.ts'
+} from './runtime/server-functions'
 export {
   createServerFunctionEvent,
   getEvent,
   runWithEvent,
   type CreateServerFunctionEventOptions,
   type ServerFunctionEvent,
-} from './runtime/event.ts'
+} from './runtime/event'
 export {
   handleServerFunctionRequest,
   type HandleServerFunctionRequestOptions,
   type ResolveServerFunction,
-} from './runtime/request.ts'
+} from './runtime/request'
 export {
   createServer,
   type CreateServerOptions,
-} from './node-server.ts'
+} from './node-server'
 
