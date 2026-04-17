@@ -1,6 +1,6 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
 import {createMemo, storePath} from "solid-js";
-import {retrieveTodos} from "./TodoRepository";
+import {retrieveTodos} from "./TodoRepository.server";
 import {createDeltaStore} from "@web/solid-delta";
 
 export const UserScope = createScopeProvider<{ userId: string }>()

@@ -1,6 +1,5 @@
 import { render } from '@solidjs/web';
 import {TodoPage} from "./TodoPage/TodoPage";
-import "virtual:uno.css";
 
 
 export default function App() {

@@ -8,12 +8,21 @@ import {
   type Plugin,
   type ViteDevServer,
 } from 'vite'
-import { createServerFunctionEvent, handleServerFunctionRequest } from './runtime'
+import {
+  createServerFunctionEvent,
+  handleServerFunctionRequest,
+} from '@web/server-functions/runtime'
+import {
+  CREATE_SERVER_NO_LISTEN_ENV,
+  handleCreateServerRequest,
+  getCreateServerRequestHandler,
+  type CreateServerRequestHandler,
+} from './create-server-request.ts'
 
 const CLIENT_PROXY_PREFIX = '\0solid-server-function-client:'
 const SERVER_MANIFEST_ID = 'virtual:solid-server-functions/server-manifest'
 const RESOLVED_SERVER_MANIFEST_ID = `\0${SERVER_MANIFEST_ID}`
-const CLIENT_RUNTIME_IMPORT_ID = '@vite-server/solid-server-functions/client'
+const CLIENT_RUNTIME_IMPORT_ID = '@web/server-functions/client'
 
 export interface SolidServerFunctionsPluginOptions {
   serverEntry: string
@@ -70,23 +79,30 @@ export function solidServerFunctions(options: SolidServerFunctionsPluginOptions)
       server.middlewares.use(async (req, res, next) => {
         try {
           const request = await toWebRequest(req)
+          const event = createServerFunctionEvent({
+            request,
+            node: { req, res },
+          })
           const response = await handleServerFunctionRequest(
             request,
             async (id) => resolveServerFunctionInDev(server, id),
-            {
-              event: createServerFunctionEvent({
-                request,
-                node: { req, res },
-              }),
-            },
+            { event },
           )
 
-          if (!response) {
+          if (response) {
+            await sendWebResponse(res, response, req.method ?? 'GET')
+            return
+          }
+
+          const createServerHandler = await resolveCreateServerHandlerInDev(server, root, options.serverEntry)
+          const customResponse = await handleCreateServerRequest(createServerHandler, event)
+
+          if (!customResponse) {
             next()
             return
           }
 
-          await sendWebResponse(res, response, req.method ?? 'GET')
+          await sendWebResponse(res, customResponse, req.method ?? 'GET')
         } catch (error) {
           next(error as Error)
         }
@@ -147,6 +163,19 @@ async function resolveServerFunctionInDev(server: ViteDevServer, id: string) {
   }
 
   return handler as (...args: unknown[]) => unknown
+}
+
+async function resolveCreateServerHandlerInDev(server: ViteDevServer, root: string, serverEntry: string) {
+  const environment = server.environments.server
+
+  if (!environment || !isRunnableDevEnvironment(environment)) {
+    throw new Error('The Vite server runtime environment is not available.')
+  }
+
+  process.env[CREATE_SERVER_NO_LISTEN_ENV] = '1'
+
+  const mod = await environment.runner.import(toRootModuleId(root, serverEntry))
+  return getCreateServerRequestHandler(mod.default) ?? undefined
 }
 
 async function createClientProxyModule(root: string, filePath: string) {

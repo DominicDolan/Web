@@ -5,9 +5,15 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { serverFunctions } from 'virtual:solid-server-functions/server-manifest'
 import {
+  CREATE_SERVER_NO_LISTEN_ENV,
+  CREATE_SERVER_REQUEST_HANDLER_SYMBOL,
+  handleCreateServerRequest,
+  type CreateServerRequestHandler,
+} from './create-server-request.ts'
+import {
   createServerFunctionEvent,
   handleServerFunctionRequest,
-} from './runtime'
+} from './runtime/index.ts'
 
 const textTypes = new Set([
   'application/javascript',
@@ -31,11 +37,6 @@ const mimeTypes = new Map<string, string>([
   ['.woff2', 'font/woff2'],
 ])
 
-export interface CreateServerRenderContext {
-  assets: string
-  scripts: string
-}
-
 export interface CreateServerOptions {
   clientDistDir?: string
   clientIndexFile?: string
@@ -43,25 +44,33 @@ export interface CreateServerOptions {
   onListen?(port: number, server: Server): void
 }
 
+interface CreateServerRuntime extends Server {
+  [CREATE_SERVER_REQUEST_HANDLER_SYMBOL]?: CreateServerRequestHandler
+}
+
+export function createServer(options?: CreateServerOptions): Server
+export function createServer(handler: CreateServerRequestHandler, options?: CreateServerOptions): Server
 export function createServer(
-  renderDocument: (context: CreateServerRenderContext) => string,
-  options: CreateServerOptions = {},
+  handlerOrOptions: CreateServerOptions | CreateServerRequestHandler = {},
+  maybeOptions: CreateServerOptions = {},
 ) {
+  const handleRequest = typeof handlerOrOptions === 'function' ? handlerOrOptions : undefined
+  const options = typeof handlerOrOptions === 'function' ? maybeOptions : handlerOrOptions
   const port = options.port ?? Number(process.env.PORT ?? 3000)
   const clientDistDir = options.clientDistDir ?? resolveClientDistDir()
   const clientIndexFile = options.clientIndexFile ?? 'index.html'
-  let documentContextPromise: Promise<CreateServerRenderContext> | undefined
+  let documentHtmlPromise: Promise<string> | undefined
 
   const server = createHttpServer(async (req, res) => {
     try {
       await handleNodeRequest(req, res, {
         clientDistDir,
         clientIndexFile,
+        handleRequest,
         port,
-        renderDocument,
-        getDocumentContext() {
-          documentContextPromise ??= loadDocumentContext(clientDistDir, clientIndexFile)
-          return documentContextPromise
+        getDocumentHtml() {
+          documentHtmlPromise ??= loadDocumentHtml(clientDistDir, clientIndexFile)
+          return documentHtmlPromise
         },
       })
     } catch (error) {
@@ -71,9 +80,13 @@ export function createServer(
     }
   })
 
-  server.listen(port, () => {
-    options.onListen?.(port, server)
-  })
+  ;(server as CreateServerRuntime)[CREATE_SERVER_REQUEST_HANDLER_SYMBOL] = handleRequest
+
+  if (process.env[CREATE_SERVER_NO_LISTEN_ENV] !== '1') {
+    server.listen(port, () => {
+      options.onListen?.(port, server)
+    })
+  }
 
   return server
 }
@@ -81,9 +94,9 @@ export function createServer(
 interface HandleNodeRequestOptions {
   clientDistDir: string
   clientIndexFile: string
-  getDocumentContext(): Promise<CreateServerRenderContext>
+  getDocumentHtml(): Promise<string>
+  handleRequest?: CreateServerRequestHandler
   port: number
-  renderDocument: (context: CreateServerRenderContext) => string
 }
 
 async function handleNodeRequest(
@@ -92,6 +105,10 @@ async function handleNodeRequest(
   options: HandleNodeRequestOptions,
 ) {
   const request = await toWebRequest(req, options.port)
+  const event = createServerFunctionEvent({
+    request,
+    node: { req, res },
+  })
   const rpcResponse = await handleServerFunctionRequest(
     request,
     async (id) => {
@@ -103,16 +120,18 @@ async function handleNodeRequest(
 
       return handler
     },
-    {
-      event: createServerFunctionEvent({
-        request,
-        node: { req, res },
-      }),
-    },
+    { event },
   )
 
   if (rpcResponse) {
     await sendWebResponse(res, rpcResponse, req.method ?? 'GET')
+    return
+  }
+
+  const customResponse = await handleCreateServerRequest(options.handleRequest, event)
+
+  if (customResponse) {
+    await sendWebResponse(res, customResponse, req.method ?? 'GET')
     return
   }
 
@@ -144,11 +163,11 @@ async function handleNodeRequest(
 }
 
 async function serveRenderedDocument(
-  options: Pick<HandleNodeRequestOptions, 'getDocumentContext' | 'renderDocument'>,
+  options: Pick<HandleNodeRequestOptions, 'getDocumentHtml'>,
   res: ServerResponse,
   method: string,
 ) {
-  const html = options.renderDocument(await options.getDocumentContext())
+  const html = await options.getDocumentHtml()
 
   res.statusCode = 200
   res.setHeader('content-type', 'text/html; charset=utf-8')
@@ -159,6 +178,14 @@ async function serveRenderedDocument(
   }
 
   res.end(html)
+}
+
+export function getCreateServerRequestHandler(target: unknown) {
+  if (!target || (typeof target !== 'object' && typeof target !== 'function')) {
+    return undefined
+  }
+
+  return (target as CreateServerRuntime)[CREATE_SERVER_REQUEST_HANDLER_SYMBOL]
 }
 
 function toAssetPath(clientDistDir: string, pathname: string) {
@@ -266,19 +293,8 @@ async function sendWebResponse(res: ServerResponse, response: Response, method: 
   res.end(body)
 }
 
-async function loadDocumentContext(clientDistDir: string, clientIndexFile: string): Promise<CreateServerRenderContext> {
-  const html = await readFile(path.join(clientDistDir, clientIndexFile), 'utf8')
-  const headMatch = html.match(/<head[^>]*>([\s\S]*?)<\/head>/i)
-  const headContent = headMatch?.[1] ?? ''
-  const assets = headContent.replace(/<script\b[\s\S]*?<\/script>/gi, '').trim()
-  const scripts = [...html.matchAll(/<script\b[\s\S]*?<\/script>/gi)]
-    .map((match) => match[0])
-    .join('\n')
-
-  return {
-    assets,
-    scripts,
-  }
+async function loadDocumentHtml(clientDistDir: string, clientIndexFile: string): Promise<string> {
+  return readFile(path.join(clientDistDir, clientIndexFile), 'utf8')
 }
 
 function resolveClientDistDir() {

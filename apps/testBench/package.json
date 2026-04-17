@@ -4,9 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev --port 3001",
-    "build": "vinxi build",
-    "start": "vinxi start"
+    "dev": "vite"
   },
   "dependencies": {
     "@paralleldrive/cuid2": "3.3.0",
@@ -16,10 +14,9 @@
     "@web/solid-scope": "*",
     "@web/unolayout": "*",
     "@web/utils": "*",
-    "@web/vinxi": "*",
-    "solid-js": "2.0.0-beta.4",
-    "@solidjs/web": "2.0.0-beta.4",
-    "unocss": "66.6.0"
+    "vite": "8.0.8",
+    "solid-js": "2.0.0-beta.7",
+    "@solidjs/web": "2.0.0-beta.7"
   },
   "devDependencies": {
     "vite-tsconfig-paths": "6.1.1"

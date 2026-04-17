@@ -24,5 +24,10 @@ export {
 export {
   createServer,
   type CreateServerOptions,
-} from './node-server'
+} from './node-server.ts'
+export {
+  type CreateServerRequestEvent,
+  type CreateServerRequestHandler,
+  type CreateServerRequestResult,
+} from './create-server-request.ts'
 

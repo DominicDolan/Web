@@ -1,4 +1,4 @@
-import {Todo} from "./TodoRepository";
+import {Todo} from "./TodoRepository.server";
 import {useTodoScope} from "./TodoScope";
 import {createSignal, Match, Show, Switch} from "solid-js";
 import {PartialModel} from "@web/schema";
