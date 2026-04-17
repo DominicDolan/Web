@@ -21,4 +21,8 @@ export {
   type HandleServerFunctionRequestOptions,
   type ResolveServerFunction,
 } from './runtime/request.ts'
+export {
+  createServer,
+  type CreateServerOptions,
+} from './node-server.ts'
 
