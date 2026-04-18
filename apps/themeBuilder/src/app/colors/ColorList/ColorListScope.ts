@@ -2,7 +2,7 @@ import {defineScope} from "@web/solid-scope";
 import {ThemeScope} from "~/app/themes/ThemeEditor/ThemeScope";
 import {createDeltaStore, createMarker} from "@web/solid-delta";
 import {createMemo} from "solid-js";
-import {getColorDeltas, saveColor} from "~/app/colors/ColorRepository";
+import {getColorDeltas, saveColor} from "~/app/colors/ColorRepository.server";
 import {createId} from "@paralleldrive/cuid2";
 import {useNavigate} from "@web/router";
 

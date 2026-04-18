@@ -4,9 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev --port 3001",
-    "build": "vinxi build",
-    "start": "vinxi start",
+    "dev": "vite dev --port 3001",
     "generate:schema": "generate-schema src/models migrations",
     "apply:schema": "wrangler d1 migrations apply DB --local --config ./wrangler.jsonc",
     "apply:schema:prod": "wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc"
@@ -14,8 +12,8 @@
   "dependencies": {
     "@codemirror/lang-css": "^6.3.1",
     "@codemirror/view": "^6.39.11",
-    "solid-js": "2.0.0-beta.5",
-    "@solidjs/web": "2.0.0-beta.5",
+    "solid-js": "2.0.0-beta.7",
+    "@solidjs/web": "2.0.0-beta.7",
     "@web/lins": "*",
     "@web/utils": "*",
     "@web/d1": "*",
@@ -25,10 +23,10 @@
     "@web/unolayout": "*",
     "@web/router": "*",
     "@paralleldrive/cuid2": "3.3.0",
-    "nitro": "3.0.260311-beta",
-    "tailwindcss": "4.2.1",
+    "tailwindcss": "4.2.2",
+    "@tailwindcss/vite": "4.2.2",
+    "vite-plugin-solid": "3.0.0-next.5",
     "codemirror": "6.0.2",
-    "vinxi": "0.5.11",
     "zod": "4.3.6"
   }
 }

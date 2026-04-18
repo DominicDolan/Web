@@ -1,6 +1,6 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
 import {createMemo} from "solid-js";
-import {getThemesDeltas, saveTheme} from "~/app/themes/ThemeEditor/ThemeRepository";
+import {getThemesDeltas, saveTheme} from "~/app/themes/ThemeEditor/ThemeRepository.server";
 import {useNavigate} from "@web/router";
 import {createDeltaStore} from "@web/solid-delta";
 import {createId} from "@paralleldrive/cuid2";

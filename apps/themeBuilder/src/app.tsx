@@ -10,7 +10,7 @@ export default function App() {
     const location = useLocation();
 
     return (
-        <div class="minimalTheme light">
+        <div class="minimalTheme light h-full">
             <Switch fallback={<><div>404</div></>}>
                 <Match when={location.segments()[0] === "editor" && location.segments()[2] === "colors" && location.segments().length === 4}>
                     <ColorScope themeId={location.segments()[1]} colorId={location.segments()[3]}>

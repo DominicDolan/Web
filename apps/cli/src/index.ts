@@ -112,7 +112,6 @@ async function updatePackageJson(
 
 async function updateCssFramework(appDir: string, cssFramework: "unocss" | "tailwind"): Promise<void> {
     const unoConfigPath = path.join(appDir, "uno.config.ts");
-    const tailwindConfigPath = path.join(appDir, "tailwind.config.ts");
     const appConfigPath = path.join(appDir, "app.config.ts");
     const appConfigTailwindPath = path.join(appDir, "app.config.tailwind.ts");
     const appCssPath = path.join(appDir, "src", "app.css");
@@ -151,9 +150,6 @@ async function updateCssFramework(appDir: string, cssFramework: "unocss" | "tail
     }
     if (await pathExists(appTailwindCssPath)) {
         await unlink(appTailwindCssPath);
-    }
-    if (await pathExists(tailwindConfigPath)) {
-        await unlink(tailwindConfigPath);
     }
 }
 

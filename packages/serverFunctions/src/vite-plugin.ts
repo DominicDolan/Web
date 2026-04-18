@@ -26,6 +26,7 @@ const CLIENT_RUNTIME_IMPORT_ID = '@web/server-functions/client'
 
 export interface SolidServerFunctionsPluginOptions {
   serverEntry: string
+  createRequestContext?: (request: Request) => unknown | Promise<unknown>
 }
 
 export function solidServerFunctions(options: SolidServerFunctionsPluginOptions): Plugin {
@@ -79,14 +80,18 @@ export function solidServerFunctions(options: SolidServerFunctionsPluginOptions)
       server.middlewares.use(async (req, res, next) => {
         try {
           const request = await toWebRequest(req)
+          const context = await options.createRequestContext?.(request)
+
           const event = createServerFunctionEvent({
             request,
+            context,
             node: { req, res },
           })
+
           const response = await handleServerFunctionRequest(
-            request,
-            async (id) => resolveServerFunctionInDev(server, id),
-            { event },
+              request,
+              async (id) => resolveServerFunctionInDev(server, id),
+              { event },
           )
 
           if (response) {

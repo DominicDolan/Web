@@ -1,5 +1,5 @@
 import {createMemo, createSignal, For, Loading, Show} from "solid-js";
-import {ColorPaletteRow, getColorPalette} from "~/app/colors/ColorRepository";
+import {ColorPaletteRow, getColorPalette} from "~/app/colors/ColorRepository.server";
 import style from "../ColorPreview.module.css"
 import {ColorDefinition} from "~/models/ColorDefinition";
 

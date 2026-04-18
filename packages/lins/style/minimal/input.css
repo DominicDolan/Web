@@ -65,6 +65,8 @@
 
     @scope (body) to (.elementsPreview) {
         input:not([type=radio]):not([type=checkbox]):not([type=range]), textarea, select, input-shell {
+            border-radius: 0.25rem;
+
             :where(&), &.outlined {
                 --outline-color: oklab(from var(--current-color) 70% a b);
                 outline: 1px solid var(--outline-color);

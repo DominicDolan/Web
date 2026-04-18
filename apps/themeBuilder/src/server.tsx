@@ -1,18 +1,11 @@
-import {createServer} from "@web/vinxi/server";
+import {createServer} from "@web/server-functions/server";
 
-export default createServer(({scripts, assets}) => {
-    return `
-    <html lang="en">
-        <head>
-            <meta charset="UTF-8"/>
-            <title>Theme.Build</title>
-            ${assets}
-        </head>
-        <body>
-        <div id="app">
-        </div>
-        ${scripts}
-        </body>
-        </html>
-    `
+export default createServer(async (event) => {
+    const url = new URL(event.request.url)
+
+    if (url.pathname === '/api/health' && event.request.method === 'GET') {
+        return new Response(JSON.stringify({ ok: true }), {
+            headers: { 'content-type': 'application/json' },
+        })
+    }
 })

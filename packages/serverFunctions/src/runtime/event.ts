@@ -1,11 +1,16 @@
 import { AsyncLocalStorage } from 'node:async_hooks'
 
-export interface ServerFunctionEvent<NodeRequest = unknown, NodeResponse = unknown> {
+export interface ServerFunctionEvent<
+    NodeRequest = unknown,
+    NodeResponse = unknown,
+    TContext = unknown,
+> {
   request: Request
   url: URL
   method: string
   headers: Headers
   responseHeaders: Headers
+  context?: TContext
   node?: {
     req: NodeRequest
     res: NodeResponse
@@ -15,8 +20,13 @@ export interface ServerFunctionEvent<NodeRequest = unknown, NodeResponse = unkno
   removeHeader(name: string): void
 }
 
-export interface CreateServerFunctionEventOptions<NodeRequest = unknown, NodeResponse = unknown> {
+export interface CreateServerFunctionEventOptions<
+    NodeRequest = unknown,
+    NodeResponse = unknown,
+    TContext = unknown,
+> {
   request: Request
+  context?: TContext
   node?: {
     req: NodeRequest
     res: NodeResponse
@@ -26,9 +36,13 @@ export interface CreateServerFunctionEventOptions<NodeRequest = unknown, NodeRes
 
 const eventStorage = getEventStorage()
 
-export function createServerFunctionEvent<NodeRequest = unknown, NodeResponse = unknown>(
-  options: CreateServerFunctionEventOptions<NodeRequest, NodeResponse>,
-): ServerFunctionEvent<NodeRequest, NodeResponse> {
+export function createServerFunctionEvent<
+    NodeRequest = unknown,
+    NodeResponse = unknown,
+    TContext = unknown,
+>(
+    options: CreateServerFunctionEventOptions<NodeRequest, NodeResponse, TContext>,
+): ServerFunctionEvent<NodeRequest, NodeResponse, TContext> {
   const responseHeaders = options.responseHeaders ?? new Headers()
 
   return {
@@ -37,6 +51,7 @@ export function createServerFunctionEvent<NodeRequest = unknown, NodeResponse = 
     method: options.request.method,
     headers: new Headers(options.request.headers),
     responseHeaders,
+    context: (options.context ?? {}) as TContext,
     node: options.node,
     setHeader(name, value) {
       responseHeaders.set(name, value)
@@ -54,14 +69,18 @@ export function runWithEvent<T>(event: ServerFunctionEvent, callback: () => T): 
   return eventStorage.run(event, callback)
 }
 
-export function getEvent<NodeRequest = unknown, NodeResponse = unknown>() {
+export function getEvent<
+    NodeRequest = unknown,
+    NodeResponse = unknown,
+    TContext = unknown,
+>() {
   const event = eventStorage.getStore()
 
   if (!event) {
     throw new Error('getEvent() was called outside of a server function request context.')
   }
 
-  return event as ServerFunctionEvent<NodeRequest, NodeResponse>
+  return event as ServerFunctionEvent<NodeRequest, NodeResponse, TContext>
 }
 
 function getEventStorage() {

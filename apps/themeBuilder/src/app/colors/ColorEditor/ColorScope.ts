@@ -1,7 +1,7 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
 import {createDeltaStore, createMarker} from "@web/solid-delta";
 import {createEffect, createMemo} from "solid-js";
-import {getSingleColorDelta, saveColor} from "~/app/colors/ColorRepository";
+import {getSingleColorDelta, saveColor} from "~/app/colors/ColorRepository.server";
 import {debounce} from "@web/utils/Debounce.js";
 
 

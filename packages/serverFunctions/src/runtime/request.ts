@@ -11,8 +11,8 @@ export interface ResolveServerFunction {
   (id: string): Promise<ServerFunctionHandler> | ServerFunctionHandler
 }
 
-export interface HandleServerFunctionRequestOptions<NodeRequest = unknown, NodeResponse = unknown> {
-  event?: ServerFunctionEvent<NodeRequest, NodeResponse>
+export interface HandleServerFunctionRequestOptions<NodeRequest = unknown, NodeResponse = unknown, Context = unknown> {
+  event?: ServerFunctionEvent<NodeRequest, NodeResponse, Context>
 }
 
 export async function handleServerFunctionRequest(

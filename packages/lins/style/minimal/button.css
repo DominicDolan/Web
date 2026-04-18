@@ -34,6 +34,10 @@
 }
 
 @layer elements {
+    button {
+        border-radius: 0.375rem;
+    }
+
     button, button.outlined {
         --current-color: var(--active-color, var(--primary-color));
         color: var(--current-color);
