@@ -1,4 +1,4 @@
-import style from "../ColorPreview.module.css"
+import style from "../colors.module.css"
 import { createMemo } from "solid-js"
 import {useColorUtils} from "~/app/colors/ColorUtils";
 

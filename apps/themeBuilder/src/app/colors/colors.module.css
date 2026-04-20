@@ -13,6 +13,11 @@
     inherits: false;
     initial-value: 1;
 }
+@property --button-color {
+    syntax: '<color>';
+    inherits: false;
+    initial-value: white;
+}
 
 .colorPresentation {
     border-radius: 5px;
@@ -47,4 +52,32 @@
     border-radius: 3px;
     background-color: var(--presentation-color);
     cursor: pointer;
+}
+
+.colorFilterButton {
+    border-radius: 999vh;
+}
+
+.red {
+    background-color: oklch(from red l 0.18 h);
+}
+
+.green {
+    background-color: oklch(from green l 0.18 h);
+}
+
+.blue {
+    background-color: oklch(from blue l 0.18 h);
+}
+
+.grayscale {
+    background: linear-gradient(to right,
+    oklch(0.2 0 0) 50%,
+    oklch(0.95 0 0) 50%);
+    outline: 1px solid oklch(0.6 0 0);
+    outline-offset: -1px;
+}
+
+.active {
+    outline: 2px solid var(--success-color);
 }
