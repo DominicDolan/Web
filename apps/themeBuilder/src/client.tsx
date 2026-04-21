@@ -1,7 +1,7 @@
 import { render } from '@solidjs/web';
 import "@web/lins/minimal.css"
 import "./style.css";
-import App from "~/app";
+import App from "~/app/app";
 import {LocationContext} from "@web/router";
 
 const app = document.getElementById("app");

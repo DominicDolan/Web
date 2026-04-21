@@ -2,6 +2,8 @@ import {TypefaceRole, TypefaceSize, typefaceSizes} from "~/constants/TypefaceRol
 import {camelToTitleCase} from "@web/utils/StringCasing.js";
 import {createSignal, For} from "solid-js";
 import {defaultTypefacesQueryObject} from "~/constants/DefaultTypefaces";
+import {useNavigate} from "@web/router";
+import {useTypographyListScope} from "~/app/typography/TypographyList/TypographyListScope";
 
 export function TypefaceRoleItem(props: {role: TypefaceRole}) {
 
@@ -12,6 +14,12 @@ export function TypefaceRoleItem(props: {role: TypefaceRole}) {
         if (size === "large") return "Lg"
         return ""
     }
+    const {theme} = useTypographyListScope()
+    const navigate = useNavigate()
+    function onTypefaceClicked(size: TypefaceSize) {
+        navigate(`/editor/${theme().id}/typography/${props.role}/${size}/${type()}`)
+    }
+
     return <section class="flex flex-col gap-8 mt-4">
         <hgroup class="flex flex-row gap-4 items-center">
             <h3>{camelToTitleCase(props.role)}</h3>
@@ -24,10 +32,10 @@ export function TypefaceRoleItem(props: {role: TypefaceRole}) {
         <div class="grid grid-cols-3 gap-8">
             <For each={typefaceSizes}>
                 {(size) => <>
-                    <article class="tonal flex flex-col gap-4" role="button">
+                    <article class="tonal flex flex-col gap-4" role="button" onClick={() => onTypefaceClicked(size())}>
                         <hgroup class="flex flex-row justify-between gap-2">
                             {camelToTitleCase(size())}
-                            <code>{props.role + getSizeSuffix(size()) + (type() === "variant" ? ".variant" : "")}</code>
+                            <code>.{props.role + getSizeSuffix(size()) + (type() === "variant" ? ".variant" : "")}</code>
                         </hgroup>
                         <article class="inset flex flex-col gap-2" style={defaultTypefacesQueryObject[props.role][type()][size()].css}>
                             {camelToTitleCase(props.role) + " Text"}

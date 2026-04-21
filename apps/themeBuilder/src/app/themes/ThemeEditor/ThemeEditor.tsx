@@ -1,4 +1,4 @@
-import NavBarTemplate from "~/app/common/NavBarTemplate";
+import MainPageNav from "~/components/MainPageNav";
 import {createMemo, For, Loading, Show} from "solid-js";
 import {A, useLocation} from "@web/router";
 import ThemeSettings from "~/app/themes/ThemeEditor/ThemeSettings";
@@ -19,7 +19,7 @@ export default function ThemeEditor() {
 
     return <Loading fallback={<div>Loading...</div>}>
         <div class={"grid grid-cols-[14rem_20rem_1fr] w-full h-full"}>
-            <NavBarTemplate class={"themeEditor"}>
+            <MainPageNav class={"themeEditor"}>
                 <div class={"w-full flex flex-col gap-6"}>
                     <button onClick={() => addNewTheme()} class="flex flex-row gap-2 items-center"><i>add</i><span>Add Theme</span></button>
                     <ul class="nav flex flex-col gap-4 w-full pl-0">
@@ -30,7 +30,7 @@ export default function ThemeEditor() {
                         </For>
                     </ul>
                 </div>
-            </NavBarTemplate>
+            </MainPageNav>
             <Show when={selectedTheme() != null}>
                 <ThemeScope theme={selectedTheme()!}>
                     <ThemeSettings theme={selectedTheme()!}></ThemeSettings>

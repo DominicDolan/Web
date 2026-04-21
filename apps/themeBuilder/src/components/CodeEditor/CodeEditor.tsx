@@ -2,7 +2,7 @@ import {EditorView, minimalSetup} from "codemirror";
 import "./CodeEditor.module.css"
 import {Extension} from "@codemirror/state";
 import {autocompletion, closeBrackets} from "@codemirror/autocomplete";
-import {onChangeExtension} from "~/app/common/CodeEditor/CodeEditorPlugins";
+import {onChangeExtension} from "~/components/CodeEditor/CodeEditorPlugins";
 
 function toExtensionArray(ext?: Extension | readonly Extension[]): readonly Extension[] {
     if (ext == null) return [];

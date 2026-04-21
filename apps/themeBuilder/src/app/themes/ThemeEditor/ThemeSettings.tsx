@@ -129,7 +129,7 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                             </A>
                         </li>
                         <li>
-                            <A class={"flex flex-row gap-2"} href={`/editor/${props.theme.id}/fonts`}>
+                            <A class={"flex flex-row gap-2"} href={`/editor/${props.theme.id}/typography`}>
                                 <i>format_size</i>
                                 <span>Edit Fonts</span>
                                 <i class="ml-auto">keyboard_arrow_right</i>
@@ -146,7 +146,7 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                 </section>
             </div>
             <Switch>
-                <Match when={location.segments()[2] === "fonts"}>
+                <Match when={location.segments()[2] === "typography"}>
                     <TypographyList/>
                 </Match>
                 <Match when={location.segments()[2] === "elements"}>

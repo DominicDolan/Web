@@ -5,9 +5,21 @@ import ContactUs from "~/app/contact/ContactUs/ContactUs";
 import {ThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 import {ColorScope} from "~/app/colors/ColorEditor/ColorScope";
 import {ColorEditor} from "~/app/colors/ColorEditor/ColorEditor";
+import {TypographyScope} from "~/app/typography/TypographyEditor/TypographyScope";
+import {TypographyEditor} from "~/app/typography/TypographyEditor/TypographyEditor";
+import {TypefaceRole, typefaceRoles, TypefaceSize, typefaceSizes, TypefaceType} from "~/constants/TypefaceRoles";
 
 export default function App() {
     const location = useLocation();
+
+    function matchesTypographyPath() {
+        const segments = location.segments()
+        const hasRole = segments[3] != null && typefaceRoles.includes(segments[3].toLowerCase() as any)
+        const hasSize = segments[4] != null && typefaceSizes.includes(segments[4].toLowerCase() as any)
+        const hasType = segments[5] == null || segments[5] === "variant" || segments[5] === "default"
+
+        return segments[0] === "editor" && segments[2] === "typography" && hasRole && hasSize && hasType;
+    }
 
     return (
         <div class="minimalTheme light h-full">
@@ -16,6 +28,15 @@ export default function App() {
                     <ColorScope themeId={location.segments()[1]} colorId={location.segments()[3]}>
                         <ColorEditor/>
                     </ColorScope>
+                </Match>
+                <Match when={matchesTypographyPath()}>
+                    <TypographyScope
+                        themeId={location.segments()[1]}
+                        role={location.segments()[3] as TypefaceRole}
+                        size={location.segments()[4] as TypefaceSize}
+                        type={location.segments()[5] == null ? "default" : location.segments()[5] as TypefaceType}>
+                        <TypographyEditor/>
+                    </TypographyScope>
                 </Match>
                 <Match when={location.path() === "/" || location.segments()[0] === "editor"}>
                     <Show when={location.path() === "/"}>

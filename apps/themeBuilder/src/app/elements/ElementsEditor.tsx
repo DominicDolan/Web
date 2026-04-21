@@ -1,5 +1,5 @@
 import {A, createAsync, RouteSectionProps, useNavigate} from "@solidjs/router";
-import NavBarTemplate from "~/app/common/NavBarTemplate";
+import MainPageNav from "~/components/MainPageNav";
 import {ElementStyleProvider, useElementStyleScope} from "~/app/elements/repository/ElementStyleStore";
 import {getElementStylesQuery} from "~/app/elements/repository/ElementStyleRepository";
 import {ElementsEditorItems} from "~/app/elements/ElementsEditorItems/ElementsEditorItems";
@@ -91,9 +91,9 @@ export default function ElementsEditor(props: RouteSectionProps<undefined>) {
     return <Suspense>
         <ElementStyleProvider themeId={themeId!!} deltas={elementStyleDeltas()} use={useElementStyleScope}>
         {({elementStyles, cssContent}) => <div grid-cols={"[20rem,1fr]"} sizing={"h-full"}>
-            <NavBarTemplate prepend={<button class={"icon flat surface"} sizing={"w-2.5rem h-2.5rem"}
-                                             spacing={"ma-0.5rem"}
-                                             flex={"row center justify-center"} onClick={goBack}>
+            <MainPageNav prepend={<button class={"icon flat surface"} sizing={"w-2.5rem h-2.5rem"}
+                                          spacing={"ma-0.5rem"}
+                                          flex={"row center justify-center"} onClick={goBack}>
                                 <i>arrow_back</i>
                             </button>}>
 
@@ -114,7 +114,7 @@ export default function ElementsEditor(props: RouteSectionProps<undefined>) {
                         </li>
                     </ul>
                 </section>
-            </NavBarTemplate>
+            </MainPageNav>
             <div ref={setScrollContainer} sizing={"h-full"} style={"overflow-y: auto"}>
                 <ElementsEditorItems styles={elementStyles}/>
             </div>

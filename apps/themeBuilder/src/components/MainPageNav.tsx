@@ -1,8 +1,8 @@
-import Title from "~/app/common/Title";
+import Title from "~/components/Title";
 import {Show} from "solid-js";
 
 
-export default function NavBarTemplate(props: { children?: any, class?: string, prepend?: any, loading?: boolean }) {
+export default function MainPageNav(props: { children?: any, class?: string, prepend?: any, loading?: boolean }) {
 
     return <nav class={`pageNav ${props.class} py-4 px-6 flex flex-col gap-8`}>
         <div class="flex flex-row gap-2 items-center">
