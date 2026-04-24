@@ -3,7 +3,7 @@ import {camelToTitleCase} from "@web/utils/StringCasing.js";
 import {createSignal, For} from "solid-js";
 import {defaultTypefacesQueryObject} from "~/constants/DefaultTypefaces";
 import {useNavigate} from "@web/router";
-import {useTypographyListScope} from "~/app/typography/TypographyList/TypographyListScope";
+import {useTypefaceListScope} from "~/app/typography/TypefaceList/TypefaceListScope";
 
 export function TypefaceRoleItem(props: {role: TypefaceRole}) {
 
@@ -14,7 +14,7 @@ export function TypefaceRoleItem(props: {role: TypefaceRole}) {
         if (size === "large") return "Lg"
         return ""
     }
-    const {theme} = useTypographyListScope()
+    const {theme, getCssOrDefault} = useTypefaceListScope()
     const navigate = useNavigate()
     function onTypefaceClicked(size: TypefaceSize) {
         navigate(`/editor/${theme().id}/typography/${props.role}/${size}/${type()}`)
@@ -37,7 +37,7 @@ export function TypefaceRoleItem(props: {role: TypefaceRole}) {
                             {camelToTitleCase(size())}
                             <code>.{props.role + getSizeSuffix(size()) + (type() === "variant" ? ".variant" : "")}</code>
                         </hgroup>
-                        <article class="inset flex flex-col gap-2" style={defaultTypefacesQueryObject[props.role][type()][size()].css}>
+                        <article class="inset flex flex-col gap-2" style={getCssOrDefault(props.role, type(), size())}>
                             {camelToTitleCase(props.role) + " Text"}
                         </article>
                     </article>

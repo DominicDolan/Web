@@ -5,8 +5,8 @@ import ContactUs from "~/app/contact/ContactUs/ContactUs";
 import {ThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 import {ColorScope} from "~/app/colors/ColorEditor/ColorScope";
 import {ColorEditor} from "~/app/colors/ColorEditor/ColorEditor";
-import {TypographyScope} from "~/app/typography/TypographyEditor/TypographyScope";
-import {TypographyEditor} from "~/app/typography/TypographyEditor/TypographyEditor";
+import {TypefaceScope} from "~/app/typography/TypefaceEditor/TypefaceScope";
+import {TypefaceEditor} from "~/app/typography/TypefaceEditor/TypefaceEditor";
 import {TypefaceRole, typefaceRoles, TypefaceSize, typefaceSizes, TypefaceType} from "~/constants/TypefaceRoles";
 
 export default function App() {
@@ -30,13 +30,13 @@ export default function App() {
                     </ColorScope>
                 </Match>
                 <Match when={matchesTypographyPath()}>
-                    <TypographyScope
+                    <TypefaceScope
                         themeId={location.segments()[1]}
                         role={location.segments()[3] as TypefaceRole}
                         size={location.segments()[4] as TypefaceSize}
                         type={location.segments()[5] == null ? "default" : location.segments()[5] as TypefaceType}>
-                        <TypographyEditor/>
-                    </TypographyScope>
+                        <TypefaceEditor/>
+                    </TypefaceScope>
                 </Match>
                 <Match when={location.path() === "/" || location.segments()[0] === "editor"}>
                     <Show when={location.path() === "/"}>

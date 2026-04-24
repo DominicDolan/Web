@@ -14,7 +14,7 @@ export const getElementStylesQuery = query(async (themeId: string) => {
     "use server"
     const db = useDatabaseTable(elementStyleDefinition)
 
-    const definitions = await db.getManyBy("theme", themeId)
+    const definitions = await db.getMany().byColumn("theme", themeId).execute()
 
     return deltaArrayToGroup(definitions)
 }, "getElementStyles")

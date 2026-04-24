@@ -3,7 +3,7 @@ import {A, useLocation, useNavigate} from "@web/router";
 import {useThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 import {ThemeDefinition} from "~/models/ThemeDefinition";
 import ColorList from "~/app/colors/ColorList/ColorList";
-import {TypographyList} from "~/app/typography/TypographyList/TypographyList";
+import {TypefaceList} from "~/app/typography/TypefaceList/TypefaceList";
 
 export default function ThemeSettings(props: { children?: any, theme: ThemeDefinition }) {
 
@@ -147,7 +147,7 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
             </div>
             <Switch>
                 <Match when={location.segments()[2] === "typography"}>
-                    <TypographyList/>
+                    <TypefaceList/>
                 </Match>
                 <Match when={location.segments()[2] === "elements"}>
                     <div>Elements</div>

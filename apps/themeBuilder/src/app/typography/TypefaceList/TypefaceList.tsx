@@ -1,9 +1,9 @@
 import {For} from "solid-js";
 import {typefaceRoles} from "~/constants/TypefaceRoles";
-import {TypefaceRoleItem} from "~/app/typography/TypographyList/TypefaceRoleItem";
+import {TypefaceRoleItem} from "~/app/typography/TypefaceList/TypefaceRoleItem";
 
 
-export function TypographyList() {
+export function TypefaceList() {
 
     return <div class={"flex flex-col gap-8 p-8"}>
         <hgroup class={"flex flex-row gap-2 items-center justify-between"}>

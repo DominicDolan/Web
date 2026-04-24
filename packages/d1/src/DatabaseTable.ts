@@ -11,6 +11,16 @@ type ModelEventRow = {
     timestamp: number
 }
 
+type GetManyBuilder<M extends Model> = PromiseLike<ModelDelta<M>[]> & {
+    byColumn(column: string, value: unknown): GetManyBuilder<M>
+    byPath(path: string, value: unknown): GetManyBuilder<M>
+    execute(): Promise<ModelDelta<M>[]>
+}
+
+function quoteIdentifier(identifier: string) {
+    return `"${identifier.replaceAll(`"`, `""`)}"`
+}
+
 function convertEventRowToModelDelta<M extends Model>(row: ModelEventRow): ModelDelta<M> {
     let value = row.value;
     if (typeof value === "string") {
@@ -44,17 +54,64 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
         console.log(e)
     }
 
+    const quotedTableName = quoteIdentifier(String(tableName))
+
+    async function runGetManyQuery(columnFilters: Array<[string, unknown]>, pathFilters: Array<[string, unknown]>) {
+        const sourceAlias = "source_rows"
+        const filterAlias = "matching_rows"
+        const conditions: string[] = []
+        const bindValues: unknown[] = []
+
+        for (const [column, value] of columnFilters) {
+            conditions.push(`EXISTS (SELECT 1 FROM ${quotedTableName} AS ${filterAlias} WHERE ${filterAlias}.id = ${sourceAlias}.id AND ${filterAlias}.${quoteIdentifier(column)} = ?)`)
+            bindValues.push(value)
+        }
+
+        for (const [path, value] of pathFilters) {
+            conditions.push(`EXISTS (SELECT 1 FROM ${quotedTableName} AS ${filterAlias} WHERE ${filterAlias}.id = ${sourceAlias}.id AND ${filterAlias}.path = ? AND ${filterAlias}.value = ?)`)
+            bindValues.push(path, value)
+        }
+
+        const whereClause = conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : ""
+        const sql = `SELECT ${sourceAlias}.id, ${sourceAlias}.path, ${sourceAlias}.value, MAX(${sourceAlias}.timestamp) as timestamp FROM ${quotedTableName} AS ${sourceAlias}${whereClause} GROUP BY ${sourceAlias}.id, ${sourceAlias}.path;`
+
+        const {results} = await db.prepare(sql)
+            .bind(...bindValues)
+            .all<ModelEventRow>()
+
+        return results.map(convertEventRowToModelDelta<M>).toSorted((a, b) => a.timestamp - b.timestamp)
+    }
+
+    function createGetManyBuilder(): GetManyBuilder<M> {
+        const columnFilters: Array<[string, unknown]> = []
+        const pathFilters: Array<[string, unknown]> = []
+
+        const execute = () => runGetManyQuery(columnFilters, pathFilters)
+
+        const builder: GetManyBuilder<M> = {
+            byColumn(column: string, value: unknown) {
+                columnFilters.push([column, value])
+                return builder
+            },
+            byPath(path: string, value: unknown) {
+                pathFilters.push([path, value])
+                return builder
+            },
+            execute,
+            then(onfulfilled, onrejected) {
+                return execute().then(onfulfilled, onrejected)
+            }
+        }
+
+        return builder
+    }
+
     return {
         async getAll() {
-            const sql = `SELECT id, path, value, MAX(timestamp) as timestamp FROM "${tableName}" GROUP BY id, path;`
-
-            const {results} = await db.prepare(sql)
-                .all<ModelEventRow>()
-
-            return results.map(convertEventRowToModelDelta<M>).toSorted((a, b) => a.timestamp - b.timestamp)
+            return runGetManyQuery([], [])
         },
         async getOne(id: string) {
-            const sql = `SELECT id, path, value, MAX(timestamp) as timestamp FROM "${tableName}" WHERE id = ? GROUP BY path;`
+            const sql = `SELECT id, path, value, MAX(timestamp) as timestamp FROM ${quotedTableName} WHERE id = ? GROUP BY path;`
 
             const {results} = await db.prepare(sql)
                 .bind(id)
@@ -62,14 +119,8 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
 
             return results.map(convertEventRowToModelDelta<M>).toSorted((a, b) => a.timestamp - b.timestamp)
         },
-        async getManyBy(column: string, value: string) {
-            const sql = `SELECT id, path, value, MAX(timestamp) as timestamp FROM "${tableName}" WHERE "${column}" = ? GROUP BY id, path;`
-
-            const {results} = await db.prepare(sql)
-                .bind(value)
-                .all<ModelEventRow>()
-
-            return results.map(convertEventRowToModelDelta<M>).toSorted((a, b) => a.timestamp - b.timestamp)
+        getMany() {
+            return createGetManyBuilder()
         },
         async insert(delta: ModelDelta<M> | ModelDelta<M>[], extra?: Record<string, unknown>) {
 
@@ -84,7 +135,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
 
 
             const valueSets = deltaArray.map(() => `(${placeholders})`).join(', ')
-            const sql = `INSERT INTO "${tableName}" (${columns}) VALUES ${valueSets}`
+            const sql = `INSERT INTO ${quotedTableName} (${columns}) VALUES ${valueSets}`
 
             await db.prepare(sql).bind(
                 ...deltaArray.flatMap(delta => [

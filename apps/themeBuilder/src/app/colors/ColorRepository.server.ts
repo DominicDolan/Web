@@ -1,9 +1,8 @@
 "use server"
 
-import {useDatabaseTable} from "@web/d1";
+import {getDB, useDatabaseTable} from "@web/d1";
 import {ModelDelta} from "@web/solid-delta";
 import {ColorDefinition, colorDefinitionSchema} from "~/models/ColorDefinition";
-import {getDB} from "@web/d1";
 
 export type ColorPaletteRow = {
     id: number;
@@ -23,7 +22,9 @@ export type ColorPaletteRow = {
 export async function getColorDeltas(themeId: string) {
     const db = useDatabaseTable(colorDefinitionSchema)
 
-    return (await db.getManyBy("theme", themeId)) as ModelDelta<ColorDefinition>[]
+    return await db.getMany()
+        .byColumn("theme", themeId)
+        .execute() as ModelDelta<ColorDefinition>[]
 }
 
 export async function getSingleColorDelta(colorId: string) {
