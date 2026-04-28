@@ -1,3 +1,5 @@
+"use server"
+
 import {useDatabaseTable} from "@web/d1";
 import {ModelDelta} from "@web/solid-delta";
 import {TypefaceDefinition, typefaceDefinitionSchema} from "~/models/TypefaceDefinition";
@@ -27,4 +29,10 @@ export async function getSingleTypefaceDeltas(themeId: string, role: TypefaceRol
         .byPath("size", size)
         .byPath("type", type)
         .execute()
+}
+
+export async function saveTypeface(typefaceDeltas: ModelDelta<TypefaceDefinition>[], themeId: string) {
+    if (typefaceDeltas.length === 0) return
+    const db = useDatabaseTable(typefaceDefinitionSchema)
+    await db.insert(typefaceDeltas, {theme: themeId})
 }

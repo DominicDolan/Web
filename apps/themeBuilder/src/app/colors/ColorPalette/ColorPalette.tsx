@@ -149,7 +149,7 @@ export function ColorPalette(props: { selected: ColorDefinition, onColorClicked:
                     <i>palette</i>
                     <span>All</span>
                 </button>
-                <ul role="radiogroup" class="flex flex-row gap-2 px-3 py-2">
+                <ul role="tablist" class="inset flex flex-row gap-2 px-3 py-2">
                     <li role="button" class={`px-4 py-2 flex gap-1 items-center ${ selectedFilter() === "tailwind" ? 'active' : ''}`} onClick={() => setFilter("tailwind")}>
                         <img src="/img/tailwind-icon.svg" alt="Tailwind CSS Icon" class="aspect-square w-5"/>
                         <span>Tailwind</span>

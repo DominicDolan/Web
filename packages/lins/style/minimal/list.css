@@ -152,7 +152,7 @@
             }
         }
 
-        ul[role="radiogroup"] {
+        ul[role="tablist"].inset {
             isolation: isolate;
             --current-color: var(--active-color, var(--primary-color));
             --on-current-color: var(--on-active-color, var(--on-primary-color));
@@ -163,9 +163,17 @@
                 inset 0 1px 2px -1px var(--shadow-color);
             border-radius: var(--border-radius);
 
+            display: inline-flex;
+            padding-block: 0.5rem;
+            gap: 0.5rem;
+            padding-inline: 0.5rem;
+
             anchor-scope: all;
 
             & > li {
+                padding-inline: 0.6rem;
+                padding-block: 0.4rem;
+                cursor: pointer;
                 &.active, &:has(.active) {
                     color: var(--current-color);
                     anchor-name: --active;
