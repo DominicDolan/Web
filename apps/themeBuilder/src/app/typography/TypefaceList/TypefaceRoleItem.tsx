@@ -31,9 +31,9 @@ export function TypefaceRoleItem(props: {role: TypefaceRole}) {
         <div class="grid grid-cols-3 gap-8">
             <For each={typefaceSizes}>
                 {(size) => <>
-                    <article class="tonal flex flex-col gap-4" role="button" onClick={() => onTypefaceClicked(size())}>
+                    <article class="flat flex flex-col gap-4" role="button" onClick={() => onTypefaceClicked(size())}>
                         <hgroup class="flex flex-row justify-between gap-2">
-                            {camelToTitleCase(size())}
+                            {camelToTitleCase(props.role)} {camelToTitleCase(size())}
                             <code>.{props.role + getSizeSuffix(size()) + (type() === "variant" ? ".variant" : "")}</code>
                         </hgroup>
                         <article class="inset flex flex-col gap-2" style={getCssOrDefault(props.role, type(), size())}>

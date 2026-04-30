@@ -21,7 +21,7 @@ export default function ThemeEditor() {
         <div class={"grid grid-cols-[14rem_20rem_1fr] w-full h-full"}>
             <MainPageNav class={"themeEditor"}>
                 <div class={"w-full flex flex-col gap-6"}>
-                    <button onClick={() => addNewTheme()} class="flex flex-row gap-2 items-center"><i>add</i><span>Add Theme</span></button>
+                    <button onClick={() => addNewTheme()} class="flat surface flex flex-row gap-2 items-center"><i>add</i><span>Add Theme</span></button>
                     <ul class="nav flex flex-col gap-4 w-full pl-0">
                         <For each={themes}>
                             {(theme) => <li>

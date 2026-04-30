@@ -19,11 +19,13 @@
         --secondary-color: #3d3846;
         --on-secondary-color: white;
 
-        --surface-color: #f6f5f4;
+        --surface-color: white;
         --on-surface-color: var(--primary-color);
 
-        --background-color: #FFFFFF;
+        --background-color: oklch(from black 0.92 c h);
         --on-background: black;
+
+        --accent-color: #00A544;
 
         --success-color: #26a269;
         --on-success-color: white;
@@ -73,18 +75,27 @@
         --on-active-color: var(--on-background);
     }
 
-    html {
+    html, body, #app, .minimalTheme {
         background: var(--background-color);
         background-size: cover;
     }
 
-    #app .pageNav, #app .themeSettings {
-        background-color: var(--surface-color);
+    #app .pageNav, #app {
         color: var(--on-surface-color);
         border-right: 1px solid var(--shadow-color);
     }
 
+    .pageNav, .themeSettings {
+        background-color: oklch(from blue l c h / 0.03);
+    }
+
     #app .themeSettings {
-        box-shadow: 8px 0 12px -1px var(--shadow-color);
+        box-shadow: 8px 0 12px -5px var(--shadow-color);
+    }
+
+    .content {
+        position: relative;
+
+        background: transparent;
     }
 }

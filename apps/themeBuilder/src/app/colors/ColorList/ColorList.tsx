@@ -23,6 +23,7 @@ export default function ColorList() {
                     color => <ColorEditCard
                         name={variableNameToTitle(color().name)}
                         color={color().hex}
+                        textColor={color().onHex}
                         onClick={() => onColorClicked(color())} />}
                 </For>
                 <ColorAddCard />

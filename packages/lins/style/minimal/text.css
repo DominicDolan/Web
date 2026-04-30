@@ -70,13 +70,18 @@
     h6, .headlineSm {
         font-size: 1.5rem;
     }
+
+
     .titleLg {
         font-size: 1.25rem;
-        line-height: 1.2;
         font-weight: 700;
+        line-height: 1.2;
     }
-    .title {
+    :where(article > hgroup, article > h3), .title {
         font-size: 1.125rem;
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--accent-color);
     }
     .titleSm {
         font-size: 1rem;
@@ -84,7 +89,7 @@
     .bodyLg {
         font-size: 1rem;
     }
-    .body {
+    :where(ul > *), .body {
         font-size: 0.875rem;
     }
     .bodySm {
@@ -169,11 +174,10 @@
 
     hgroup > code {
         font-size: 0.875rem;
-        background-color: var(--background-color);
     }
 
     code {
-        background-color: var(--surface-color);
+        background-color: var(--background-color);
         border-radius: 6px;
         padding: 0.25rem;
 

@@ -2,7 +2,7 @@ import style from "../colors.module.css"
 import { createMemo } from "solid-js"
 import {useColorUtils} from "~/app/colors/ColorUtils";
 
-export function ColorEditCard(props: { name: string, color: string, onClick: () => void }) {
+export function ColorEditCard(props: { name: string, color: string, textColor: string, onClick: () => void }) {
     const {rgb, hsl, contrastRatio, bestContrast} = useColorUtils(() => props.color)
 
     const largeTextSuccess = createMemo(() => contrastRatio() >= 4.5)
@@ -25,12 +25,12 @@ export function ColorEditCard(props: { name: string, color: string, onClick: () 
         "error": smallTextError(),
     })
 
-    return <article class={"tonal flex flex-col gap-4"} onClick={props.onClick} role="button">
+    return <article class={"flat flex flex-col gap-4"} onClick={props.onClick} role="button">
         <hgroup>
             <h3>{props.name}&nbsp;</h3>
         </hgroup>
         <div class={[style.colorPresentation, "w-full h-30 relative flex items-center justify-center font-bold text-xl"]}
-             style={`--presentation-color: ${props.color}; color: ${bestContrast()}`}>
+             style={`--presentation-color: ${props.color}; color: ${props.textColor}`}>
             <code class="absolute right-2 bottom-2">{props.color}</code>
         </div>
         <div class={"flex flex-col gap-2"}>
@@ -47,7 +47,7 @@ export function ColorEditCard(props: { name: string, color: string, onClick: () 
         <div class={"flex flex-col gap-2"}>
             <div class="flex flex-row justify-between">
                 <span>Text</span>
-                <code>{bestContrast()}</code>
+                <code>{props.textColor}</code>
             </div>
             <div class="flex flex-row justify-between items-center">
                 <div class={"flex flex-col"}>

@@ -106,7 +106,7 @@ export function ColorPalette(props: { selected: ColorDefinition, onColorClicked:
     return <article class="elevated h-full flex flex-col gap-2">
         <hgroup class="flex flex-row justify-between items-center">
             <div class="flex flex-row gap-4 items-center w-160">
-                <input-shell class="flat h-12 py-2 flex-1 flex flex-row gap-2 items-center">
+                <input-shell class="outlined h-12 py-2 flex-1 flex flex-row gap-2 items-center">
                     <i>search</i>
                     <input
                         value={searchTerm()}
@@ -120,7 +120,7 @@ export function ColorPalette(props: { selected: ColorDefinition, onColorClicked:
                         </button>
                     </Show>
                 </input-shell>
-                <input-shell class={["flat h-12 py-2 flex flex-row gap-4 items-center"]}>
+                <input-shell class={["outlined h-12 py-2 flex flex-row gap-4 items-center"]}>
                     <i>filter_list</i>
                     <button onClick={(e) => onSortClicked("red", e)}
                             class={[style.colorFilterButton, style.red, { [style.active]: colorToSort() === "red"}, "flat flex items-center gap-2 aspect-square w-4 p-3"]}>

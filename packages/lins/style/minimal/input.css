@@ -65,9 +65,9 @@
 
     @scope (body) to (.elementsPreview) {
         input:not([type=radio]):not([type=checkbox]):not([type=range]), textarea, select, input-shell {
-            border-radius: 0.25rem;
+            border-radius: 0.5rem;
 
-            :where(&), &.outlined {
+            &.outlined {
                 --outline-color: oklab(from var(--current-color) 70% a b);
                 outline: 1px solid var(--outline-color);
                 background-color: transparent;
@@ -79,7 +79,7 @@
                 outline: none;
             }
 
-            &.flat {
+            :where(&), &.flat {
                 background-color: var(--on-current-color);
                 color: var(--current-color);
                 outline: none;
@@ -88,6 +88,10 @@
             &.tonal {
                 background-color: color-mix(in srgb, var(--current-color) 10%, var(--surface-color));
             }
+        }
+
+        input[type=checkbox], input[type=radio], input[type=range] {
+            accent-color: var(--accent-color);
         }
     }
 }

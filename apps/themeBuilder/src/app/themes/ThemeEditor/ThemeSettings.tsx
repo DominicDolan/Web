@@ -120,7 +120,7 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                 <hr class={"w-full"}/>
                 <section class={"w-full flex flex-col gap-4 mt-10 mb-8"}>
                     <h2 class={"mb-2"}>Edit Theme</h2>
-                    <ul class={"plain flex flex-col"}>
+                    <ul class={"plain flex flex-col gap-1"}>
                         <li>
                             <A class={"flex flex-row gap-2"} href={`/editor/${props.theme.id}/colors`}>
                                 <i>palette</i>
@@ -145,17 +145,19 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                     </ul>
                 </section>
             </div>
-            <Switch>
-                <Match when={location.segments()[2] === "typography"}>
-                    <TypefaceList/>
-                </Match>
-                <Match when={location.segments()[2] === "elements"}>
-                    <div>Elements</div>
-                </Match>
-                <Match when={location.segments()[2] === "colors"}>
-                    <ColorList/>
-                </Match>
-            </Switch>
+            <div class="content overflow-y-auto">
+                <Switch>
+                    <Match when={location.segments()[2] === "typography"}>
+                        <TypefaceList/>
+                    </Match>
+                    <Match when={location.segments()[2] === "elements"}>
+                        <div>Elements</div>
+                    </Match>
+                    <Match when={location.segments()[2] === "colors"}>
+                        <ColorList/>
+                    </Match>
+                </Switch>
+            </div>
         </Loading>
     </>
 }

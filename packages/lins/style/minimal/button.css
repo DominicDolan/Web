@@ -38,7 +38,7 @@
         border-radius: 0.375rem;
     }
 
-    button, button.outlined {
+    :where(button), button.outlined {
         --current-color: var(--active-color, var(--primary-color));
         color: var(--current-color);
 
@@ -70,7 +70,9 @@
     }
 
     button.flat {
-
+        box-shadow: none;
+        --outline-color: oklab(from var(--current-color) 80% a b);
+        border: 1px solid var(--outline-color);
         &:hover, &:focus-visible {
             background: color-mix(in oklab, var(--on-current-color) 15%, var(--current-color));
         }

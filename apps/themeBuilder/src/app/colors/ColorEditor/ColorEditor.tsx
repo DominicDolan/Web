@@ -90,7 +90,7 @@ export function ColorEditor() {
                         <section class="flex flex-col gap-8">
                             <h2>On {colorName()}</h2>
                             <div class="grid grid-cols-[1fr_1fr] gap-y-8 gap-x-4 px-4">
-                                <form-field>
+                                <form-field class="flex flex-col">
                                     <label for="onColorVariableName">Variable Name</label>
                                     <input id="onColorVariableName" disabled value={onColorVariableName()} class="w-full"/>
                                 </form-field>
@@ -112,7 +112,7 @@ export function ColorEditor() {
                                                 value={onColorHex()}
                                                 onInput={e => updateHex(e.currentTarget.value, true)}/>
                                         </input-shell>
-                                        <button class={isOnColorSynced() ? "outlined active" : "outlined"} onClick={() => setIsOnColorSynced(!isOnColorSynced())}>
+                                        <button class={[isOnColorSynced() ? "outlined active" : "outlined", "py-1 px-2 flex flex-row items-center"]} onClick={() => setIsOnColorSynced(!isOnColorSynced())}>
                                             <i>sync</i>
                                         </button>
                                     </div>

@@ -30,9 +30,18 @@
                     0 4px 6px -1px var(--shadow-color);
         }
 
+        :where(&.flat) {
+            box-shadow: none;
+        }
+
         :where(& &), &.outlined {
             border: 1px solid color-mix(in oklab, var(--current-color) 50%, transparent);
             box-shadow: none;
+        }
+
+        &[role="button"]:hover {
+            box-shadow:
+                    0 4px 10px -1px var(--shadow-color);
         }
 
         &.tonal {
@@ -40,13 +49,10 @@
             color: var(--current-color);
             box-shadow: none;
 
-            &[role="button"]:hover {
-                box-shadow:
-                        0 4px 10px -1px var(--shadow-color);
-            }
         }
 
         &.inset {
+            border: none;
             background-color: var(--background-color);
             box-shadow: inset 0 2px 4px -1px var(--shadow-color),
             inset 0 1px 2px -1px var(--shadow-color);
