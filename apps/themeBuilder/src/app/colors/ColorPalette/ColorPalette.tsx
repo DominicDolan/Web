@@ -103,7 +103,7 @@ export function ColorPalette(props: { selected: ColorDefinition, onColorClicked:
         return sorted.filter(color => color.color_name.toLowerCase().includes(searchTerm().toLowerCase()))
     })
 
-    return <article class="elevated h-full flex flex-col gap-2">
+    return <article class="elevated h-full flex flex-col gap-2 overflow-auto">
         <hgroup class="flex flex-row justify-between items-center">
             <div class="flex flex-row gap-4 items-center w-160">
                 <input-shell class="outlined h-12 py-2 flex-1 flex flex-row gap-2 items-center">

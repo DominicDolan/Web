@@ -44,7 +44,7 @@ export function ColorEditor() {
 
     return <Loading>
         <SubPageTemplate onBackClicked={onBackClicked} title={"Edit Color"} backButtonText={"Back to Palette"} >
-            <div class="grid grid-cols-[1fr_2fr] gap-x-8">
+            <div class="grid grid-cols-[1fr_2fr] gap-x-8 h-full min-h-0">
                 <div class="flex flex-col gap-8 px-4">
                     <div class="flex flex-col gap-12 px-8">
                         <section class="flex flex-col gap-2">
