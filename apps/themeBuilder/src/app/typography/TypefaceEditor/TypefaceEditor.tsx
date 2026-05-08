@@ -1,7 +1,8 @@
 import {useTypefaceScope} from "~/app/typography/TypefaceEditor/TypefaceScope";
 import {SubPageTemplate} from "~/components/SubPageTemplate";
 import {useNavigate} from "@web/router";
-import {createMemo, createSignal, Loading, Match, Switch, type JSX} from "solid-js";
+import {createMemo, createSignal, Loading, Match, Switch, type JSX, Accessor} from "solid-js";
+import {Dynamic} from "@solidjs/web";
 
 type TextPropertyKey =
     | "font-family"
@@ -16,11 +17,14 @@ type TextPropertyKey =
 
 type PropertyConfig = {
     key: TextPropertyKey;
-    id: string;
+    component: (props: {onInput: (value: string) => void, value: Accessor<string> }) => JSX.Element;
+};
+
+type ButtonOption = {
     label: string;
-    placeholder?: string;
-    type?: JSX.InputHTMLAttributes<HTMLInputElement>["type"];
-    options?: {label: string, value: string}[];
+    value: string;
+    icon?: string;
+    preview?: JSX.Element;
 };
 
 const propertyOrder: TextPropertyKey[] = [
@@ -35,83 +39,182 @@ const propertyOrder: TextPropertyKey[] = [
     "text-align",
 ];
 
+function ButtonRowField(props: {
+    id: string;
+    label: string;
+    value: Accessor<string>;
+    onInput: (value: string) => void;
+    options: ButtonOption[];
+}) {
+    return <form-field class="flex flex-col gap-2">
+        <label for={props.id}>{props.label}</label>
+        <div id={props.id} role="radiogroup" aria-label={props.label} class="flex flex-wrap">
+            {props.options.map((option) => {
+                const isActive = () => props.value() === option.value;
+
+                return <button
+                    type="button"
+                    title={option.label}
+                    class={`outlined inline-flex min-w-9 items-center justify-center${isActive() ? " active" : ""}`}
+                    onClick={() => props.onInput(option.value)}>
+                    {option.icon ? <i>{option.icon}</i> : option.preview}
+                </button>
+            })}
+        </div>
+    </form-field>
+}
+
 const propertyFields: PropertyConfig[] = [
     {
         key: "font-family",
-        id: "fontFamily",
-        label: "Font Family",
-        placeholder: "\"Roboto Flex\", sans-serif",
+        component({onInput, value}) {
+            return <form-field class="flex flex-col gap-2">
+                <label for="fontFamily">Font Family</label>
+                <input-shell class="outlined flex gap-2 h-full p-2">
+                    <input
+                        id="fontFamily"
+                        type="text"
+                        placeholder="Roboto Flex, sans-serif"
+                        value={value()}
+                        onInput={(event) => onInput(event.currentTarget.value)}/>
+                </input-shell>
+            </form-field>
+        }
     },
     {
         key: "font-size",
-        id: "fontSize",
-        label: "Font Size",
-        placeholder: "16px",
+        component({onInput, value}) {
+            return <form-field class="flex flex-col gap-2">
+                <label for="fontSize">Font Size</label>
+                <input-shell class="outlined flex gap-2 h-full p-2">
+                    <input
+                        id="fontSize"
+                        type="text"
+                        placeholder="16px"
+                        value={value()}
+                        onInput={(event) => onInput(event.currentTarget.value)}/>
+                </input-shell>
+            </form-field>
+        }
     },
     {
         key: "font-weight",
-        id: "fontWeight",
-        label: "Font Weight",
-        placeholder: "400",
+        component({onInput, value}) {
+            return <form-field class="flex flex-col gap-2">
+                <label for="fontWeight">Font Weight</label>
+                <input-shell class="flex gap-4 items-center h-full p-2">
+                    <input
+                        id="fontWeight"
+                        type="range"
+                        placeholder="400"
+                        value={value()}
+                        min={100}
+                        max={900}
+                        step={100}
+                        onInput={(event) => onInput(event.currentTarget.value)}/>
+                    <span>{value()}</span>
+                </input-shell>
+            </form-field>
+        }
     },
     {
         key: "line-height",
-        id: "lineHeight",
-        label: "Line Height",
-        placeholder: "24px",
+        component({onInput, value}) {
+            return <form-field class="flex flex-col gap-2">
+                <label for="lineHeight">Line Height</label>
+                <input-shell class="outlined flex gap-2 h-full p-2">
+                    <input
+                        id="lineHeight"
+                        type="text"
+                        placeholder="1.5"
+                        value={value()}
+                        onInput={(event) => onInput(event.currentTarget.value)}/>
+                </input-shell>
+            </form-field>
+        }
     },
     {
         key: "letter-spacing",
-        id: "letterSpacing",
-        label: "Letter Spacing",
-        placeholder: "0.15px",
+        component({onInput, value}) {
+            return <form-field class="flex flex-col gap-2">
+                <label for="letterSpacing">Letter Spacing</label>
+                <input-shell class="outlined flex gap-2 h-full p-2">
+                    <input
+                        id="letterSpacing"
+                        type="text"
+                        placeholder="0.15px"
+                        value={value()}
+                        onInput={(event) => onInput(event.currentTarget.value)}/>
+                </input-shell>
+            </form-field>
+        }
     },
     {
         key: "font-style",
-        id: "fontStyle",
-        label: "Font Style",
-        options: [
-            {label: "Default", value: ""},
-            {label: "Normal", value: "normal"},
-            {label: "Italic", value: "italic"},
-            {label: "Oblique", value: "oblique"},
-        ],
+        component({onInput, value}) {
+            return <ButtonRowField
+                id="fontStyle"
+                label="Font Style"
+                onInput={onInput}
+                value={value}
+                options={[
+                    {label: "Default", value: "", icon: "format_clear"},
+                    {label: "Normal", value: "normal", preview: <span class="text-sm leading-none">N</span>},
+                    {label: "Italic", value: "italic", icon: "format_italic"},
+                    {label: "Oblique", value: "oblique", preview: <span class="text-sm leading-none" style={{"font-style": "oblique"}}>O</span>},
+                ]}/>
+        }
     },
     {
         key: "text-transform",
-        id: "textTransform",
-        label: "Text Transform",
-        options: [
-            {label: "Default", value: ""},
-            {label: "None", value: "none"},
-            {label: "Uppercase", value: "uppercase"},
-            {label: "Lowercase", value: "lowercase"},
-            {label: "Capitalize", value: "capitalize"},
-        ],
+        component({onInput, value}) {
+            return <ButtonRowField
+                id="textTransform"
+                label="Text Transform"
+                onInput={onInput}
+                value={value}
+                options={[
+                    {label: "Default", value: "", icon: "format_clear"},
+                    {label: "None", value: "none", preview: <span class="text-sm leading-none">aB</span>},
+                    {label: "Uppercase", value: "uppercase", preview: <span class="text-sm leading-none">AB</span>},
+                    {label: "Lowercase", value: "lowercase", preview: <span class="text-sm leading-none">ab</span>},
+                    {label: "Capitalize", value: "capitalize", preview: <span class="text-sm leading-none">Ab</span>},
+                ]}/>
+        },
     },
     {
         key: "text-decoration",
-        id: "textDecoration",
-        label: "Text Decoration",
-        options: [
-            {label: "Default", value: ""},
-            {label: "None", value: "none"},
-            {label: "Underline", value: "underline"},
-            {label: "Overline", value: "overline"},
-            {label: "Line Through", value: "line-through"},
-        ],
+        component({onInput, value}) {
+            return <ButtonRowField
+                id="textDecoration"
+                label="Text Decoration"
+                onInput={onInput}
+                value={value}
+                options={[
+                    {label: "Default", value: "", icon: "format_clear"},
+                    {label: "None", value: "none", preview: <span class="text-sm leading-none">ab</span>},
+                    {label: "Underline", value: "underline", icon: "format_underlined"},
+                    {label: "Overline", value: "overline", preview: <span class="text-sm leading-none" style={{"text-decoration": "overline"}}>ab</span>},
+                    {label: "Line Through", value: "line-through", icon: "format_strikethrough"},
+                ]}/>
+        },
     },
     {
         key: "text-align",
-        id: "textAlign",
-        label: "Text Align",
-        options: [
-            {label: "Default", value: ""},
-            {label: "Left", value: "left"},
-            {label: "Center", value: "center"},
-            {label: "Right", value: "right"},
-            {label: "Justify", value: "justify"},
-        ],
+        component({onInput, value}) {
+            return <ButtonRowField
+                id="textAlign"
+                label="Text Align"
+                onInput={onInput}
+                value={value}
+                options={[
+                    {label: "Default", value: "", icon: "format_clear"},
+                    {label: "Left", value: "left", icon: "format_align_left"},
+                    {label: "Center", value: "center", icon: "format_align_center"},
+                    {label: "Right", value: "right", icon: "format_align_right"},
+                    {label: "Justify", value: "justify", icon: "format_align_justify"},
+                ]}/>
+        },
     },
 ];
 
@@ -226,27 +329,12 @@ export function TypefaceEditor() {
                             <Switch>
                                 <Match when={activeTab() === "properties"}>
                                     <div class="grid grid-cols-[1fr_1fr] gap-4 px-4 py-6">
-                                        {propertyFields.map((field) => (
-                                            <form-field class="flex flex-col gap-2">
-                                                <label for={field.id}>{field.label}</label>
-                                                {field.options ? (
-                                                    <select
-                                                        id={field.id}
-                                                        value={cssProperties()[field.key] ?? ""}
-                                                        onInput={(event) => updateProperty(field.key, event.currentTarget.value)}>
-                                                        {field.options.map((option) => (
-                                                            <option value={option.value}>{option.label}</option>
-                                                        ))}
-                                                    </select>
-                                                ) : (
-                                                    <input
-                                                        id={field.id}
-                                                        type={field.type ?? "text"}
-                                                        value={cssProperties()[field.key] ?? ""}
-                                                        placeholder={field.placeholder}
-                                                        onInput={(event) => updateProperty(field.key, event.currentTarget.value)}/>
-                                                )}
-                                            </form-field>
+                                        {propertyFields.map((field) => (<div>
+                                                <Dynamic
+                                                    component={field.component}
+                                                    onInput={(value: string) => updateProperty(field.key, value)}
+                                                    value={() => cssProperties()[field.key] ?? ""}/>
+                                            </div>
                                         ))}
                                     </div>
                                 </Match>
