@@ -58,6 +58,11 @@ export const retrieveTodos = () => {
     })
 }
 
-export const writeTodo = (delta: ModelDelta<Todo>) => {
-    databaseTodos.push(delta)
+export const writeTodo = async (delta: ModelDelta<Todo>) => {
+    return new Promise<void>((resolve, reject) => {
+        setTimeout(() => {
+            databaseTodos.push(delta)
+            resolve()
+        }, 500)
+    })
 }

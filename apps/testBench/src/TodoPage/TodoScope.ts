@@ -1,23 +1,37 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
-import {createMemo, storePath} from "solid-js";
-import {createDeltaStore} from "@web/solid-delta";
-import {retrieveTodos} from "~/TodoPage/TodoRepository.server";
+import {action, createMemo, createOptimisticStore, refresh, storePath} from "solid-js";
+import {createDeltaStore, ModelDelta} from "@web/solid-delta";
+import {retrieveTodos, Todo, writeTodo} from "~/TodoPage/TodoRepository.server";
 
 export const UserScope = createScopeProvider<{ userId: string }>()
 
 export const useTodoScope = defineScope(UserScope, (props) => {
 
-    const getTodos = createMemo(() => retrieveTodos())
+    const [getTodos, setOptimisticTodos] = createOptimisticStore(() => retrieveTodos(), [])
 
-    const [todos, setTodos] = createDeltaStore(getTodos)
+    const [todos, setTodos] = createDeltaStore(() => getTodos)
 
-    function markCompleteState(id: string, completed: boolean) {
-        setTodos(storePath(id, "completed", completed))
-    }
+    const markCompleteState = action(function* (id: string, value: boolean) {
+        // const deltas = setTodos(storePath(id, "text", text))
+        const delta: ModelDelta<Todo> = {id, path: "completed", value, timestamp: Date.now()}
+        setOptimisticTodos(store => {
+            store.push(delta)
+        })
+        yield writeTodo(delta)
 
-    function updateTodo(id: string, text: string) {
-        setTodos(storePath(id, "text", text))
-    }
+        refresh(getTodos)
+    })
+
+    const updateTodo = action(function* (id: string, text: string) {
+        // const deltas = setTodos(storePath(id, "text", text))
+        const delta: ModelDelta<Todo> = {id, path: "text", value: text, timestamp: Date.now()}
+        setOptimisticTodos(store => {
+            store.push(delta)
+        })
+        yield writeTodo(delta)
+
+        refresh(getTodos)
+    })
 
     function addTodo(text: string) {
         setTodos((draft) => {
@@ -30,6 +44,6 @@ export const useTodoScope = defineScope(UserScope, (props) => {
         todos,
         markCompleteState,
         updateTodo,
-        addTodo
+        addTodo, getTodos
     }
 })

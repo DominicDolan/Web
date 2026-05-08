@@ -18,19 +18,22 @@ function EditingTodoItem(props: { todo: PartialModel<Todo>, onSave: (value: stri
     </form>
 }
 export function TodoItem(props: { todo: Todo}) {
-    const {markCompleteState, updateTodo} = useTodoScope()
+    const {markCompleteState, updateTodo, getTodos} = useTodoScope()
 
     const [isEditing, setIsEditing] = createSignal(false)
 
     const [inputRef, setInputRef] = createSignal<HTMLInputElement | null>(null)
     function onSubmitted(e: any) {
         e.preventDefault()
+        setTimeout(() => {
+            setIsEditing(false)
+        }, 0)
         updateTodo(props.todo.id, inputRef()?.value ?? "")
-        setIsEditing(false)
     }
 
     return <>
         <div flex="row gap-2">
+            <div>Todo Deltas {JSON.stringify(getTodos)}</div>
             <Switch>
                 <Match when={isEditing()}>
                     <form class="flex gap-4" onSubmit={onSubmitted}>

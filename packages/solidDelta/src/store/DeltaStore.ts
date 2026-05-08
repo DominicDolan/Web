@@ -39,8 +39,8 @@ function insertValueByTimestamp<M extends Model>(arr: ModelDelta<M>[], el: Model
 }
 
 export const InternalKey = Symbol("InternalKey")
-
-export type SetModels<M extends Model> = StoreSetter<Record<string, Partial<Omit<M, "id" | "updatedAt">>>>
+export type SetModelsRecord<M extends Model> = Record<string, Partial<Omit<M, "id" | "updatedAt">>>
+export type SetModels<M extends Model> = (fn: (state: SetModelsRecord<M>) => SetModelsRecord<M> | void) => ModelDelta<M>[]
 
 /**
  * Creates a reactive delta-based store for managing a collection of models.
@@ -103,7 +103,7 @@ export type SetModels<M extends Model> = StoreSetter<Record<string, Partial<Omit
  * );
  * ```
  */
-export function createDeltaStore<M extends Model, Valid extends boolean = true>(initialData?: () => ModelDelta<M>[] | Promise<ModelDelta<M>[]>, opts?: { assumeValid: Valid }) {
+export function createDeltaStore<M extends Model, Valid extends boolean = true>(initialData?: () => readonly ModelDelta<M>[] | Promise<readonly ModelDelta<M>[]>, opts?: { assumeValid: Valid }) {
     const deltas = createMemo(initialData ?? (() => ([] as ModelDelta<M>[])))
 
     const [deltasLocal, setDeltasLocal] = createStore((store: ModelDelta<M>[]) => {
@@ -161,6 +161,8 @@ export function createDeltaStore<M extends Model, Valid extends boolean = true>(
         setTimeout(() => {
             refresh(models)
         })
+
+        return deltas
     }
 
     const store = [
