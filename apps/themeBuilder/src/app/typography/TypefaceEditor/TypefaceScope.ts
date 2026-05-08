@@ -37,19 +37,47 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
 
     function updateCss(css: string, debounceSaveChange = false) {
         setTypeface(old => {
-            const id = typefaces[0]?.id ?? Object.keys(old)[0] ?? createId()
+            const id = typefaces[0]?.id ?? createId()
 
             if (old[id] == null) {
                 old[id] = {
-                    role: props.role,
-                    size: props.size,
-                    type: props.type,
                     css: defaultTypeface().css,
-                    applyAsDefault: defaultTypeface().applyAsDefault,
                 }
             }
 
             old[id].css = css
+        })
+
+        if (debounceSaveChange) {
+            debounceSave()
+        } else {
+            save()
+        }
+    }
+
+    function addSelector() {
+        setTypeface(old => {
+            const id = typefaces[0]?.id ?? createId()
+
+            if (old[id]?.applyAsDefault != null) {
+                old[id].applyAsDefault.push("")
+            } else {
+                old[id].applyAsDefault = [""]
+            }
+        })
+
+        save()
+    }
+
+    function updateSelector(selector: string, index: number, debounceSaveChange = false) {
+        setTypeface(old => {
+            const id = typefaces[0]?.id ?? createId()
+
+            if (old[id]?.applyAsDefault == null) {
+                old[id].applyAsDefault = []
+            }
+
+            old[id].applyAsDefault[index] = selector
         })
 
         if (debounceSaveChange) {
@@ -68,5 +96,7 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
         defaultTypeface,
         getCssOrDefault,
         updateCss,
+        addSelector,
+        updateSelector,
     }
 })

@@ -26,6 +26,7 @@
         --on-background: black;
 
         --accent-color: #00A544;
+        --on-accent-color: white;
 
         --success-color: #26a269;
         --on-success-color: white;
@@ -49,6 +50,11 @@
     .secondary {
         --active-color: var(--secondary-color);
         --on-active-color: var(--on-secondary-color);
+    }
+
+    .accent {
+        --active-color: var(--accent-color);
+        --on-active-color: var(--on-accent-color);
     }
 
     .success {

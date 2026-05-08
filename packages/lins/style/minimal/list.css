@@ -49,6 +49,7 @@
             & > li {
                 border-radius: 0.75rem;
                 border-left: 0.5rem solid transparent;
+                position: relative;
 
                 &:not(:has(> *)) {
                     padding: 0.8rem 0.9rem;
@@ -65,11 +66,16 @@
                     border-left-color: var(--accent-color);
                     background: var(--background-color);
                     color: var(--current-color);
+
+                    &:hover {
+                        background: oklab(from var(--background-color) l a b / 0.5);
+                    }
                 }
 
                 &:hover {
                     background: oklab(from white l a b / 0.3);
                 }
+
             }
         }
 

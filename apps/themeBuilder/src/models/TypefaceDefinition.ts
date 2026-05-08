@@ -8,7 +8,7 @@ export const typefaceDefinitionSchema = modelSchema.extend({
     size: z.enum(typefaceSizes),
     type: z.enum(["default", "variant"]),
     css: z.string(),
-    applyAsDefault: z.string().default(""),
+    applyAsDefault: z.array(z.string().default("")),
 }).meta({
     table: createModelSchema("typeface_events", { recreate: true }).addColumn("theme", "TEXT").build(),
 })
