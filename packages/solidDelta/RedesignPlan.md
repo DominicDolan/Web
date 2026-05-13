@@ -1,242 +1,329 @@
-# The idea behind using "deltas"
 
-The DeltaMachine can convert a list of deltas (or changes or events) into a list of models which is passed to the UI.
-The UI can the "push" a delta whenever it wants to update the model. This tends to be cleaner than directly mutating the model.
+# Delta System Refactor Plan
 
-## Advantages:
-1. **Mutations without mutation:** Appending a delta to a list acts like a mutation
-2. **Consistency:** Having a timestamp allows consistency when different mutations occur at different times
-3. **Undo:** The UI can easily undo the last delta
-4. **Better DX:**Simply pushing a delta against a model ID is easier and simpler that finding the model and mutating it. Especially for nested data structures.
+## Background
 
-# Issues with current design
+The current `createDeltaStore` is a single abstraction that owns delta storage,
+projects deltas into reactive models, and provides a draft-based setter. It
+works, but three concerns have emerged:
 
-1. It consumes more storage. When editing an input it will create a new delta for every character. To keep consistency, all these deltas should be saved to the database.
-2. We could try to "squash" the deltas to avoid point 1 but then we have a harder time dealing with 2 users editing the same value, this is an issue that using deltas is supposed to fix. 
-3. The current implementation of DeltaMachine is probably more complex than it needs to be. It heavily relies on `createEvent()`. `DeltaMachine` and `DeltaStore` probably don't need to be 2 separate files.
-4. This strategy of deltas is a departure from the design of Solid which means that we are often fighting the solid primitives.
-5. It might be hard to get this implementation working with Solid 2.0 even though the Solid 2.0 features like `createProjection` could be very useful here.
+1. **Arrays don't fit the path syntax.** Paths like `myObj.userList.4.firstName`
+   break when items are inserted or deleted, because indices aren't stable
+   identifiers under concurrent edits.
+2. **The store is too opinionated.** It couples storage with projection, which
+   makes it hard to use Solid 2.0 primitives like `createOptimisticStore` or
+   custom `createProjection` setups alongside delta-based state.
+3. **No explicit lifecycle events.** "Create" and "delete" are implicit, derived
+   from the presence/absence of deltas. This makes garbage collection,
+   validation of required fields, and conflict resolution harder than they
+   need to be.
 
-# Future Design
-Deltas should use Solid's path syntax (like `setStore`). Each delta represents a single path change with a timestamp. For each path, only the most recent delta matters—older ones can be deleted. This simplifies multi-user editing (latest change wins) and enables undo/redo by preserving and ordering deltas by timestamp.
+This plan addresses all three, and reshapes the package around composable
+primitives.
 
-## API Design
+---
 
-### Machine Creation
-```typescript
-// Option 1: Destructured
-const { models: users, push, on } = createDeltaMachine<User>(userDeltas)
+## Design Decisions
 
-// Option 2: Object return
-const machine = createDeltaMachine<User>(userDeltas)
-// Access: machine.models, machine.push, machine.on
+### 1. Arrays — keyed representation with fractional ordering
+
+Arrays in the user-facing model are presented as normal JavaScript arrays. Under
+the hood, every array is stored as a keyed object with a stable key per element
+and a fractional `order` field for sorting. The user never sees the keys.
+
+- Default behaviour for **all** array fields, regardless of element type
+  (primitives, objects, etc).
+- Keys are auto-generated for elements without an `id` field. Elements with an
+  `id` use that id as their key.
+- Ordering uses **fractional indexing** so that inserts and reorders produce
+  small, conflict-friendly deltas (no rewriting of neighbouring entries).
+- Conversion (array ⇄ keyed object) happens entirely inside the delta layer
+  (`createModels` + `useDeltaWriter`). Application code keeps using arrays.
+
+### 2. Layered architecture
+
+The package will be split into three composable layers.
+
+#### Layer 1 — `createModels` (pure projection)
+
+A pure data transform from a reactive deltas accessor to a reactive models
+collection.
+
+```ts
+const models = createModels(() => deltas)
+// or
+const modelsById = createModelsById(() => deltas)
 ```
 
-### Push Signatures
-```typescript
-// CREATE - generates id if not provided, creates single "create" delta
-push("create", { username: "michael584", location: "Nigeria" })
-// Delta: { type: "create", modelId: "auto-id", model: {...}, timestamp }
 
-push("create", { id: "user-123", username: "michael584" })
-// Delta: { type: "create", modelId: "user-123", model: {...}, timestamp }
+No write API, no storage assumptions. Consumers bring their own delta store
+(`createStore`, `createOptimisticStore`, server resource, IndexedDB, etc).
 
-// UPDATE - uses Solid path syntax, auto-splits into multiple deltas
-push(userId, { username: "michael584", location: "Nigeria" })
-// Creates 2 deltas with paths: ["username", "michael584"] and ["location", "Nigeria"]
+#### Layer 2 — `useDeltaWriter` (write helper)
 
-push(userId, "profile", { name: "John", age: 30 })
-// Creates 2 deltas: ["profile", "name", "John"] and ["profile", "age", 30]
+A small utility that produces deltas from mutations, with access to the current
+deltas source so it can correctly resolve array keys, generate fractional
+indices, and emit minimal deltas.
 
-push(userId, "profile", "name", "John")
-// Creates 1 delta: ["profile", "name", "John"]
+```textmate
+const writeDeltas = useDeltaWriter<Theme>(() => deltas)
 
-push(userId, "userProfiles", [0, 2], "enabled", true)
-// Creates 2 deltas: ["userProfiles", 0, "enabled", true] and ["userProfiles", 2, "enabled", true]
-
-// DELETE - uses path syntax, no value
-push("delete", userId) // Delete entire model (path: [])
-push("delete", userId, "username") // Delete field (path: ["username"])
-push("delete", userId, "profile", "settings") // Delete nested (path: ["profile", "settings"])
+writeDeltas(id, { name: "x" })                           // shallow patch
+writeDeltas(id, draft => { draft.tags.push("new") })     // draft mutation
+writeDeltas("create", { name: "New Theme" })            // create lifecycle delta, ID is created implicitly
+writeDeltas("create", { id: "custom-id", name: "New Theme" })   // create delta with provided ID
+writeDeltas("delete", id)                               // delete lifecycle delta
 ```
 
-## Usage Examples
 
-### UI Level - Input onChange
-```typescript
-const { models: users, push } = createDeltaMachine<User>(userDeltas)
+All knowledge of delta shape, array keying, and path encoding lives in this
+module. Callers must **never** hand-construct deltas.
 
-<input
-  value={user.username}
-  onInput={(e) => push(user.id, "username", e.target.value)}
-/>
+#### Layer 3 — `createDeltaStore` (convenience wrapper)
 
-<input
-  value={user.profile.name}
-  onInput={(e) => push(user.id, "profile", "name", e.target.value)}
-/>
+A thin wrapper that composes Layer 1 + Layer 2 with a built-in `createStore`,
+preserving today's ergonomic `[models, setModels]` API. The 90% case.
 
-// Batch update multiple fields
-<button onClick={() => push(user.id, {
-  username: "newname",
-  lastActive: Date.now()
-})}>
-  Update
-</button>
+```textmate
+const [themes, setThemes] = createDeltaStore<Theme>(() => fetchDeltas())
+setThemes(draft => { draft[id].name = "x" })
 ```
 
-### Data Level - Saving Deltas
-```typescript
-const { models: users, push, on, mark, getUnmarkedDeltas } = createDeltaMachine<User>(userDeltas)
 
-// Save individual deltas
-on.pathChange((delta) => {
-  // delta: { type: "update", modelId, path: [..., value], timestamp }
-  //    or: { type: "create", modelId, model, timestamp }
-  //    or: { type: "delete", modelId, path, timestamp }
-  saveToDb(delta)
-})
+Power users skip Layer 3 and compose Layers 1 + 2 with their own storage.
 
-// Debounced batch save with marking
-const debouncedSave = debounce(() => {
-  const unsaved = getUnmarkedDeltas("saved")
-  db.batchSaveDeltas(unsaved).then(() => {
-    mark("saved") // Mark all deltas up to now as saved
-  })
-}, 500)
+### 3. Explicit lifecycle deltas (create / delete)
 
-on.newDeltas(debouncedSave)
+Two new delta shapes, both using `path: ""`:
 
-// Save with conflict resolution
-on.pathChange((delta) => {
-  if (delta.type === "update") {
-    const pathWithoutValue = delta.path.slice(0, -1)
-    const existing = db.getDelta(delta.modelId, pathWithoutValue)
-    if (!existing || delta.timestamp > existing.timestamp) {
-      db.saveDelta(delta) // Latest wins
-    }
-  } else {
-    db.saveDelta(delta) // Create/delete always save
-  }
-})
+- **Create**: `{ id, path: "", value: <initial ModelData>, timestamp }`
+    - `value` is an object containing initial field values.
+    - Required fields enforced at the type level via `value: ModelData<M>`.
+    - Initial values are semantically equivalent to field writes at the create's
+      timestamp.
+- **Delete**: `{ id, path: "", value: undefined, timestamp }`
+
+Field deltas remain `{ id, path: "some.field", value, timestamp }`.
+
+Type definition (illustrative):
+
+```textmate
+type CreateDelta<M extends Model> = {
+  id: string
+  path: ""
+  value: ModelData<M>
+  timestamp: number
+}
+
+type DeleteDelta = {
+  id: string
+  path: ""
+  value: undefined
+  timestamp: number
+}
+
+type FieldDelta<M extends Model> = {
+  id: string
+  path: KeySanitize<keyof ModelData<M>> | `${KeySanitize<keyof ModelData<M>>}.${string}`
+  value: any
+  timestamp: number
+}
+
+type ModelDelta<M extends Model> = CreateDelta<M> | DeleteDelta | FieldDelta<M>
 ```
 
-### Complete ProgrammeGuide
-```typescript
-const { models: users, push, on } = createDeltaMachine<User>(loadedDeltas)
 
-// Create new user
-const newUser = push("create", { username: "alice" })
+### 4. Projection rules (used by `createModels`)
 
-// Update user
-push(newUser.id, "profile", { name: "Alice", age: 25 })
+The client projection is intentionally simple and policy-free.
 
-// Delete field
-push("delete", newUser.id, "profile", "age")
+For each model id, sorting deltas by timestamp:
 
-// Save to DB
-on.newDeltas((deltas) => {
-  deltas.forEach(d => db.save(d))
-})
+1. **Visibility**: a model is visible iff there exists at least one create
+   delta with no later delete delta (a later create cancels a delete).
+2. **Fields**: per-property last-write-wins across **all** field deltas
+   (including the field writes embedded inside create's `value` object,
+   treated as same-timestamp writes). There is **no floor** at the most recent
+   create — field deltas from before the create still apply.
+3. `updatedAt` is the maximum timestamp of any applied delta.
+
+#### Why no floor on create?
+
+- Handles offline delete/recreate toggling without losing concurrent edits from
+  other users.
+- Resists a class of "snipping" attacks/clock-skew issues where a create with a
+  large timestamp could wipe out legitimate field deltas.
+- A deliberate "fresh start" re-creation naturally clears previous state by
+  carrying explicit initial values in the create's `value`, which then win at
+  the create's timestamp.
+
+### 5. Server-side stale data policy
+
+Retention is a server-side concern, decoupled from the client projection. A
+`StaleDataPolicy` interface determines which deltas can be pruned.
+
+```textmate
+type StaleDataPolicy = {
+  shouldPrune(delta: ModelDelta, allDeltasForId: ModelDelta[], now: number): boolean
+}
 ```
 
-## Implementation Steps
 
-1. **Refactor Delta Structure**
-   - **Create delta**: `{ type: "create", modelId: string, model: Partial<M>, timestamp: number }`
-   - **Update delta**: `{ type: "update", modelId: string, path: [...string[], value: any], timestamp: number }`
-     - Path includes value as last element: `["profile", "name", "John"]` not `["profile", "name"]` + separate value
-   - **Delete delta**: `{ type: "delete", modelId: string, path: string[], timestamp: number }`
-     - Path excludes value (it's a deletion)
+Planned policies (not all in scope for this refactor):
 
-2. **Implement Push Signature**
-   - `push("create", model)` - generate id if missing, create single "create" delta
-   - `push(modelId, ...path, value)` - single update delta (e.g., `push(id, "profile", "name", "John")`)
-   - `push(modelId, object)` - auto-split object into multiple update deltas
-   - `push(modelId, ...pathWithArrays, value)` - expand array indices into multiple deltas
-     - ProgrammeGuide: `push(id, "userProfiles", [0, 2], "enabled", true)` → 2 deltas for `[0].enabled` and `[2].enabled`
-   - `push("delete", modelId, ...path)` - delete delta for model or specific path
-   - Helpers:
-     - Expand objects into path arrays: `{username: "a", location: "b"}` → 2 update deltas
-     - Expand Solid array syntax: `[0, 2]` in path → multiple deltas
+- **PermanentTombstone (default)**: once a model has a delete delta, prune all
+  deltas for that id after a grace period.
+- **UndoWindow**: keep deltas for N days after delete to permit undo, then prune.
+- **ChangeHistoryAcked**: only prune once an external change-history table has
+  acknowledged the deletion.
 
-3. **Simplify DeltaMachine Architecture**
-   - Merge `DeltaMachine.ts` and `DeltaStore.ts` into single file
-   - Avoid using `createEvent()` internally for complex event chains
-   - Use `createEvent()` for external API: `on: { pathChange, newDeltas, modelCreate, modelDelete }`
-   - Internal store: `Record<string, Record<pathString, Delta>>` for fast path lookup
-   - Expose: `{ models: M[], push, on: { ... }, mark, deleteMarked, getUnmarkedDeltas }`
+The client doesn't care which policy ran; it just projects whatever deltas it
+receives.
 
-4. **Implement Path-Based Reducer**
-   - Build models by applying deltas sorted by timestamp
-   - Use `setStore` semantics: treat update path as `setStore(model, ...path.slice(0, -1), path[path.length - 1])`
-   - For same path, latest timestamp wins (keep all deltas in memory for now)
-   - Support Solid's array index syntax: `[0, 2]` expands to multiple paths
+---
 
-5. **Add Timestamp-Based Conflict Resolution**
-   - When applying deltas, latest timestamp wins for same path
-   - Keep all deltas in memory (no auto-squashing yet)
-   - Marking system handles cleanup policy (see next step)
+## Implementation Plan (TDD)
 
-6. **Implement Delta Marking System**
-   - `mark(label: string, timestamp?: number)` - mark deltas older than timestamp with label
-     - ProgrammeGuide: `mark("saved", Date.now())`, `mark("stale", oldTimestamp)`
-   - `deleteMarked(label: string)` - delete all deltas with given label from memory
-   - `getUnmarkedDeltas(label: string)` - get deltas without given label
-     - ProgrammeGuide: `getUnmarkedDeltas("saved")` returns unsaved deltas
-   - Internal tracking: each delta has `marks: Set<string>`
+We use TDD throughout: update or write the tests first, watch them fail, then
+implement.
 
-7. **Optimize Storage & Persistence**
-   - Debouncing should happen at consumer level (not in machine)
-   - Use marking system for save tracking: `mark("saved")` after DB save
-   - Use marking system for cleanup: `mark("stale")` then `deleteMarked("stale")`
+Work happens primarily in `packages/solidDelta`. Application code (e.g. theme
+builder) is updated only at the end once the new API is stable.
 
-8. **Solid 2.0 Compatibility**
-   - Ensure stores work with fine-grained reactivity
-   - Consider `createProjection` for model transformations
-   - Test with Solid 2.0 primitives
+### Phase 1 — Lifecycle deltas and projection rules
 
-## Tests Required
+Goal: introduce create/delete lifecycle deltas and the new projection rules,
+without yet splitting the API into separate layers.
 
-### Unit Tests
-- **Push signature parsing**
-  - `push("create", model)` with/without id
-  - `push(id, ...path, value)` with various path lengths
-  - `push(id, object)` splits into multiple deltas
-  - `push("delete", id, ...path)`
-- **Path expansion**
-  - Object → path array conversion: `{a: 1, b: {c: 2}}` → `[["a"], ["b", "c"]]`
-  - Nested object flattening
-- **Delta application**
-  - Apply path deltas using `setStore` semantics
-  - Timestamp ordering (latest wins)
-  - Auto-squashing older deltas for same path
-- **Model reconstruction**
-  - Build models from delta list
-  - Handle create/update/delete deltas
-  - Path-based updates on existing models
+1. **Tests**
+    - Update `DeltaStore.test.tsx` to cover:
+        - Create delta with initial values produces a visible model with those
+          values.
+        - Delete delta hides the model.
+        - Create after delete restores the model.
+        - Late-arriving field delta with timestamp before the most recent create
+          still applies (no floor).
+        - Field deltas with timestamps inside a deleted window do not appear
+          (model not visible), but if a later create restores visibility, the
+          per-property last-write-wins result includes them.
+        - Required fields in create's `value` are type-enforced.
+2. **Code**
+    - Extend `ModelDelta<M>` type to the discriminated union of
+      `CreateDelta | DeleteDelta | FieldDelta`.
+    - Update projection logic to follow the new rules (visibility from
+      lifecycle events; field last-write-wins ungated).
+    - Keep `createDeltaStore` returning the same `[models, setModels]` tuple for
+      now.
 
-### Integration Tests
-- **UI input changes**
-  - Input onChange → `push(id, "field", value)` → model updates
-  - Batch updates with object syntax
-- **Persistence**
-  - `getUnsavedDeltas()` tracks dirty deltas
-  - `markSaved()` / `markAllSaved()` updates tracking
-  - Load initial deltas → reconstruct models
-- **Conflict resolution**
-  - Multi-user: concurrent edits, latest timestamp wins
-  - Same path updated multiple times: only latest kept
-- **Memory/performance**
-  - High-frequency input (1 delta per keystroke) with auto-squashing
-  - Large object updates split correctly
+### Phase 2 — Extract `createModels`
 
-### Edge Cases
-- Delete field: `push("delete", id, "field")`
-- Delete entire model: `push("delete", id)`
-- Nested deletes: `push("delete", id, "profile", "settings")`
-- Create with partial data
-- Update/delete non-existent model should throw, 
-- create -> delete -> update should throw
-- Empty paths, null/undefined values
-- Timestamp collisions (same millisecond)
+Goal: extract pure projection into its own primitive.
+
+1. **Tests**
+    - New `createModels.test.ts` covering all projection rules in isolation
+      (no store, just deltas in → models out).
+2. **Code**
+    - Implement `createModels(() => deltas)` and `createModelsById(() => deltas)`
+      as standalone primitives.
+    - Reimplement `createDeltaStore` to use `createModels` internally.
+
+### Phase 3 — Extract `useDeltaWriter`
+
+Goal: extract write logic into its own primitive.
+
+1. **Tests**
+    - New `useDeltaWriter.test.ts` covering:
+        - Shallow patch object → field deltas.
+        - Draft mutation → minimal field deltas (diff-based).
+        - `create()` produces a create delta with required initial values.
+        - `delete()` produces a delete delta.
+        - Timestamps are monotonic within a single call.
+2. **Code**
+    - Implement `useDeltaWriter<M>(() => deltas)` with the API:
+        - `writeDeltas(id, patchOrDraftFn)`
+        - `writeDeltas.create(id, initialValue)`
+        - `writeDeltas.delete(id)`
+    - Reimplement `createDeltaStore`'s `setModels` to use `useDeltaWriter`
+      internally.
+
+### Phase 4 — Keyed arrays + fractional ordering
+
+Goal: arrays in models are projected as real arrays but stored as keyed objects
+under the hood.
+
+1. **Schema additions** (`@web/schema`)
+    - **Tests** for schema helpers (`array`, `atomicArray`).
+    - **Code**: implement schema helpers and the metadata needed for
+      `createModels` / `useDeltaWriter` to detect array fields.
+2. **Projection**
+    - **Tests** in `createModels.test.ts`:
+        - Keyed-object deltas project as arrays sorted by `order`.
+        - Inserting in the middle produces a single new keyed delta.
+        - Removing an item produces a single tombstone-style delta for that key.
+        - `atomicArray` fields project as the raw value (no key conversion).
+    - **Code**: extend `createModels` to recognise array fields by schema and
+      convert keyed-object storage back into ordered arrays.
+3. **Writes**
+    - **Tests** in `useDeltaWriter.test.ts`:
+        - Array `push` produces one new keyed delta with fractional order after the
+          last existing item.
+        - Array `splice` (insert at middle) produces a single delta with a
+          fractional order between neighbours.
+        - Array reorder via swap produces minimal deltas (only the moved items).
+        - Mutating object fields of array items produces deltas addressed by the
+          stable key, not the index.
+    - **Code**: extend the draft mutation handler to diff array state in terms
+      of keyed entries + fractional indices. Provide a fractional-indexing utility
+      in `packages/solidDelta/src/utils`.
+4. **Identity for objects with `id`**: prefer `id` as the key when the schema
+   indicates so.
+
+### Phase 5 — Migrate consumers
+
+Goal: switch app code over to the new API.
+
+1. Update `ThemesListScope`, `ColorScope`, `TypefaceListScope`,
+   `ElementStyleStore`, and any other scopes using `createDeltaStore`.
+2. Where appropriate, switch to direct composition of `createModels` +
+   `useDeltaWriter` (e.g. anywhere we want `createOptimisticStore`).
+3. Replace hand-built lifecycle behaviour (current "create by setting fields"
+   patterns) with explicit `writeDeltas.create(...)` and
+   `writeDeltas.delete(...)`.
+
+### Phase 6 — Server-side `StaleDataPolicy`
+
+Goal: define the pruning interface and ship the default policy.
+
+1. **Tests** for `PermanentTombstonePolicy.test.ts`:
+    - All deltas for a deleted id are pruned after the grace period.
+    - No deltas are pruned for live models.
+    - Re-created ids are treated as live.
+2. **Code**:
+    - Define `StaleDataPolicy` interface.
+    - Implement `PermanentTombstonePolicy` and wire it into the relevant
+      repositories (e.g. `ColorRepository.server.ts`).
+3. `UndoWindow` and `ChangeHistoryAcked` policies are deferred to follow-up
+   work.
+
+---
+
+## Out of Scope
+
+- `UndoWindow` and `ChangeHistoryAcked` policies (interface only for now).
+- Server-authoritative timestamps / clock-skew correction. Mitigations are
+  noted in design but not implemented here.
+- A general `set(item)` schema helper. Add only if a real use case appears.
+
+---
+
+## Migration Notes
+
+- `ModelDelta<M>` becomes a discriminated union; downstream code that pattern-
+  matches on `delta.path === ""` keeps working, but consumers reading
+  `delta.value` for non-empty paths should expect the new typings.
+- Hand-constructed deltas in application code (if any exist) must move to
+  `useDeltaWriter`. A grep for `timestamp: Date.now()` across the repo will
+  surface these.
+- The DB row format does not change. Lifecycle deltas use `path = ''` exactly
+  as today, just with the value semantics formalised.
+

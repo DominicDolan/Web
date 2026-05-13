@@ -1,7 +1,7 @@
 import {useTypefaceScope} from "~/app/typography/TypefaceEditor/TypefaceScope";
 import {SubPageTemplate} from "~/components/SubPageTemplate";
 import {useNavigate} from "@web/router";
-import {createMemo, createSignal, Loading, Match, Switch, type JSX, Accessor, For, Repeat} from "solid-js";
+import {createMemo, createSignal, Loading, Match, Switch, type JSX, Accessor, For, Repeat, snapshot} from "solid-js";
 import {Dynamic} from "@solidjs/web";
 import {getTypefaceSelector} from "~/app/typography/TypographyUtils";
 import {propertyFields, TextPropertyKey} from "~/app/typography/TypefaceEditor/TypefaceFormItems";
@@ -35,17 +35,30 @@ export function TypefaceEditor() {
         updateCss(buildCssDeclarations(nextProperties), true)
     }
 
+    const applyAsDefaultSelectors = createMemo(() => typeface()?.applyAsDefault ?? [] as Array<string>)
+
     function onAddSelectorClicked() {
+        const newSelectorIndex = applyAsDefaultSelectors().length
         addSelector()
+        setCurrentlyEditingSelector(newSelectorIndex)
     }
 
     function onEditSelector(index: number, value: string) {
-        console.log("editing")
         updateSelector(value, index, true)
     }
+
     function onFinishedEditSelector(index: number, value: string) {
+        setTimeout(() => {
+            setCurrentlyEditingSelector(null)
+        })
         updateSelector(value, index, false)
     }
+
+    function onRemoveSelectorClicked(index: number) {
+        console.log("removing")
+    }
+
+    const [currentlyEditingSelector, setCurrentlyEditingSelector] = createSignal<number | null>(null)
 
     return <div>
         <SubPageTemplate onBackClicked={onBackClicked} title={`Edit Typeface`} backButtonText={"Back to Typography"}>
@@ -88,11 +101,15 @@ export function TypefaceEditor() {
                     <article>
                         <h3 class="headline variant">Apply as Default</h3>
                         <div class="p-4 flex flex-col gap-4">
-                            <Repeat count={typeface().applyAsDefault.length}>{(index) => <>
+                            <Repeat count={applyAsDefaultSelectors().length}>{(index) => <>
                                 <ApplyAsDefaultSelector
-                                    selector={typeface().applyAsDefault[index]}
+                                    selector={applyAsDefaultSelectors()[index]}
+                                    isEditing={currentlyEditingSelector() === index}
+                                    onClick={() => setCurrentlyEditingSelector(index)}
                                     onInput={(value) => onEditSelector(index, value)}
-                                    onEnter={(value) => onFinishedEditSelector(index, value)}/>
+                                    onEnter={(value) => onFinishedEditSelector(index, value)}
+                                    onDelete={() => onRemoveSelectorClicked(index)}
+                                />
                             </>}
                             </Repeat>
                             <article class="tonal accent flex flex-row gap-2 items-center" role="button" onClick={() => onAddSelectorClicked()}>

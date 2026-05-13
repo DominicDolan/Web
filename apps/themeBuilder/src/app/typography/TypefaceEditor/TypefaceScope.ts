@@ -1,6 +1,6 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
 import {TypefaceRole, TypefaceSize, TypefaceType} from "~/constants/TypefaceRoles";
-import {createMemo} from "solid-js";
+import {createMemo, snapshot} from "solid-js";
 import {getSingleTypefaceDeltas, saveTypeface} from "~/app/typography/TypefaceRepository.server";
 import {createDeltaStore, createMarker} from "@web/solid-delta";
 import {defaultTypefacesQueryObject} from "~/constants/DefaultTypefaces";
@@ -14,6 +14,17 @@ export const TypefaceScope = createScopeProvider<{
     type: TypefaceType
 }>()
 
+function isValidSelector(selector: string): boolean {
+    if (!selector) return false;
+
+    try {
+        document.createDocumentFragment().querySelector(selector);
+    } catch {
+        return false;
+    }
+    return true;
+}
+
 export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
 
     const typefaceDeltas = createMemo(() => getSingleTypefaceDeltas(props.themeId, props.role, props.size, props.type))
@@ -24,12 +35,14 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
     const [getUncommitted, markCommitted] = createMarker(store)
     markCommitted()
 
-    const typeface = createMemo(() => typefaces[0] ?? defaultTypeface())
-    const getCssOrDefault = () => typeface().css
+    const typeface = createMemo(() => typefaces[0] ?? null)
+    const getCssOrDefault = () => typeface()?.css ?? defaultTypeface().css
 
     async function save() {
         debounceSave.cancel()
         const uncommitted = await getUncommitted()
+        console.log(snapshot(uncommitted))
+        debugger
         await saveTypeface(uncommitted, props.themeId)
     }
 
@@ -65,8 +78,6 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
                 old[id].applyAsDefault = [""]
             }
         })
-
-        save()
     }
 
     function updateSelector(selector: string, index: number, debounceSaveChange = false) {
@@ -79,6 +90,10 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
 
             old[id].applyAsDefault[index] = selector
         })
+
+        if (!isValidSelector(selector)) {
+            return
+        }
 
         if (debounceSaveChange) {
             debounceSave()
