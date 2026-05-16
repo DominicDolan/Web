@@ -1,0 +1,195 @@
+import {createSignal, flush} from "solid-js";
+import {describe, expect, it} from "vitest";
+import {Model} from "@web/schema";
+import {ModelDelta} from "../model/ModelDelta";
+import {createModels, createModelsById} from "./createModels";
+
+interface TestTask extends Model {
+    title: string
+    status: "todo" | "doing" | "done"
+    owner?: {
+        name?: string
+    }
+}
+
+describe("createModels", () => {
+    it("projects a create delta with initial values into a visible model", () => {
+        const models = createModels<TestTask>(() => [
+            delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+        ]);
+
+        expect(models()).toEqual([
+            {
+                id: "task-1",
+                updatedAt: 10,
+                title: "Write tests",
+                status: "todo",
+            },
+        ]);
+    });
+
+    it("hides a model when the latest lifecycle delta is a delete", () => {
+        const models = createModels<TestTask>(() => [
+            delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+            delta("task-1", "status", "done", 20),
+            delta("task-1", "", undefined, 30),
+        ]);
+
+        expect(models()).toEqual([]);
+    });
+
+    it("restores a model when a create arrives after a delete", () => {
+        const models = createModels<TestTask>(() => [
+            delta("task-1", "", {title: "First title", status: "todo"}, 10),
+            delta("task-1", "", undefined, 20),
+            delta("task-1", "", {title: "Restored title", status: "doing"}, 30),
+        ]);
+
+        expect(models()).toEqual([
+            {
+                id: "task-1",
+                updatedAt: 30,
+                title: "Restored title",
+                status: "doing",
+            },
+        ]);
+    });
+
+    it("applies late-arriving field deltas from before the most recent create", () => {
+        const models = createModels<TestTask>(() => [
+            delta("task-1", "", {title: "Initial title", status: "todo"}, 20),
+            delta("task-1", "owner.name", "Ada", 10),
+        ]);
+
+        expect(models()).toEqual([
+            {
+                id: "task-1",
+                updatedAt: 20,
+                title: "Initial title",
+                status: "todo",
+                owner: {
+                    name: "Ada",
+                },
+            },
+        ]);
+    });
+
+    it("lets create fields supersede older field deltas for the same property", () => {
+        const models = createModels<TestTask>(() => [
+            delta("task-1", "", {title: "Initial title", status: "todo"}, 20),
+            delta("task-1", "status", "doing", 10),
+        ]);
+
+        expect(models()).toEqual([
+            {
+                id: "task-1",
+                updatedAt: 20,
+                title: "Initial title",
+                status: "todo",
+            },
+        ]);
+    });
+
+    it("keeps field deltas from a deleted window ready for a later create", () => {
+        const models = createModels<TestTask>(() => [
+            delta("task-1", "", {title: "Initial title", status: "todo"}, 10),
+            delta("task-1", "", undefined, 20),
+            delta("task-1", "owner.name", "Ada", 30),
+            delta("task-1", "", {title: "Restored title", status: "doing"}, 40),
+        ]);
+
+        expect(models()).toEqual([
+            {
+                id: "task-1",
+                updatedAt: 40,
+                title: "Restored title",
+                status: "doing",
+                owner: {
+                    name: "Ada",
+                },
+            },
+        ]);
+    });
+
+    it("uses per-property last-write-wins across creates and field deltas", () => {
+        const models = createModels<TestTask>(() => [
+            delta("task-1", "", {title: "Create title", status: "todo"}, 10),
+            delta("task-1", "title", "Older title", 5),
+            delta("task-1", "status", "doing", 15),
+            delta("task-1", "title", "Newer title", 20),
+        ]);
+
+        expect(models()).toEqual([
+            {
+                id: "task-1",
+                updatedAt: 20,
+                title: "Newer title",
+                status: "doing",
+            },
+        ]);
+    });
+
+    it("applies nested field deltas and deletions by path", () => {
+        const models = createModels<TestTask>(() => [
+            delta("task-1", "", {title: "Initial title", status: "todo"}, 10),
+            delta("task-1", "owner.name", "Ada", 20),
+            delta("task-1", "owner.name", undefined, 30),
+        ]);
+
+        expect(models()).toEqual([
+            {
+                id: "task-1",
+                updatedAt: 30,
+                title: "Initial title",
+                status: "todo",
+                owner: {},
+            },
+        ]);
+    });
+
+    it("reacts when the delta accessor changes", () => {
+        const [deltas, setDeltas] = createSignal<ModelDelta<TestTask>[]>([
+            delta("task-1", "", {title: "Initial title", status: "todo"}, 10),
+        ]);
+        const models = createModels<TestTask>(deltas);
+
+        expect(models()[0].status).toBe("todo");
+
+        setDeltas((current) => [
+            ...current,
+            delta<TestTask>("task-1", "status", "done", 20),
+        ]);
+        flush();
+
+        expect(models()[0].status).toBe("done");
+        expect(models()[0].updatedAt).toBe(20);
+    });
+});
+
+describe("createModelsById", () => {
+    it("projects visible models into a record keyed by id", () => {
+        const modelsById = createModelsById<TestTask>(() => [
+            delta("task-1", "", {title: "First", status: "todo"}, 10),
+            delta("task-2", "", {title: "Second", status: "doing"}, 20),
+            delta("task-2", "", undefined, 30),
+        ]);
+
+        expect(modelsById()).toEqual({
+            "task-1": {
+                id: "task-1",
+                updatedAt: 10,
+                title: "First",
+                status: "todo",
+            },
+        });
+    });
+});
+
+function delta<M extends Model>(
+    id: string,
+    path: ModelDelta<M>["path"],
+    value: ModelDelta<M>["value"],
+    timestamp: number,
+): ModelDelta<M> {
+    return {id, path, value, timestamp};
+}

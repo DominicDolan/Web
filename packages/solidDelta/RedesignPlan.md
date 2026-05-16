@@ -65,7 +65,7 @@ A small utility that produces deltas from mutations, with access to the current
 deltas source so it can correctly resolve array keys, generate fractional
 indices, and emit minimal deltas.
 
-```textmate
+```ts
 const writeDeltas = useDeltaWriter<Theme>(() => deltas)
 
 writeDeltas(id, { name: "x" })                           // shallow patch
@@ -84,7 +84,7 @@ module. Callers must **never** hand-construct deltas.
 A thin wrapper that composes Layer 1 + Layer 2 with a built-in `createStore`,
 preserving today's ergonomic `[models, setModels]` API. The 90% case.
 
-```textmate
+```ts
 const [themes, setThemes] = createDeltaStore<Theme>(() => fetchDeltas())
 setThemes(draft => { draft[id].name = "x" })
 ```
@@ -107,7 +107,7 @@ Field deltas remain `{ id, path: "some.field", value, timestamp }`.
 
 Type definition (illustrative):
 
-```textmate
+```ts
 type CreateDelta<M extends Model> = {
   id: string
   path: ""
@@ -162,7 +162,7 @@ For each model id, sorting deltas by timestamp:
 Retention is a server-side concern, decoupled from the client projection. A
 `StaleDataPolicy` interface determines which deltas can be pruned.
 
-```textmate
+```ts
 type StaleDataPolicy = {
   shouldPrune(delta: ModelDelta, allDeltasForId: ModelDelta[], now: number): boolean
 }
