@@ -1,6 +1,7 @@
 import {Accessor, createMemo} from "solid-js";
 import {Model, PartialModel} from "@web/schema";
 import {ModelDelta} from "../model/ModelDelta";
+import {cloneValue, isPlainObject} from "../utils/ObjectUtils";
 
 type ProjectedModel<M extends Model, Valid extends boolean> = Valid extends true ? M : PartialModel<M>
 type ProjectedModelsById<M extends Model, Valid extends boolean> = Record<string, ProjectedModel<M, Valid>>
@@ -129,11 +130,3 @@ function valueWrites(path: string[], value: any): Array<{ path: string[], value:
     return entries.flatMap(([key, child]) => valueWrites([...path, key], child));
 }
 
-function isPlainObject(value: any): value is Record<string, any> {
-    return value != null && typeof value === "object" && !Array.isArray(value);
-}
-
-function cloneValue<T>(value: T): T {
-    if (value == null || typeof value !== "object") return value;
-    return JSON.parse(JSON.stringify(value));
-}

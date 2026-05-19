@@ -28,8 +28,9 @@ primitives.
 ### 1. Arrays — keyed representation with fractional ordering
 
 Arrays in the user-facing model are presented as normal JavaScript arrays. Under
-the hood, every array is stored as a keyed object with a stable key per element
-and a fractional `order` field for sorting. The user never sees the keys.
+the hood, array entries are stored through a self-describing reserved path
+segment, `$array`, with a stable key per element and a fractional `order` field
+for sorting. The user never sees the keys or the internal path segment.
 
 - Default behaviour for **all** array fields, regardless of element type
   (primitives, objects, etc).
@@ -39,6 +40,99 @@ and a fractional `order` field for sorting. The user never sees the keys.
   small, conflict-friendly deltas (no rewriting of neighbouring entries).
 - Conversion (array ⇄ keyed object) happens entirely inside the delta layer
   (`createModels` + `useDeltaWriter`). Application code keeps using arrays.
+- No schema metadata, Zod dependency, or schema helper is required to detect
+  arrays. The delta path itself is self-describing, which keeps `createModels`
+  and `useDeltaWriter` schema-free and primitive.
+
+Array paths use this convention:
+
+```ts
+// primitive array item
+{
+  id: "task-1",
+  path: "tags.$array.tag-a",
+  value: {
+    order: 10,
+    value: "alpha",
+  },
+  timestamp: 20,
+}
+
+// object array item
+{
+  id: "task-1",
+  path: "checklist.$array.item-b",
+  value: {
+    order: 20,
+    id: "item-b",
+    label: "Second",
+    done: false,
+  },
+  timestamp: 30,
+}
+
+// object array item field mutation
+{
+  id: "task-1",
+  path: "checklist.$array.item-b.done",
+  value: true,
+  timestamp: 40,
+}
+
+// array item tombstone/removal
+{
+  id: "task-1",
+  path: "tags.$array.tag-a",
+  value: undefined,
+  timestamp: 50,
+}
+
+// reorder
+{
+  id: "task-1",
+  path: "checklist.$array.item-b.order",
+  value: 15,
+  timestamp: 60,
+}
+```
+
+Projection rules:
+
+- Any path containing the unescaped segment `$array` is treated as array
+  storage.
+- The segment immediately before `$array` is the user-facing array field name.
+- The segment immediately after `$array` is the stable item key.
+- Array entries are sorted by their `order` field.
+- Primitive array entries are stored as `{ order, value }` and projected as the
+  inner `value`.
+- Object array entries are stored as `{ order, ...item }` and projected as the
+  item object without exposing the internal storage key.
+- If the item object has an `id`, use that `id` as the stable item key when
+  writing new deltas.
+- If the item does not have an `id`, generate a stable key.
+- Removing an item writes a tombstone delta at
+  `<arrayField>.$array.<itemKey>` with `value: undefined`.
+- Reordering should emit minimal order updates, e.g.
+  `<arrayField>.$array.<itemKey>.order`.
+
+#### Path encoding / escaping
+
+JavaScript object keys can be arbitrary strings, so there is no character that
+is truly impossible as an object key. Therefore `$array` is a reserved
+unescaped path segment, not an impossible user key.
+
+Introduce a path codec responsible for encoding and decoding user-provided path
+segments. The codec must escape:
+
+- literal `.` characters, because `.` is the path separator;
+- literal reserved segments such as `$array`;
+- any escape prefix used by the codec itself.
+
+Internal array paths use the unescaped `$array` segment. User object keys that
+literally equal `$array` must be escaped so they are not confused with array
+storage. Projection and writing logic must operate on decoded path segments but
+preserve the distinction between reserved internal segments and escaped user
+keys.
 
 ### 2. Layered architecture
 
@@ -76,8 +170,10 @@ writeDeltas("delete", id)                               // delete lifecycle delt
 ```
 
 
-All knowledge of delta shape, array keying, and path encoding lives in this
-module. Callers must **never** hand-construct deltas.
+All knowledge of delta shape, the reserved `$array` path notation, array keying,
+and path escaping lives in this module and the delta internals. Application
+code continues to mutate normal JavaScript arrays. Callers must **never**
+hand-construct deltas.
 
 #### Layer 3 — `createDeltaStore` (convenience wrapper)
 
@@ -251,32 +347,51 @@ Goal: extract write logic into its own primitive.
 Goal: arrays in models are projected as real arrays but stored as keyed objects
 under the hood.
 
-1. **Schema additions** (`@web/schema`)
-    - **Tests** for schema helpers (`array`, `atomicArray`).
-    - **Code**: implement schema helpers and the metadata needed for
-      `createModels` / `useDeltaWriter` to detect array fields.
+1. **Path codec and reserved segment parsing**
+    - **Tests** for path encoding/decoding:
+        - Literal `.` characters in user keys round-trip safely.
+        - Literal user keys equal to `$array` are escaped and are not treated as
+          array storage.
+        - The codec escapes its own escape prefix.
+        - Internal array paths retain an unescaped `$array` segment.
+    - **Code**: implement a shared path codec and parser that distinguishes
+      reserved internal `$array` segments from escaped user keys.
 2. **Projection**
     - **Tests** in `createModels.test.ts`:
-        - Keyed-object deltas project as arrays sorted by `order`.
+        - Paths such as `tags.$array.tag-a` project as arrays sorted by
+          `order`.
+        - Primitive entries stored as `{ order, value }` project as the inner
+          value.
+        - Object entries stored as `{ order, ...item }` project as item
+          objects without exposing the internal storage key.
         - Inserting in the middle produces a single new keyed delta.
         - Removing an item produces a single tombstone-style delta for that key.
-        - `atomicArray` fields project as the raw value (no key conversion).
-    - **Code**: extend `createModels` to recognise array fields by schema and
-      convert keyed-object storage back into ordered arrays.
+        - Object item field mutations such as
+          `checklist.$array.item-b.done` update that array item.
+    - **Code**: extend `createModels` to recognise the reserved `$array` path
+      segment and convert array storage back into ordered arrays.
 3. **Writes**
     - **Tests** in `useDeltaWriter.test.ts`:
-        - Array `push` produces one new keyed delta with fractional order after the
-          last existing item.
-        - Array `splice` (insert at middle) produces a single delta with a
-          fractional order between neighbours.
-        - Array reorder via swap produces minimal deltas (only the moved items).
+        - Array `push` produces one new delta like `tags.$array.<itemKey>` with
+          fractional order after the last existing item.
+        - Array `splice` insert in the middle produces a single delta like
+          `tags.$array.<itemKey>` with a fractional order between neighbours.
+        - Array removal produces a tombstone delta like
+          `tags.$array.tag-a` with `value: undefined`.
+        - Array reorder via swap produces minimal order deltas, e.g.
+          `tags.$array.tag-a.order`.
         - Mutating object fields of array items produces deltas addressed by the
-          stable key, not the index.
+          stable key, not the index, e.g. `checklist.$array.item-b.done`.
     - **Code**: extend the draft mutation handler to diff array state in terms
-      of keyed entries + fractional indices. Provide a fractional-indexing utility
-      in `packages/solidDelta/src/utils`.
-4. **Identity for objects with `id`**: prefer `id` as the key when the schema
-   indicates so.
+      of `$array` keyed entries + fractional indices. Support array push,
+      splice, removal, reorder, and object item field mutation.
+4. **Fractional ordering utility**
+    - **Tests** for generating an order before, after, and between existing
+      neighbouring order values.
+    - **Code**: provide a fractional-indexing utility in
+      `packages/solidDelta/src/utils`.
+5. **Identity for objects with `id`**: prefer `id` as the stable item key when
+   writing new object array deltas. Generate a stable key when no `id` exists.
 
 ### Phase 5 — Migrate consumers
 
@@ -313,6 +428,8 @@ Goal: define the pruning interface and ship the default policy.
 - Server-authoritative timestamps / clock-skew correction. Mitigations are
   noted in design but not implemented here.
 - A general `set(item)` schema helper. Add only if a real use case appears.
+- Schema-driven array detection is intentionally out of scope unless a future
+  use case requires it.
 
 ---
 
@@ -324,6 +441,9 @@ Goal: define the pruning interface and ship the default policy.
 - Hand-constructed deltas in application code (if any exist) must move to
   `useDeltaWriter`. A grep for `timestamp: Date.now()` across the repo will
   surface these.
+- Any hand-constructed array deltas must be updated to the reserved `$array`
+  path notation, e.g. `tags.$array.tag-a` instead of `tags.tag-a`.
+- Callers should use `useDeltaWriter` instead of hand-writing array deltas,
+  because the path codec and reserved segment escaping are internal details.
 - The DB row format does not change. Lifecycle deltas use `path = ''` exactly
   as today, just with the value semantics formalised.
-

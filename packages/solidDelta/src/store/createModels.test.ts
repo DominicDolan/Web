@@ -10,6 +10,12 @@ interface TestTask extends Model {
     owner?: {
         name?: string
     }
+    tags?: string[]
+    checklist?: Array<{
+        id: string
+        label: string
+        done: boolean
+    }>
 }
 
 describe("createModels", () => {
@@ -163,6 +169,54 @@ describe("createModels", () => {
 
         expect(models()[0].status).toBe("done");
         expect(models()[0].updatedAt).toBe(20);
+    });
+
+    describe("keyed arrays", () => {
+        it("projects keyed primitive array entries as arrays sorted by order", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "tags.tag-b", {order: 20, value: "beta"}, 20),
+                delta("task-1", "tags.tag-a", {order: 10, value: "alpha"}, 30),
+            ]);
+
+            expect(models()[0].tags).toEqual(["alpha", "beta"]);
+        });
+
+        it("projects keyed object array entries without exposing storage metadata", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "checklist.item-b", {order: 20, id: "item-b", label: "Second", done: false}, 20),
+                delta("task-1", "checklist.item-a", {order: 10, id: "item-a", label: "First", done: true}, 30),
+            ]);
+
+            expect(models()[0].checklist).toEqual([
+                {id: "item-a", label: "First", done: true},
+                {id: "item-b", label: "Second", done: false},
+            ]);
+        });
+
+        it("removes keyed array entries with tombstone-style deltas", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "tags.tag-a", {order: 10, value: "alpha"}, 20),
+                delta("task-1", "tags.tag-b", {order: 20, value: "beta"}, 30),
+                delta("task-1", "tags.tag-b", undefined, 40),
+            ]);
+
+            expect(models()[0].tags).toEqual(["alpha"]);
+        });
+
+        it("applies nested field deltas to keyed object array entries by stable key", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "checklist.item-a", {order: 10, id: "item-a", label: "First", done: false}, 20),
+                delta("task-1", "checklist.item-a.done", true, 30),
+            ]);
+
+            expect(models()[0].checklist).toEqual([
+                {id: "item-a", label: "First", done: true},
+            ]);
+        });
     });
 });
 
