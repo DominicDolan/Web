@@ -44,26 +44,30 @@ for sorting. The user never sees the keys or the internal path segment.
   arrays. The delta path itself is self-describing, which keeps `createModels`
   and `useDeltaWriter` schema-free and primitive.
 
+Array items have a three-phase lifecycle (create → update → delete), with
+two reserved field names — `$order` and `$value` — that follow the same `$`
+prefix convention as `$array`.
+
 Array paths use this convention:
 
 ```ts
-// primitive array item
+// create: primitive array item (reserved $order + $value)
 {
   id: "task-1",
   path: "tags.$array.tag-a",
   value: {
-    order: 10,
-    value: "alpha",
+    $order: 10,
+    $value: "alpha",
   },
   timestamp: 20,
 }
 
-// object array item
+// create: object array item (reserved $order plus user fields)
 {
   id: "task-1",
   path: "checklist.$array.item-b",
   value: {
-    order: 20,
+    $order: 20,
     id: "item-b",
     label: "Second",
     done: false,
@@ -71,7 +75,7 @@ Array paths use this convention:
   timestamp: 30,
 }
 
-// object array item field mutation
+// update: object array item field mutation (leaf primitive)
 {
   id: "task-1",
   path: "checklist.$array.item-b.done",
@@ -79,7 +83,15 @@ Array paths use this convention:
   timestamp: 40,
 }
 
-// array item tombstone/removal
+// update: primitive array item value mutation (leaf primitive)
+{
+  id: "task-1",
+  path: "tags.$array.tag-a.$value",
+  value: "omega",
+  timestamp: 45,
+}
+
+// delete: tombstone
 {
   id: "task-1",
   path: "tags.$array.tag-a",
@@ -87,10 +99,10 @@ Array paths use this convention:
   timestamp: 50,
 }
 
-// reorder
+// update: reorder (leaf primitive on reserved $order)
 {
   id: "task-1",
-  path: "checklist.$array.item-b.order",
+  path: "checklist.$array.item-b.$order",
   value: 15,
   timestamp: 60,
 }
@@ -102,18 +114,25 @@ Projection rules:
   storage.
 - The segment immediately before `$array` is the user-facing array field name.
 - The segment immediately after `$array` is the stable item key.
-- Array entries are sorted by their `order` field.
-- Primitive array entries are stored as `{ order, value }` and projected as the
-  inner `value`.
-- Object array entries are stored as `{ order, ...item }` and projected as the
-  item object without exposing the internal storage key.
+- Create deltas establish the item at `<arrayField>.$array.<itemKey>` with
+  reserved fields `$order` (for sorting) and, for primitives, `$value` (for
+  the inner value). Object items spread user fields alongside `$order`.
+- Update deltas always address leaf paths ending in a primitive value, e.g.
+  `<arrayField>.$array.<itemKey>.done` or
+  `<arrayField>.$array.<itemKey>.$order` or
+  `<arrayField>.$array.<itemKey>.$value`. No coarser-grained field deltas
+  are written — this ensures that concurrent edits to different fields of the
+  same array item never stomp each other.
+- Primitive array entries are projected from their `$value` leaf.
+- Object array entries are projected from their per-field leafs, without
+  exposing internal storage keys or reserved fields (`$order`, `$value`).
 - If the item object has an `id`, use that `id` as the stable item key when
   writing new deltas.
 - If the item does not have an `id`, generate a stable key.
 - Removing an item writes a tombstone delta at
   `<arrayField>.$array.<itemKey>` with `value: undefined`.
-- Reordering should emit minimal order updates, e.g.
-  `<arrayField>.$array.<itemKey>.order`.
+- Reordering should emit minimal order updates on the reserved `$order`
+  field, e.g. `<arrayField>.$array.<itemKey>.$order`.
 
 #### Path encoding / escaping
 
@@ -345,46 +364,61 @@ Goal: extract write logic into its own primitive.
 ### Phase 4 — Keyed arrays + fractional ordering
 
 Goal: arrays in models are projected as real arrays but stored as keyed objects
-under the hood.
+under the hood. Array items have a three-phase lifecycle (create → update →
+delete), with reserved `$order` and `$value` fields using the same `$`-prefix
+convention as `$array`. Updates always target leaf primitives so that
+concurrent edits to different fields of the same item never stomp each other.
 
 1. **Path codec and reserved segment parsing**
     - **Tests** for path encoding/decoding:
         - Literal `.` characters in user keys round-trip safely.
-        - Literal user keys equal to `$array` are escaped and are not treated as
-          array storage.
+        - Literal user keys equal to `$array`, `$order`, or `$value` are
+          escaped and are not treated as reserved.
         - The codec escapes its own escape prefix.
-        - Internal array paths retain an unescaped `$array` segment.
+        - Internal array paths retain unescaped `$array`, `$order`, and
+          `$value` segments.
     - **Code**: implement a shared path codec and parser that distinguishes
-      reserved internal `$array` segments from escaped user keys.
+      reserved internal segments (`$array`, `$order`, `$value`) from escaped
+      user keys.
 2. **Projection**
     - **Tests** in `createModels.test.ts`:
         - Paths such as `tags.$array.tag-a` project as arrays sorted by
-          `order`.
-        - Primitive entries stored as `{ order, value }` project as the inner
-          value.
-        - Object entries stored as `{ order, ...item }` project as item
-          objects without exposing the internal storage key.
-        - Inserting in the middle produces a single new keyed delta.
-        - Removing an item produces a single tombstone-style delta for that key.
+          `$order`.
+        - Primitive entries created as `{ $order, $value }` project as the
+          inner `$value`.
+        - Object entries created as `{ $order, ...item }` project as item
+          objects without exposing reserved fields.
+        - Inserting in the middle produces a single create delta.
+        - Removing an item produces a single tombstone-style delete delta for
+          that key.
         - Object item field mutations such as
-          `checklist.$array.item-b.done` update that array item.
+          `checklist.$array.item-b.done` update that array item at leaf
+          granularity.
+        - Primitive item value mutation via `$value` leaf path updates the
+          projected value.
     - **Code**: extend `createModels` to recognise the reserved `$array` path
-      segment and convert array storage back into ordered arrays.
+      segment and convert array storage back into ordered arrays, using
+      `$order` for sort and `$value` for primitive projection.
 3. **Writes**
     - **Tests** in `useDeltaWriter.test.ts`:
-        - Array `push` produces one new delta like `tags.$array.<itemKey>` with
-          fractional order after the last existing item.
-        - Array `splice` insert in the middle produces a single delta like
-          `tags.$array.<itemKey>` with a fractional order between neighbours.
-        - Array removal produces a tombstone delta like
+        - Array `push` produces one create delta like `tags.$array.<itemKey>`
+          with `{ $order, $value }` (for primitives) or `{ $order, ...fields }`
+          (for objects), with fractional `$order` after the last existing item.
+        - Array `splice` insert in the middle produces a create delta with
+          `$order` between neighbours.
+        - Array removal produces a delete delta like
           `tags.$array.tag-a` with `value: undefined`.
-        - Array reorder via swap produces minimal order deltas, e.g.
-          `tags.$array.tag-a.order`.
-        - Mutating object fields of array items produces deltas addressed by the
-          stable key, not the index, e.g. `checklist.$array.item-b.done`.
+        - Array reorder via swap produces update deltas on
+          `<arrayField>.$array.<itemKey>.$order` for only the moved items.
+        - Mutating object fields of array items produces update deltas
+          addressed by stable key, not index, e.g.
+          `checklist.$array.item-b.done`.
+        - Mutating a primitive array item's value produces an update delta on
+          `tags.$array.<itemKey>.$value`.
     - **Code**: extend the draft mutation handler to diff array state in terms
-      of `$array` keyed entries + fractional indices. Support array push,
-      splice, removal, reorder, and object item field mutation.
+      of `$array` keyed entries + fractional indices. Support array create
+      (push/splice), delete (removal), update (reorder via `$order`, field
+      mutation), and primitive value mutation via `$value`.
 4. **Fractional ordering utility**
     - **Tests** for generating an order before, after, and between existing
       neighbouring order values.
@@ -392,6 +426,13 @@ under the hood.
       `packages/solidDelta/src/utils`.
 5. **Identity for objects with `id`**: prefer `id` as the stable item key when
    writing new object array deltas. Generate a stable key when no `id` exists.
+
+   For objects with an `id`, the create delta value includes `$order` and
+   spreads the user fields (including `id`) — but the path segment key is
+   derived from the object's `id` field, not auto-generated.
+
+   For objects without an `id`, generate a stable key and include all user
+   fields alongside `$order` in the create delta.
 
 ### Phase 5 — Migrate consumers
 

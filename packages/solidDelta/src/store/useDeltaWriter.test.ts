@@ -209,11 +209,11 @@ describe("useDeltaWriter", () => {
     });
 
     describe("array draft mutations", () => {
-        it("turns array push into one new keyed delta ordered after the last item", () => {
+        it("turns array push into one create delta with $order after the last item", () => {
             const writeDeltas = useDeltaWriter<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-                delta("task-1", "tags.$array.tag-a", {order: 10, value: "alpha"}, 20),
-                delta("task-1", "tags.$array.tag-b", {order: 20, value: "beta"}, 30),
+                delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
+                delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
             ]);
 
             const deltas = writeDeltas("task-1", (draft) => {
@@ -223,17 +223,17 @@ describe("useDeltaWriter", () => {
             expect(deltas).toHaveLength(1);
             expect(deltas[0].path).toMatch(/^tags\.\$array\.[^.]+$/);
             expect(deltas[0].value).toMatchObject({
-                value: "gamma",
-                order: expect.any(Number),
+                $value: "gamma",
+                $order: expect.any(Number),
             });
-            expect(deltas[0].value.order).toBeGreaterThan(20);
+            expect(deltas[0].value.$order).toBeGreaterThan(20);
         });
 
-        it("turns middle array splice into one keyed delta ordered between its neighbours", () => {
+        it("turns middle array splice into a create delta with $order between neighbours", () => {
             const writeDeltas = useDeltaWriter<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-                delta("task-1", "tags.$array.tag-a", {order: 10, value: "alpha"}, 20),
-                delta("task-1", "tags.$array.tag-c", {order: 30, value: "charlie"}, 30),
+                delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
+                delta("task-1", "tags.$array.tag-c", {$order: 30, $value: "charlie"}, 30),
             ]);
 
             const deltas = writeDeltas("task-1", (draft) => {
@@ -243,18 +243,18 @@ describe("useDeltaWriter", () => {
             expect(deltas).toHaveLength(1);
             expect(deltas[0].path).toMatch(/^tags\.\$array\.[^.]+$/);
             expect(deltas[0].value).toMatchObject({
-                value: "bravo",
-                order: expect.any(Number),
+                $value: "bravo",
+                $order: expect.any(Number),
             });
-            expect(deltas[0].value.order).toBeGreaterThan(10);
-            expect(deltas[0].value.order).toBeLessThan(30);
+            expect(deltas[0].value.$order).toBeGreaterThan(10);
+            expect(deltas[0].value.$order).toBeLessThan(30);
         });
 
-        it("uses a new generated key when inserting primitive array items", () => {
+        it("uses a new generated key when creating primitive array items", () => {
             const writeDeltas = useDeltaWriter<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-                delta("task-1", "tags.$array.tag-a", {order: 10, value: "alpha"}, 20),
-                delta("task-1", "tags.$array.tag-b", {order: 20, value: "beta"}, 30),
+                delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
+                delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
             ]);
 
             const [newDelta] = writeDeltas("task-1", (draft) => {
@@ -266,11 +266,11 @@ describe("useDeltaWriter", () => {
             expect(newDelta.path).toMatch(/^tags\.\$array\.[^.]+$/);
         });
 
-        it("uses an inserted object item's id as its stable storage key", () => {
+        it("uses an object item's id as its storage key in a create delta with $order", () => {
             const writeDeltas = useDeltaWriter<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-                delta("task-1", "checklist.$array.item-a", {order: 10, id: "item-a", label: "First", done: false}, 20),
-                delta("task-1", "checklist.$array.item-c", {order: 30, id: "item-c", label: "Third", done: false}, 30),
+                delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: false}, 20),
+                delta("task-1", "checklist.$array.item-c", {$order: 30, id: "item-c", label: "Third", done: false}, 30),
             ]);
 
             const deltas = writeDeltas("task-1", (draft) => {
@@ -285,20 +285,20 @@ describe("useDeltaWriter", () => {
                         id: "item-b",
                         label: "Second",
                         done: false,
-                        order: expect.any(Number),
+                        $order: expect.any(Number),
                     },
                 }),
             ]);
-            expect(deltas[0].value.order).toBeGreaterThan(10);
-            expect(deltas[0].value.order).toBeLessThan(30);
+            expect(deltas[0].value.$order).toBeGreaterThan(10);
+            expect(deltas[0].value.$order).toBeLessThan(30);
         });
 
-        it("turns array item removal into one tombstone delta for the stable key", () => {
+        it("turns array item removal into a delete delta for the stable key", () => {
             const writeDeltas = useDeltaWriter<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-                delta("task-1", "tags.$array.tag-a", {order: 10, value: "alpha"}, 20),
-                delta("task-1", "tags.$array.tag-b", {order: 20, value: "beta"}, 30),
-                delta("task-1", "tags.$array.tag-c", {order: 30, value: "charlie"}, 40),
+                delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
+                delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
+                delta("task-1", "tags.$array.tag-c", {$order: 30, $value: "charlie"}, 40),
             ]);
 
             const deltas = writeDeltas("task-1", (draft) => {
@@ -314,12 +314,12 @@ describe("useDeltaWriter", () => {
             ]);
         });
 
-        it("turns array reorder into minimal order deltas for only the moved items", () => {
+        it("turns array reorder into update deltas on $order for only the moved item", () => {
             const writeDeltas = useDeltaWriter<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-                delta("task-1", "tags.$array.tag-a", {order: 10, value: "alpha"}, 20),
-                delta("task-1", "tags.$array.tag-b", {order: 20, value: "beta"}, 30),
-                delta("task-1", "tags.$array.tag-c", {order: 30, value: "charlie"}, 40),
+                delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
+                delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
+                delta("task-1", "tags.$array.tag-c", {$order: 30, $value: "charlie"}, 40),
             ]);
 
             const deltas = writeDeltas("task-1", (draft) => {
@@ -330,7 +330,7 @@ describe("useDeltaWriter", () => {
             expect(deltas).toHaveLength(1);
             expect(deltas[0]).toMatchObject({
                 id: "task-1",
-                path: "tags.$array.tag-a.order",
+                path: "tags.$array.tag-a.$order",
                 value: expect.any(Number),
             });
             expect(deltas[0].value).toBeGreaterThan(30);
@@ -339,8 +339,8 @@ describe("useDeltaWriter", () => {
         it("addresses object item field mutations by stable key rather than array index", () => {
             const writeDeltas = useDeltaWriter<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-                delta("task-1", "checklist.$array.item-a", {order: 10, id: "item-a", label: "First", done: false}, 20),
-                delta("task-1", "checklist.$array.item-b", {order: 20, id: "item-b", label: "Second", done: false}, 30),
+                delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: false}, 20),
+                delta("task-1", "checklist.$array.item-b", {$order: 20, id: "item-b", label: "Second", done: false}, 30),
             ]);
 
             const deltas = writeDeltas("task-1", (draft) => {
@@ -357,11 +357,11 @@ describe("useDeltaWriter", () => {
             expect(deltas[0].path).not.toContain(".1.");
         });
 
-        it("does not rewrite unchanged keyed array entries when one object item changes", () => {
+        it("does not rewrite unchanged array entries when one object item changes", () => {
             const writeDeltas = useDeltaWriter<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-                delta("task-1", "checklist.$array.item-a", {order: 10, id: "item-a", label: "First", done: false}, 20),
-                delta("task-1", "checklist.$array.item-b", {order: 20, id: "item-b", label: "Second", done: false}, 30),
+                delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: false}, 20),
+                delta("task-1", "checklist.$array.item-b", {$order: 20, id: "item-b", label: "Second", done: false}, 30),
             ]);
 
             const deltas = writeDeltas("task-1", (draft) => {
@@ -377,6 +377,28 @@ describe("useDeltaWriter", () => {
             ]);
             expect(deltas.some((nextDelta) => nextDelta.path.startsWith("checklist.$array.item-a"))).toBe(false);
             expect(deltas.some((nextDelta) => nextDelta.path === "checklist.$array.item-b")).toBe(false);
+        });
+    });
+
+    describe("primitive array value mutations", () => {
+        it("updates a primitive array item via $value leaf path", () => {
+            const writeDeltas = useDeltaWriter<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
+                delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
+            ]);
+
+            const deltas = writeDeltas("task-1", (draft) => {
+                draft.tags![0] = "omega";
+            });
+
+            expect(deltas).toEqual([
+                expect.objectContaining({
+                    id: "task-1",
+                    path: "tags.$array.tag-a.$value",
+                    value: "omega",
+                }),
+            ]);
         });
     });
 });
