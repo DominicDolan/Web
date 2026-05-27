@@ -217,6 +217,7 @@ describe("useDeltaWriter", () => {
             ]);
 
             const deltas = writeDeltas("task-1", (draft) => {
+                console.log(draft.tags)
                 draft.tags!.push("gamma");
             });
 

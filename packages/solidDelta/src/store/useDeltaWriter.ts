@@ -78,14 +78,17 @@ export function useDeltaWriter<M extends Model>(
 
         mutate(draft);
 
-        return diffPaths(original, draft)
+        const diffs = diffPaths(original, draft)
             .filter((write) => !isMetadataPath(write.path))
-            .map((write) => ({
-                id,
-                path: write.path.join(".") as ModelDelta<M>["path"],
-                value: cloneValue(write.value),
-                timestamp: Date.now(),
-            }));
+
+        console.log(diffs)
+
+        return diffs.map((write) => ({
+            id,
+            path: write.path.join(".") as ModelDelta<M>["path"],
+            value: cloneValue(write.value),
+            timestamp: Date.now(),
+        }));
     }
 }
 
