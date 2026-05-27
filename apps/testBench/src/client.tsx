@@ -1,10 +1,11 @@
 import { render } from '@solidjs/web';
 import {TodoPage} from "./TodoPage/TodoPage";
+import {ProjectionTest} from "~/ProjectionTest.tsx";
 
 
 export default function App() {
     return <main>
-        <TodoPage/>
+        <ProjectionTest/>
     </main>
 }
 

@@ -25,7 +25,7 @@ export default function ThemeEditor() {
                     <ul class="nav flex flex-col gap-4 w-full pl-0">
                         <For each={themes}>
                             {(theme) => <li>
-                                <A href={`/editor/${theme().id}`} class={"block"}>{theme().name}</A>
+                                <A href={`/editor/${theme.id}`} class={"block"}>{theme.name}</A>
                             </li>}
                         </For>
                     </ul>
