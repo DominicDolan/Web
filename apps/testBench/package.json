@@ -14,9 +14,9 @@
     "@web/solid-scope": "*",
     "@web/unolayout": "*",
     "@web/utils": "*",
-    "vite": "8.0.8",
-    "solid-js": "2.0.0-beta.7",
-    "@solidjs/web": "2.0.0-beta.7"
+    "vite": "8.0.14",
+    "solid-js": "2.0.0-beta.14",
+    "@solidjs/web": "2.0.0-beta.14"
   },
   "devDependencies": {
     "vite-tsconfig-paths": "6.1.1"

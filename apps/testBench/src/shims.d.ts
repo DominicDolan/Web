@@ -2,7 +2,7 @@ type LayoutAttributeNames = "flex" | "grid" | "grid-area" | "grid-row" | "grid-c
 
 export interface LayoutAttributes extends Partial<Record<LayoutAttributeNames, string | boolean>> {}
 
-declare module 'solid-js' {
+declare module '@solidjs/web' {
     namespace JSX {
         interface HTMLAttributes<T> extends LayoutAttributes {}
     }

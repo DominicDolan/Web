@@ -7,8 +7,8 @@
     "dev": "vite dev --port 3001"
   },
   "dependencies": {
-    "solid-js": "2.0.0-beta.7",
-    "@solidjs/web": "2.0.0-beta.7",
+    "solid-js": "2.0.0-beta.14",
+    "@solidjs/web": "2.0.0-beta.14",
     "@web/components": "*",
     "@web/utils": "*",
     "@web/schema": "*",
