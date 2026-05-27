@@ -10,7 +10,7 @@ export function TodoList() {
     return <div flex="col gap-2">
         <Loading fallback={<div>Loading...</div>}>
             <For each={todos}>{ todo => <>
-                <TodoItem todo={todo()}/>
+                <TodoItem todo={todo}/>
             </>}</For>
         </Loading>
     </div>

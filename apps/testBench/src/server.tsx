@@ -8,11 +8,5 @@ export default createServer(async (event) => {
             headers: { 'content-type': 'application/json' },
         })
     }
-
-    if (url.pathname === '/api/users' && event.request.method === 'POST') {
-        const body = await event.request.json()
-        return Response.json({ created: true, body })
-    }
-
-    return undefined
 })
+
