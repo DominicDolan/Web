@@ -1,8 +1,8 @@
-import {createMemo, createRoot, createSignal, flush} from "solid-js";
+import {createSignal, flush} from "solid-js";
 import {describe, expect, it} from "vitest";
 import {Model} from "@web/schema";
 import {ModelDelta} from "../model/ModelDelta";
-import {createModels, createModelsById, createModelsById2} from "./createModels";
+import {createModels} from "./createModels";
 
 interface TestTask extends Model {
     title: string
@@ -20,24 +20,18 @@ interface TestTask extends Model {
 
 describe("createModels", () => {
     it("projects a create delta with initial values into a visible model", async () => {
-        await createRoot(async (dispose) => {
-            const models = createModels<TestTask>(() => [
-                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-            ]);
+        const models = createModels<TestTask>(() => [
+            delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+        ]);
 
-            await new Promise(resolve => setTimeout(resolve, 0));
-
-            expect(models).toEqual([
-                {
-                    id: "task-1",
-                    updatedAt: 10,
-                    title: "Write tests",
-                    status: "todo",
-                },
-            ]);
-
-            dispose()
-        })
+        expect(models).toEqual([
+            {
+                id: "task-1",
+                updatedAt: 10,
+                title: "Write tests",
+                status: "todo",
+            },
+        ]);
     });
 
     it("hides a model when the latest lifecycle delta is a delete", () => {
@@ -47,7 +41,7 @@ describe("createModels", () => {
             delta("task-1", "", undefined, 30),
         ]);
 
-        expect(models()).toEqual([]);
+        expect(models).toEqual([]);
     });
 
     it("restores a model when a create arrives after a delete", () => {
@@ -57,7 +51,7 @@ describe("createModels", () => {
             delta("task-1", "", {title: "Restored title", status: "doing"}, 30),
         ]);
 
-        expect(models()).toEqual([
+        expect(models).toEqual([
             {
                 id: "task-1",
                 updatedAt: 30,
@@ -73,7 +67,7 @@ describe("createModels", () => {
             delta("task-1", "owner.name", "Ada", 10),
         ]);
 
-        expect(models()).toEqual([
+        expect(models).toEqual([
             {
                 id: "task-1",
                 updatedAt: 20,
@@ -92,7 +86,7 @@ describe("createModels", () => {
             delta("task-1", "status", "doing", 10),
         ]);
 
-        expect(models()).toEqual([
+        expect(models).toEqual([
             {
                 id: "task-1",
                 updatedAt: 20,
@@ -110,7 +104,7 @@ describe("createModels", () => {
             delta("task-1", "", {title: "Restored title", status: "doing"}, 40),
         ]);
 
-        expect(models()).toEqual([
+        expect(models).toEqual([
             {
                 id: "task-1",
                 updatedAt: 40,
@@ -131,7 +125,7 @@ describe("createModels", () => {
             delta("task-1", "title", "Newer title", 20),
         ]);
 
-        expect(models()).toEqual([
+        expect(models).toEqual([
             {
                 id: "task-1",
                 updatedAt: 20,
@@ -148,7 +142,7 @@ describe("createModels", () => {
             delta("task-1", "owner.name", undefined, 30),
         ]);
 
-        expect(models()).toEqual([
+        expect(models).toEqual([
             {
                 id: "task-1",
                 updatedAt: 30,
@@ -165,7 +159,7 @@ describe("createModels", () => {
         ]);
         const models = createModels<TestTask>(deltas);
 
-        expect(models()[0].status).toBe("todo");
+        expect(models[0].status).toBe("todo");
 
         setDeltas((current) => [
             ...current,
@@ -173,130 +167,77 @@ describe("createModels", () => {
         ]);
         flush();
 
-        expect(models()[0].status).toBe("done");
-        expect(models()[0].updatedAt).toBe(20);
+        expect(models[0].status).toBe("done");
+        expect(models[0].updatedAt).toBe(20);
     });
 
-    // describe("keyed arrays", () => {
-    //     it("projects keyed primitive array entries as arrays sorted by order", () => {
-    //         const models = createModels<TestTask>(() => [
-    //             delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-    //             delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 20),
-    //             delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 30),
-    //         ]);
-    //
-    //         expect(models()[0].tags).toEqual(["alpha", "beta"]);
-    //     });
-    //
-    //     it("projects keyed object array entries without exposing storage metadata", () => {
-    //         const models = createModels<TestTask>(() => [
-    //             delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-    //             delta("task-1", "checklist.$array.item-b", {$order: 20, id: "item-b", label: "Second", done: false}, 20),
-    //             delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: true}, 30),
-    //         ]);
-    //
-    //         expect(models()[0].checklist).toEqual([
-    //             {id: "item-a", label: "First", done: true},
-    //             {id: "item-b", label: "Second", done: false},
-    //         ]);
-    //     });
-    //
-    //     it("removes keyed array entries with tombstone-style deltas", () => {
-    //         const models = createModels<TestTask>(() => [
-    //             delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-    //             delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
-    //             delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
-    //             delta("task-1", "tags.$array.tag-b", undefined, 40),
-    //         ]);
-    //
-    //         expect(models()[0].tags).toEqual(["alpha"]);
-    //     });
-    //
-    //     it("applies nested field deltas to keyed object array entries by stable key", () => {
-    //         const models = createModels<TestTask>(() => [
-    //             delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-    //             delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: false}, 20),
-    //             delta("task-1", "checklist.$array.item-a.done", true, 30),
-    //         ]);
-    //
-    //         expect(models()[0].checklist).toEqual([
-    //             {id: "item-a", label: "First", done: true},
-    //         ]);
-    //     });
-    //
-    //     it("updates primitive array item value via $value leaf path", () => {
-    //         const models = createModels<TestTask>(() => [
-    //             delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-    //             delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
-    //             delta("task-1", "tags.$array.tag-a.$value", "omega", 30),
-    //         ]);
-    //
-    //         expect(models()[0].tags).toEqual(["omega"]);
-    //     });
-    //
-    //     it("updates array item order via $order leaf path", () => {
-    //         const models = createModels<TestTask>(() => [
-    //             delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
-    //             delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
-    //             delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
-    //             delta("task-1", "tags.$array.tag-a.$order", 25, 40),
-    //         ]);
-    //
-    //         expect(models()[0].tags).toEqual(["beta", "alpha"]);
-    //     });
-    // });
-});
+    describe("keyed arrays", () => {
+        it("projects keyed primitive array entries as arrays sorted by order", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 20),
+                delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 30),
+            ]);
 
-describe("createModelsById", () => {
-    it("projects visible models into a record keyed by id", () => {
-        const modelsById = createModelsById<TestTask>(() => [
-            delta("task-1", "", {title: "First", status: "todo"}, 10),
-            delta("task-2", "", {title: "Second", status: "doing"}, 20),
-            delta("task-2", "", undefined, 30),
-        ]);
-
-        expect(modelsById()).toEqual({
-            "task-1": {
-                id: "task-1",
-                updatedAt: 10,
-                title: "First",
-                status: "todo",
-            },
-        });
-    });
-
-    it("only updates the specific model that changed", () => {
-        const [deltas, setDeltas] = createSignal<ModelDelta<TestTask>[]>([
-            delta("task-1", "", {title: "Task 1", status: "todo"}, 10),
-            delta("task-2", "", {title: "Task 2", status: "todo"}, 10),
-        ]);
-        const modelsById = createModelsById2<TestTask>(deltas);
-
-        let task1Updates = 0;
-        let task2Updates = 0;
-
-        createRoot(() => {
-            createMemo(() => {
-                modelsById()["task-1"];
-                task1Updates++;
-            });
-            createMemo(() => {
-                modelsById()["task-2"];
-                task2Updates++;
-            });
+            expect(models[0].tags).toEqual(["alpha", "beta"]);
         });
 
-        expect(task1Updates).toBe(1);
-        expect(task2Updates).toBe(1);
+        it("projects keyed object array entries without exposing storage metadata", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "checklist.$array.item-b", {$order: 20, id: "item-b", label: "Second", done: false}, 20),
+                delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: true}, 30),
+            ]);
 
-        setDeltas((current) => [
-            ...current,
-            delta<TestTask>("task-1", "status", "done", 20),
-        ]);
-        flush();
+            expect(models[0].checklist).toEqual([
+                {id: "item-a", label: "First", done: true},
+                {id: "item-b", label: "Second", done: false},
+            ]);
+        });
 
-        expect(task1Updates).toBe(2);
-        expect(task2Updates).toBe(1);
+        it("removes keyed array entries with tombstone-style deltas", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
+                delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
+                delta("task-1", "tags.$array.tag-b", undefined, 40),
+            ]);
+
+            expect(models[0].tags).toEqual(["alpha"]);
+        });
+
+        it("applies nested field deltas to keyed object array entries by stable key", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: false}, 20),
+                delta("task-1", "checklist.$array.item-a.done", true, 30),
+            ]);
+
+            expect(models[0].checklist).toEqual([
+                {id: "item-a", label: "First", done: true},
+            ]);
+        });
+
+        it("updates primitive array item value via $value leaf path", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
+                delta("task-1", "tags.$array.tag-a.$value", "omega", 30),
+            ]);
+
+            expect(models[0].tags).toEqual(["omega"]);
+        });
+
+        it("updates array item order via $order leaf path", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
+                delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
+                delta("task-1", "tags.$array.tag-a.$order", 25, 40),
+            ]);
+
+            expect(models[0].tags).toEqual(["beta", "alpha"]);
+        });
     });
 });
 

@@ -1,132 +1,6 @@
 import {Accessor, createEffect, createMemo, createProjection} from "solid-js";
 import {Model, PartialModel} from "@web/schema";
 import {ModelDelta} from "../model/ModelDelta";
-import {cloneValue, isPlainObject} from "../utils/ObjectUtils";
-
-type ProjectedModel<M extends Model, Valid extends boolean> = Valid extends true ? M : PartialModel<M>
-type ProjectedModelsById<M extends Model, Valid extends boolean> = Record<string, ProjectedModel<M, Valid>>
-
-type FormattedDeltas<M extends Model> = {
-    id: string
-    timestamp: number
-    path: string[]
-    value: any
-}
-
-function formatPath(path: string): string[] {
-    const sanitizedPath = path.replace(/\.$/, '');
-    return path.split('.');
-}
-
-export function useModelCreator<M extends Model>(deltas: Accessor<readonly ModelDelta<M>[]>) {
-
-    const formattedDeltas: Accessor<FormattedDeltas<M>[]> = createMemo(() => {
-
-
-
-        return deltas().map(delta => {
-            const path = delta.path.split(".")
-            const sanitizedPath = path
-                .map(segment => segment.trim())
-            return ({
-                id: delta.id,
-                timestamp: delta.timestamp,
-                path: delta.path,
-                value: delta.value
-            });
-        })
-    })
-    return {
-        formattedDeltas: createMemo(() => {
-
-            return deltas().map(delta => {
-                const path = delta.path.split(".")
-                const sanitizedPath = path
-                    .map(segment => segment.trim())
-                return ({
-                    id: delta.id,
-                    timestamp: delta.timestamp,
-                    path: delta.path,
-                    value: delta.value
-                });
-            })
-        })
-    }
-}
-
-//
-// export function createModel<M extends Model>(deltas: Accessor<readonly ModelDelta<M>[]>) {
-//
-//     const model = createProjection((draft) => {
-//         const sortedDeltas = [...deltas()].sort((a, b) => a.timestamp - b.timestamp)
-//
-//         let latestCreate = -Infinity;
-//         let latestDelete = -Infinity;
-//
-//         for (const delta of sortedDeltas) {
-//             if (delta.path !== "") continue;
-//
-//             if (delta.value === undefined) {
-//                 latestDelete = Math.max(latestDelete, delta.timestamp);
-//             } else {
-//                 latestCreate = Math.max(latestCreate, delta.timestamp);
-//             }
-//         }
-//     })
-//
-//     const idDeltas = [...unsortedDeltas].sort((a, b) => a.timestamp - b.timestamp);
-//     let latestCreate = -Infinity;
-//     let latestDelete = -Infinity;
-//
-//     for (const delta of idDeltas) {
-//         if (delta.path !== "") continue;
-//
-//         if (delta.value === undefined) {
-//             latestDelete = Math.max(latestDelete, delta.timestamp);
-//         } else {
-//             latestCreate = Math.max(latestCreate, delta.timestamp);
-//         }
-//     }
-//
-//     if (latestCreate === -Infinity || latestDelete > latestCreate) continue;
-//
-//     const model = {id, updatedAt: latestCreate} as PartialModel<M>;
-//     const writeTimestamps = new Map<string, number>();
-//
-//     for (const delta of idDeltas) {
-//         if (delta.path === "") {
-//             if (delta.value === undefined) continue;
-//
-//             for (const key in delta.value) {
-//                 if (key === "id" || key === "updatedAt") continue
-//
-//                 model[key as keyof PartialModel<M>] = delta.value[key]
-//             }
-//         } else {
-//             const pathKey = delta.path;
-//             const existingTimestamp = writeTimestamps.get(delta.path);
-//             if (existingTimestamp != null && existingTimestamp > delta.timestamp) continue;
-//
-//             writeTimestamps.set(pathKey, delta.timestamp);
-//             setByPath(model, splitPath(delta.path), delta.value);
-//         }
-//     }
-//
-//     model.updatedAt = Math.max(
-//         latestCreate,
-//         ...[...writeTimestamps.values()],
-//     );
-//     modelsById[id] = model;
-// }
-
-export function useDeltasById<M extends Model>(id: string, allDeltas: Accessor<readonly ModelDelta<M>[]>) {
-    const deltasById = createProjection((draft) => {
-        draft.splice(0, draft.length, ...allDeltas().filter(delta => delta.id === id));
-    }, [] as ModelDelta<M>[])
-    return {
-        deltasById
-    }
-}
 
 function insertValueByTimestamp<M extends Model>(arr: ModelDelta<M>[], el: ModelDelta<M>) {
     let left = 0;
@@ -144,14 +18,41 @@ function insertValueByTimestamp<M extends Model>(arr: ModelDelta<M>[], el: Model
     arr.splice(left, 0, el);
 }
 
+function applyObjectPathToModel(model: any, path: string, value: any) {
+    const pathParts = path.split(".")
+    let currentObj = model
+
+    for (let i = 0; i < pathParts.length; i++) {
+        const part = pathParts[i];
+        const next = pathParts[i + 1];
+
+        if (next == null) {
+            if (value === undefined) {
+                delete currentObj[part];
+            } else {
+                currentObj[part] = value;
+            }
+            return
+        }
+
+        if (currentObj[part] == null) {
+            currentObj[part] = {};
+        }
+
+        currentObj = currentObj[part];
+    }
+}
+
 export function createModels<M extends Model>(
     deltas: Accessor<readonly ModelDelta<M>[]>
 ) {
-    console.log("createModels", deltas)
 
-    const deltasById = createProjection((draft) => {
-        console.log("deltasById")
+    const deltasByIdNoArrays = createProjection((draft) => {
         for (const delta of deltas()) {
+            if (delta.path.includes("$array")) {
+                continue
+            }
+
             if (draft[delta.id] == null) {
                 draft[delta.id] = [delta]
                 continue
@@ -168,19 +69,77 @@ export function createModels<M extends Model>(
                 continue
             }
 
-            if (draft[delta.id][existingDeltaIndex].timestamp > delta.timestamp) {
+            if (draft[delta.id][existingDeltaIndex].timestamp < delta.timestamp) {
                 draft[delta.id].splice(existingDeltaIndex, 1)
                 insertValueByTimestamp(draft[delta.id], delta)
             }
         }
     }, {} as Record<string, ModelDelta<M>[]>)
 
+    const arrayMapById = createProjection((draft) => {
+        for (const delta of deltas()) {
+            if (!delta.path.includes("$array")) {
+                continue
+            }
+
+            const [pathKey, rest ] = delta.path.split(".$array")
+
+            if (draft[delta.id] == null) {
+                draft[delta.id] = {}
+            }
+
+            if (draft[delta.id][pathKey] == null) {
+                draft[delta.id][pathKey] = []
+            }
+
+            const path = rest.split(".")
+            const [_, key, nextPart] = path
+            let index = draft[delta.id][pathKey].findIndex((a: any) => a.key === key)
+
+            if (index === -1) {
+                draft[delta.id][pathKey].push({ key })
+                index = draft[delta.id][pathKey].length - 1
+            }
+
+            if (nextPart == null) {
+                if (delta.value == undefined) {
+                    draft[delta.id][pathKey].splice(index, 1)
+                    continue
+                }
+                if (delta.value.$value != null) {
+                    draft[delta.id][pathKey][index].$value = delta.value.$value
+                } else {
+                    if (draft[delta.id][pathKey][index].$value == null) {
+                        draft[delta.id][pathKey][index].$value = {}
+                    }
+                    for (const deltaKey in delta.value) {
+                        if (deltaKey === "$order") {
+                            continue
+                        }
+                        draft[delta.id][pathKey][index].$value[deltaKey] = delta.value[deltaKey]
+                    }
+                }
+
+                draft[delta.id][pathKey][index].$order = delta.value.$order
+            } else if (nextPart === "$value") {
+                draft[delta.id][pathKey][index].$value = delta.value
+            } else if (nextPart === "$order") {
+                draft[delta.id][pathKey][index].$order = delta.value
+            } else {
+                if (draft[delta.id][pathKey][index].$value == null) {
+                    draft[delta.id][pathKey][index].$value = {}
+                }
+                applyObjectPathToModel(draft[delta.id][pathKey][index].$value, nextPart, delta.value)
+            }
+        }
+    }, {} as Record<string, Record<string, { key: string, $order?: number, $value?: any }[]>>)
+
     return createProjection((draft) => {
-        for (const id in deltasById) {
+        for (const id in deltasByIdNoArrays) {
             const existingIndex = draft.findIndex(m => m.id === id)
 
             const index = existingIndex === -1 ? draft.length : existingIndex
-            for (const delta of deltasById[id]) {
+            for (const delta of deltasByIdNoArrays[id]) {
                 if (delta.path === "" && delta.value === undefined) {
                     draft[index] = undefined as unknown as M
                 } else if (delta.path === "" && delta.value !== undefined) {
@@ -190,14 +149,29 @@ export function createModels<M extends Model>(
                     for (const key in delta.value) {
                         draft[index][key as keyof M] = delta.value[key]
                     }
+
+                    draft[index].updatedAt = Math.max(delta.timestamp, draft[index].updatedAt ?? -Infinity)
                 } else {
                     if (draft[index] === undefined) {
                         draft[index] = { id } as M
                     }
-                    draft[index][delta.path as keyof M] = delta.value
+                    applyObjectPathToModel(draft[index], delta.path, delta.value)
+                    draft[index].updatedAt = Math.max(delta.timestamp, draft[index].updatedAt ?? -Infinity)
                 }
             }
+        }
 
+        for (const id in arrayMapById) {
+            for (const pathKey in arrayMapById[id]) {
+                const array = arrayMapById[id][pathKey]
+                    .toSorted((a, b) => (a.$order ?? Number.MAX_VALUE) - (b.$order ?? Number.MAX_VALUE))
+                    .map((item) => item.$value)
+
+                const model = draft.find(item => item.id === id) ?? { id } as M
+                applyObjectPathToModel(model, pathKey, array)
+
+                model.updatedAt = Math.max(/*delta.timestamp*/0, model.updatedAt ?? -Infinity)
+            }
         }
 
         for (let i = 0; i < draft.length; i++) {
@@ -207,139 +181,6 @@ export function createModels<M extends Model>(
             }
         }
 
-        console.log("draft", draft)
     }, [] as M[])
-}
-
-
-export function createModelsById2<M extends Model, Valid extends boolean = true>(
-    deltas: Accessor<readonly ModelDelta<M>[]>,
-    _opts?: { assumeValid: Valid },
-): Accessor<ProjectedModelsById<M, Valid>> {
-    return createMemo(() => {
-        const grouped = new Map<string, ModelDelta<M>[]>();
-
-        for (const delta of deltas()) {
-            const group = grouped.get(delta.id);
-            if (group == null) {
-                grouped.set(delta.id, [delta]);
-            } else {
-                group.push(delta);
-            }
-        }
-
-        const modelsById: Record<string, PartialModel<M>> = {};
-
-        for (const [id, unsortedDeltas] of grouped) {
-            const idDeltas = [...unsortedDeltas].sort((a, b) => a.timestamp - b.timestamp);
-            let latestCreate = -Infinity;
-            let latestDelete = -Infinity;
-
-            for (const delta of idDeltas) {
-                if (delta.path !== "") continue;
-
-                if (delta.value === undefined) {
-                    latestDelete = Math.max(latestDelete, delta.timestamp);
-                } else {
-                    latestCreate = Math.max(latestCreate, delta.timestamp);
-                }
-            }
-
-            if (latestCreate === -Infinity || latestDelete > latestCreate) continue;
-
-            const model = {id, updatedAt: latestCreate} as PartialModel<M>;
-            const writeTimestamps = new Map<string, number>();
-
-            for (const delta of idDeltas) {
-                if (delta.path === "") {
-                    if (delta.value === undefined) continue;
-
-                    for (const key in delta.value) {
-                        if (key === "id" || key === "updatedAt") continue
-
-                        model[key as keyof PartialModel<M>] = delta.value[key]
-                    }
-                } else {
-                    const pathKey = delta.path;
-                    const existingTimestamp = writeTimestamps.get(delta.path);
-                    if (existingTimestamp != null && existingTimestamp > delta.timestamp) continue;
-
-                    writeTimestamps.set(pathKey, delta.timestamp);
-                    setByPath(model, splitPath(delta.path), delta.value);
-                }
-            }
-
-            model.updatedAt = Math.max(
-                latestCreate,
-                ...[...writeTimestamps.values()],
-            );
-            modelsById[id] = model;
-        }
-
-        return modelsById as ProjectedModelsById<M, Valid>;
-    });
-}
-
-export function createModels2<M extends Model, Valid extends boolean = true>(
-    deltas: Accessor<readonly ModelDelta<M>[]>,
-    opts?: { assumeValid: Valid },
-): Accessor<Array<ProjectedModel<M, Valid>>> {
-    const modelsById = createModelsById2(deltas, opts);
-
-    return createMemo(() => Object.values(modelsById()) as Array<ProjectedModel<M, Valid>>);
-}
-
-function splitPath(path: string): string[] {
-    return path.split(".").filter(Boolean);
-}
-
-function applyWrite(
-    model: Record<string, any>,
-    path: string[],
-    value: any,
-    timestamp: number,
-    writeTimestamps: Map<string, number>,
-) {
-    if (path.length === 0) return;
-
-    const pathKey = path.join(".");
-    const existingTimestamp = writeTimestamps.get(pathKey);
-    if (existingTimestamp != null && existingTimestamp > timestamp) return;
-
-    writeTimestamps.set(pathKey, timestamp);
-    setByPath(model, path, value);
-}
-
-function setByPath(obj: Record<string, any>, path: string[], value: any) {
-    let nestedObj = obj;
-
-    for (let i = 0; i < path.length - 1; i++) {
-        const part = path[i];
-
-        if (nestedObj[part] == null || typeof nestedObj[part] !== "object" || Array.isArray(nestedObj[part])) {
-            if (value === undefined) return;
-            nestedObj[part] = {};
-        }
-
-        nestedObj = nestedObj[part];
-    }
-
-    const key = path.at(-1)!;
-    if (value === undefined) {
-        delete nestedObj[key];
-    } else {
-        nestedObj[key] = cloneValue(value);
-    }
-}
-
-function valueWrites(path: string[], value: any): Array<{ path: string[], value: any }> {
-    if (!isPlainObject(value)) return [{path, value}];
-
-    const entries = Object.entries(value)
-        .filter(([key]) => key !== "id" && key !== "updatedAt");
-
-    if (entries.length === 0 && path.length > 0) return [{path, value}];
-
-    return entries.flatMap(([key, child]) => valueWrites([...path, key], child));
 }
 

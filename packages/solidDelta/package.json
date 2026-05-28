@@ -7,11 +7,11 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "test": "vitest",
+    "test": "vitest --run",
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "vitest": "4.1.1",
+    "vitest": "4.1.7",
     "jsdom": "29.0.1",
     "solid-js": "2.0.0-beta.14",
     "@paralleldrive/cuid2": "3.3.0",
