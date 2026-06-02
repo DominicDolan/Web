@@ -1,6 +1,9 @@
-import {Accessor, createEffect, createMemo, createProjection} from "solid-js";
-import {Model, PartialModel} from "@web/schema";
+import {Accessor, createProjection} from "solid-js";
+import {Model} from "@web/schema";
 import {ModelDelta} from "../model/ModelDelta";
+
+type ArrayItem = { key: string, $order?: number, $value?: any, timestamp: number }
+type ArrayMap = Record<string, ArrayItem[]>
 
 function insertDeltaByTimestamp<M extends Model>(arr: ModelDelta<M>[], el: ModelDelta<M>) {
     let left = 0;
@@ -63,11 +66,76 @@ function applyObjectPathToModel(model: any, path: string, value: any) {
     }
 }
 
+function applyArrayDeltaToMap<M extends Model>(arrayMap: ArrayMap, delta: ModelDelta<M>) {
+    const [pathKey, rest] = delta.path.split(".$array")
+
+    if (arrayMap[pathKey] == null) {
+        arrayMap[pathKey] = []
+    }
+
+    const path = rest.split(".")
+    const [_, key, nextPart] = path
+    let index = arrayMap[pathKey].findIndex((a: any) => a.key === key)
+
+    if (index === -1) {
+        arrayMap[pathKey].push({key, timestamp: delta.timestamp})
+        index = arrayMap[pathKey].length - 1
+    }
+
+    if (arrayMap[pathKey][index].timestamp > delta.timestamp) {
+        return
+    } else {
+        arrayMap[pathKey][index].timestamp = delta.timestamp
+    }
+
+    if (nextPart == null) {
+        if (delta.value == undefined) {
+            arrayMap[pathKey].splice(index, 1)
+            return
+        }
+        if (delta.value.$value != null) {
+            arrayMap[pathKey][index].$value = delta.value.$value
+        } else {
+            if (arrayMap[pathKey][index].$value == null) {
+                arrayMap[pathKey][index].$value = {}
+            }
+            for (const deltaKey in delta.value) {
+                if (deltaKey === "$order") {
+                    continue
+                }
+                arrayMap[pathKey][index].$value[deltaKey] = delta.value[deltaKey]
+            }
+        }
+
+        arrayMap[pathKey][index].$order = delta.value.$order
+    } else if (nextPart === "$value") {
+        arrayMap[pathKey][index].$value = delta.value
+    } else if (nextPart === "$order") {
+        arrayMap[pathKey][index].$order = delta.value
+    } else {
+        if (arrayMap[pathKey][index].$value == null) {
+            arrayMap[pathKey][index].$value = {}
+        }
+        applyObjectPathToModel(arrayMap[pathKey][index].$value, nextPart, delta.value)
+    }
+}
+
+function applyArrayMapToModel<M extends Model>(model: M, arrayMap: ArrayMap) {
+    for (const pathKey in arrayMap) {
+        const array = arrayMap[pathKey]
+            .toSorted((a, b) => (a.$order ?? Number.MAX_VALUE) - (b.$order ?? Number.MAX_VALUE))
+            .map((item) => item.$value)
+
+        applyObjectPathToModel(model, pathKey, array)
+    }
+}
+
 export function createModel<M extends Model>(deltas: ModelDelta<M>[]) {
     const deltasNoArrays: ModelDelta<M>[] = []
     const deltasArrays: ModelDelta<M>[] = []
     const model = {} as M
-    const arrayMap = {} as Record<string, { key: string, $order?: number, $value?: any, timestamp: number }[]>
+    const arrayMap = {} as ArrayMap
+    let visible = true
 
     for (const delta of deltas) {
         if (model.id == null) {
@@ -100,8 +168,14 @@ export function createModel<M extends Model>(deltas: ModelDelta<M>[]) {
 
     for (const delta of deltasNoArrays) {
         if (delta.path === "" && delta.value === undefined) {
-            return undefined
+            for (const key in model) {
+                if (key !== "id") {
+                    delete model[key]
+                }
+            }
+            visible = false
         } else if (delta.path === "" && delta.value !== undefined) {
+            visible = true
             for (const key in delta.value) {
                 model[key as keyof M] = delta.value[key]
             }
@@ -113,60 +187,16 @@ export function createModel<M extends Model>(deltas: ModelDelta<M>[]) {
         }
     }
 
-    for (const delta of deltasArrays) {
-        const [pathKey, rest] = delta.path.split(".$array")
-
-        if (arrayMap[pathKey] == null) {
-            arrayMap[pathKey] = []
-        }
-
-        const path = rest.split(".")
-        const [_, key, nextPart] = path
-        let index = arrayMap[pathKey].findIndex((a: any) => a.key === key)
-
-        if (index === -1) {
-            arrayMap[pathKey].push({key, timestamp: delta.timestamp})
-            index = arrayMap[pathKey].length - 1
-        }
-
-        if (arrayMap[pathKey][index].timestamp > delta.timestamp) {
-            continue
-        } else {
-            arrayMap[pathKey][index].timestamp = delta.timestamp
-        }
-
-        if (nextPart == null) {
-            if (delta.value == undefined) {
-                arrayMap[pathKey].splice(index, 1)
-                continue
-            }
-            if (delta.value.$value != null) {
-                arrayMap[pathKey][index].$value = delta.value.$value
-            } else {
-                if (arrayMap[pathKey][index].$value == null) {
-                    arrayMap[pathKey][index].$value = {}
-                }
-                for (const deltaKey in delta.value) {
-                    if (deltaKey === "$order") {
-                        continue
-                    }
-                    arrayMap[pathKey][index].$value[deltaKey] = delta.value[deltaKey]
-                }
-            }
-
-            arrayMap[pathKey][index].$order = delta.value.$order
-        } else if (nextPart === "$value") {
-            arrayMap[pathKey][index].$value = delta.value
-        } else if (nextPart === "$order") {
-            arrayMap[pathKey][index].$order = delta.value
-        } else {
-            if (arrayMap[pathKey][index].$value == null) {
-                arrayMap[pathKey][index].$value = {}
-            }
-            applyObjectPathToModel(arrayMap[pathKey][index].$value, nextPart, delta.value)
-        }
+    if (!visible) {
+        return undefined
     }
 
+    for (const delta of deltasArrays) {
+        applyArrayDeltaToMap(arrayMap, delta)
+    }
+
+    applyArrayMapToModel(model, arrayMap)
+    return model
 }
 
 export function createModels<M extends Model>(
@@ -211,64 +241,13 @@ export function createModels<M extends Model>(
     const arrayMapById = createProjection((draft) => {
         for (const id in deltasByIdArrays) {
             for (const delta of deltasByIdArrays[id]) {
-                const [pathKey, rest] = delta.path.split(".$array")
-
                 if (draft[id] == null) {
                     draft[id] = {}
                 }
-
-                if (draft[id][pathKey] == null) {
-                    draft[id][pathKey] = []
-                }
-
-                const path = rest.split(".")
-                const [_, key, nextPart] = path
-                let index = draft[id][pathKey].findIndex((a: any) => a.key === key)
-
-                if (index === -1) {
-                    draft[id][pathKey].push({key, timestamp: delta.timestamp})
-                    index = draft[id][pathKey].length - 1
-                }
-
-                if (draft[id][pathKey][index].timestamp > delta.timestamp) {
-                    continue
-                } else {
-                    draft[id][pathKey][index].timestamp = delta.timestamp
-                }
-
-                if (nextPart == null) {
-                    if (delta.value == undefined) {
-                        draft[id][pathKey].splice(index, 1)
-                        continue
-                    }
-                    if (delta.value.$value != null) {
-                        draft[id][pathKey][index].$value = delta.value.$value
-                    } else {
-                        if (draft[id][pathKey][index].$value == null) {
-                            draft[id][pathKey][index].$value = {}
-                        }
-                        for (const deltaKey in delta.value) {
-                            if (deltaKey === "$order") {
-                                continue
-                            }
-                            draft[id][pathKey][index].$value[deltaKey] = delta.value[deltaKey]
-                        }
-                    }
-
-                    draft[id][pathKey][index].$order = delta.value.$order
-                } else if (nextPart === "$value") {
-                    draft[id][pathKey][index].$value = delta.value
-                } else if (nextPart === "$order") {
-                    draft[id][pathKey][index].$order = delta.value
-                } else {
-                    if (draft[id][pathKey][index].$value == null) {
-                        draft[id][pathKey][index].$value = {}
-                    }
-                    applyObjectPathToModel(draft[id][pathKey][index].$value, nextPart, delta.value)
-                }
+                applyArrayDeltaToMap(draft[id], delta)
             }
         }
-    }, {} as Record<string, Record<string, { key: string, $order?: number, $value?: any, timestamp: number }[]>>)
+    }, {} as Record<string, ArrayMap>)
 
     return createProjection((draft) => {
         for (const id in deltasByIdNoArrays) {
@@ -298,16 +277,15 @@ export function createModels<M extends Model>(
         }
 
         for (const id in arrayMapById) {
-            for (const pathKey in arrayMapById[id]) {
-                const array = arrayMapById[id][pathKey]
-                    .toSorted((a, b) => (a.$order ?? Number.MAX_VALUE) - (b.$order ?? Number.MAX_VALUE))
-                    .map((item) => item.$value)
+            let model = draft.find(item => item.id === id)
 
-                const model = draft.find(item => item.id === id) ?? { id } as M
-                applyObjectPathToModel(model, pathKey, array)
-
-                model.updatedAt = Math.max(/*delta.timestamp*/0, model.updatedAt ?? -Infinity)
+            if (model == null) {
+                model = { id } as M
+                draft.push(model)
             }
+
+            applyArrayMapToModel(model, arrayMapById[id])
+            model.updatedAt = Math.max(0, model.updatedAt ?? -Infinity)
         }
 
         for (let i = 0; i < draft.length; i++) {
@@ -319,4 +297,3 @@ export function createModels<M extends Model>(
 
     }, [] as M[])
 }
-

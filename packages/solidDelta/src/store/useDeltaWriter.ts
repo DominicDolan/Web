@@ -4,6 +4,7 @@ import {ModelDelta} from "../model/ModelDelta";
 import {diffPaths} from "../utils/diffPaths";
 import {createId} from "@paralleldrive/cuid2";
 import {cloneValue, isPlainObject} from "../utils/ObjectUtils";
+import {createModel} from "./createModels.ts";
 
 type ModelCreateData<M extends Model> = ModelData<M> & Partial<Pick<M, "id">>
 type ModelPatch<M extends Model> = Partial<M>
@@ -71,7 +72,7 @@ export function useDeltaWriter<M extends Model>(
     }
 
     function draftMutationDeltas(id: string, mutate: (draft: ModelDraft<M>) => void): ModelDelta<M>[] {
-        const currentModel = {}//modelsById()[id];
+        const currentModel = createModel(deltas().filter(delta => delta.id === id));
         const original = cloneValue(currentModel ?? {id, updatedAt: 0});
         const draft = cloneValue(original) as ModelDraft<M>;
 
