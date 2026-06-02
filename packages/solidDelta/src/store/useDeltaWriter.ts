@@ -2,7 +2,6 @@ import {Accessor} from "solid-js";
 import {Model, ModelData} from "@web/schema";
 import {ModelDelta} from "../model/ModelDelta";
 import {diffPaths} from "../utils/diffPaths";
-import {createModelsById} from "./createModels";
 import {createId} from "@paralleldrive/cuid2";
 import {cloneValue, isPlainObject} from "../utils/ObjectUtils";
 
@@ -22,7 +21,7 @@ export type WriteDeltas<M extends Model> = {
 export function useDeltaWriter<M extends Model>(
     deltas: Accessor<readonly ModelDelta<M>[]>,
 ): WriteDeltas<M> {
-    const modelsById = createModelsById(deltas);
+    // const modelsById = createModelsById(deltas);
 
     return ((idOrOperation: string, patchOrMutation: unknown) => {
         if (idOrOperation === "create") {
@@ -72,7 +71,7 @@ export function useDeltaWriter<M extends Model>(
     }
 
     function draftMutationDeltas(id: string, mutate: (draft: ModelDraft<M>) => void): ModelDelta<M>[] {
-        const currentModel = modelsById()[id];
+        const currentModel = {}//modelsById()[id];
         const original = cloneValue(currentModel ?? {id, updatedAt: 0});
         const draft = cloneValue(original) as ModelDraft<M>;
 

@@ -238,6 +238,32 @@ describe("createModels", () => {
 
             expect(models[0].tags).toEqual(["beta", "alpha"]);
         });
+
+
+        it("ignores deltas to keyed object array entries when the timestamp is behind", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: false}, 20),
+                delta("task-1", "checklist.$array.item-a.done", true, 30),
+                delta("task-1", "checklist.$array.item-a.done", false, 25),
+            ]);
+
+            expect(models[0].checklist).toEqual([
+                {id: "item-a", label: "First", done: true},
+            ]);
+        });
+
+        it("applies field deltas to object array entries with out of order deltas", () => {
+            const models = createModels<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "checklist.$array.item-a.done", true, 30),
+                delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: false}, 20),
+            ]);
+
+            expect(models[0].checklist).toEqual([
+                {id: "item-a", label: "First", done: true},
+            ]);
+        });
     });
 });
 

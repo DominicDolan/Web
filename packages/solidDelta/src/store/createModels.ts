@@ -2,7 +2,7 @@ import {Accessor, createEffect, createMemo, createProjection} from "solid-js";
 import {Model, PartialModel} from "@web/schema";
 import {ModelDelta} from "../model/ModelDelta";
 
-function insertValueByTimestamp<M extends Model>(arr: ModelDelta<M>[], el: ModelDelta<M>) {
+function insertDeltaByTimestamp<M extends Model>(arr: ModelDelta<M>[], el: ModelDelta<M>) {
     let left = 0;
     let right = arr.length;
 
@@ -16,6 +16,26 @@ function insertValueByTimestamp<M extends Model>(arr: ModelDelta<M>[], el: Model
     }
 
     arr.splice(left, 0, el);
+}
+
+
+function insertUniqueDeltaByTimestamp<M extends Model>(deltas: ModelDelta<M>[], currentDelta: ModelDelta<M>) {
+    let existingDeltaIndex: number
+    if (currentDelta.path === "") {
+        existingDeltaIndex = deltas.findIndex(d => d.path === "" && (d.value == null) === (currentDelta.value == null))
+    } else {
+        existingDeltaIndex = deltas.findIndex(d => d.path === currentDelta.path)
+    }
+
+    if (existingDeltaIndex === -1) {
+        insertDeltaByTimestamp(deltas, currentDelta)
+        return
+    }
+
+    if (deltas[existingDeltaIndex].timestamp < currentDelta.timestamp) {
+        deltas.splice(existingDeltaIndex, 1)
+        insertDeltaByTimestamp(deltas, currentDelta)
+    }
 }
 
 function applyObjectPathToModel(model: any, path: string, value: any) {
@@ -43,6 +63,42 @@ function applyObjectPathToModel(model: any, path: string, value: any) {
     }
 }
 
+export function createModel<M extends Model>(deltas: ModelDelta<M>[]) {
+    const deltasNoArrays: ModelDelta<M>[] = []
+    const deltasArrays: ModelDelta<M>[] = []
+    const model = {} as M
+
+    for (const delta of deltas) {
+        if (model.id == null) {
+            model.id = delta.id
+        }
+
+        if (delta.id !== model.id) throw new Error(
+            `Expected all deltas to have the same id. Received id ${delta.id} and id ${model.id}`
+        )
+
+        if (delta.path.includes("$array")) {
+            continue
+        }
+
+        if (delta.path === "") {
+            insertDeltaByTimestamp(deltasNoArrays, delta)
+            continue
+        }
+
+        insertUniqueDeltaByTimestamp(deltasNoArrays, delta)
+    }
+
+    for (const delta of deltas) {
+        if (!delta.path.includes("$array")) {
+            continue
+        }
+
+        insertUniqueDeltaByTimestamp(deltasArrays, delta)
+    }
+
+}
+
 export function createModels<M extends Model>(
     deltas: Accessor<readonly ModelDelta<M>[]>
 ) {
@@ -59,80 +115,90 @@ export function createModels<M extends Model>(
             }
 
             if (delta.path === "") {
-                insertValueByTimestamp(draft[delta.id], delta)
+                insertDeltaByTimestamp(draft[delta.id], delta)
                 continue
             }
 
-            const existingDeltaIndex = draft[delta.id].findIndex(d => d.path === delta.path)
-            if (existingDeltaIndex === -1) {
-                insertValueByTimestamp(draft[delta.id], delta)
-                continue
-            }
-
-            if (draft[delta.id][existingDeltaIndex].timestamp < delta.timestamp) {
-                draft[delta.id].splice(existingDeltaIndex, 1)
-                insertValueByTimestamp(draft[delta.id], delta)
-            }
+            insertUniqueDeltaByTimestamp(draft[delta.id], delta)
         }
     }, {} as Record<string, ModelDelta<M>[]>)
 
-    const arrayMapById = createProjection((draft) => {
+    const deltasByIdArrays = createProjection((draft) => {
         for (const delta of deltas()) {
             if (!delta.path.includes("$array")) {
                 continue
             }
 
-            const [pathKey, rest ] = delta.path.split(".$array")
-
             if (draft[delta.id] == null) {
-                draft[delta.id] = {}
+                draft[delta.id] = [delta]
+                continue
             }
 
-            if (draft[delta.id][pathKey] == null) {
-                draft[delta.id][pathKey] = []
-            }
+            insertUniqueDeltaByTimestamp(draft[delta.id], delta)
+        }
+    }, {} as Record<string, ModelDelta<M>[]>)
 
-            const path = rest.split(".")
-            const [_, key, nextPart] = path
-            let index = draft[delta.id][pathKey].findIndex((a: any) => a.key === key)
+    const arrayMapById = createProjection((draft) => {
+        for (const id in deltasByIdArrays) {
+            for (const delta of deltasByIdArrays[id]) {
+                const [pathKey, rest] = delta.path.split(".$array")
 
-            if (index === -1) {
-                draft[delta.id][pathKey].push({ key })
-                index = draft[delta.id][pathKey].length - 1
-            }
+                if (draft[id] == null) {
+                    draft[id] = {}
+                }
 
-            if (nextPart == null) {
-                if (delta.value == undefined) {
-                    draft[delta.id][pathKey].splice(index, 1)
+                if (draft[id][pathKey] == null) {
+                    draft[id][pathKey] = []
+                }
+
+                const path = rest.split(".")
+                const [_, key, nextPart] = path
+                let index = draft[id][pathKey].findIndex((a: any) => a.key === key)
+
+                if (index === -1) {
+                    draft[id][pathKey].push({key, timestamp: delta.timestamp})
+                    index = draft[id][pathKey].length - 1
+                }
+
+                if (draft[id][pathKey][index].timestamp > delta.timestamp) {
                     continue
-                }
-                if (delta.value.$value != null) {
-                    draft[delta.id][pathKey][index].$value = delta.value.$value
                 } else {
-                    if (draft[delta.id][pathKey][index].$value == null) {
-                        draft[delta.id][pathKey][index].$value = {}
-                    }
-                    for (const deltaKey in delta.value) {
-                        if (deltaKey === "$order") {
-                            continue
-                        }
-                        draft[delta.id][pathKey][index].$value[deltaKey] = delta.value[deltaKey]
-                    }
+                    draft[id][pathKey][index].timestamp = delta.timestamp
                 }
 
-                draft[delta.id][pathKey][index].$order = delta.value.$order
-            } else if (nextPart === "$value") {
-                draft[delta.id][pathKey][index].$value = delta.value
-            } else if (nextPart === "$order") {
-                draft[delta.id][pathKey][index].$order = delta.value
-            } else {
-                if (draft[delta.id][pathKey][index].$value == null) {
-                    draft[delta.id][pathKey][index].$value = {}
+                if (nextPart == null) {
+                    if (delta.value == undefined) {
+                        draft[id][pathKey].splice(index, 1)
+                        continue
+                    }
+                    if (delta.value.$value != null) {
+                        draft[id][pathKey][index].$value = delta.value.$value
+                    } else {
+                        if (draft[id][pathKey][index].$value == null) {
+                            draft[id][pathKey][index].$value = {}
+                        }
+                        for (const deltaKey in delta.value) {
+                            if (deltaKey === "$order") {
+                                continue
+                            }
+                            draft[id][pathKey][index].$value[deltaKey] = delta.value[deltaKey]
+                        }
+                    }
+
+                    draft[id][pathKey][index].$order = delta.value.$order
+                } else if (nextPart === "$value") {
+                    draft[id][pathKey][index].$value = delta.value
+                } else if (nextPart === "$order") {
+                    draft[id][pathKey][index].$order = delta.value
+                } else {
+                    if (draft[id][pathKey][index].$value == null) {
+                        draft[id][pathKey][index].$value = {}
+                    }
+                    applyObjectPathToModel(draft[id][pathKey][index].$value, nextPart, delta.value)
                 }
-                applyObjectPathToModel(draft[delta.id][pathKey][index].$value, nextPart, delta.value)
             }
         }
-    }, {} as Record<string, Record<string, { key: string, $order?: number, $value?: any }[]>>)
+    }, {} as Record<string, Record<string, { key: string, $order?: number, $value?: any, timestamp: number }[]>>)
 
     return createProjection((draft) => {
         for (const id in deltasByIdNoArrays) {
