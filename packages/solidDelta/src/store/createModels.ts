@@ -67,6 +67,7 @@ export function createModel<M extends Model>(deltas: ModelDelta<M>[]) {
     const deltasNoArrays: ModelDelta<M>[] = []
     const deltasArrays: ModelDelta<M>[] = []
     const model = {} as M
+    const arrayMap = {} as Record<string, { key: string, $order?: number, $value?: any, timestamp: number }[]>
 
     for (const delta of deltas) {
         if (model.id == null) {
@@ -95,6 +96,75 @@ export function createModel<M extends Model>(deltas: ModelDelta<M>[]) {
         }
 
         insertUniqueDeltaByTimestamp(deltasArrays, delta)
+    }
+
+    for (const delta of deltasNoArrays) {
+        if (delta.path === "" && delta.value === undefined) {
+            return undefined
+        } else if (delta.path === "" && delta.value !== undefined) {
+            for (const key in delta.value) {
+                model[key as keyof M] = delta.value[key]
+            }
+
+            model.updatedAt = Math.max(delta.timestamp, model.updatedAt ?? -Infinity)
+        } else {
+            applyObjectPathToModel(model, delta.path, delta.value)
+            model.updatedAt = Math.max(delta.timestamp, model.updatedAt ?? -Infinity)
+        }
+    }
+
+    for (const delta of deltasArrays) {
+        const [pathKey, rest] = delta.path.split(".$array")
+
+        if (arrayMap[pathKey] == null) {
+            arrayMap[pathKey] = []
+        }
+
+        const path = rest.split(".")
+        const [_, key, nextPart] = path
+        let index = arrayMap[pathKey].findIndex((a: any) => a.key === key)
+
+        if (index === -1) {
+            arrayMap[pathKey].push({key, timestamp: delta.timestamp})
+            index = arrayMap[pathKey].length - 1
+        }
+
+        if (arrayMap[pathKey][index].timestamp > delta.timestamp) {
+            continue
+        } else {
+            arrayMap[pathKey][index].timestamp = delta.timestamp
+        }
+
+        if (nextPart == null) {
+            if (delta.value == undefined) {
+                arrayMap[pathKey].splice(index, 1)
+                continue
+            }
+            if (delta.value.$value != null) {
+                arrayMap[pathKey][index].$value = delta.value.$value
+            } else {
+                if (arrayMap[pathKey][index].$value == null) {
+                    arrayMap[pathKey][index].$value = {}
+                }
+                for (const deltaKey in delta.value) {
+                    if (deltaKey === "$order") {
+                        continue
+                    }
+                    arrayMap[pathKey][index].$value[deltaKey] = delta.value[deltaKey]
+                }
+            }
+
+            arrayMap[pathKey][index].$order = delta.value.$order
+        } else if (nextPart === "$value") {
+            arrayMap[pathKey][index].$value = delta.value
+        } else if (nextPart === "$order") {
+            arrayMap[pathKey][index].$order = delta.value
+        } else {
+            if (arrayMap[pathKey][index].$value == null) {
+                arrayMap[pathKey][index].$value = {}
+            }
+            applyObjectPathToModel(arrayMap[pathKey][index].$value, nextPart, delta.value)
+        }
     }
 
 }
