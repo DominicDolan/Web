@@ -3,50 +3,28 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "apps/cli",
-    "apps/themeBuilder",
-    "apps/appTemplate",
-    "apps/liveTvPlayer",
-    "apps/testBench",
-    "apps/tailwindTest",
-    "packages/d1",
-    "packages/solidDelta",
-    "packages/lins",
-    "packages/utils",
-    "packages/components",
-    "packages/schema",
-    "packages/unoLayout",
-    "packages/solidScope",
-    "packages/solid2Vinxi",
-    "packages/router",
-    "packages/serverFunctions",
-    "apps/aiChat"
-  ],
-  "scripts": {
-    "dev": "concurrently \"npm run dev:vite\" \"npm run dev:wrangler\"",
-    "dev:vite": "npm run dev --workspace=@web/theme-builder",
-    "dev:wrangler": "wrangler --cwd .output dev",
-    "migrate:local": "npm run migrate:local --workspace=@web/theme-builder",
-    "migrate:prod": "npm run migrate:prod --workspace=@web/theme-builder",
-    "build:schema": "npm run build:schema --workspace=@web/theme-builder",
-    "build": "npm run build --workspace=@web/theme-builder",
-    "preview": "vinxi build && dev:wrangler",
-    "start": "npm run start --workspace=@web/theme-builder",
-    "test": "vitest",
-    "test:delta": "vitest DeltaMachine"
-  },
-  "engines": {
-    "node": ">=22"
-  },
-  "web-types": {
-    "contributions": {
-      "types-syntax": "typescript",
-      "html": {
-        "tags": [
-          "x-input"
-        ]
-      }
+  "workspaces": {
+    "packages": [
+      "apps/cli",
+      "apps/theme-builder",
+      "packages/d1",
+      "packages/solidDelta",
+      "packages/lins",
+      "packages/utils",
+      "packages/components",
+      "packages/schema",
+      "packages/solidScope",
+      "packages/server-functions",
+      "packages/router"
+    ],
+    "catalog": {
+      "solid-js": "2.0.0-beta.14",
+      "@solidjs/web": "2.0.0-beta.14",
+      "vite": "8.0.16",
+      "vite-plugin-solid": "3.0.0-next.5",
+      "wrangler": "4.77.0",
+      "zod": "4.4.3"
     }
-  }
+  },
+  "dependencies": {}
 }

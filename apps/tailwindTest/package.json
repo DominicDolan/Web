@@ -14,9 +14,9 @@
     "solid-js": "1.9.11",
     "vinxi": "0.5.11",
     "vite-plugin-solid": "2.11.10",
-    "@web/components": "*",
-    "@web/utils": "*",
-    "@web/schema": "*"
+    "@web/components": "workspace:*",
+    "@web/utils": "workspace:*",
+    "@web/schema": "workspace:*"
   },
   "devDependencies": {
     "tailwindcss": "^4.1.0",

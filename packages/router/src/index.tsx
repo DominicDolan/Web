@@ -3,10 +3,12 @@ import {
     createContext,
     createMemo,
     createSignal,
-    JSX, omit,
+    omit,
     onSettled,
     useContext
 } from "solid-js";
+import {JSX} from "@solidjs/web";
+import AnchorHTMLAttributes = JSX.AnchorHTMLAttributes;
 
 const LocationContextProvider = createContext<{
     location: {
@@ -58,12 +60,13 @@ export function LocationContext(props: { children: any }) {
     return <LocationContextProvider value={{location, navigate}}>{props.children}</LocationContextProvider>
 }
 
-interface AProps extends JSX.AnchorHTMLAttributes<HTMLAnchorElement> {
+type AProps = AnchorHTMLAttributes<any> & {
     href: string;
     replace?: boolean;
     matches?: (location: ReturnType<typeof createLocation>) => boolean;
+    onClick?: (e: any) => void
+    children?: any;
 }
-
 
 function isExternalHref(href: string): boolean {
     return /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(href);
@@ -89,9 +92,9 @@ export function A(props: AProps) {
         }
     }
 
-    const userOnClick = props.onClick as JSX.EventHandler<HTMLAnchorElement, MouseEvent> | undefined;
+    const userOnClick = props.onClick
 
-    const onClick: JSX.EventHandlerUnion<HTMLAnchorElement, MouseEvent> = (event) => {
+    const onClick = (event: MouseEvent) => {
         userOnClick?.(event);
         if (event.defaultPrevented) return;
         if (event.button !== 0) return;
@@ -110,7 +113,7 @@ export function A(props: AProps) {
         const passedClass = Array.isArray(props.class) ? props.class : [props.class]
         return [...passedClass, { active: matches() }]
     }
-    
+
     return (
         <a
             {...anchorProps}

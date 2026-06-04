@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev --port 3001",
+    "serve": "vite dev --port 3001",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "generate:schema": "generate-schema src/models migrations",
     "apply:schema": "wrangler d1 migrations apply DB --local --config ./wrangler.jsonc",
     "apply:schema:prod": "wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc"
@@ -12,21 +13,24 @@
   "dependencies": {
     "@codemirror/lang-css": "^6.3.1",
     "@codemirror/view": "^6.39.11",
-    "solid-js": "2.0.0-beta.14",
-    "@solidjs/web": "2.0.0-beta.14",
-    "@web/lins": "*",
-    "@web/utils": "*",
-    "@web/d1": "*",
-    "@web/schema": "*",
-    "@web/solid-delta": "*",
-    "@web/components": "*",
-    "@web/unolayout": "*",
-    "@web/router": "*",
+    "solid-js": "catalog:",
+    "@solidjs/web": "catalog:",
+    "@web/lins": "workspace:*",
+    "@web/utils": "workspace:*",
+    "@web/d1": "workspace:*",
+    "@web/schema": "workspace:*",
+    "@web/solid-delta": "workspace:*",
+    "@web/solid-scope": "workspace:*",
+    "@web/server-functions": "workspace:*",
+    "@web/components": "workspace:*",
+    "@web/router": "workspace:*",
     "@paralleldrive/cuid2": "3.3.0",
     "tailwindcss": "4.2.2",
     "@tailwindcss/vite": "4.2.2",
-    "vite-plugin-solid": "3.0.0-next.5",
+    "wrangler": "catalog:",
+    "vite-plugin-solid": "catalog:",
+    "vite": "catalog:",
     "codemirror": "6.0.2",
-    "zod": "4.3.6"
+    "zod": "catalog:"
   }
 }

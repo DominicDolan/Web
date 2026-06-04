@@ -3,8 +3,8 @@ import {createModelSchema} from "@web/d1";
 import {modelSchema} from "@web/schema";
 
 export const themeDefinitionSchema = modelSchema.extend({
-    name: z.string().trim(),
-    class: z.string().trim(),
+    name: z.string().trim().nonempty(),
+    class: z.string().trim().nonempty(),
     description: z.string().optional(),
     mode: z.enum(["light", "dark"]).default("light"),
 }).meta({

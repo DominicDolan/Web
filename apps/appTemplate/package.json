@@ -16,7 +16,7 @@
     "@tailwindcss/vite": "4.2.2",
     "unocss": "66.6.0",
     "vinxi": "0.5.11",
-    "@web/vinxi": "*"
+    "@web/vinxi": "workspace:*"
   },
   "devDependencies": {
     "vite-tsconfig-paths": "6.1.1"

@@ -38,3 +38,8 @@ export async function saveTheme(themeDeltas: ModelDelta<ThemeDefinition>[]) {
     const db = useDatabaseTable(themeDefinitionSchema)
     await db.insert(themeDeltas)
 }
+
+export async function validateTheme(theme: unknown) {
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    return themeDefinitionSchema.safeParse(theme)
+}

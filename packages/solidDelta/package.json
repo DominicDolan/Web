@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "vitest --run",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "hello": "echo hello"
   },
   "dependencies": {
     "vitest": "4.1.7",
@@ -16,7 +17,7 @@
     "solid-js": "2.0.0-beta.14",
     "@paralleldrive/cuid2": "3.3.0",
     "@solidjs/web": "2.0.0-beta.14",
-    "@web/solid-scope": "*"
+    "@web/solid-scope": "workspace:*"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.9.1",

@@ -63,6 +63,13 @@
         }
     }
 
+    form-field {
+        output {
+            font-size: 0.875rem;
+            color: var(--error-color);
+        }
+    }
+
     @scope (body) to (.elementsPreview) {
         input:not([type=radio]):not([type=checkbox]):not([type=range]), textarea, select, input-shell {
             border-radius: 0.5rem;

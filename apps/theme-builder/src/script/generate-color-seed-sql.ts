@@ -17,11 +17,11 @@ type SeedColorRecord = ColorRecord & {
 };
 
 const tailwindPath =
-    process.argv[2] ?? "apps/themeBuilder/src/script/tailwind-colors.json";
+    process.argv[2] ?? "apps/theme-builder/src/script/tailwind-colors.json";
 const materialPath =
-    process.argv[3] ?? "apps/themeBuilder/src/script/material-colors.json";
+    process.argv[3] ?? "apps/theme-builder/src/script/material-colors.json";
 const outputPath =
-    process.argv[4] ?? "apps/themeBuilder/src/script/color-palettes.seed.sql";
+    process.argv[4] ?? "apps/theme-builder/src/script/color-palettes.seed.sql";
 
 function parseHex(hex: string): { r: number; g: number; b: number } {
     const normalized = hex.trim().replace(/^#/, "");

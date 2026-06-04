@@ -25,7 +25,6 @@ export type WriteDeltas<M extends Model> = {
 export function useDeltaWriter<M extends Model>(
     deltas: Accessor<readonly ModelDelta<M>[]>,
 ): WriteDeltas<M> {
-    // const modelsById = createModelsById(deltas);
 
     return ((idOrOperation: string, patchOrMutation: unknown) => {
         if (idOrOperation === "create") {

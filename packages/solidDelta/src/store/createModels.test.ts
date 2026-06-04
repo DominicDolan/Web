@@ -20,7 +20,7 @@ interface TestTask extends Model {
 
 describe("createModels", () => {
     it("projects a create delta with initial values into a visible model", async () => {
-        const models = createModels<TestTask>(() => [
+        const [models] = createModels<TestTask>(() => [
             delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
         ]);
 
@@ -35,7 +35,7 @@ describe("createModels", () => {
     });
 
     it("hides a model when the latest lifecycle delta is a delete", () => {
-        const models = createModels<TestTask>(() => [
+        const [models] = createModels<TestTask>(() => [
             delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
             delta("task-1", "status", "done", 20),
             delta("task-1", "", undefined, 30),
@@ -45,7 +45,7 @@ describe("createModels", () => {
     });
 
     it("restores a model when a create arrives after a delete", () => {
-        const models = createModels<TestTask>(() => [
+        const [models] = createModels<TestTask>(() => [
             delta("task-1", "", {title: "First title", status: "todo"}, 10),
             delta("task-1", "", undefined, 20),
             delta("task-1", "", {title: "Restored title", status: "doing"}, 30),
@@ -62,7 +62,7 @@ describe("createModels", () => {
     });
 
     it("applies late-arriving field deltas from before the most recent create", () => {
-        const models = createModels<TestTask>(() => [
+        const [models] = createModels<TestTask>(() => [
             delta("task-1", "", {title: "Initial title", status: "todo"}, 20),
             delta("task-1", "owner.name", "Ada", 10),
         ]);
@@ -81,7 +81,7 @@ describe("createModels", () => {
     });
 
     it("lets create fields supersede older field deltas for the same property", () => {
-        const models = createModels<TestTask>(() => [
+        const [models] = createModels<TestTask>(() => [
             delta("task-1", "", {title: "Initial title", status: "todo"}, 20),
             delta("task-1", "status", "doing", 10),
         ]);
@@ -97,7 +97,7 @@ describe("createModels", () => {
     });
 
     it("keeps field deltas from a deleted window ready for a later create", () => {
-        const models = createModels<TestTask>(() => [
+        const [models] = createModels<TestTask>(() => [
             delta("task-1", "", {title: "Initial title", status: "todo"}, 10),
             delta("task-1", "", undefined, 20),
             delta("task-1", "owner.name", "Ada", 30),
@@ -118,7 +118,7 @@ describe("createModels", () => {
     });
 
     it("uses per-property last-write-wins across creates and field deltas", () => {
-        const models = createModels<TestTask>(() => [
+        const [models] = createModels<TestTask>(() => [
             delta("task-1", "", {title: "Create title", status: "todo"}, 10),
             delta("task-1", "title", "Older title", 5),
             delta("task-1", "status", "doing", 15),
@@ -136,7 +136,7 @@ describe("createModels", () => {
     });
 
     it("applies nested field deltas and deletions by path", () => {
-        const models = createModels<TestTask>(() => [
+        const [models] = createModels<TestTask>(() => [
             delta("task-1", "", {title: "Initial title", status: "todo"}, 10),
             delta("task-1", "owner.name", "Ada", 20),
             delta("task-1", "owner.name", undefined, 30),
@@ -157,7 +157,7 @@ describe("createModels", () => {
         const [deltas, setDeltas] = createSignal<ModelDelta<TestTask>[]>([
             delta("task-1", "", {title: "Initial title", status: "todo"}, 10),
         ]);
-        const models = createModels<TestTask>(deltas);
+        const [models] = createModels<TestTask>(deltas);
 
         expect(models[0].status).toBe("todo");
 
@@ -173,7 +173,7 @@ describe("createModels", () => {
 
     describe("keyed arrays", () => {
         it("projects keyed primitive array entries as arrays sorted by order", () => {
-            const models = createModels<TestTask>(() => [
+            const [models] = createModels<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
                 delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 20),
                 delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 30),
@@ -183,7 +183,7 @@ describe("createModels", () => {
         });
 
         it("projects keyed object array entries without exposing storage metadata", () => {
-            const models = createModels<TestTask>(() => [
+            const [models] = createModels<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
                 delta("task-1", "checklist.$array.item-b", {$order: 20, id: "item-b", label: "Second", done: false}, 20),
                 delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: true}, 30),
@@ -196,7 +196,7 @@ describe("createModels", () => {
         });
 
         it("removes keyed array entries with tombstone-style deltas", () => {
-            const models = createModels<TestTask>(() => [
+            const [models] = createModels<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
                 delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
                 delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
@@ -207,7 +207,7 @@ describe("createModels", () => {
         });
 
         it("applies nested field deltas to keyed object array entries by stable key", () => {
-            const models = createModels<TestTask>(() => [
+            const [models] = createModels<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
                 delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: false}, 20),
                 delta("task-1", "checklist.$array.item-a.done", true, 30),
@@ -219,7 +219,7 @@ describe("createModels", () => {
         });
 
         it("updates primitive array item value via $value leaf path", () => {
-            const models = createModels<TestTask>(() => [
+            const [models] = createModels<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
                 delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
                 delta("task-1", "tags.$array.tag-a.$value", "omega", 30),
@@ -229,7 +229,7 @@ describe("createModels", () => {
         });
 
         it("updates array item order via $order leaf path", () => {
-            const models = createModels<TestTask>(() => [
+            const [models] = createModels<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
                 delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
                 delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
@@ -241,7 +241,7 @@ describe("createModels", () => {
 
 
         it("ignores deltas to keyed object array entries when the timestamp is behind", () => {
-            const models = createModels<TestTask>(() => [
+            const [models] = createModels<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
                 delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: false}, 20),
                 delta("task-1", "checklist.$array.item-a.done", true, 30),
@@ -254,7 +254,7 @@ describe("createModels", () => {
         });
 
         it("applies field deltas to object array entries with out of order deltas", () => {
-            const models = createModels<TestTask>(() => [
+            const [models] = createModels<TestTask>(() => [
                 delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
                 delta("task-1", "checklist.$array.item-a.done", true, 30),
                 delta("task-1", "checklist.$array.item-a", {$order: 10, id: "item-a", label: "First", done: false}, 20),

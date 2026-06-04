@@ -3,7 +3,7 @@ import type {BareElementTag} from "@web/lins/elements"
 interface SolidClassAttribute {
     class: string | JSX.ClassList //Record<string | boolean> | Array<string | Record<string | boolean>>
 }
-declare module 'solid-js' {
+declare module '@solidjs/web' {
     namespace JSX {
         interface HTMLAttributes<T> extends SolidClassAttribute {}
 

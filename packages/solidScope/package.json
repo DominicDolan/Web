@@ -6,7 +6,7 @@
   "exports": {
     ".": "./src/index.ts"
   },
-  "scripts": {
+  "scripts": {"hello": "echo hello", 
     "test": "vitest"
   },
   "dependencies": {

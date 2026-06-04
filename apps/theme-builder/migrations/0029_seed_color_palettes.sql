@@ -1,5 +1,5 @@
 -- Generated file. Do not edit by hand.
--- Source: apps/themeBuilder/src/script/generate-color-seed-sql.ts
+-- Source: apps/theme-builder/src/script/generate-color-seed-sql.ts
 
 INSERT OR IGNORE INTO "color_palettes" (
   "source",

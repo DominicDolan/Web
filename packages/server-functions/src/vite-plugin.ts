@@ -156,11 +156,15 @@ async function resolveServerFunctionInDev(server: ViteDevServer, id: string) {
   const environment = server.environments.server
 
   if (!environment || !isRunnableDevEnvironment(environment)) {
-    throw new Error('The Vite server runtime environment is not available.')
+    // Bun might have a different prototype chain or environment object structure
+    // but if it has a runner, it's runnable.
+    if (!(environment as any)?.runner) {
+      throw new Error('The Vite server runtime environment is not available.')
+    }
   }
 
   const [moduleId, exportName] = splitServerFunctionId(id)
-  const mod = await environment.runner.import(`/${moduleId}`)
+  const mod = await (environment as any).runner.import(`/${moduleId}`)
   const handler = exportName === 'default' ? mod.default : mod[exportName]
 
   if (typeof handler !== 'function') {
@@ -174,12 +178,16 @@ async function resolveCreateServerHandlerInDev(server: ViteDevServer, root: stri
   const environment = server.environments.server
 
   if (!environment || !isRunnableDevEnvironment(environment)) {
-    throw new Error('The Vite server runtime environment is not available.')
+    // Bun might have a different prototype chain or environment object structure
+    // but if it has a runner, it's runnable.
+    if (!(environment as any)?.runner) {
+      throw new Error('The Vite server runtime environment is not available.')
+    }
   }
 
   process.env[CREATE_SERVER_NO_LISTEN_ENV] = '1'
 
-  const mod = await environment.runner.import(toRootModuleId(root, serverEntry))
+  const mod = await (environment as any).runner.import(toRootModuleId(root, serverEntry))
   return getCreateServerRequestHandler(mod.default) ?? undefined
 }
 

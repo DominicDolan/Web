@@ -3,10 +3,10 @@ import {Match, Show, Switch} from "solid-js";
 import {Navigate, useLocation} from "@web/router";
 import ContactUs from "~/app/contact/ContactUs/ContactUs";
 import {ThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
-import {ColorScope} from "~/app/colors/ColorEditor/ColorScope";
-import {ColorEditor} from "~/app/colors/ColorEditor/ColorEditor";
-import {TypefaceScope} from "~/app/typography/TypefaceEditor/TypefaceScope";
-import {TypefaceEditor} from "~/app/typography/TypefaceEditor/TypefaceEditor";
+// import {ColorScope} from "~/app/colors/ColorEditor/ColorScope";
+// import {ColorEditor} from "~/app/colors/ColorEditor/ColorEditor";
+// import {TypefaceScope} from "~/app/typography/TypefaceEditor/TypefaceScope";
+// import {TypefaceEditor} from "~/app/typography/TypefaceEditor/TypefaceEditor";
 import {TypefaceRole, typefaceRoles, TypefaceSize, typefaceSizes, TypefaceType} from "~/constants/TypefaceRoles";
 
 export default function App() {
@@ -25,18 +25,20 @@ export default function App() {
         <div class="minimalTheme light h-full">
             <Switch fallback={<><div>404</div></>}>
                 <Match when={location.segments()[0] === "editor" && location.segments()[2] === "colors" && location.segments().length === 4}>
-                    <ColorScope themeId={location.segments()[1]} colorId={location.segments()[3]}>
-                        <ColorEditor/>
-                    </ColorScope>
+                    <div>Color Placeholder</div>
+                    {/*<ColorScope themeId={location.segments()[1]} colorId={location.segments()[3]}>*/}
+                    {/*    <ColorEditor/>*/}
+                    {/*</ColorScope>*/}
                 </Match>
                 <Match when={matchesTypographyPath()}>
-                    <TypefaceScope
-                        themeId={location.segments()[1]}
-                        role={location.segments()[3] as TypefaceRole}
-                        size={location.segments()[4] as TypefaceSize}
-                        type={location.segments()[5] == null ? "default" : location.segments()[5] as TypefaceType}>
-                        <TypefaceEditor/>
-                    </TypefaceScope>
+                    <div>Typeface Placeholder</div>
+                    {/*<TypefaceScope*/}
+                    {/*    themeId={location.segments()[1]}*/}
+                    {/*    role={location.segments()[3] as TypefaceRole}*/}
+                    {/*    size={location.segments()[4] as TypefaceSize}*/}
+                    {/*    type={location.segments()[5] == null ? "default" : location.segments()[5] as TypefaceType}>*/}
+                    {/*    <TypefaceEditor/>*/}
+                    {/*</TypefaceScope>*/}
                 </Match>
                 <Match when={location.path() === "/" || location.segments()[0] === "editor"}>
                     <Show when={location.path() === "/"}>

@@ -1,6 +1,7 @@
 import {Accessor, createProjection} from "solid-js";
 import {Model} from "@web/schema";
 import {ModelDelta} from "../model/ModelDelta";
+import {useDeltaWriter} from "./useDeltaWriter.ts";
 
 type ArrayItem = { key: string, $order?: number, $value?: any, timestamp: number }
 type ArrayMap = Record<string, ArrayItem[]>
@@ -249,7 +250,9 @@ export function createModels<M extends Model>(
         }
     }, {} as Record<string, ArrayMap>)
 
-    return createProjection((draft) => {
+    const createDeltas = useDeltaWriter(deltas)
+
+    const models = createProjection((draft) => {
         for (const id in deltasByIdNoArrays) {
             const existingIndex = draft.findIndex(m => m.id === id)
 
@@ -296,4 +299,6 @@ export function createModels<M extends Model>(
         }
 
     }, [] as M[])
+
+    return [models, createDeltas] as const
 }

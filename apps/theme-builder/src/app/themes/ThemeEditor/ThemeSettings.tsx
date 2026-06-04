@@ -1,34 +1,31 @@
-import {For, Loading, Match, Show, Switch} from "solid-js";
+import {action, createMemo, createSignal, For, Loading, Match, Show, Switch} from "solid-js";
 import {A, useLocation, useNavigate} from "@web/router";
 import {useThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 import {ThemeDefinition} from "~/models/ThemeDefinition";
-import ColorList from "~/app/colors/ColorList/ColorList";
-import {TypefaceList} from "~/app/typography/TypefaceList/TypefaceList";
+import {validateTheme} from "~/app/themes/ThemeEditor/ThemeRepository.server.ts";
+import {debounce} from "@web/utils/Debounce.ts";
+import {$ZodIssue} from "zod/v4/core";
+// import ColorList from "~/app/colors/ColorList/ColorList";
+// import {TypefaceList} from "~/app/typography/TypefaceList/TypefaceList";
 
 export default function ThemeSettings(props: { children?: any, theme: ThemeDefinition }) {
 
     const {
         themes,
-        renameTheme,
-        removeTheme,
-        changeThemeDescription,
-        saveChanges,
-        changeThemeClass
+        updateTheme,
+        deleteTheme
     } = useThemesListScope()
 
     const navigate = useNavigate()
     const location = useLocation()
 
-    function rename(newName: string) {
-        renameTheme(props.theme.id, newName)
-    }
 
-    function remove() {
+    async function remove() {
         const themeIndex = themes.findIndex(t => t.id === props.theme.id)
         if (themeIndex === -1) return
 
         const newTheme = themes[themeIndex + 1] ?? themes[themeIndex - 1]
-        removeTheme(props.theme.id)
+        await deleteTheme(props.theme.id)
         if (newTheme != null) {
             navigate("/editor/" + (newTheme.id))
         } else {
@@ -36,40 +33,51 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
         }
     }
 
-    function changeDescription(newDescription: string) {
-        changeThemeDescription(props.theme.id, newDescription)
-    }
-
-    function getCssClassFromName(name: string) {
-        return name
-            .replace(/[^a-zA-Z0-9]/g, " ")
-            .split(" ")
-            .filter(word => word.length > 0)
-            .map((word, index) =>
-                index === 0
-                    ? word.toLowerCase()
-                    : word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
-            )
-            .join("")
-    }
-
-    let cssClassHasBeenEdited = false
-    function onNameChange(e: Event) {
-        const name = (e.target as HTMLInputElement).value
-        if (!cssClassHasBeenEdited) {
-            const cssClass = getCssClassFromName(name)
-            changeThemeClass(props.theme.id, cssClass)
-        }
-        rename(name)
-    }
-
-    function onCssClassChange(e: Event) {
-        cssClassHasBeenEdited = true
-        changeThemeClass(props.theme.id, (e.target as HTMLInputElement).value)
-    }
-
     function onBlur() {
         saveChanges()
+    }
+
+    function saveChanges() {
+
+    }
+
+    const [formRef, setFormRef] = createSignal<HTMLFormElement | null>(null)
+    const [formData, setFormData] = createSignal<FormData | null>(null)
+
+    const setFormDataDebounced = debounce(() => {
+        const form = formRef()
+        if (form == null) return
+
+        console.log(form?.elements)
+        for (const element of form?.elements) {
+            console.log(element)
+        }
+
+        const formData = new FormData(form ?? undefined)
+
+        setFormData(formData)
+    }, 500)
+
+
+    const issues = createMemo<$ZodIssue[]>(async () => {
+        if (formData() == null) return []
+        const result = await validateTheme(formData())
+        if (!result.success && result.error.message != null) {
+            return JSON.parse(result.error.message)
+        }
+        return []
+    })
+
+    function validationMessageByField(path: string): string {
+        return issues().find(issue => issue.path[0] === path)?.message ?? ""
+    }
+
+
+    function onFormSubmitted(e: Event) {
+        e.preventDefault()
+        const formData = new FormData(e.target as HTMLFormElement)
+        const entries = Object.fromEntries(formData)
+        console.log(entries)
     }
 
     return <>
@@ -83,7 +91,8 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                 }
             </For>
         </empty-state>}>
-            <div
+            <form onSubmit={onFormSubmitted}
+                  ref={setFormRef}
                 class={"themeSettings py-6 px-6 flex flex-col items-center"}>
                 <section class={"w-full flex flex-col gap-4 mb-8"}>
                     <hgroup class={"flex flex-row items-center justify-between"}>
@@ -101,21 +110,33 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                     <form-field class={"flex flex-col gap-2"}>
                         <label>Name</label>
                         <input-shell>
-                            <input type={"text"} value={props.theme.name ?? ""} onInput={onNameChange} onBlur={onBlur}
+                            <input type={"text"} value={props.theme.name ?? ""}
+                                   name="name"
+                                   onInput={setFormDataDebounced}
+                                   onBlur={() => setFormDataDebounced.flush()}
                                    required/>
                         </input-shell>
+                        <output>{validationMessageByField("name")}</output>
                     </form-field>
                     <form-field class={"flex flex-col gap-2"}>
                         <label>CSS Class</label>
                         <input-shell>
-                            <input type={"text"} value={props.theme?.class ?? ""} onInput={onCssClassChange} onBlur={onBlur}
+                            <input type={"text"} value={props.theme?.class ?? ""}
+                                   name="class"
+                                   onInput={setFormDataDebounced}
+                                   onBlur={() => setFormDataDebounced.flush()}
                                    required/>
                         </input-shell>
                     </form-field>
                     <form-field class={"flex flex-col gap-2"}>
                         <label>Description</label>
-                        <textarea onInput={(e) => changeDescription(e.target.value)}>{props.theme.description ?? ""}</textarea>
+                        <textarea
+                            value={props.theme.description ?? ""}
+                            name="description"
+                            onInput={setFormDataDebounced}
+                            onBlur={() => setFormDataDebounced.flush()}></textarea>
                     </form-field>
+                    <button>Save</button>
                 </section>
                 <hr class={"w-full"}/>
                 <section class={"w-full flex flex-col gap-4 mt-10 mb-8"}>
@@ -144,19 +165,19 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                         </li>
                     </ul>
                 </section>
-            </div>
+            </form>
             <div class="content overflow-y-auto">
-                <Switch>
-                    <Match when={location.segments()[2] === "typography"}>
-                        <TypefaceList/>
-                    </Match>
-                    <Match when={location.segments()[2] === "elements"}>
-                        <div>Elements</div>
-                    </Match>
-                    <Match when={location.segments()[2] === "colors"}>
-                        <ColorList/>
-                    </Match>
-                </Switch>
+                {/*<Switch>*/}
+                {/*    <Match when={location.segments()[2] === "typography"}>*/}
+                {/*        <TypefaceList/>*/}
+                {/*    </Match>*/}
+                {/*    <Match when={location.segments()[2] === "elements"}>*/}
+                {/*        <div>Elements</div>*/}
+                {/*    </Match>*/}
+                {/*    <Match when={location.segments()[2] === "colors"}>*/}
+                {/*        <ColorList/>*/}
+                {/*    </Match>*/}
+                {/*</Switch>*/}
             </div>
         </Loading>
     </>

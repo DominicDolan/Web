@@ -10,7 +10,7 @@ export default defineConfig({
     appType: "spa",
     plugins: [
         solidServerFunctions({
-            serverEntry: "/home/doghouse/Source/SolidJS/web/apps/themeBuilder/src/server.tsx",
+            serverEntry: "/home/doghouse/Source/SolidJS/web/apps/theme-builder/src/server.tsx",
             async createRequestContext() {
                 cloudflareProxyPromise ??= getPlatformProxy({
                     configPath: "./wrangler.jsonc",
