@@ -12,7 +12,8 @@
     "noEmit": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
-    "types": ["vinxi/types/client", "vitest/globals", "@testing-library/jest-dom", "@cloudflare/workers-types", "node"],
+    "types": [
+    ],
     "isolatedModules": true,
     "paths": {
       "~/*": ["./src/*"]

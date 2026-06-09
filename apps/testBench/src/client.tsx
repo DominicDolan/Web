@@ -1,5 +1,5 @@
 import { render } from '@solidjs/web';
-import {TodoPage} from "./TodoPage/TodoPage";
+import {TodoPage} from "~/TodoPage/TodoPage.tsx";
 
 
 export default function App() {

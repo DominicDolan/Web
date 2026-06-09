@@ -63,10 +63,16 @@
         }
     }
 
+    input-shell:has(input:invalid) {
+        outline: 1px solid red !important;
+    }
+
     form-field {
         output {
             font-size: 0.875rem;
             color: var(--error-color);
+            min-height: 1lh;
+            display: block;
         }
     }
 

@@ -25,11 +25,11 @@
       "import": "./src/runtime/index.ts"
     }
   },
-  "scripts": {"hello": "echo hello", 
+  "scripts": {"hello": "echo hello",
     "build": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "typescript": "~6.0.2"
+    "typescript": "catalog:"
   },
   "peerDependencies": {
     "vite": "^8.0.4"

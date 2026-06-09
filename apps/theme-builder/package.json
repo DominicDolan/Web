@@ -31,6 +31,7 @@
     "vite-plugin-solid": "catalog:",
     "vite": "catalog:",
     "codemirror": "6.0.2",
-    "zod": "catalog:"
+    "zod": "catalog:",
+    "typescript": "catalog:"
   }
 }

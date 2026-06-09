@@ -1,4 +1,4 @@
-import {createSignal, onMount} from "solid-js";
+import {createSignal, onSettled} from "solid-js";
 import "./UseTabs.css"
 
 export function useTabs() {
@@ -11,7 +11,7 @@ export function useTabs() {
         }
     }
 
-    onMount(() => {
+    onSettled(() => {
         if (windowElement != null) {
             windowElement.style.viewTransitionName = "window-" + window.performance.now().toString().replace('.', '_') + Math.floor(Math.random() * 1000);
         }

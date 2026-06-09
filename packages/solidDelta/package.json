@@ -17,11 +17,12 @@
     "solid-js": "2.0.0-beta.14",
     "@paralleldrive/cuid2": "3.3.0",
     "@solidjs/web": "2.0.0-beta.14",
-    "@web/solid-scope": "workspace:*"
+    "@web/solid-scope": "workspace:*",
+    "@web/schema": "workspace:*"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.9.1",
     "@cloudflare/workers-types": "4.20260331.1",
-    "typescript": "5.5.4"
+    "typescript": "catalog:"
   }
 }

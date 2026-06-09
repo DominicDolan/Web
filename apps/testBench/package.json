@@ -12,11 +12,12 @@
     "@web/schema": "workspace:*",
     "@web/solid-delta": "workspace:*",
     "@web/solid-scope": "workspace:*",
-    "@web/unolayout": "workspace:*",
     "@web/utils": "workspace:*",
+    "@web/server-functions": "workspace:*",
     "vite": "8.0.14",
-    "solid-js": "2.0.0-beta.14",
-    "@solidjs/web": "2.0.0-beta.14"
+    "vite-plugin-solid": "catalog:",
+    "solid-js": "catalog:",
+    "@solidjs/web": "catalog:"
   },
   "devDependencies": {
     "vite-tsconfig-paths": "6.1.1"

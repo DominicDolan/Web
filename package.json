@@ -7,6 +7,7 @@
     "packages": [
       "apps/cli",
       "apps/theme-builder",
+      "apps/testBench",
       "packages/d1",
       "packages/solidDelta",
       "packages/lins",
@@ -23,8 +24,10 @@
       "vite": "8.0.16",
       "vite-plugin-solid": "3.0.0-next.5",
       "wrangler": "4.77.0",
-      "zod": "4.4.3"
+      "zod": "4.4.3",
+      "typescript": "5.5.2"
     }
   },
-  "dependencies": {}
+  "dependencies": {
+  }
 }
