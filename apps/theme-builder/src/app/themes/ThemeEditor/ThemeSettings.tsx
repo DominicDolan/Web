@@ -12,18 +12,19 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
     const {
         themes,
         updateThemeLocal,
-        deleteThemeAndSave,
-        saveDeltas
+        saveDeltas,
+        removeTheme,
     } = useThemesListScope()
 
     const navigate = useNavigate()
     const location = useLocation()
 
     async function remove() {
-        const themeIndex = themes().findIndex(t => t.id === props.theme.id)
+        const themeIndex = themes.findIndex(t => t.id === props.theme.id)
         if (themeIndex === -1) return
 
-        const newTheme = themes()[themeIndex + 1] ?? themes()[themeIndex - 1]
+        const newTheme = themes[themeIndex + 1] ?? themes[themeIndex - 1]
+
         await deleteThemeAndSave(props.theme.id)
         if (newTheme != null) {
             navigate("/editor/" + (newTheme.id))

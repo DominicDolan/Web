@@ -18,9 +18,7 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
     }), [] as ModelDelta<ThemeDefinition>[])
     const acked = createDeltaTracker(() => themeDeltas)
 
-    const [themesOld, createDeltas] = createModels(() => themeDeltas)
-
-    const themes = () => themesOld.filter((theme) => theme !== undefined)
+    const [themes, createDeltas] = createModels(() => themeDeltas)
 
     const navigate = useNavigate()
 
@@ -74,11 +72,17 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
         await saveDeltas(deltas)
     }
 
+    function removeTheme(id: string) {
+        const deltas = createDeltas("delete", id)
+        saveDeltasLocal(deltas)
+    }
+
     return {
         themes,
         addNewThemeLocal,
         updateThemeLocal,
         deleteThemeAndSave,
-        saveDeltas
+        saveDeltas,
+        removeTheme
     }
 })

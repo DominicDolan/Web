@@ -254,7 +254,7 @@ export function createModels<M extends Model>(
 
     const models = createProjection((draft) => {
         for (const id in deltasByIdNoArrays) {
-            const existingIndex = draft.findIndex(m => m.id === id)
+            const existingIndex = draft.findIndex(m => m && m.id === id)
 
             const index = existingIndex === -1 ? draft.length : existingIndex
             for (const delta of deltasByIdNoArrays[id]) {
@@ -280,9 +280,12 @@ export function createModels<M extends Model>(
         }
 
         for (const id in arrayMapById) {
-            let model = draft.find(item => item.id === id)
+            let model = draft.find(item => item && item.id === id)
 
             if (model == null) {
+                const isDeleted = deltasByIdNoArrays[id]?.some(d => d.path === "" && d.value === undefined)
+                if (isDeleted) continue
+
                 model = { id } as M
                 draft.push(model)
             }

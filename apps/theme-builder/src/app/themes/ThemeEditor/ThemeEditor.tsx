@@ -14,7 +14,7 @@ export default function ThemeEditor() {
 
     const selectedTheme = createMemo(() => {
         if (themeId() == null) return undefined
-        return themes().find(theme => theme.id === themeId())
+        return themes.find(theme => theme.id === themeId())
     })
 
     return <Loading fallback={<div>Loading...</div>}>
@@ -23,7 +23,7 @@ export default function ThemeEditor() {
                 <div class={"w-full flex flex-col gap-6"}>
                     <button onClick={() => addNewThemeLocal()} class="flat surface flex flex-row gap-2 items-center"><i>add</i><span>Add Theme</span></button>
                     <ul class="nav flex flex-col gap-4 w-full pl-0">
-                        <For each={themes()}>
+                        <For each={themes}>
                             {(theme) => <li>
                                 <A href={`/editor/${theme.id}`} class={"block"}>{theme.name}</A>
                             </li>}
@@ -31,9 +31,9 @@ export default function ThemeEditor() {
                     </ul>
                 </div>
             </MainPageNav>
-            <Show when={selectedTheme()}>{(t) => {
-                return <ThemeScope theme={t()}>
-                    <ThemeSettings theme={t()}></ThemeSettings>
+            <Show when={selectedTheme()} keyed>{(t) => {
+                return <ThemeScope theme={t}>
+                    <ThemeSettings theme={t}></ThemeSettings>
                 </ThemeScope>
             }}
             </Show>
