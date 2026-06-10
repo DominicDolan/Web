@@ -171,6 +171,88 @@ describe("createModels", () => {
         expect(models[0].updatedAt).toBe(20);
     });
 
+    it("handles adding multiple models sequentially", () => {
+        const [deltas, setDeltas] = createSignal<ModelDelta<TestTask>[]>([]);
+        const [models, createDeltas] = createModels<TestTask>(deltas);
+
+        // 1. Add first theme
+        const deltas1 = createDeltas("create", {
+            id: "theme-1",
+            title: "Theme 1",
+            status: "todo"
+        });
+        setDeltas(d => [...d, ...deltas1]);
+        flush();
+
+        expect(models.length).toBe(1);
+        expect(models[0]).toEqual({
+            id: "theme-1",
+            title: "Theme 1",
+            status: "todo",
+            updatedAt: expect.any(Number)
+        });
+
+        // 2. Add second theme
+        const deltas2 = createDeltas("create", {
+            id: "theme-2",
+            title: "Theme 2",
+            status: "todo"
+        });
+        setDeltas(d => [...d, ...deltas2]);
+        flush();
+
+        expect(models.length).toBe(2);
+        expect(models.find(m => m.id === "theme-1")?.title).toBe("Theme 1");
+        expect(models.find(m => m.id === "theme-2")?.title).toBe("Theme 2");
+
+        // 3. Add third theme
+        const deltas3 = createDeltas("create", {
+            id: "theme-3",
+            title: "Theme 3",
+            status: "todo"
+        });
+        setDeltas(d => [...d, ...deltas3]);
+        flush();
+
+        expect(models.length).toBe(3);
+        expect(models.find(m => m.id === "theme-1")?.title).toBe("Theme 1");
+        expect(models.find(m => m.id === "theme-2")?.title).toBe("Theme 2");
+        expect(models.find(m => m.id === "theme-3")?.title).toBe("Theme 3");
+    });
+
+
+    it("handles deletion and re-addition", () => {
+        const [deltas, setDeltas] = createSignal<ModelDelta<TestTask>[]>([]);
+        const [models, createDeltas] = createModels<TestTask>(deltas);
+
+        // Add 3 themes
+        setDeltas(d => [...d, ...createDeltas("create", { id: "t1", title: "T1", status: "todo" })]);
+        setDeltas(d => [...d, ...createDeltas("create", { id: "t2", title: "T2", status: "todo" })]);
+        setDeltas(d => [...d, ...createDeltas("create", { id: "t3", title: "T3", status: "todo" })]);
+        flush();
+
+        expect(models.length).toBe(3);
+
+        // Delete T2
+        setDeltas(d => [...d, ...createDeltas("delete", "t2")]);
+        flush();
+
+        expect(models.length).toBe(2);
+        expect(models.map(m => m.id)).not.toContain("t2");
+
+        // Add T4
+        setDeltas(d => [...d, ...createDeltas("create", { id: "t4", title: "T4", status: "todo" })]);
+        flush();
+
+        expect(models.length).toBe(3);
+        expect(models.map(m => m.id)).toContain("t4");
+        expect(models.find(m => m.id === "t4")?.title).toBe("T4");
+
+        // Verify others are still there and not empty
+        expect(models.find(m => m.id === "t1")?.title).toBe("T1");
+        expect(models.find(m => m.id === "t3")?.title).toBe("T3");
+    });
+
     describe("keyed arrays", () => {
         it("projects keyed primitive array entries as arrays sorted by order", () => {
             const [models] = createModels<TestTask>(() => [

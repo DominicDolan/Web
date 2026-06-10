@@ -254,27 +254,40 @@ export function createModels<M extends Model>(
 
     const models = createProjection((draft) => {
         for (const id in deltasByIdNoArrays) {
-            const existingIndex = draft.findIndex(m => m && m.id === id)
+            const ensureModel = () => {
+                const existingIndex = draft.findIndex(m => m && m.id === id)
+                if (existingIndex !== -1) {
+                    return draft[existingIndex]
+                }
 
-            const index = existingIndex === -1 ? draft.length : existingIndex
+                const emptyIndex = draft.findIndex(m => m === undefined)
+                const model = { id } as M
+                if (emptyIndex === -1) {
+                    draft.push(model)
+                } else {
+                    draft[emptyIndex] = model
+                }
+
+                return model
+            }
+
             for (const delta of deltasByIdNoArrays[id]) {
                 if (delta.path === "" && delta.value === undefined) {
-                    draft[index] = undefined as unknown as M
-                } else if (delta.path === "" && delta.value !== undefined) {
-                    if (draft[index] === undefined) {
-                        draft[index] = { id } as M
+                    const index = draft.findIndex(m => m && m.id === id)
+                    if (index !== -1) {
+                        draft[index] = undefined as unknown as M
                     }
+                } else if (delta.path === "" && delta.value !== undefined) {
+                    const model = ensureModel()
                     for (const key in delta.value) {
-                        draft[index][key as keyof M] = delta.value[key]
+                        model[key as keyof M] = delta.value[key]
                     }
 
-                    draft[index].updatedAt = Math.max(delta.timestamp, draft[index].updatedAt ?? -Infinity)
+                    model.updatedAt = Math.max(delta.timestamp, model.updatedAt ?? -Infinity)
                 } else {
-                    if (draft[index] === undefined) {
-                        draft[index] = { id } as M
-                    }
-                    applyObjectPathToModel(draft[index], delta.path, delta.value)
-                    draft[index].updatedAt = Math.max(delta.timestamp, draft[index].updatedAt ?? -Infinity)
+                    const model = ensureModel()
+                    applyObjectPathToModel(model, delta.path, delta.value)
+                    model.updatedAt = Math.max(delta.timestamp, model.updatedAt ?? -Infinity)
                 }
             }
         }
