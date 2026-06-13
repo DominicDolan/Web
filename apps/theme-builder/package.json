@@ -6,6 +6,7 @@
   "scripts": {
     "serve": "vite dev --port 3001",
     "test": "echo \"Error: no test specified\" && exit 1",
+    "check": "tsc --noEmit --project tsconfig.json",
     "generate:schema": "generate-schema src/models migrations",
     "apply:schema": "wrangler d1 migrations apply DB --local --config ./wrangler.jsonc",
     "apply:schema:prod": "wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc"

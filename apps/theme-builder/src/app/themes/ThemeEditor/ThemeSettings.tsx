@@ -141,7 +141,7 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                 </section>
             </div>
             <div class="content overflow-y-auto">
-                {/*<Switch>*/}
+                <Switch>
                 {/*    <Match when={location.segments()[2] === "typography"}>*/}
                 {/*        <TypefaceList/>*/}
                 {/*    </Match>*/}
@@ -151,7 +151,7 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                 {/*    <Match when={location.segments()[2] === "colors"}>*/}
                 {/*        <ColorList/>*/}
                 {/*    </Match>*/}
-                {/*</Switch>*/}
+                </Switch>
             </div>
         </Loading>
     </>

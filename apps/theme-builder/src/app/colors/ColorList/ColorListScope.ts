@@ -1,44 +1,70 @@
-import {defineScope} from "@web/solid-scope";
-import {ThemeScope} from "~/app/themes/ThemeEditor/ThemeScope";
-import {createDeltaStore, createMarker} from "@web/solid-delta";
-import {createMemo} from "solid-js";
-import {getColorDeltas, saveColor} from "~/app/colors/ColorRepository.server";
-import {createId} from "@paralleldrive/cuid2";
-import {useNavigate} from "@web/router";
-
+import { defineScope } from '@web/solid-scope'
+import { ThemeScope } from '~/app/themes/ThemeEditor/ThemeScope'
+import { createModels, ModelDelta, createDeltaTracker } from '@web/solid-delta'
+import {
+    action,
+    createOptimisticStore,
+    flush,
+    refresh,
+    createStore,
+} from 'solid-js'
+import { getColorDeltas, saveColor } from '~/app/colors/ColorRepository.server'
+import { createId } from '@paralleldrive/cuid2'
+import { useNavigate } from '@web/router'
+import { ThemeDefinition } from '~/models/ThemeDefinition.ts'
+import { ColorDefinition } from '~/models/ColorDefinition.ts'
 
 export const useColorListScope = defineScope(ThemeScope, (props) => {
+    const [colorDeltas, setColorDeltas] = createStore(async () => {
+        const res = await getColorDeltas(props.theme.id)
+        setTimeout(() => acked.mark(res))
+        return res
+    }, [] as ModelDelta<ColorDefinition>[])
+    const acked = createDeltaTracker(() => colorDeltas)
 
-    const colorDeltas = createMemo(() => getColorDeltas(props.theme.id))
-    const store = createDeltaStore(() => colorDeltas())
-    const [colors, setColors] = store
-    const [getUncommitted, markCommitted] = createMarker(store)
-    markCommitted()
+    const [colors, createDeltas] = createModels(() => colorDeltas)
 
     const navigate = useNavigate()
 
-    async function save() {
-        const uncommitted = await getUncommitted()
-        await saveColor(uncommitted, props.theme.id)
+    const saveDeltas = action(function* (
+        deltas?: ModelDelta<ColorDefinition>[]
+    ) {
+        if (deltas != null) {
+            pushColorDeltas(deltas)
+        }
+
+        const uncommitted = acked.inverseIncluding(deltas ?? [])
+        yield saveColor(uncommitted, props.theme.id)
+
+        refresh(colorDeltas)
+    })
+
+    function pushColorDeltas(deltas: ModelDelta<ColorDefinition>[]) {
+        setColorDeltas((old) => {
+            old.push(...deltas)
+        })
     }
 
     async function addColor() {
         const newId = createId()
-        setColors(old => {
-            old[newId] = {
-                name: "",
-                hex: "#000000",
-                alpha: 1,
-            }
+        const deltas = createDeltas('create', {
+            id: newId,
+            name: '',
+            hex: '#000000',
+            alpha: 1,
         })
-        await save()
+
+        pushColorDeltas(deltas)
 
         navigate(`/editor/${props.theme.id}/colors/${newId}`)
+
+        flush()
+        await saveDeltas()
     }
 
     return {
         theme: () => props.theme,
         addColor,
-        colors
+        colors,
     }
-});
+})
