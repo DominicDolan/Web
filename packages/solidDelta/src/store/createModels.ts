@@ -252,42 +252,30 @@ export function createModels<M extends Model>(
 
     const createDeltas = useDeltaWriter(deltas)
 
-    const models = createProjection((draft) => {
+    const models = createProjection(() => {
+
+        const draft = [] as Array<(M & { _deleted?: boolean })>
+
         for (const id in deltasByIdNoArrays) {
-            const ensureModel = () => {
-                const existingIndex = draft.findIndex(m => m && m.id === id)
-                if (existingIndex !== -1) {
-                    return draft[existingIndex]
-                }
+            const existingIndex = draft.findIndex(m => m && m.id === id)
 
-                const emptyIndex = draft.findIndex(m => m === undefined)
-                const model = { id } as M
-                if (emptyIndex === -1) {
-                    draft.push(model)
-                } else {
-                    draft[emptyIndex] = model
-                }
-
-                return model
-            }
-
+            const index = existingIndex === -1 ? draft.length : existingIndex
             for (const delta of deltasByIdNoArrays[id]) {
+                if (draft[index] == undefined) {
+                    draft[index] = { id } as M
+                }
                 if (delta.path === "" && delta.value === undefined) {
-                    const index = draft.findIndex(m => m && m.id === id)
-                    if (index !== -1) {
-                        draft[index] = undefined as unknown as M
-                    }
+                    draft[index]._deleted = true
                 } else if (delta.path === "" && delta.value !== undefined) {
-                    const model = ensureModel()
+                    delete draft[index]._deleted
                     for (const key in delta.value) {
-                        model[key as keyof M] = delta.value[key]
+                        draft[index][key as keyof M] = delta.value[key]
                     }
 
-                    model.updatedAt = Math.max(delta.timestamp, model.updatedAt ?? -Infinity)
+                    draft[index].updatedAt = Math.max(delta.timestamp, draft[index].updatedAt ?? -Infinity)
                 } else {
-                    const model = ensureModel()
-                    applyObjectPathToModel(model, delta.path, delta.value)
-                    model.updatedAt = Math.max(delta.timestamp, model.updatedAt ?? -Infinity)
+                    applyObjectPathToModel(draft[index], delta.path, delta.value)
+                    draft[index].updatedAt = Math.max(delta.timestamp, draft[index].updatedAt ?? -Infinity)
                 }
             }
         }
@@ -307,13 +295,15 @@ export function createModels<M extends Model>(
             model.updatedAt = Math.max(0, model.updatedAt ?? -Infinity)
         }
 
-        for (let i = 0; i < draft.length; i++) {
+        // Replace temporary workaround with this after bug is fixed in beta.15
+        /*for (let i = draft.length - 1; i >= 0; i--) {
             if (draft[i] === undefined) {
                 draft.splice(i, 1);
-                i--;
             }
-        }
+        }*/
 
+        // temporary workaround
+        return draft.filter(m => !m?._deleted) as M[]
     }, [] as M[])
 
     return [models, createDeltas] as const

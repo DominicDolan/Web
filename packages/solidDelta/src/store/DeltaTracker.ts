@@ -12,7 +12,9 @@ export type DeltaTrackerOptions<M extends Model> = {
 
 export type DeltaTracker<M extends Model> = {
     get(options?: DeltaTrackerReadOptions): ModelDelta<M>[]
+    getIncluding(deltas: readonly ModelDelta<M>[], options?: DeltaTrackerReadOptions): ModelDelta<M>[]
     inverse(options?: DeltaTrackerReadOptions): ModelDelta<M>[]
+    inverseIncluding(deltas: readonly ModelDelta<M>[], options?: DeltaTrackerReadOptions): ModelDelta<M>[]
     mark(delta: ModelDelta<M> | readonly ModelDelta<M>[]): void
     clear(): void
 }
@@ -44,12 +46,12 @@ export function createDeltaTracker<M extends Model>(
         return Array.from(latest.values());
     }
 
-    function readTracked(tracked: boolean, options?: DeltaTrackerReadOptions) {
+    function readTracked(tracked: boolean, deltas: readonly ModelDelta<M>[], options?: DeltaTrackerReadOptions) {
         revision();
 
         const result: ModelDelta<M>[] = [];
 
-        for (const delta of getDeltas()) {
+        for (const delta of deltas) {
             const timestamp = frontier.get(trackBy(delta)) ?? -Infinity;
             const isTracked = delta.timestamp <= timestamp;
 
@@ -63,10 +65,16 @@ export function createDeltaTracker<M extends Model>(
 
     return {
         get(options) {
-            return readTracked(true, options);
+            return readTracked(true, getDeltas(), options);
+        },
+        getIncluding(deltas: readonly ModelDelta<M>[], options?: DeltaTrackerReadOptions) {
+            return readTracked(true, [...getDeltas(), ...deltas], options);
         },
         inverse(options) {
-            return readTracked(false, options);
+            return readTracked(false, getDeltas(), options);
+        },
+        inverseIncluding(deltas: readonly ModelDelta<M>[], options?: DeltaTrackerReadOptions) {
+            return readTracked(false, [...getDeltas(), ...deltas], options);
         },
         mark(deltaOrDeltas) {
             const deltas = Array.isArray(deltaOrDeltas) ? deltaOrDeltas : [deltaOrDeltas];

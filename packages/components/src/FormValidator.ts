@@ -140,6 +140,8 @@ export function useFormValidator<M>(
 
                 inputElement.addEventListener("focus", onFormFocus)
             }
+
+            setFormData(fd)
         }
 
         return () => {

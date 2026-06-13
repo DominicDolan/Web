@@ -1,5 +1,5 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
-import {action, createStore, onSettled, refresh} from "solid-js";
+import {action, createStore, onSettled, refresh, flush} from "solid-js";
 import {getThemesDeltas, saveTheme} from "~/app/themes/ThemeEditor/ThemeRepository.server";
 import {useNavigate} from "@web/router";
 import {createId} from "@paralleldrive/cuid2";
@@ -36,7 +36,7 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
             saveDeltasLocal(deltas)
         }
 
-        const uncommitted = acked.inverse()
+        const uncommitted = acked.inverseIncluding(deltas ?? [])
         yield saveTheme(uncommitted)
 
         refresh(themeDeltas);
@@ -72,17 +72,11 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
         await saveDeltas(deltas)
     }
 
-    function removeTheme(id: string) {
-        const deltas = createDeltas("delete", id)
-        saveDeltasLocal(deltas)
-    }
-
     return {
         themes,
         addNewThemeLocal,
         updateThemeLocal,
         deleteThemeAndSave,
-        saveDeltas,
-        removeTheme
+        saveDeltas
     }
 })
