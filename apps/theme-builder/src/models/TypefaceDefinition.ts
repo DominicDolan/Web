@@ -3,7 +3,8 @@ import {createModelSchema} from "@web/d1";
 import {z} from "zod";
 import {typefaceRoles, typefaceSizes} from "~/constants/TypefaceRoles";
 
-export const typefaceDefinitionSchema = modelSchema.extend({
+export const typefaceDefinitionSchema = z.object({
+    ...modelSchema,
     role: z.enum(typefaceRoles),
     size: z.enum(typefaceSizes),
     type: z.enum(["default", "variant"]),

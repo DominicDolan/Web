@@ -27,6 +27,7 @@ export function createScopeProvider<Props extends Record<string, any>>(): ScopeP
         const data = new Map<symbol, unknown>()
         const propsNoChildren = omit(props, "children") as Props
 
+        // @ts-ignore
         return <StoreContext value={{props: propsNoChildren, data}}>
             {props.children}
         </StoreContext>

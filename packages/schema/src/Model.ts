@@ -1,11 +1,14 @@
 import {z} from "zod";
 
-export const modelSchema = z.object({
+export const modelSchema = {
     id: z.string(),
     updatedAt: z.number()
-})
+}
 
-export type Model = z.infer<typeof modelSchema>
+export type Model = {
+    id: string,
+    updatedAt: number
+}
 
 export type PartialModel<M extends Model> = Model & Partial<ModelData<M>>
 

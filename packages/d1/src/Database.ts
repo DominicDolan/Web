@@ -1,3 +1,4 @@
+import { D1Database } from "@cloudflare/workers-types"
 import { getEvent } from "@web/server-functions/runtime"
 
 interface CloudflareContext {

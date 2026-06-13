@@ -79,7 +79,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
             .bind(...bindValues)
             .all<ModelEventRow>()
 
-        return results.map(convertEventRowToModelDelta<M>).toSorted((a, b) => a.timestamp - b.timestamp)
+        return results.map(convertEventRowToModelDelta<M>).toSorted((a: any, b: any) => a.timestamp - b.timestamp)
     }
 
     function createGetManyBuilder(): GetManyBuilder<M> {
@@ -117,7 +117,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
                 .bind(id)
                 .all<ModelEventRow>()
 
-            return results.map(convertEventRowToModelDelta<M>).toSorted((a, b) => a.timestamp - b.timestamp)
+            return results.map(convertEventRowToModelDelta<M>).toSorted((a: any, b: any) => a.timestamp - b.timestamp)
         },
         getMany() {
             return createGetManyBuilder()

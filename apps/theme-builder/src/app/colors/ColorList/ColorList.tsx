@@ -21,10 +21,10 @@ export default function ColorList() {
             <Loading fallback={<div>Loading...</div>}>
                 <For each={colors}>{
                     color => <ColorEditCard
-                        name={variableNameToTitle(color().name)}
-                        color={color().hex}
-                        textColor={color().onHex}
-                        onClick={() => onColorClicked(color())} />}
+                        name={variableNameToTitle(color.name)}
+                        color={color.hex}
+                        textColor={color.onHex}
+                        onClick={() => onColorClicked(color)} />}
                 </For>
                 <ColorAddCard />
             </Loading>

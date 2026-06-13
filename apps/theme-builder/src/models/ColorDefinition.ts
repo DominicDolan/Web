@@ -2,7 +2,8 @@ import {z} from "zod";
 import {createModelSchema} from "@web/d1";
 import {modelSchema} from "@web/schema";
 
-export const colorDefinitionSchema = modelSchema.extend({
+export const colorDefinitionSchema = z.object({
+    ...modelSchema,
     hex: z.string(),
     alpha: z.number(),
     name: z.string().regex(/^--/),

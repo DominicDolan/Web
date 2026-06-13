@@ -2,7 +2,8 @@ import {z} from "zod";
 import {createModelSchema} from "@web/d1";
 import {modelSchema} from "@web/schema";
 
-export const elementStyleDefinition = modelSchema.extend({
+export const elementStyleDefinition = z.object({
+    ...modelSchema,
     element: z.string(),
     variant: z.string(),
     css: z.string(),

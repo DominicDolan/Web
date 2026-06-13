@@ -1,7 +1,7 @@
 import {Accessor, createProjection} from "solid-js";
 import {Model} from "@web/schema";
 import {ModelDelta} from "../model/ModelDelta";
-import {useDeltaWriter} from "./useDeltaWriter.ts";
+import {useDeltaWriter, WriteDeltas} from "./useDeltaWriter.ts";
 
 type ArrayItem = { key: string, $order?: number, $value?: any, timestamp: number }
 type ArrayMap = Record<string, ArrayItem[]>
@@ -306,5 +306,5 @@ export function createModels<M extends Model>(
         return draft.filter(m => !m?._deleted) as M[]
     }, [] as M[])
 
-    return [models, createDeltas] as const
+    return [models as readonly M[], createDeltas as WriteDeltas<M>] as const
 }

@@ -2,7 +2,8 @@ import {z} from "zod";
 import {createModelSchema} from "@web/d1";
 import {modelSchema} from "@web/schema";
 
-export const themeDefinitionSchema = modelSchema.extend({
+export const themeDefinitionSchema = z.object({
+    ...modelSchema,
     name: z.string().trim().nonempty(),
     class: z.string().trim().nonempty(),
     description: z.string().optional(),
