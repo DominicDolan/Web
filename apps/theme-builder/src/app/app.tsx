@@ -8,6 +8,8 @@ import {ThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 // import {TypefaceScope} from "~/app/typography/TypefaceEditor/TypefaceScope";
 // import {TypefaceEditor} from "~/app/typography/TypefaceEditor/TypefaceEditor";
 import {TypefaceRole, typefaceRoles, TypefaceSize, typefaceSizes, TypefaceType} from "~/constants/TypefaceRoles";
+import {ColorScope} from "~/app/colors/ColorEditor/ColorScope.ts";
+import {ColorEditor} from "~/app/colors/ColorEditor/ColorEditor.tsx";
 
 export default function App() {
     const location = useLocation();
@@ -25,10 +27,9 @@ export default function App() {
         <div class="minimalTheme light h-full">
             <Switch fallback={<><div>404</div></>}>
                 <Match when={location.segments()[0] === "editor" && location.segments()[2] === "colors" && location.segments().length === 4}>
-                    <div>Color Placeholder</div>
-                    {/*<ColorScope themeId={location.segments()[1]} colorId={location.segments()[3]}>*/}
-                    {/*    <ColorEditor/>*/}
-                    {/*</ColorScope>*/}
+                    <ColorScope themeId={location.segments()[1]} colorId={location.segments()[3]}>
+                        <ColorEditor/>
+                    </ColorScope>
                 </Match>
                 <Match when={matchesTypographyPath()}>
                     <div>Typeface Placeholder</div>

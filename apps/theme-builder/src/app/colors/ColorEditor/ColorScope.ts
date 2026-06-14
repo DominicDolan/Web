@@ -1,77 +1,79 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
-import {createDeltaStore, createMarker} from "@web/solid-delta";
-import {createEffect, createMemo} from "solid-js";
+import {action, createStore, refresh} from "solid-js";
 import {getSingleColorDelta, saveColor} from "~/app/colors/ColorRepository.server";
 import {debounce} from "@web/utils/Debounce.js";
+import {createDeltaTracker, createModels, ModelDelta} from "@web/solid-delta";
+import {ColorDefinition} from "~/models/ColorDefinition.ts";
 
 
 export const ColorScope = createScopeProvider<{ themeId: string, colorId: string }>();
 
 export const useColorScope = defineScope(ColorScope, (props) => {
-    const colorDeltas = createMemo(() => getSingleColorDelta(props.colorId))
 
-    const store = createDeltaStore(() => colorDeltas())
-    const [color, setColor] = store
-    const [getUncommitted, markCommitted] = createMarker(store)
-    markCommitted()
+    const [colorDeltas, setColorDeltas] = createStore(() => {
+        return getSingleColorDelta(props.colorId).then((res) => {
+            setTimeout(() => acked.mark(res));
+            return res;
+        })
+    }, [] as ModelDelta<ColorDefinition>[])
 
-    async function save() {
-        debounceSave.cancel()
-        const uncommitted = await getUncommitted()
-        await saveColor(uncommitted, props.themeId)
+    const acked = createDeltaTracker(() => colorDeltas)
+
+    const [colors, createDeltas] = createModels(() => colorDeltas)
+
+    const saveDeltas = action(async function* (deltas?: ModelDelta<ColorDefinition>[]) {
+        if (deltas != null) {
+            pushColorDeltas(deltas);
+        }
+
+        const uncommitted = acked.inverseIncluding(deltas ?? []);
+        yield saveColor(uncommitted, props.themeId);
+
+        refresh(colorDeltas);
+    })
+
+
+    function pushColorDeltas(deltas: ModelDelta<ColorDefinition>[]) {
+        setColorDeltas((draft) => {
+            draft.push(...deltas);
+        });
     }
 
-    const debounceSave = debounce(save, 1000)
+    const debounceSave = debounce(saveDeltas, 1000)
 
-    function updateName(newName: string, debounce = false) {
-        setColor(old => {
-            old[props.colorId].name = newName
-        })
+    function setColorValue(key: keyof ColorDefinition, value: ColorDefinition[keyof ColorDefinition], debounce = false) {
+        const deltas = createDeltas(props.colorId, {[key]: value})
+
         if (debounce) {
+            pushColorDeltas(deltas)
             debounceSave()
         } else {
-            save()
+            saveDeltas(deltas)
         }
+    }
+
+    function updateName(newName: string, debounce = false) {
+        setColorValue("name", newName, debounce)
     }
 
     function updateHex(newHex: string, debounce = false) {
-        setColor(old => {
-            old[props.colorId].hex = newHex
-        })
-        if (debounce) {
-            debounceSave()
-        } else {
-            save()
-        }
+        setColorValue("hex", newHex, debounce)
     }
 
     function updateAlpha(newAlpha: number, debounce = false) {
-        setColor(old => {
-            old[props.colorId].alpha = newAlpha
-        })
-        if (debounce) {
-            debounceSave()
-        } else {
-            save()
-        }
+        setColorValue("alpha", newAlpha, debounce)
     }
 
     function updateOnHex(hex: string, debounce = false) {
-        setColor(old => {
-            old[props.colorId].onHex = hex
-        })
-        if (debounce) {
-            debounceSave()
-        } else {
-            save()
-        }
+        setColorValue("onHex", hex, debounce)
     }
+
     return {
         updateName,
         updateHex,
         updateAlpha,
         updateOnHex,
-        color: () => color[0],
+        color: () => colors[0],
         themeId: () => props.themeId,
     }
 })

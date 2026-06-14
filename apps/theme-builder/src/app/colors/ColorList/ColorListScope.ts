@@ -3,7 +3,6 @@ import { ThemeScope } from '~/app/themes/ThemeEditor/ThemeScope'
 import { createModels, ModelDelta, createDeltaTracker } from '@web/solid-delta'
 import {
     action,
-    createOptimisticStore,
     flush,
     refresh,
     createStore,
@@ -11,7 +10,6 @@ import {
 import { getColorDeltas, saveColor } from '~/app/colors/ColorRepository.server'
 import { createId } from '@paralleldrive/cuid2'
 import { useNavigate } from '@web/router'
-import { ThemeDefinition } from '~/models/ThemeDefinition.ts'
 import { ColorDefinition } from '~/models/ColorDefinition.ts'
 
 export const useColorListScope = defineScope(ThemeScope, (props) => {
@@ -52,6 +50,8 @@ export const useColorListScope = defineScope(ThemeScope, (props) => {
             name: '',
             hex: '#000000',
             alpha: 1,
+            cssClass: "",
+            onHex: "",
         })
 
         pushColorDeltas(deltas)
