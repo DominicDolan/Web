@@ -1,9 +1,10 @@
 "use server"
 
 import {useDatabaseTable} from "@web/d1";
-import {ModelDelta} from "@web/solid-delta";
+import {createModel, ModelDelta} from "@web/solid-delta";
 import {TypefaceDefinition, typefaceDefinitionSchema} from "~/models/TypefaceDefinition";
 import {TypefaceRole, TypefaceSize, TypefaceType} from "~/constants/TypefaceRoles";
+import {groupBy} from "@web/utils/GroupBy.ts";
 
 
 export function getTypefacesForTheme(themeId: string) {
@@ -23,12 +24,22 @@ export async function getTypefaceDeltas(themeId: string) {
 export async function getSingleTypefaceDeltas(themeId: string, role: TypefaceRole, size: TypefaceSize, type: TypefaceType) {
     const db = useDatabaseTable(typefaceDefinitionSchema)
 
-    return await db.getMany()
+    const result = await db.getMany()
         .byColumn("theme", themeId)
-        .byPath("role", role)
-        .byPath("size", size)
-        .byPath("type", type)
         .execute()
+
+    const grouped = groupBy(result, "id")
+
+    for (const id in grouped) {
+        const deltas = grouped[id]
+        const model = createModel(deltas)
+
+        if (model != undefined && model.role === role && model.size === size && model.type === type) {
+            return deltas
+        }
+    }
+
+    return []
 }
 
 export async function saveTypeface(typefaceDeltas: ModelDelta<TypefaceDefinition>[], themeId: string) {

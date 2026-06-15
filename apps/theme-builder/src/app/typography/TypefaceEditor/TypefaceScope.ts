@@ -1,6 +1,6 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
 import {TypefaceRole, TypefaceSize, TypefaceType} from "~/constants/TypefaceRoles";
-import {action, createMemo, createStore, flush, refresh} from "solid-js";
+import {action, createMemo, createStore, refresh} from "solid-js";
 import {getSingleTypefaceDeltas, saveTypeface} from "~/app/typography/TypefaceRepository.server";
 import {defaultTypefacesQueryObject} from "~/constants/DefaultTypefaces";
 import {createId} from "@paralleldrive/cuid2";
@@ -63,16 +63,16 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
 
     const debounceSaveDeltas = debounce(saveDeltas, 1000)
 
-    function createTypefaceWithDefaults() {
+    function createTypefaceWithDefaults(overrides: Partial<TypefaceDefinition> = {}) {
         const newId = createId()
 
         return createDeltas("create", {
             id: newId,
-            css: defaultTypeface().css,
-            type: defaultTypeface().type,
-            size: defaultTypeface().size,
-            role: defaultTypeface().role,
-            applyAsDefault: []
+            css: overrides.css ?? defaultTypeface().css,
+            type: overrides.type ?? defaultTypeface().type,
+            size: overrides.size ?? defaultTypeface().size,
+            role: overrides.role ?? defaultTypeface().role,
+            applyAsDefault: overrides.applyAsDefault ?? []
         })
     }
 
@@ -102,41 +102,32 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
 
     function addSelector() {
         let id = typefaces[0]?.id
-        const deltas = []
         if (id == null) {
-            const createDeltas = createTypefaceWithDefaults()
-            deltas.push(...createDeltas)
-            id = createDeltas[0].id
+            const deltas = createTypefaceWithDefaults({
+                applyAsDefault: [""]
+            })
+            pushTypefaceDeltas(deltas)
+        } else {
+            const deltas = createDeltas(id, (draft) => {
+                draft.applyAsDefault?.push("")
+            })
+            pushTypefaceDeltas(deltas)
         }
-
-        console.log("adding selector")
-        const updateDeltas = createDeltas(id, (draft) => {
-            draft.applyAsDefault?.push("")
-        })
-
-        deltas.push(...updateDeltas)
-        pushTypefaceDeltas(deltas)
-
-        flush()
-
-        console.log("current deltas", typefaceDeltas)
     }
 
     function updateSelector(selector: string, index: number, debounceSaveChange = false) {
         let id = typefaces[0]?.id
-        const deltas = []
         if (id == null) {
-            const createDeltas = createTypefaceWithDefaults()
-            deltas.push(...createDeltas)
-            id = createDeltas[0].id
+            const deltas = createTypefaceWithDefaults({
+                applyAsDefault: [selector]
+            })
+            pushTypefaceDeltas(deltas)
+        } else {
+            const deltas = createDeltas(id, (draft) => {
+                draft.applyAsDefault[index] = selector
+            })
+            pushTypefaceDeltas(deltas)
         }
-
-        const updateDeltas = createDeltas(id, (draft) => {
-            draft.applyAsDefault[index] = selector
-        })
-
-        deltas.push(...updateDeltas)
-        pushTypefaceDeltas(deltas)
 
         if (!isValidSelector(selector)) {
             return
