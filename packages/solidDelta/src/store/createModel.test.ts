@@ -17,6 +17,12 @@ interface TestTask extends Model {
     }>
 }
 
+interface TestTypeface extends Model {
+    id: string;
+    css: string;
+    applyAsDefault: string[];
+}
+
 describe("createModel", () => {
     it("projects a create delta with initial values into a visible model", () => {
         const model = createModel<TestTask>([
@@ -229,6 +235,114 @@ describe("createModel", () => {
             expect(model?.checklist).toEqual([
                 {id: "item-a", label: "First", done: true},
             ]);
+        });
+    });
+
+    describe("createModel - Error checking", () => {
+        const id = "typeface-1";
+
+        it("should not crash when updating a primitive array element", () => {
+            const deltas: ModelDelta<TestTypeface>[] = [
+                { id, path: "", value: { id, css: "body { color: red }", applyAsDefault: [] }, timestamp: 10 },
+                { id, path: "applyAsDefault.$array.key-0", value: { $order: 10, $value: "div" }, timestamp: 20 },
+                { id, path: "applyAsDefault.$array.key-0.$value", value: "span", timestamp: 30 },
+            ];
+
+            const model = createModel<TestTypeface>(deltas);
+            expect(model?.applyAsDefault).toEqual(["span"]);
+        });
+
+        it("should not crash when an array is mutated from a state that isn't perfectly synced", () => {
+            const deltas: ModelDelta<TestTypeface>[] = [
+                { id, path: "", value: { id, css: "body { color: red }", applyAsDefault: [] }, timestamp: 10 },
+                { id, path: "applyAsDefault.$array.some-key.$value", value: "span", timestamp: 20 },
+            ];
+
+            const model = createModel<TestTypeface>(deltas);
+            expect(model?.applyAsDefault).toEqual(["span"]);
+        });
+
+        it("should handle mixed primitive and object array-like projections", () => {
+            const deltas: ModelDelta<TestTypeface>[] = [
+                { id, path: "", value: { id, css: "body { color: red }", applyAsDefault: [] }, timestamp: 10 },
+                { id, path: "applyAsDefault.$array.key-0", value: { $order: 10, $value: "div" }, timestamp: 20 },
+                { id, path: "applyAsDefault.$array.key-0.someField", value: "someValue", timestamp: 30 },
+            ];
+
+            const model = createModel<TestTypeface>(deltas);
+            expect(model).toBeDefined();
+        });
+
+        it("should test for potential out-of-bounds or undefined access in applyArrayMapToModel", () => {
+            const deltas: ModelDelta<TestTypeface>[] = [
+                { id, path: "", value: { id, css: "body { color: red }", applyAsDefault: [] }, timestamp: 10 },
+                { id, path: "applyAsDefault.$array.key-0", value: { $order: 10, $value: undefined }, timestamp: 20 },
+                { id, path: "applyAsDefault.$array.key-0.$value", value: "span", timestamp: 30 },
+            ];
+
+            const model = createModel<TestTypeface>(deltas);
+            expect(model?.applyAsDefault).toEqual(["span"]);
+        });
+
+        it("should check if deleting and then updating an element causes the error", () => {
+            const deltas: ModelDelta<TestTypeface>[] = [
+                { id, path: "", value: { id, css: "body { color: red }", applyAsDefault: [] }, timestamp: 10 },
+                { id, path: "applyAsDefault.$array.key-0", value: { $order: 10, $value: "div" }, timestamp: 20 },
+                { id, path: "applyAsDefault.$array.key-0", value: undefined, timestamp: 30 },
+                { id, path: "applyAsDefault.$array.key-0.$value", value: "span", timestamp: 40 },
+            ];
+
+            const model = createModel<TestTypeface>(deltas);
+            expect(model?.applyAsDefault).toEqual(["span"]);
+        });
+
+        it("should not crash when multiple arrays are present and one is updated", () => {
+            interface MultiArrayModel extends Model {
+                id: string;
+                arr1: string[];
+                arr2: string[];
+            }
+            const deltas: ModelDelta<MultiArrayModel>[] = [
+                { id, path: "", value: { id, arr1: [], arr2: [] }, timestamp: 10 },
+                { id, path: "arr1.$array.k1", value: { $order: 10, $value: "a" }, timestamp: 20 },
+                { id, path: "arr2.$array.k2", value: { $order: 10, $value: "b" }, timestamp: 30 },
+                { id, path: "arr1.$array.k1.$value", value: "a2", timestamp: 40 },
+            ];
+            const model = createModel<MultiArrayModel>(deltas);
+            expect(model?.arr1).toEqual(["a2"]);
+            expect(model?.arr2).toEqual(["b"]);
+        });
+
+        it("should not crash when a value is updated to an object and then to a primitive", () => {
+            const deltas: ModelDelta<TestTypeface>[] = [
+                { id, path: "", value: { id, css: "", applyAsDefault: [] }, timestamp: 10 },
+                { id, path: "applyAsDefault.$array.k1", value: { $order: 10, $value: { name: "obj" } }, timestamp: 20 },
+                { id, path: "applyAsDefault.$array.k1.$value", value: "primitive", timestamp: 30 },
+            ];
+            const model = createModel<TestTypeface>(deltas);
+            expect(model?.applyAsDefault).toEqual(["primitive"]);
+        });
+
+        it("should not crash when a value is updated to a primitive and then to an object", () => {
+            const deltas: ModelDelta<TestTypeface>[] = [
+                { id, path: "", value: { id, css: "", applyAsDefault: [] }, timestamp: 10 },
+                { id, path: "applyAsDefault.$array.k1", value: { $order: 10, $value: "primitive" }, timestamp: 20 },
+                { id, path: "applyAsDefault.$array.k1.someField", value: "objValue", timestamp: 30 },
+            ];
+            const model = createModel<TestTypeface>(deltas);
+            // This should handle the case where $value was a string but a field update comes in
+            expect(model).toBeDefined();
+        });
+
+        it("should not crash when array indices are shifted via order updates", () => {
+            const deltas: ModelDelta<TestTypeface>[] = [
+                { id, path: "", value: { id, css: "", applyAsDefault: [] }, timestamp: 10 },
+                { id, path: "applyAsDefault.$array.k1", value: { $order: 10, $value: "a" }, timestamp: 20 },
+                { id, path: "applyAsDefault.$array.k2", value: { $order: 20, $value: "b" }, timestamp: 30 },
+                { id, path: "applyAsDefault.$array.k2.$order", value: 5, timestamp: 40 },
+            ];
+            const model = createModel<TestTypeface>(deltas);
+            expect(model?.applyAsDefault).toEqual(["b", "a"]);
         });
     });
 });

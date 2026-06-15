@@ -117,7 +117,11 @@ function applyArrayDeltaToMap<M extends Model>(arrayMap: ArrayMap, delta: ModelD
         if (arrayMap[pathKey][index].$value == null) {
             arrayMap[pathKey][index].$value = {}
         }
-        applyObjectPathToModel(arrayMap[pathKey][index].$value, nextPart, delta.value)
+        if (typeof arrayMap[pathKey][index].$value === "object") {
+            applyObjectPathToModel(arrayMap[pathKey][index].$value, nextPart, delta.value)
+        } else {
+            console.warn(`Tried to add extra path values to non-object value, path: ${delta.path}. ignoring`)
+        }
     }
 }
 

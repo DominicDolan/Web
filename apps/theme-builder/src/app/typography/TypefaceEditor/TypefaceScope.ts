@@ -140,6 +140,17 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
         }
     }
 
+    function removeSelector(index: number) {
+        const id = typefaces[0]?.id
+        if (id == null) return
+        const deltas = createDeltas(id, (draft) => {
+            draft.applyAsDefault.splice(index, 1)
+        })
+        pushTypefaceDeltas(deltas)
+
+        saveDeltas()
+    }
+
     return {
         themeId: () => props.themeId,
         role: () => props.role,
@@ -151,5 +162,6 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
         updateCss,
         addSelector,
         updateSelector,
+        removeSelector
     }
 })

@@ -1,7 +1,7 @@
 import {useTypefaceScope} from "~/app/typography/TypefaceEditor/TypefaceScope";
 import {SubPageTemplate} from "~/components/SubPageTemplate";
 import {useNavigate} from "@web/router";
-import {createMemo, createSignal, Loading, Match, Switch, type JSX, Accessor, For, Repeat, snapshot} from "solid-js";
+import {createMemo, createSignal, Loading, Match, Switch, Repeat} from "solid-js";
 import {Dynamic} from "@solidjs/web";
 import {getTypefaceSelector} from "~/app/typography/TypographyUtils";
 import {propertyFields, TextPropertyKey} from "~/app/typography/TypefaceEditor/TypefaceFormItems";
@@ -10,7 +10,7 @@ import {ApplyAsDefaultSelector} from "~/app/typography/TypefaceEditor/ApplyAsDef
 
 export function TypefaceEditor() {
 
-    const {themeId, role, size, type, typeface, getCssOrDefault, updateCss, addSelector, updateSelector} = useTypefaceScope()
+    const {themeId, role, size, type, typeface, getCssOrDefault, updateCss, addSelector, updateSelector, removeSelector} = useTypefaceScope()
 
     const navigate = useNavigate()
     function onBackClicked() {
@@ -55,7 +55,10 @@ export function TypefaceEditor() {
     }
 
     function onRemoveSelectorClicked(index: number) {
-        console.log("removing")
+        setTimeout(() => {
+            setCurrentlyEditingSelector(null)
+        })
+        removeSelector(index)
     }
 
     const [currentlyEditingSelector, setCurrentlyEditingSelector] = createSignal<number | null>(null)
