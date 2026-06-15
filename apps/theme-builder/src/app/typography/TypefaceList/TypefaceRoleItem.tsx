@@ -27,12 +27,12 @@ export function TypefaceRoleItem(props: {role: TypefaceRole}) {
         <div class="grid grid-cols-3 gap-8">
             <For each={typefaceSizes}>
                 {(size) => <>
-                    <article class="flat flex flex-col gap-4" role="button" onClick={() => onTypefaceClicked(size())}>
+                    <article class="flat flex flex-col gap-4" role="button" onClick={() => onTypefaceClicked(size)}>
                         <hgroup class="flex flex-row justify-between gap-2">
-                            {camelToTitleCase(props.role)} {camelToTitleCase(size())}
-                            <code>{getTypefaceSelector(props.role, size(), type())}</code>
+                            {camelToTitleCase(props.role)} {camelToTitleCase(size)}
+                            <code>{getTypefaceSelector(props.role, size, type())}</code>
                         </hgroup>
-                        <article class="inset flex flex-col gap-2" style={getCssOrDefault(props.role, type(), size())}>
+                        <article class="inset flex flex-col gap-2" style={getCssOrDefault(props.role, type(), size)}>
                             {camelToTitleCase(props.role) + " Text"}
                         </article>
                     </article>

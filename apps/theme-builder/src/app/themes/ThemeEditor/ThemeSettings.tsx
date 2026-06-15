@@ -1,12 +1,11 @@
-import {For, Loading, createEffect, Switch, Match} from "solid-js";
+import {For, Loading, Switch, Match} from "solid-js";
 import {A, useLocation, useNavigate} from "@web/router";
 import {useThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 import {ThemeDefinition} from "~/models/ThemeDefinition";
 import {validateTheme} from "~/app/themes/ThemeEditor/ThemeRepository.server.ts";
 import {useFormValidator} from "@web/components"
 import ColorList from "~/app/colors/ColorList/ColorList.tsx";
-// import ColorList from "~/app/colors/ColorList/ColorList";
-// import {TypefaceList} from "~/app/typography/TypefaceList/TypefaceList";
+import {TypefaceList} from "~/app/typography/TypefaceList/TypefaceList";
 
 export default function ThemeSettings(props: { children?: any, theme: ThemeDefinition }) {
 
@@ -143,9 +142,9 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
             </div>
             <div class="content overflow-y-auto">
                 <Switch>
-                {/*    <Match when={location.segments()[2] === "typography"}>*/}
-                {/*        <TypefaceList/>*/}
-                {/*    </Match>*/}
+                    <Match when={location.segments()[2] === "typography"}>
+                        <TypefaceList/>
+                    </Match>
                 {/*    <Match when={location.segments()[2] === "elements"}>*/}
                 {/*        <div>Elements</div>*/}
                 {/*    </Match>*/}

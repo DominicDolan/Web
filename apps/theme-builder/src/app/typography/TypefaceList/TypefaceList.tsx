@@ -10,7 +10,7 @@ export function TypefaceList() {
             <h2>Typography</h2>
         </hgroup>
         <For each={typefaceRoles}>{(role) => <>
-            <TypefaceRoleItem role={role()}/>
+            <TypefaceRoleItem role={role}/>
         </>}</For>
     </div>
 }

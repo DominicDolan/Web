@@ -68,8 +68,8 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
         }
 
         for (const [path, value] of pathFilters) {
-            conditions.push(`EXISTS (SELECT 1 FROM ${quotedTableName} AS ${filterAlias} WHERE ${filterAlias}.id = ${sourceAlias}.id AND ${filterAlias}.path = ? AND ${filterAlias}.value = ?)`)
-            bindValues.push(path, value)
+            conditions.push(`EXISTS (SELECT 1 FROM ${quotedTableName} AS ${filterAlias} WHERE ${filterAlias}.id = ${sourceAlias}.id AND (${filterAlias}.path = ? AND ${filterAlias}.value = ? OR ${filterAlias}.path = "" AND json_extract(${filterAlias}.value, '$.${path}') = ?))`)
+            bindValues.push(path, value, value)
         }
 
         const whereClause = conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : ""

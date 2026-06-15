@@ -3,13 +3,11 @@ import {Match, Show, Switch} from "solid-js";
 import {Navigate, useLocation} from "@web/router";
 import ContactUs from "~/app/contact/ContactUs/ContactUs";
 import {ThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
-// import {ColorScope} from "~/app/colors/ColorEditor/ColorScope";
-// import {ColorEditor} from "~/app/colors/ColorEditor/ColorEditor";
-// import {TypefaceScope} from "~/app/typography/TypefaceEditor/TypefaceScope";
-// import {TypefaceEditor} from "~/app/typography/TypefaceEditor/TypefaceEditor";
 import {TypefaceRole, typefaceRoles, TypefaceSize, typefaceSizes, TypefaceType} from "~/constants/TypefaceRoles";
 import {ColorScope} from "~/app/colors/ColorEditor/ColorScope.ts";
 import {ColorEditor} from "~/app/colors/ColorEditor/ColorEditor.tsx";
+import {TypefaceEditor} from "~/app/typography/TypefaceEditor/TypefaceEditor.tsx";
+import {TypefaceScope} from "~/app/typography/TypefaceEditor/TypefaceScope.ts";
 
 export default function App() {
     const location = useLocation();
@@ -32,14 +30,13 @@ export default function App() {
                     </ColorScope>
                 </Match>
                 <Match when={matchesTypographyPath()}>
-                    <div>Typeface Placeholder</div>
-                    {/*<TypefaceScope*/}
-                    {/*    themeId={location.segments()[1]}*/}
-                    {/*    role={location.segments()[3] as TypefaceRole}*/}
-                    {/*    size={location.segments()[4] as TypefaceSize}*/}
-                    {/*    type={location.segments()[5] == null ? "default" : location.segments()[5] as TypefaceType}>*/}
-                    {/*    <TypefaceEditor/>*/}
-                    {/*</TypefaceScope>*/}
+                    <TypefaceScope
+                        themeId={location.segments()[1]}
+                        role={location.segments()[3] as TypefaceRole}
+                        size={location.segments()[4] as TypefaceSize}
+                        type={location.segments()[5] == null ? "default" : location.segments()[5] as TypefaceType}>
+                        <TypefaceEditor/>
+                    </TypefaceScope>
                 </Match>
                 <Match when={location.path() === "/" || location.segments()[0] === "editor"}>
                     <Show when={location.path() === "/"}>

@@ -432,6 +432,52 @@ describe("createModels", () => {
                 {id: "item-a", label: "First", done: true},
             ]);
         });
+
+        it("reacts to updates in keyed arrays when deltas are pushed", () => {
+            const [deltas, setDeltas] = createSignal<ModelDelta<TestTask>[]>([
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
+            ]);
+            const [models] = createModels<TestTask>(deltas);
+
+            expect(models[0].tags).toEqual(["alpha"]);
+
+            // Push new delta to add a tag
+            setDeltas(current => [
+                ...current,
+                delta("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
+            ]);
+            flush();
+
+            expect(models[0].tags).toEqual(["alpha", "beta"]);
+
+            // Push delta to reorder tag-a
+            setDeltas(current => [
+                ...current,
+                delta("task-1", "tags.$array.tag-a.$order", 25, 40),
+            ]);
+            flush();
+
+            expect(models[0].tags).toEqual(["beta", "alpha"]);
+
+            // Push delta to update tag-a value
+            setDeltas(current => [
+                ...current,
+                delta("task-1", "tags.$array.tag-a.$value", "omega", 50),
+            ]);
+            flush();
+
+            expect(models[0].tags).toEqual(["beta", "omega"]);
+
+            // Push delta to remove tag-b
+            setDeltas(current => [
+                ...current,
+                delta("task-1", "tags.$array.tag-b", undefined, 60),
+            ]);
+            flush();
+
+            expect(models[0].tags).toEqual(["omega"]);
+        });
     });
 });
 

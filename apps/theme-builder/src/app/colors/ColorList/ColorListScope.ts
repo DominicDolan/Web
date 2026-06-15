@@ -56,9 +56,10 @@ export const useColorListScope = defineScope(ThemeScope, (props) => {
 
         pushColorDeltas(deltas)
 
+        flush()
+
         navigate(`/editor/${props.theme.id}/colors/${newId}`)
 
-        flush()
         await saveDeltas()
     }
 
