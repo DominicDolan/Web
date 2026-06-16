@@ -3,7 +3,7 @@ import {ThemeScope} from "~/app/themes/ThemeEditor/ThemeScope.ts";
 
 export const useElementListScope = defineScope(ThemeScope, (props) => {
 
-
-
-    return {}
+    return {
+        theme: () => props.theme
+    }
 })

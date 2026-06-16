@@ -1,0 +1,10 @@
+.previewContainer {
+    position: relative;
+    overflow: hidden;
+}
+
+.previewContent {
+    transform-origin: center;
+    pointer-events: none;
+    user-select: none;
+}

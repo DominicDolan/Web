@@ -55,7 +55,7 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
     }
 
     return <>
-        <Loading fallback={<empty-state class={"loader themeSettings flex flex-col gap-8 p-8"}>
+        <Loading fallback={<empty-state aria-busy class={"skeleton themeSettings flex flex-col gap-8 p-8"}>
             <div class={"w-full h-3"}></div>
             <For each={Array.from({length: 3})}>
                 {() => <div class={"flex flex-col gap-4"}>

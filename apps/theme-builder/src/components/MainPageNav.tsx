@@ -10,7 +10,7 @@ export default function MainPageNav(props: { children?: any, class?: string, pre
             <Title/>
         </div>
         <Show when={!props.loading} fallback={
-            <empty-state class={"loader flex flex-col gap-6"}>
+            <empty-state aria-busy class={"skeleton flex flex-col gap-6"}>
                 { Array.from({length: 3}).map(() => <div class="min-h-8 w-full" ></div>) }
             </empty-state>
             }>

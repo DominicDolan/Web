@@ -1,3 +1,11 @@
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
 
 @layer base {
     empty-state {
@@ -5,10 +13,40 @@
     }
 }
 
-@layer elements {
+empty-state.skeleton *:not(:has(> *)) {
+    pointer-events: none;
+    user-select: none;
+    border-radius: 0.25rem;
+}
 
-    empty-state {
-        border-radius: 0.5rem;
-        border: 4px dotted oklab(from currentColor l a b / 0.2);
+empty-state.skeleton:not([aria-busy]) *:not(:has(> *)) {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+empty-state.skeleton[aria-busy] *:not(:has(> *)) {
+    animation: shimmer 1.4s linear infinite;
+    background: linear-gradient(90deg,
+        rgba(0, 0, 0, 0.06) 25%,
+        rgba(0, 0, 0, 0.12) 37%,
+        rgba(0, 0, 0, 0.06) 63%
+    );
+    background-size: 200% 100%;
+}
+
+empty-state.empty {
+
+    --current-color: var(--active-color, var(--surface-color));
+    --on-current-color: var(--on-active-color, var(--on-surface-color));
+    isolation: isolate;
+    position: relative;
+
+    ::after {
+        --border-color: color-mix(in oklab, var(--current-color) 15%, transparent);
+        content: "";
+        position: absolute;
+        inset: 1rem;
+        pointer-events: none;
+        border: 2px dashed var(--border-color);
+        border-radius: 1.5rem;
     }
 }

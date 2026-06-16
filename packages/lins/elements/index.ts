@@ -29,7 +29,6 @@ const bareElementTags = [
     "empty-state",
     "input-shell",
     "form-field",
-    "progress-bar"
 ] as const
 export type BareElementTag = typeof bareElementTags[number];
 

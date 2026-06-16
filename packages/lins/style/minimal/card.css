@@ -38,6 +38,9 @@
             --current-color: var(--active-color, var(--primary-color));
             --on-current-color: var(--on-active-color, var(--on-primary-color));
 
+            background-color: transparent;
+            color: inherit;
+
             border: 1px solid color-mix(in oklab, var(--current-color) 50%, transparent);
             box-shadow: none;
         }
