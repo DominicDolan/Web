@@ -1,7 +1,7 @@
-import ElementsTemplate from "~/app/elements/components/ElementsTemplate";
-import ElementCssEditor from "~/app/elements/components/ElementCssEditor";
+import ElementsTemplate from "~/app/elements_old/components/ElementsTemplate";
+import ElementCssEditor from "~/app/elements_old/components/ElementCssEditor";
 import {ElementStyleDefinition} from "~/models/ElementStyleDefinition";
-import {useElementStyleScope} from "~/app/elements/repository/ElementStyleStore";
+import {useElementStyleScope} from "~/app/elements_old/repository/ElementStyleStore";
 import {debounce} from "@web/utils";
 
 

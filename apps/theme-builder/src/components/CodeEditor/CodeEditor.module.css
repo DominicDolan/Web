@@ -1,4 +1,8 @@
 
+.disabled {
+    opacity: 0.8;
+    color: #333;
+}
 
 :global(.cm-focused) {
     outline: none !important;

@@ -23,7 +23,7 @@
         --on-surface-color: var(--primary-color);
 
         --background-color: oklch(from black 0.92 c h);
-        --on-background: black;
+        --on-background-color: black;
 
         --accent-color: #00A544;
         --on-accent-color: white;

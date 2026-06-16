@@ -14,14 +14,14 @@
 
 @layer elements {
     article, .card {
-        --current-color: var(--active-color, var(--primary-color));
-        --on-current-color: var(--on-active-color, var(--on-primary-color));
-
         transition: box-shadow 0.2s ease-in-out;
 
         :where(&), &.flat, &.elevated {
-            background-color: var(--surface-color);
-            color: var(--on-surface-color);
+            --current-color: var(--active-color, var(--surface-color));
+            --on-current-color: var(--on-active-color, var(--on-surface-color));
+
+            background-color: var(--current-color);
+            color: var(--on-current-color);
         }
 
         :where(&), &.elevated {
@@ -35,6 +35,9 @@
         }
 
         :where(& &), &.outlined {
+            --current-color: var(--active-color, var(--primary-color));
+            --on-current-color: var(--on-active-color, var(--on-primary-color));
+
             border: 1px solid color-mix(in oklab, var(--current-color) 50%, transparent);
             box-shadow: none;
         }
@@ -45,6 +48,9 @@
         }
 
         &.tonal, &.highlighted {
+            --current-color: var(--active-color, var(--primary-color));
+            --on-current-color: var(--on-active-color, var(--on-primary-color));
+
             border: none;
             background-color: color-mix(in oklab, var(--current-color) 10%, transparent);
             color: var(--current-color);
@@ -53,8 +59,11 @@
         }
 
         &.inset {
+            --current-color: var(--active-color, var(--background-color));
+            --on-current-color: var(--on-active-color, var(--on-background-color));
+
             border: none;
-            background-color: var(--background-color);
+            background-color: var(--current-color);
             box-shadow: inset 0 2px 4px -1px var(--shadow-color),
             inset 0 1px 2px -1px var(--shadow-color);
         }

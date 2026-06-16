@@ -1,8 +1,8 @@
 import {A, createAsync, RouteSectionProps, useNavigate} from "@solidjs/router";
 import MainPageNav from "~/components/MainPageNav";
-import {ElementStyleProvider, useElementStyleScope} from "~/app/elements/repository/ElementStyleStore";
-import {getElementStylesQuery} from "~/app/elements/repository/ElementStyleRepository";
-import {ElementsEditorItems} from "~/app/elements/ElementsEditorItems/ElementsEditorItems";
+import {ElementStyleProvider, useElementStyleScope} from "~/app/elements_old/repository/ElementStyleStore";
+import {getElementStylesQuery} from "~/app/elements_old/repository/ElementStyleRepository";
+import {ElementsEditorItems} from "~/app/elements_old/ElementsEditorItems/ElementsEditorItems";
 import {createEffect, createSignal, on, onCleanup, onMount, Show, Suspense} from "solid-js";
 
 export default function ElementsEditor(props: RouteSectionProps<undefined>) {

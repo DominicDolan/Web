@@ -8,6 +8,8 @@ import {ColorScope} from "~/app/colors/ColorEditor/ColorScope.ts";
 import {ColorEditor} from "~/app/colors/ColorEditor/ColorEditor.tsx";
 import {TypefaceEditor} from "~/app/typography/TypefaceEditor/TypefaceEditor.tsx";
 import {TypefaceScope} from "~/app/typography/TypefaceEditor/TypefaceScope.ts";
+import {ElementEditorScope} from "~/app/elements/ElementEditor/ElementEditorScope.ts";
+import {ElementEditor} from "~/app/elements/ElementEditor/ElementEditor.tsx";
 
 export default function App() {
     const location = useLocation();
@@ -37,6 +39,11 @@ export default function App() {
                         type={location.segments()[5] == null ? "default" : location.segments()[5] as TypefaceType}>
                         <TypefaceEditor/>
                     </TypefaceScope>
+                </Match>
+                <Match when={location.segments()[2] === "elements" && location.segments().length === 4}>
+                    <ElementEditorScope themeId={location.segments()[1]} elementType={location.segments()[3]}>
+                        <ElementEditor />
+                    </ElementEditorScope>
                 </Match>
                 <Match when={location.path() === "/" || location.segments()[0] === "editor"}>
                     <Show when={location.path() === "/"}>

@@ -1,0 +1,20 @@
+import CodeEditor from "~/components/CodeEditor/CodeEditor";
+import {css} from "@codemirror/lang-css";
+import {highlightReadOnlyLines, readOnlyLines} from "~/components/CodeEditor/CodeEditorPlugins";
+import style from "./CodeEditor.module.css"
+
+export default function CssEditor(props: {selector: string, content: string, onChange?: (value: string) => void, onBlur?: () => void}) {
+    function getDoc() {
+        return `${props.selector} {\n${props.content}\n}`
+    }
+    return <CodeEditor
+        extensions={[
+            css(),
+            readOnlyLines([1, -1]),
+            highlightReadOnlyLines([1, -1], style.disabled)
+        ]}
+        doc={getDoc()}
+        onChange={props.onChange}
+        onBlur={props.onBlur}
+    />
+}

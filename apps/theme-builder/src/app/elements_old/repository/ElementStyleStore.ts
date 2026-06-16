@@ -6,7 +6,7 @@ import {ElementStyleDefinition} from "~/models/ElementStyleDefinition";
 import {ModelData, ModelDelta} from "@web/schema";
 import {createMemo} from "solid-js";
 import {createId} from "@paralleldrive/cuid2";
-import {updateElementStyleAction} from "~/app/elements/repository/ElementStyleRepository";
+import {updateElementStyleAction} from "~/app/elements_old/repository/ElementStyleRepository";
 import {useAction, useSubmission} from "@solidjs/router";
 import {createScopeProvider} from "@web/solid-scope";
 

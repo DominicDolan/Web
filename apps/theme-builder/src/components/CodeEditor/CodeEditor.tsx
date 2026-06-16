@@ -35,5 +35,5 @@ export default function CodeEditor(props: ConstructorParameters<typeof EditorVie
         })
     }
 
-    return <code ref={(el) => {ref = el; setTimeout(() => mountEditorView())}}></code>
+    return <code class="block" ref={(el) => {ref = el; setTimeout(() => mountEditorView())}}></code>
 }

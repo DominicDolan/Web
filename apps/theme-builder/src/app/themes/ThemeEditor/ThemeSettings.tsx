@@ -6,6 +6,7 @@ import {validateTheme} from "~/app/themes/ThemeEditor/ThemeRepository.server.ts"
 import {useFormValidator} from "@web/components"
 import ColorList from "~/app/colors/ColorList/ColorList.tsx";
 import {TypefaceList} from "~/app/typography/TypefaceList/TypefaceList";
+import {ElementList} from "~/app/elements/ElementList/ElementList.tsx";
 
 export default function ThemeSettings(props: { children?: any, theme: ThemeDefinition }) {
 
@@ -145,9 +146,9 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                     <Match when={location.segments()[2] === "typography"}>
                         <TypefaceList/>
                     </Match>
-                {/*    <Match when={location.segments()[2] === "elements"}>*/}
-                {/*        <div>Elements</div>*/}
-                {/*    </Match>*/}
+                    <Match when={location.segments()[2] === "elements"}>
+                        <ElementList/>
+                    </Match>
                     <Match when={location.segments()[2] === "colors"}>
                         <ColorList/>
                     </Match>

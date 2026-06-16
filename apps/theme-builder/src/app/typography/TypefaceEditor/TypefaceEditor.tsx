@@ -7,6 +7,7 @@ import {getTypefaceSelector} from "~/app/typography/TypographyUtils";
 import {propertyFields, TextPropertyKey} from "~/app/typography/TypefaceEditor/TypefaceFormItems";
 import {buildCssDeclarations, indentCss, parseCssDeclarations} from "~/app/typography/TypefaceEditor/TypefaceCssUtils";
 import {ApplyAsDefaultSelector} from "~/app/typography/TypefaceEditor/ApplyAsDefaultSelector";
+import CssEditor from "~/components/CodeEditor/CssEditor.tsx";
 
 export function TypefaceEditor() {
 
@@ -89,7 +90,12 @@ export function TypefaceEditor() {
                                     </form>
                                 </Match>
                                 <Match when={activeTab() === "code"}>
-                                    <pre class="inset px-4 py-6 whitespace-pre-wrap overflow-auto">{codeBlock()}</pre>
+                                    <article class="elevated primary flex flex-col gap-4">
+                                        <h3 class="headline variant">Direct CSS Editor</h3>
+                                        <article class={"tonal accent p-0"}>
+                                            <CssEditor selector={selector()} content={indentCss(getCssOrDefault())} />
+                                        </article>
+                                    </article>
                                 </Match>
                             </Switch>
                         </div>
