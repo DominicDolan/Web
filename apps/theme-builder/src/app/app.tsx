@@ -10,6 +10,7 @@ import {TypefaceEditor} from "~/app/typography/TypefaceEditor/TypefaceEditor.tsx
 import {TypefaceScope} from "~/app/typography/TypefaceEditor/TypefaceScope.ts";
 import {ElementEditorScope} from "~/app/elements/ElementEditor/ElementEditorScope.ts";
 import {ElementEditor} from "~/app/elements/ElementEditor/ElementEditor.tsx";
+import {elementCategories} from "~/app/elements/elementCategories.ts";
 
 export default function App() {
     const location = useLocation();
@@ -21,6 +22,12 @@ export default function App() {
         const hasType = segments[5] == null || segments[5] === "variant" || segments[5] === "default"
 
         return segments[0] === "editor" && segments[2] === "typography" && hasRole && hasSize && hasType;
+    }
+
+    const categories = elementCategories.map(category => category.type)
+
+    function matchesElementPath() {
+        return location.segments()[2] === "elements" && location.segments().length === 4 && categories.includes(location.segments()[3])
     }
 
     return (
@@ -40,7 +47,7 @@ export default function App() {
                         <TypefaceEditor/>
                     </TypefaceScope>
                 </Match>
-                <Match when={location.segments()[2] === "elements" && location.segments().length === 4}>
+                <Match when={matchesElementPath()}>
                     <ElementEditorScope themeId={location.segments()[1]} elementType={location.segments()[3]}>
                         <ElementEditor />
                     </ElementEditorScope>
