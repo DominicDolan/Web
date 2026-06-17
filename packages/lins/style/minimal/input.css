@@ -23,7 +23,6 @@
         border-radius: 0.25rem;
         border: none;
         transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-        cursor: text;
 
         &::placeholder {
             opacity: 0.8;
@@ -42,6 +41,10 @@
     select,
     ::picker(select) {
         appearance: base-select;
+    }
+
+    input-shell, input-shell::part(default-control) {
+        cursor: text;
     }
 
 }
@@ -76,11 +79,17 @@
         }
     }
 
-    @scope (body) to (.elementsPreview) {
+    @scope (body) to (.notMinimal) {
         input:not([type=radio]):not([type=checkbox]):not([type=range]), textarea, select, input-shell {
             border-radius: 0.5rem;
 
-            &.outlined {
+            :where(&), &.flat {
+                background-color: var(--on-current-color);
+                color: var(--current-color);
+                outline: none;
+            }
+
+            :where(article &), &.outlined {
                 --outline-color: oklab(from var(--current-color) 70% a b);
                 outline: 1px solid var(--outline-color);
                 background-color: transparent;
@@ -92,11 +101,6 @@
                 outline: none;
             }
 
-            :where(&), &.flat {
-                background-color: var(--on-current-color);
-                color: var(--current-color);
-                outline: none;
-            }
 
             :where(form.tonal &), &.tonal {
                 border: none;

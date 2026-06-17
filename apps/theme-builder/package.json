@@ -36,5 +36,8 @@
     "codemirror": "6.0.2",
     "zod": "catalog:",
     "typescript": "catalog:"
+  },
+  "devDependencies": {
+    "tsx": "4.22.4"
   }
 }

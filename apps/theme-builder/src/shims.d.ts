@@ -2,6 +2,7 @@ import type {BareElementTag} from "@web/lins/elements"
 
 interface SolidClassAttribute {
     class: string | JSX.ClassList //Record<string | boolean> | Array<string | Record<string | boolean>>
+    ["aria-selected"]: string | boolean
 }
 declare module '@solidjs/web' {
     namespace JSX {

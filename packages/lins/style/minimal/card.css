@@ -50,6 +50,11 @@
                     0 4px 10px -1px var(--shadow-color);
         }
 
+        &[aria-selected="false"] {
+            opacity: 0.7;
+            background-color: oklab(from var(--current-color) calc(l*93%) a b);
+        }
+
         &.tonal, &.highlighted {
             --current-color: var(--active-color, var(--primary-color));
             --on-current-color: var(--on-active-color, var(--on-primary-color));
@@ -88,6 +93,21 @@
                 border-radius: 999px;
                 background-color: var(--current-color);
                 z-index: 1;
+            }
+        }
+
+        &.text {
+            border: none;
+            box-shadow: none;
+            background-color: transparent;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+            /*color: inherit;*/
+            color: color-mix(in oklab, currentColor 50%, var(--on-current-color));
+
+            &[role="button"]:hover {
+                box-shadow: none;
+                background-color: color-mix(in oklab, var(--current-color) 10%, transparent);
+                color: inherit;
             }
         }
     }

@@ -40,7 +40,7 @@ empty-state.empty {
     isolation: isolate;
     position: relative;
 
-    ::after {
+    &::after {
         --border-color: color-mix(in oklab, var(--current-color) 15%, transparent);
         content: "";
         position: absolute;
@@ -50,3 +50,8 @@ empty-state.empty {
         border-radius: 1.5rem;
     }
 }
+
+
+/*empty-state.empty::after {*/
+/*    content: "";*/
+/*}*/

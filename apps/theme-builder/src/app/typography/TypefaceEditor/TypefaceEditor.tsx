@@ -68,7 +68,14 @@ export function TypefaceEditor() {
         <SubPageTemplate onBackClicked={onBackClicked} title={`Edit Typeface`} backButtonText={"Back to Typography"}>
             <Loading>
                 <div class="grid grid-cols-[1fr_1fr] gap-8 mx-8">
-                    <section class="row-span-2">
+                    <section>
+                        <h3 class="headline variant">Live Preview</h3>
+                        <div class="flex flex-col gap-4 p-4 m-4">
+                            <div style={getCssOrDefault()}>The Quick Brown Fox Jumped Over the Lazy Dog</div>
+                            <div style={getCssOrDefault()}>0123456789 !?&amp;@</div>
+                        </div>
+                    </section>
+                    <article class="row-span-2 flex flex-col gap-6">
                         <hgroup class="flex flex-row justify-between items-center">
                             <h3 class="headline variant">Font Properties</h3>
                             <ul role="tablist" class="inset">
@@ -79,7 +86,7 @@ export function TypefaceEditor() {
                         <div>
                             <Switch>
                                 <Match when={activeTab() === "properties"}>
-                                    <form class="grid grid-cols-[1fr_1fr] gap-4 px-4 py-6">
+                                    <form class="grid grid-cols-[1fr_1fr] gap-4 px-4">
                                         {propertyFields.map((field) => (<div>
                                                 <Dynamic
                                                     component={field.component}
@@ -90,43 +97,33 @@ export function TypefaceEditor() {
                                     </form>
                                 </Match>
                                 <Match when={activeTab() === "code"}>
-                                    <article class="elevated primary flex flex-col gap-4">
-                                        <h3 class="headline variant">Direct CSS Editor</h3>
-                                        <article class={"tonal accent p-0"}>
-                                            <CssEditor selector={selector()} content={indentCss(getCssOrDefault())} />
-                                        </article>
+                                    <article class="inset flex flex-col gap-4">
+                                        <CssEditor selector={selector()} content={indentCss(getCssOrDefault())} />
                                     </article>
                                 </Match>
                             </Switch>
                         </div>
-                    </section>
-                    <article>
-                        <h3 class="headline variant">Live Preview</h3>
-                        <article class="inset flex flex-col gap-4 p-4 m-4">
-                            <div style={getCssOrDefault()}>The Quick Brown Fox Jumped Over the Lazy Dog</div>
-                            <div style={getCssOrDefault()}>0123456789 !?&amp;@</div>
-                        </article>
-                    </article>
-                    <article>
-                        <h3 class="headline variant">Apply as Default</h3>
-                        <div class="p-4 flex flex-col gap-4">
-                            <Repeat count={applyAsDefaultSelectors().length}>{(index) => <>
-                                <ApplyAsDefaultSelector
-                                    selector={applyAsDefaultSelectors()[index]}
-                                    isEditing={currentlyEditingSelector() === index}
-                                    onClick={() => setCurrentlyEditingSelector(index)}
-                                    onInput={(value) => onEditSelector(index, value)}
-                                    onEnter={(value) => onFinishedEditSelector(index, value)}
-                                    onDelete={() => onRemoveSelectorClicked(index)}
-                                />
-                            </>}
-                            </Repeat>
-                            <article class="tonal accent flex flex-row gap-2 items-center" role="button" onClick={() => onAddSelectorClicked()}>
-                                <i>add_circle</i>
-                                <span>Add Selector</span>
-                            </article>
+                        <article class="outlined mt-6">
+                            <h3 class="headline variant">Apply as Default</h3>
+                            <div class="p-4 flex flex-col gap-4">
+                                <Repeat count={applyAsDefaultSelectors().length}>{(index) => <>
+                                    <ApplyAsDefaultSelector
+                                        selector={applyAsDefaultSelectors()[index]}
+                                        isEditing={currentlyEditingSelector() === index}
+                                        onClick={() => setCurrentlyEditingSelector(index)}
+                                        onInput={(value) => onEditSelector(index, value)}
+                                        onEnter={(value) => onFinishedEditSelector(index, value)}
+                                        onDelete={() => onRemoveSelectorClicked(index)}
+                                    />
+                                </>}
+                                </Repeat>
+                                <article class="tonal accent flex flex-row gap-2 items-center" role="button" onClick={() => onAddSelectorClicked()}>
+                                    <i>add_circle</i>
+                                    <span>Add Selector</span>
+                                </article>
 
-                        </div>
+                            </div>
+                        </article>
                     </article>
                 </div>
             </Loading>
