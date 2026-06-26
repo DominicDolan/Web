@@ -256,9 +256,7 @@ export function createModels<M extends Model>(
 
     const createDeltas = useDeltaWriter(deltas)
 
-    const models = createProjection(() => {
-
-        const draft = [] as Array<(M & { _deleted?: boolean })>
+    const models = createProjection((draft) => {
 
         for (const id in deltasByIdNoArrays) {
             const existingIndex = draft.findIndex(m => m && m.id === id)
@@ -299,16 +297,12 @@ export function createModels<M extends Model>(
             model.updatedAt = Math.max(0, model.updatedAt ?? -Infinity)
         }
 
-        // Replace temporary workaround with this after bug is fixed in beta.15
-        /*for (let i = draft.length - 1; i >= 0; i--) {
-            if (draft[i] === undefined) {
+        for (let i = draft.length - 1; i >= 0; i--) {
+            if (draft[i]._deleted) {
                 draft.splice(i, 1);
             }
-        }*/
-
-        // temporary workaround
-        return draft.filter(m => !m?._deleted) as M[]
-    }, [] as M[])
+        }
+    }, [] as Array<(M & { _deleted?: boolean })>)
 
     return [models as readonly M[], createDeltas as WriteDeltas<M>] as const
 }

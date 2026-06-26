@@ -19,8 +19,8 @@
       "packages/router"
     ],
     "catalog": {
-      "solid-js": "2.0.0-beta.14",
-      "@solidjs/web": "2.0.0-beta.14",
+      "solid-js": "2.0.0-beta.15",
+      "@solidjs/web": "2.0.0-beta.15",
       "vite": "8.0.16",
       "vite-plugin-solid": "3.0.0-next.5",
       "wrangler": "4.77.0",
