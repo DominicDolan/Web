@@ -400,6 +400,77 @@ describe("useDeltaWriter", () => {
                 }),
             ]);
         });
+
+        it("Can create a new array using the draft delta creation", () => {
+            const writeDeltas = useDeltaWriter<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+            ]);
+
+            const deltas = writeDeltas("task-1", (draft) => {
+                draft.tags = ["alpha"];
+            });
+
+            expect(deltas[0].value['$value']).toEqual("alpha")
+        });
+
+        it("Can create a new array with two elements using the draft delta creation", () => {
+            const writeDeltas = useDeltaWriter<TestTask>(() => [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+            ]);
+
+            const deltas = writeDeltas("task-1", (draft) => {
+                draft.tags = ["alpha", "beta"];
+            });
+
+            expect(deltas.length).toBe(2)
+            expect(deltas[0].value['$value']).toEqual("alpha")
+            expect(deltas[1].value['$value']).toEqual("beta")
+            expect(deltas[1].value['$order']).toBeGreaterThan(deltas[0].value['$order'])
+        });
+
+        it("assigns increasing orders when pushing items to an array", () => {
+            const deltas: ModelDelta<TestTask>[] = [
+                delta<TestTask>("task-1", "", {title: "Write tests", status: "todo"}, 10),
+                delta<TestTask>("task-1", "tags.$array.tag-a", {$order: 10, $value: "alpha"}, 20),
+                delta<TestTask>("task-1", "tags.$array.tag-b", {$order: 20, $value: "beta"}, 30),
+            ]
+            const writeDeltas = useDeltaWriter<TestTask>(() => deltas);
+
+            const deltas1 = writeDeltas("task-1", (draft) => {
+                draft.tags!.push("gamma");
+            });
+
+
+            expect(deltas1[0].value.$order).toBeGreaterThan(20);
+
+            deltas.push(...deltas1)
+
+            const deltas2 = writeDeltas("task-1", (draft) => {
+                draft.tags!.push("delta");
+            });
+
+            expect(deltas2[0].value.$order).toBeGreaterThan(deltas1[0].value.$order);
+        });
+
+        it("assigns increasing orders when pushing items to an array that starts empty", () => {
+            const deltas: ModelDelta<TestTask>[] = [
+                delta("task-1", "", {title: "Write tests", status: "todo"}, 10),
+            ]
+            const writeDeltas = useDeltaWriter<TestTask>(() => deltas);
+
+            const deltas1 = writeDeltas("task-1", (draft) => {
+                draft.tags = ["gamma"];
+            });
+
+            deltas.push(...deltas1)
+            const deltas2 = writeDeltas("task-1", (draft) => {
+                draft.tags!.push("delta");
+            });
+
+            deltas.push(...deltas2)
+
+            expect(deltas2[0].value.$order).toBeGreaterThan(deltas1[0].value.$order);
+        });
     });
 });
 

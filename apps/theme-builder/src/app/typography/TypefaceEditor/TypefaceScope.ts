@@ -146,9 +146,8 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
         const deltas = createDeltas(id, (draft) => {
             draft.applyAsDefault.splice(index, 1)
         })
-        pushTypefaceDeltas(deltas)
 
-        saveDeltas()
+        saveDeltas(deltas)
     }
 
     return {

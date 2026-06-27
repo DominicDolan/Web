@@ -297,8 +297,11 @@ function previousOrder(matches: Array<{ original?: ArrayItemSnapshot, value: any
     for (let cursor = index - 1; cursor >= 0; cursor--) {
         const previous = matches[cursor].original;
         if (previous == null) continue;
-        return assigned.get(previous.key) ?? previous.order;
+        return assigned.get(previous.key) ?? previous.order ?? Math.max(...assigned.values());
     }
+
+    const values = Array.from(assigned.values())
+    return values.length == 0 ? undefined : Math.max(...assigned.values())
 }
 
 function nextOrder(matches: Array<{ original?: ArrayItemSnapshot, value: any }>, index: number) {
