@@ -11,7 +11,6 @@ import {TypefaceDefinition} from "~/models/TypefaceDefinition.ts";
 export const TypefaceScope = createScopeProvider<{
     themeId: string,
     role: TypefaceRole,
-    size: TypefaceSize,
     type: TypefaceType
 }>()
 
@@ -29,19 +28,18 @@ function isValidSelector(selector: string): boolean {
 export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
 
     const [typefaceDeltas, setDeltas] = createStore(async () => {
-        const res = await getSingleTypefaceDeltas(props.themeId, props.role, props.size, props.type);
+        const res = await getSingleTypefaceDeltas(props.themeId, props.role, props.type);
         acked.mark(res);
         return res;
     }, [] as ModelDelta<TypefaceDefinition>[])
 
     const acked = createDeltaTracker(() => typefaceDeltas)
 
-    const defaultTypeface = createMemo(() => defaultTypefacesQueryObject[props.role][props.type][props.size])
-
+    const defaultTypeface = (size: TypefaceSize) => defaultTypefacesQueryObject[props.role][props.type][size]
+    const typeface = (size: TypefaceSize) => typefaces.find(t => t.size === size)
     const [typefaces, createDeltas] = createModels(() => typefaceDeltas)
 
-    const typeface = createMemo(() => typefaces[0] ?? null)
-    const getCssOrDefault = () => typeface()?.css ?? defaultTypeface().css
+    const getCssOrDefault = (size: TypefaceSize) => typeface(size)?.css ?? defaultTypeface(size).css
 
     function pushTypefaceDeltas(deltas: ModelDelta<TypefaceDefinition>[]) {
         setDeltas((draft) => {
@@ -63,15 +61,15 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
 
     const debounceSaveDeltas = debounce(saveDeltas, 1000)
 
-    function createTypefaceWithDefaults(overrides: Partial<TypefaceDefinition> = {}) {
+    function createTypefaceWithDefaults(size: TypefaceSize, overrides: Partial<TypefaceDefinition> = {}) {
         const newId = createId()
 
         return createDeltas("create", {
             id: newId,
-            css: overrides.css ?? defaultTypeface().css,
-            type: overrides.type ?? defaultTypeface().type,
-            size: overrides.size ?? defaultTypeface().size,
-            role: overrides.role ?? defaultTypeface().role,
+            css: overrides.css ?? defaultTypeface(size).css,
+            type: overrides.type ?? defaultTypeface(size).type,
+            size: overrides.size ?? defaultTypeface(size).size,
+            role: overrides.role ?? defaultTypeface(size).role,
             applyAsDefault: overrides.applyAsDefault ?? []
         })
     }
