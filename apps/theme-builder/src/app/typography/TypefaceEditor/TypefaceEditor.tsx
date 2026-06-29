@@ -11,7 +11,20 @@ import CssEditor from "~/components/CodeEditor/CssEditor.tsx";
 
 export function TypefaceEditor() {
 
-    const {themeId, role, size, type, typeface, getCssOrDefault, updateCss, addSelector, updateSelector, removeSelector} = useTypefaceScope()
+    const {
+        themeId,
+        role,
+        type,
+        typeface,
+        getCssOrDefault,
+        getSmallCssOrDefault,
+        getMediumCssOrDefault,
+        getLargeCssOrDefault,
+        updateFontCss,
+        addSelector,
+        updateSelector,
+        removeSelector
+    } = useTypefaceScope()
 
     const navigate = useNavigate()
     function onBackClicked() {
@@ -21,8 +34,7 @@ export function TypefaceEditor() {
     const [activeTab, setActiveTab] = createSignal<"properties" | "code">("properties")
 
     const cssProperties = createMemo(() => parseCssDeclarations(getCssOrDefault()))
-    const selector = createMemo(() => getTypefaceSelector(role(), size(), type()))
-    const codeBlock = createMemo(() => `${selector()} {\n${indentCss(getCssOrDefault())}\n}`)
+    const selector = createMemo(() => getTypefaceSelector(role(), type()))
 
     function updateProperty(property: TextPropertyKey, value: string) {
         const nextProperties = {...cssProperties()}
@@ -33,7 +45,7 @@ export function TypefaceEditor() {
             delete nextProperties[property]
         }
 
-        updateCss(buildCssDeclarations(nextProperties), true)
+        updateFontCss(buildCssDeclarations(nextProperties), true)
     }
 
     const applyAsDefaultSelectors = createMemo(() => typeface()?.applyAsDefault ?? [] as Array<string>)
@@ -67,14 +79,24 @@ export function TypefaceEditor() {
     return <SubPageTemplate onBackClicked={onBackClicked} title={`Edit Typeface`} backButtonText={"Back to Typography"}>
         <Loading>
             <div class="grid grid-cols-[1fr_1fr] gap-8 mx-8 pb-4 min-h-0">
-                <section>
+                <section class={"overflow-y-auto"}>
                     <h3 class="headline variant">Live Preview</h3>
-                    <div class="flex flex-col gap-4 p-4 m-4">
-                        <div style={getCssOrDefault()}>The Quick Brown Fox Jumped Over the Lazy Dog</div>
-                        <div style={getCssOrDefault()}>0123456789 !?&amp;@</div>
+                    <div class="flex flex-col gap-12 my-6">
+                        <div style={getLargeCssOrDefault()}>
+                            <p style={getCssOrDefault()}>The Quick Brown Fox Jumped Over the Lazy Dog</p>
+                            <p style={getCssOrDefault()}>0123456789 !?&amp;@</p>
+                        </div>
+                        <div style={getMediumCssOrDefault()}>
+                            <p style={getCssOrDefault()}>The Quick Brown Fox Jumped Over the Lazy Dog</p>
+                            <p style={getCssOrDefault()}>0123456789 !?&amp;@</p>
+                        </div>
+                        <div style={getSmallCssOrDefault()}>
+                            <p style={getCssOrDefault()}>The Quick Brown Fox Jumped Over the Lazy Dog</p>
+                            <p style={getCssOrDefault()}>0123456789 !?&amp;@</p>
+                        </div>
                     </div>
                 </section>
-                <article class="row-span-2 flex flex-col gap-6 h-full min-h-0 overflow-y-auto">
+                <article class="flex flex-col gap-6 h-full min-h-0 overflow-y-auto">
                     <hgroup class="flex flex-row justify-between items-center">
                         <h3 class="headline variant">Font Properties</h3>
                         <ul role="tablist" class="inset">
@@ -96,9 +118,20 @@ export function TypefaceEditor() {
                                 </form>
                             </Match>
                             <Match when={activeTab() === "code"}>
-                                <article class="inset flex flex-col gap-4">
-                                    <CssEditor selector={selector()} content={indentCss(getCssOrDefault())} />
-                                </article>
+                                <div class="flex flex-col gap-6">
+                                    <article class="inset flex flex-col gap-4">
+                                        <CssEditor selector={selector()} content={indentCss(getCssOrDefault())} />
+                                    </article>
+                                    <article class="inset flex flex-col gap-4">
+                                        <CssEditor selector={".large"} content={indentCss(getLargeCssOrDefault())} />
+                                    </article>
+                                    <article class="inset flex flex-col gap-4">
+                                        <CssEditor selector={".medium"} content={indentCss(getMediumCssOrDefault())} />
+                                    </article>
+                                    <article class="inset flex flex-col gap-4">
+                                        <CssEditor selector={".small"} content={indentCss(getSmallCssOrDefault())} />
+                                    </article>
+                                </div>
                             </Match>
                         </Switch>
                     </div>

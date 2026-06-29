@@ -24,9 +24,9 @@ export function TypefaceRoleItem(props: {role: TypefaceRole}) {
                     <article class="flat flex flex-col gap-4" role="button" onClick={() => onTypefaceClicked(variant)}>
                         <hgroup class="flex flex-row justify-between gap-2">
                             {camelToTitleCase(variant)}
-                            <code>{getTypefaceSelector(props.role, "medium", variant)}</code>
+                            <code>{getTypefaceSelector(props.role, variant)}</code>
                         </hgroup>
-                        <article class="inset flex flex-col gap-2" style={getCssOrDefault(props.role, variant, "medium")}>
+                        <article class="inset flex flex-col gap-2" style={getCssOrDefault(props.role, variant)}>
                             {camelToTitleCase(props.role) + " Text"}
                         </article>
                     </article>

@@ -35,11 +35,14 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
 
     const acked = createDeltaTracker(() => typefaceDeltas)
 
-    const defaultTypeface = (size: TypefaceSize) => defaultTypefacesQueryObject[props.role][props.type][size]
-    const typeface = (size: TypefaceSize) => typefaces.find(t => t.size === size)
+    const defaultTypeface = () => defaultTypefacesQueryObject[props.role][props.type]
+    const typeface = () => typefaces[0]
     const [typefaces, createDeltas] = createModels(() => typefaceDeltas)
 
-    const getCssOrDefault = (size: TypefaceSize) => typeface(size)?.css ?? defaultTypeface(size).css
+    const getCssOrDefault = () => typeface()?.css ?? defaultTypeface().css
+    const getSmallCssOrDefault = () => typeface()?.smallCss ?? defaultTypeface().smallCss
+    const getMediumCssOrDefault = () => typeface()?.mediumCss ?? defaultTypeface().mediumCss
+    const getLargeCssOrDefault = () => typeface()?.largeCss ?? defaultTypeface().largeCss
 
     function pushTypefaceDeltas(deltas: ModelDelta<TypefaceDefinition>[]) {
         setDeltas((draft) => {
@@ -61,20 +64,22 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
 
     const debounceSaveDeltas = debounce(saveDeltas, 1000)
 
-    function createTypefaceWithDefaults(size: TypefaceSize, overrides: Partial<TypefaceDefinition> = {}) {
+    function createTypefaceWithDefaults(overrides: Partial<TypefaceDefinition> = {}) {
         const newId = createId()
 
         return createDeltas("create", {
             id: newId,
-            css: overrides.css ?? defaultTypeface(size).css,
-            type: overrides.type ?? defaultTypeface(size).type,
-            size: overrides.size ?? defaultTypeface(size).size,
-            role: overrides.role ?? defaultTypeface(size).role,
+            css: overrides.css ?? defaultTypeface().css,
+            smallCss: overrides.smallCss ?? defaultTypeface().smallCss,
+            mediumCss: overrides.mediumCss ?? defaultTypeface().mediumCss,
+            largeCss: overrides.largeCss ?? defaultTypeface().largeCss,
+            type: overrides.type ?? defaultTypeface().type,
+            role: overrides.role ?? defaultTypeface().role,
             applyAsDefault: overrides.applyAsDefault ?? []
         })
     }
 
-    function updateCss(css: string, debounceSaveChange = false) {
+    function updateCss(field: "base" | "small" | "medium" | "large", css: string, debounceSaveChange = false) {
         let id = typefaces[0]?.id
         const deltas = []
         if (id == null) {
@@ -83,19 +88,51 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
             id = createDeltas[0].id
         }
 
-        const updateDeltas = createDeltas(id, {
-            css,
-        })
-
-        deltas.push(...updateDeltas)
-
-        pushTypefaceDeltas(deltas)
+        switch (field) {
+            case "base":
+                deltas.push(...createDeltas(id, {
+                    css,
+                }))
+                break
+            case "large":
+                deltas.push(...createDeltas(id, {
+                    largeCss: css,
+                }))
+                break
+            case "medium":
+                deltas.push(...createDeltas(id, {
+                    mediumCss: css,
+                }))
+                break
+            case "small":
+                deltas.push(...createDeltas(id, {
+                    smallCss: css,
+                }))
+                break
+        }
 
         if (debounceSaveChange) {
+            pushTypefaceDeltas(deltas)
             debounceSaveDeltas()
         } else {
-            saveDeltas()
+            saveDeltas(deltas)
         }
+    }
+
+    function updateFontCss(css: string, debounceSaveChange = false) {
+        updateCss("base", css, debounceSaveChange)
+    }
+
+    function updateSmallCss(css: string, debounceSaveChange = false) {
+        updateCss("small", css, debounceSaveChange)
+    }
+
+    function updateMediumCss(css: string, debounceSaveChange = false) {
+        updateCss("medium", css, debounceSaveChange)
+    }
+
+    function updateLargeCss(css: string, debounceSaveChange = false) {
+        updateCss("large", css, debounceSaveChange)
     }
 
     function addSelector() {
@@ -151,12 +188,17 @@ export const useTypefaceScope = defineScope(TypefaceScope, (props) => {
     return {
         themeId: () => props.themeId,
         role: () => props.role,
-        size: () => props.size,
         type: () => props.type,
         typeface,
         defaultTypeface,
         getCssOrDefault,
-        updateCss,
+        getLargeCssOrDefault,
+        getMediumCssOrDefault,
+        getSmallCssOrDefault,
+        updateFontCss,
+        updateSmallCss,
+        updateMediumCss,
+        updateLargeCss,
         addSelector,
         updateSelector,
         removeSelector

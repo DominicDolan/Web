@@ -65,7 +65,7 @@ export default function ThemeSettings(props: { children?: any, theme: ThemeDefin
                 }
             </For>
         </empty-state>}>
-            <div class={"themeSettings py-6 px-6 flex flex-col items-center"}>
+            <div class={"themeSettings py-6 px-6 flex flex-col items-center overflow-y-auto"}>
                 <section class={"w-full flex flex-col gap-4"}>
                     <hgroup class={"flex flex-row items-center justify-between"}>
                         <h2>Theme Settings</h2>
