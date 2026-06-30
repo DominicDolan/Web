@@ -1,0 +1,66 @@
+/*
+ * Navigation elements.
+ *
+ * Category selectors:
+ *   - nav
+ *   - nav.top
+ *   - nav.pageNav
+ *   - aside > nav
+ *   - nav[aria-label="Breadcrumb"] and its nav > ol track
+ *
+ * Use nav.css for landmark/navigation chrome. Use list.css for ul.nav when the
+ * list itself is the stylable category.
+ */
+
+@layer base {
+    nav {
+        --current-color: var(--active-color, var(--primary-color));
+        --on-current-color: var(--on-active-color, var(--on-primary-color));
+    }
+
+    nav[aria-label="Breadcrumb"] > ol {
+        list-style: none;
+        padding: 0;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notFoundry) {
+        nav.top {
+            /* TODO: top app-bar border/background/shadow. */
+        }
+
+        nav.pageNav,
+        aside > nav {
+            /* TODO: side/page navigation surface. Avoid page-level width here. */
+        }
+
+        nav a[aria-current="page"],
+        nav a.active {
+            /* TODO: current navigation link state. */
+        }
+
+        nav[aria-label="Breadcrumb"] {
+            /* TODO: breadcrumb container typography/colour. */
+        }
+
+        nav[aria-label="Breadcrumb"] > ol {
+            /*
+             * Breadcrumbs are naturally inline rows, so display is a reasonable
+             * soft default. The gap between items is a theme call — fill it
+             * once the visual rhythm is known.
+             */
+            display: inline-flex;
+            /* TODO: breadcrumb item gap. */
+        }
+
+        nav[aria-label="Breadcrumb"] > ol > li {
+            /* TODO: breadcrumb item style. */
+        }
+
+        nav[aria-label="Breadcrumb"] > ol > li + li::before {
+            /* TODO: decorative separator, e.g. content: "/"; opacity: .5; */
+        }
+    }
+}
+

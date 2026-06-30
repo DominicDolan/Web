@@ -1,0 +1,63 @@
+/*
+ * Overlay elements: Popover Menu and Dialog.
+ *
+ * Category selectors:
+ *   - [popover][role="menu"], [popover].menu
+ *   - dialog
+ *   - dialog > footer
+ *
+ * Popover positioning often comes from JS, anchor positioning, or markup
+ * utilities. Keep this file focused on the overlay surface, border, shadow,
+ * backdrop, and motion.
+ */
+
+@layer base {
+    [popover][role="menu"],
+    [popover].menu {
+        position: fixed;
+        margin: 0;
+        border: none;
+
+        &::backdrop {
+            background: transparent;
+        }
+    }
+
+    dialog {
+        --current-color: var(--active-color, var(--surface-color));
+        --on-current-color: var(--on-active-color, var(--on-surface-color));
+
+        border: none;
+        background: transparent;
+        color: inherit;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notFoundry) {
+        [popover][role="menu"],
+        [popover].menu {
+            /* TODO: popover/menu panel surface, radius, shadow, border. */
+        }
+
+        dialog {
+            /* TODO: dialog panel surface, radius, border, shadow. */
+        }
+
+        dialog::backdrop {
+            /* TODO: modal backdrop tint/blur. */
+        }
+
+        dialog > footer {
+            /*
+             * Context hook for dialog actions. A small gap/inline row may be a
+             * reasonable soft default; leave empty if layout utilities own it.
+             */
+        }
+
+        form > footer {
+            /* TODO: form action row appearance, if any. */
+        }
+    }
+}
+

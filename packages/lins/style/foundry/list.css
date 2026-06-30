@@ -1,0 +1,145 @@
+/*
+ * List elements: List, Tab List, Menu List.
+ *
+ * Category selectors:
+ *   - ul, ol, li
+ *   - ul[role="tablist"] and its > li tabs
+ *   - ul[role="menu"], ul.menu
+ *   - list variants such as .nav, .plain, .chips, .underlined, .inset
+ *
+ * Note: ul and ul[role="tablist"] are different element categories even
+ * though they share a tag. Keep their rules separate.
+ */
+
+@layer base {
+    ul,
+    ol {
+        --current-color: var(--active-color, var(--primary-color));
+        --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+        padding: 0;
+    }
+
+    ul[role="tablist"],
+    ul[role="menu"],
+    ul.menu,
+    ul.nav,
+    ul.plain,
+    ul.chips {
+        list-style: none;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notFoundry) {
+        ul.nav {
+            /*
+             * Navigation-list variant. Use this when a list of links/actions is
+             * not semantically a <nav> landmark by itself.
+             */
+            > li {
+                /* TODO: nav-list item typography, radius, and interaction. */
+
+                &:not(:has(> *)) {
+                    /* Optional soft layout for text-only items. */
+                }
+
+                > * {
+                    /* Optional soft layout for linked items. */
+                }
+
+                &[aria-current="page"],
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-current="page"]),
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    /* TODO: active/current nav item state. */
+                }
+
+                &:hover:not(.active):not(:has(.active)) {
+                    /* TODO: hover state for inactive items. */
+                }
+            }
+        }
+
+        ul.plain {
+            > li {
+                /* TODO: plain list item surface/marker treatment. */
+            }
+        }
+
+        ul.menu,
+        ul[role="menu"] {
+            /* TODO: floating menu surface. Usually pairs with popover.css. */
+
+            > li,
+            > [role="menuitem"] {
+                cursor: pointer;
+                /* TODO: menu item padding, hover, selected/current states. */
+            }
+        }
+
+        ul.chips {
+            > li {
+                --current-color: var(--active-color, var(--primary-color));
+                --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+                /* Chips always read as inline rows — soft layout. */
+                display: inline-flex;
+                align-items: center;
+
+                /* TODO: chip border-radius, padding, font-size, line-height, colour. */
+            }
+        }
+
+        ul[role="tablist"] {
+            /*
+             * Base tab-list appearance. Keep horizontal/vertical layout out of
+             * the theme unless every design using this theme should agree.
+             */
+            > li {
+                cursor: pointer;
+
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    /* TODO: selected tab state. */
+                }
+
+                &:hover:not([aria-selected="true"]):not(.active):not(:has(.active)) {
+                    /* TODO: hover state for unselected tabs. */
+                }
+            }
+        }
+
+        ul[role="tablist"].underlined {
+            /*
+             * Example variant: underline selected tab.
+             * The minimal theme uses CSS anchor positioning here. If you use
+             * that technique, keep it as decorative state styling.
+             */
+            > li {
+                /* TODO: underlined tab item. */
+            }
+
+            &::after {
+                /* TODO: decorative underline indicator. */
+            }
+        }
+
+        ul[role="tablist"].inset {
+            /* TODO: recessed segmented-tab container. */
+
+            > li {
+                /* TODO: inset tab item. */
+            }
+
+            &::after {
+                /* TODO: decorative selected pill/indicator. */
+            }
+        }
+    }
+}
+
