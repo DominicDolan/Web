@@ -85,14 +85,11 @@
                 --current-color: var(--active-color, var(--primary-color));
                 --on-current-color: var(--on-active-color, var(--on-primary-color));
 
+                /* Chips always read as inline rows — soft layout. */
                 display: inline-flex;
                 align-items: center;
-                border-radius: 999px;
-                padding: 0.25rem 0.5rem;
-                font-size: 0.8rem;
-                line-height: 1.25;
 
-                /* TODO: chip colour/border/background. */
+                /* TODO: chip border-radius, padding, font-size, line-height, colour. */
             }
         }
 

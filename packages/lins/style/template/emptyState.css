@@ -33,9 +33,8 @@
         empty-state.skeleton *:not(:has(> *)) {
             pointer-events: none;
             user-select: none;
-            border-radius: 0.25rem;
 
-            /* TODO: skeleton block colour. */
+            /* TODO: skeleton block border-radius and base colour. */
         }
 
         /*noinspection CssInvalidHtmlTagReference*/

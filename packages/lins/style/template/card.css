@@ -20,8 +20,8 @@
 
         /* Soft layout: cards almost always need internal breathing room. */
         padding: 1rem;
-        border-radius: 1rem;
         background-repeat: no-repeat;
+        /* TODO: border-radius for card surfaces. */
 
         transition:
             color 0.2s ease-in-out,

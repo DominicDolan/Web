@@ -46,11 +46,12 @@
 
         nav[aria-label="Breadcrumb"] > ol {
             /*
-             * Breadcrumbs are naturally inline rows, so display/gap can be a
-             * reasonable soft default. Remove if your layout utilities own this.
+             * Breadcrumbs are naturally inline rows, so display is a reasonable
+             * soft default. The gap between items is a theme call — fill it
+             * once the visual rhythm is known.
              */
             display: inline-flex;
-            gap: 0.4rem;
+            /* TODO: breadcrumb item gap. */
         }
 
         nav[aria-label="Breadcrumb"] > ol > li {

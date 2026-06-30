@@ -163,9 +163,9 @@ category, the variants they accept, and the contexts that style them.
 ### 2.3 Typography elements — `text.css`
 
 LINS uses the **Material Design 3 type scale**. There are five typeface
-roles, each available in three sizes and each with a `.variant`
-sub-style that's typically used for subtitles, key/value pairs, captions
-under a heading, and similar "secondary" text.
+roles (`.display`, `.headline`, `.title`, `.body`, `.label`), three
+sizes (`.small`, `.medium`, `.large`), and a `.variant` modifier for
+muted/secondary text.
 
 | Role       | Purpose                                                |
 | ---------- | ------------------------------------------------------ |
@@ -175,8 +175,106 @@ under a heading, and similar "secondary" text.
 | `.body`    | Standard reading text                                  |
 | `.label`   | Small metadata, captions, form labels, chip text       |
 
-Sizes are applied as a **second class**, so the typeface and the size
-compose independently:
+#### How the scale is computed
+
+Every typography element resolves its size through one rule:
+
+```css
+font-size: calc(var(--font-size, var(--base-font-size)) * var(--font-size-multiplier, 1));
+```
+
+- **Role classes** set `--font-size` directly inside the role rule, e.g.
+  `.display { --font-size: 3.5rem; }`.
+- `:root` may provide `--font-size: var(--base-font-size)` as a generic
+  fallback so the fill-ready template is valid before role rules are
+  implemented. Do not use role-specific root tokens for the scale.
+- **Size classes** set `--font-size-multiplier`, e.g.
+  `.large { --font-size-multiplier: 1.2; }`,
+  `.medium { --font-size-multiplier: 1; }`,
+  `.small { --font-size-multiplier: 0.85; }`.
+
+A theme therefore defines the scale where each role is authored:
+
+```css
+.display {
+    --font-size: /* … */;
+}
+
+.headline {
+    --font-size: /* … */;
+}
+```
+
+`.variant` rules may set a different `--font-size` from the base role,
+or omit it to inherit the role's default size.
+
+The size multipliers themselves are theme-tunable but ship with sensible
+defaults (1.2 / 1 / 0.85) so the scale works as soon as each role's
+`--font-size` is filled in.
+
+#### Selector pattern: class first, tag/context defaults in `:where()`
+
+Typography rules use the LINS default-binding pattern:
+
+```css
+:where(<tag-or-context defaults>), .<role-or-size-class> {
+    /* the role / size / variant definition */
+}
+```
+
+The **explicit class** is the authoritative selector. The list inside
+`:where()` is the zero-specificity default — author classes always win
+without specificity fights. So a theme says "by default, `h1` and `h2`
+read as `.display`" by writing:
+
+```css
+:where(h1, h2), .display {
+    --font-size: /* … */;
+}
+```
+
+The same pattern is used for size multipliers and for context defaults.
+The template ships with a starter map for common website semantics; a real
+theme should change, remove, or add selectors during implementation when its
+content model needs different defaults.
+
+```css
+:where(h1, h3, h6), .large  { --font-size-multiplier: 1.2; }
+:where(h2, h4),     .medium { --font-size-multiplier: 1; }
+:where(h5),         .small  { --font-size-multiplier: 0.85; }
+
+:where(ul > *),              .body  { --font-size: /* … */; }
+:where(form-field > output), .label { --font-size: /* … */; }
+```
+
+#### Common default role bindings
+
+These defaults are intentionally semantic, not mandatory. They give plain
+HTML a coherent type hierarchy before authors add explicit typography
+classes:
+
+| Context / element                              | Default role              | Notes |
+| ---------------------------------------------- | ------------------------- | ----- |
+| Page/hero headings (`h1`, `h2`, banner heading) | `.display`                | Large page identity / marketing text. |
+| Section headings (`section > h*`, `section > hgroup > h*`) | `.headline` | A section title should generally read larger than component/card titles. |
+| Article, dialog, nav-bar, and empty-state headings | `.title` | Component-level titles, including card/article titles. |
+| Hero subtitles (`main > hgroup > p`, banner `hgroup > p`) | `.display.variant` | Secondary line under a display heading. |
+| Section subtitles (`section > hgroup > p`)     | `.headline.variant`       | Muted/secondary section heading text. |
+| Article/dialog subtitles (`article > hgroup > p`, `dialog > hgroup > p`) | `.title.variant` | Muted/secondary component subtitle text. |
+| Paragraphs, description lists, plain list items, form controls | `.body` | Standard reading and input text. |
+| Buttons, tabs, chips, menu items, nav links, labels | `.label` | Compact action/navigation text. |
+| Breadcrumbs, metadata (`small`, `time`, `figcaption`), validation output | `.label.variant` | Small muted/supporting text. |
+
+When adding a new category, bind its text to the nearest existing role via
+`:where(...)` before inventing a new typography class. For example, a pill
+chip normally belongs with `.label`, while a dense breadcrumb normally
+belongs with `.label.variant`.
+
+> **Don't write `h1`-`h6` outside a `:where()`.** Every tag default
+> belongs inside the zero-specificity group so the role/size/variant
+> classes can always override.
+
+#### Composing the API
 
 ```html
 <h1 class="display large">Welcome</h1>
@@ -185,7 +283,14 @@ compose independently:
 ```
 
 `.small`, `.medium`, `.large` are the three sizes. Order doesn't matter
-(`.large .display` is equivalent to `.display .large`).
+(`.large.display` is equivalent to `.display.large`).
+
+Bare `h1`–`h6` also map onto the scale by setting both `--font-size` and
+`--font-size-multiplier` to a reasonable default (e.g. `h1` is
+`display` + `1.2`, `h6` is `title` + `1.2`). Authors can compose role
+and size classes on a heading element to override that default.
+
+#### The `.variant` modifier
 
 The `.variant` modifier on any typeface yields the muted/secondary
 treatment — typically used for:
@@ -206,18 +311,22 @@ treatment — typically used for:
 </dl>
 ```
 
-Other text elements covered in `text.css`:
+#### Other text elements covered in `text.css`
 
 | Element             | Selector                                  | Notes                       |
 | ------------------- | ----------------------------------------- | --------------------------- |
 | Body text           | `body`                                    | Base typography             |
 | Headings            | `h1`–`h6`                                 | Map onto the scale          |
-| Card heading        | `article > h3`, `article > hgroup > *`    | Context-styled title        |
-| Section heading     | `section > h*`, `section > hgroup > *`    | Uppercased section label    |
+| Card/article heading| `article > h*`, `article > hgroup > h*`   | Context maps to the title rule |
+| Card/article subtitle | `article > hgroup > p`                  | Context maps to the title variant rule |
+| Section heading     | `section > h*`, `section > hgroup > h*`   | Context maps to the headline rule |
+| Section subtitle    | `section > hgroup > p`                    | Context maps to the headline variant rule |
+| Control text        | `button`, tabs, chips, menu items         | Context maps to the label rule |
+| Breadcrumb text     | `nav[aria-label="Breadcrumb"]`           | Context maps to the label variant rule |
 | Inline code         | `code`                                    | Subtle chip                 |
 | Horizontal rule     | `hr`                                      | Thin theme-coloured line    |
 | Bullet item         | `li`                                      | Default `list-style` reset  |
-| List item text      | `ul > *`                                  | Body-sm default             |
+| List item text      | `ul > *`                                  | Context sets `--font-size` in the body rule |
 
 ### 2.4 Form elements — `input.css`
 

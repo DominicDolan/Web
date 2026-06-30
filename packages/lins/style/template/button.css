@@ -29,13 +29,15 @@
         text-align: center;
         vertical-align: middle;
 
-        font-weight: 500;
         user-select: none;
         cursor: pointer;
 
         border: none;
-        border-radius: 0.375rem;
         background: transparent;
+        /* TODO: --button-radius / border-radius. Themes typically share one
+         * radius token between buttons and inputs so segmented radio groups
+         * line up; pick that here. */
+        /* TODO: font-weight for the theme's button voice (e.g. 500–700). */
 
         transition:
             color 0.15s ease-in-out,
@@ -109,11 +111,12 @@
 
             &.icon {
                 /*
-                 * Icon-only buttons are conventionally square/circular.
-                 * This is soft layout: keep or remove depending on the theme.
+                 * Icon-only buttons are conventionally square — keep aspect-ratio
+                 * as soft layout. The radius is a theme decision: 50% for circular,
+                 * a smaller value for rounded-square.
                  */
                 aspect-ratio: 1;
-                border-radius: 50%;
+                /* TODO: border-radius for icon-only buttons. */
             }
 
             &:hover:not(:disabled):not([disabled]) {
@@ -147,15 +150,13 @@
                 border-radius: 0;
             }
 
-            & > button:first-child {
-                border-start-start-radius: 0.375rem;
-                border-end-start-radius: 0.375rem;
-            }
-
-            & > button:last-child {
-                border-start-end-radius: 0.375rem;
-                border-end-end-radius: 0.375rem;
-            }
+            /* TODO: re-apply the button radius on the first/last segment ends
+             * once the shared --button-radius is chosen, e.g.
+             *   & > button:first-child { border-start-start-radius: var(--button-radius);
+             *                            border-end-start-radius: var(--button-radius); }
+             *   & > button:last-child  { border-start-end-radius:  var(--button-radius);
+             *                            border-end-end-radius:    var(--button-radius); }
+             */
 
             & > button[aria-checked="true"],
             & > button[aria-selected="true"],
