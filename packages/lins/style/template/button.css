@@ -115,6 +115,9 @@
                  * as soft layout. The radius is a theme decision: 50% for circular,
                  * a smaller value for rounded-square.
                  */
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
                 aspect-ratio: 1;
                 /* TODO: border-radius for icon-only buttons. */
             }

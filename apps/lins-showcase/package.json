@@ -12,7 +12,9 @@
     "solid-js": "catalog:",
     "@solidjs/web": "catalog:",
     "@web/lins": "workspace:*",
-    "@web/utils": "workspace:*"
+    "@web/utils": "workspace:*",
+    "tailwindcss": "4.2.2",
+    "@tailwindcss/vite": "4.2.2"
   },
   "devDependencies": {
     "@types/node": "^24.13.2",

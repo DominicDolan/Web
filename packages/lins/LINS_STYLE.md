@@ -260,15 +260,15 @@ classes:
 | Article, dialog, nav-bar, and empty-state headings | `.title` | Component-level titles, including card/article titles. |
 | Hero subtitles (`main > hgroup > p`, banner `hgroup > p`) | `.display.variant` | Secondary line under a display heading. |
 | Section subtitles (`section > hgroup > p`)     | `.headline.variant`       | Muted/secondary section heading text. |
-| Article/dialog subtitles (`article > hgroup > p`, `dialog > hgroup > p`) | `.title.variant` | Muted/secondary component subtitle text. |
+| Article/dialog subtitles (`article > hgroup > p`, `dialog > hgroup > p`), breadcrumbs | `.title.variant` | Muted/secondary component subtitle text. |
 | Paragraphs, description lists, plain list items, form controls | `.body` | Standard reading and input text. |
 | Buttons, tabs, chips, menu items, nav links, labels | `.label` | Compact action/navigation text. |
-| Breadcrumbs, metadata (`small`, `time`, `figcaption`), validation output | `.label.variant` | Small muted/supporting text. |
+| Metadata (`small`, `time`, `figcaption`), validation output | `.label.variant` | Small muted/supporting text. |
 
 When adding a new category, bind its text to the nearest existing role via
 `:where(...)` before inventing a new typography class. For example, a pill
-chip normally belongs with `.label`, while a dense breadcrumb normally
-belongs with `.label.variant`.
+chip normally belongs with `.label`, while a breadcrumb normally
+belongs with `.title.variant`.
 
 > **Don't write `h1`-`h6` outside a `:where()`.** Every tag default
 > belongs inside the zero-specificity group so the role/size/variant
@@ -322,7 +322,7 @@ treatment — typically used for:
 | Section heading     | `section > h*`, `section > hgroup > h*`   | Context maps to the headline rule |
 | Section subtitle    | `section > hgroup > p`                    | Context maps to the headline variant rule |
 | Control text        | `button`, tabs, chips, menu items         | Context maps to the label rule |
-| Breadcrumb text     | `nav[aria-label="Breadcrumb"]`           | Context maps to the label variant rule |
+| Breadcrumb text     | `nav[aria-label="Breadcrumb"]`           | Context maps to the title variant rule |
 | Inline code         | `code`                                    | Subtle chip                 |
 | Horizontal rule     | `hr`                                      | Thin theme-coloured line    |
 | Bullet item         | `li`                                      | Default `list-style` reset  |

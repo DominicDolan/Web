@@ -176,9 +176,10 @@ Bare `h1`–`h6` elements are automatically mapped onto the type scale with sens
 | `article > h*`, `dialog > h*`, `empty-state > h*` | `.title` |
 | `article > hgroup > p`, `dialog > hgroup > p` | `.title.variant` |
 | `section > hgroup > p` | `.headline.variant` |
+| `nav[aria-label="Breadcrumb"]` | `.title.variant` |
 | Paragraphs, list items, inputs | `.body` |
 | Buttons, tabs, nav links, labels | `.label` |
-| Breadcrumbs, `small`, `time`, `figcaption`, validation output | `.label.variant` |
+| `small`, `time`, `figcaption`, validation output | `.label.variant` |
 
 ### 4. Lists
 Lists have several variant forms beyond plain `ul`/`ol`.

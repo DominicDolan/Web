@@ -232,7 +232,11 @@
             article > header > p,
             dialog > hgroup > p,
             dialog > header > p,
-            empty-state.empty > hgroup > p
+            empty-state.empty > hgroup > p,
+            nav[aria-label="Breadcrumb"],
+            nav[aria-label="Breadcrumb"] > ol,
+            nav[aria-label="Breadcrumb"] > ol > li,
+            nav[aria-label="Breadcrumb"] a
         ),
         .title.variant {
             /* TODO: --font-size: ...; */
@@ -253,10 +257,6 @@
 
         :where(
             small, figcaption, caption, time,
-            nav[aria-label="Breadcrumb"],
-            nav[aria-label="Breadcrumb"] > ol,
-            nav[aria-label="Breadcrumb"] > ol > li,
-            nav[aria-label="Breadcrumb"] a,
             form-field > output
         ),
         .label.variant {
