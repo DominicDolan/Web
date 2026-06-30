@@ -165,7 +165,7 @@ export function ColorPalette(props: { selected: ColorDefinition, onColorClicked:
             <Loading fallback={<div>Loading...</div>}>
                 <Show when={isSearchView()} fallback={<>
                     <For each={groups()}>{(group) => (<div class="flex flex-col gap-2">
-                        <h3 class={"sectionHeading"}>{group}</h3>
+                        <h3 class="headline variant">{group}</h3>
                         <div class="flex flex-row gap-4">
                             <For each={groupedColors()[group]}>{(color) => (<>
                                 <div onClick={(event) => onColorClicked(color, event)} class={["w-10 h-10", style.colorPresentationCompact]} style={{ ["background-color"]: color.hex_value }}>
@@ -182,7 +182,7 @@ export function ColorPalette(props: { selected: ColorDefinition, onColorClicked:
                             <li class="flex flex-row gap-6 items-center">
                                 <div onClick={(event) => onColorClicked(color, event)} class={["aspect-square w-10", style.colorPresentationCompact]} style={{ ["background-color"]: color.hex_value }}></div>
                                 <hgroup>
-                                    <h4 class="titleMd">{color.color_name}</h4>
+                                    <h4 class="title medium">{color.color_name}</h4>
                                     <span>{color.hex_value}</span>
                                 </hgroup>
                             </li>

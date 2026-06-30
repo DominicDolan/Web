@@ -3,7 +3,7 @@ import { createMemo } from "solid-js"
 import {useColorUtils} from "~/app/colors/ColorUtils";
 
 export function ColorEditCard(props: { name: string, color: string, textColor: string, onClick: () => void }) {
-    const {rgb, hsl, contrastRatio, bestContrast} = useColorUtils(() => props.color)
+    const {rgb, hsl, contrastRatio} = useColorUtils(() => props.color)
 
     const largeTextSuccess = createMemo(() => contrastRatio() >= 4.5)
     const largeTextWarning = createMemo(() => contrastRatio() < 4.5 && contrastRatio() >= 3)
@@ -52,7 +52,7 @@ export function ColorEditCard(props: { name: string, color: string, textColor: s
             <div class="flex flex-row justify-between items-center">
                 <div class={"flex flex-col"}>
                     <span>Contrast</span>
-                    <span class="labelLg">{contrastRatio().toFixed(2)}:1 ratio</span>
+                    <span class="label large variant">{contrastRatio().toFixed(2)}:1 ratio</span>
                 </div>
 
                 <div>

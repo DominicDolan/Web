@@ -3,8 +3,7 @@
  *
  * This is the concrete app theme used by theme-builder. Keep the canonical LINS
  * API aligned with style/template/text.css, but fill the TODOs with the minimal
- * visual voice. Compatibility aliases near the end keep older theme-builder
- * markup working while the app migrates to role + size composition.
+ * visual voice.
  */
 
 @layer defaults {
@@ -29,35 +28,14 @@
     :where(h1, h2, h3, h4, h5, h6),
     .display,
     .headline,
-    .title,
-    .displayLg,
-    .displayMd,
-    .displaySm,
-    .headlineLg,
-    .headlineMd,
-    .headlineSm,
-    .titleLg,
-    .titleMd,
-    .titleSm,
-    .headingXl,
-    .headingLg,
-    .headingMd,
-    .headingSm,
-    .headingXs,
-    .headingXxs {
+    .title {
         font-family: var(--font-family), sans-serif;
         line-height: var(--heading-line-height);
         font-weight: var(--heading-font-weight);
     }
 
     .body,
-    .label,
-    .bodyLg,
-    .bodyMd,
-    .bodySm,
-    .labelLg,
-    .labelMd,
-    .labelSm {
+    .label {
         font-family: var(--font-family), sans-serif;
         line-height: var(--line-height);
     }
@@ -311,60 +289,6 @@
             --font-size-multiplier: 0.85;
         }
 
-        /* Compatibility aliases for existing theme-builder markup. Prefer the
-         * role + size API above for new LINS style authoring UI.
-         */
-        .displayLg { font-size: 3rem; line-height: 1.2; font-weight: 700; }
-        .displayMd { font-size: 2.5rem; line-height: 1.2; font-weight: 700; }
-        .displaySm { font-size: 2rem; line-height: 1.2; font-weight: 700; }
-
-        .headlineLg { font-size: 2rem; line-height: 1.2; font-weight: 700; }
-        .headlineMd { font-size: 1.75rem; line-height: 1.2; font-weight: 700; }
-        .headlineSm { font-size: 1.5rem; line-height: 1.2; font-weight: 700; }
-
-        .titleLg { font-size: 1.25rem; line-height: 1.2; font-weight: 700; }
-        .titleMd { font-size: 1.125rem; line-height: 1.2; font-weight: 700; }
-        .titleSm { font-size: 1rem; line-height: 1.2; font-weight: 700; }
-
-        .bodyLg { font-size: 1rem; }
-        .bodyMd { font-size: 0.875rem; }
-        .bodySm { font-size: 0.75rem; }
-
-        .labelLg { font-size: 0.875rem; }
-        .labelMd { font-size: 0.75rem; }
-        .labelSm { font-size: 0.625rem; }
-
-        .labelLg,
-        .labelMd,
-        .labelSm {
-            font-weight: 700;
-            opacity: 0.65;
-        }
-
-        .label {
-            font-weight: 700;
-        }
-
-        .headingXl { font-size: 2.5rem; line-height: 1.2; font-weight: 700; }
-        .headingLg { font-size: 2rem; line-height: 1.2; font-weight: 700; }
-        .headingMd { font-size: 1.75rem; line-height: 1.2; font-weight: 700; }
-        .headingSm { font-size: 1.5rem; line-height: 1.2; font-weight: 700; }
-        .headingXs { font-size: 1.25rem; line-height: 1.2; font-weight: 700; }
-        .headingXxs { font-size: 1rem; line-height: 1.2; font-weight: 700; }
-
-        .sectionHeading {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: oklab(from currentColor l a b / 0.8);
-            font-weight: 700;
-        }
-
-        .cardHeading {
-            font-size: 1.25rem;
-            line-height: 1.2;
-            font-weight: 700;
-        }
 
         section > hgroup {
             padding-bottom: 0.5rem;

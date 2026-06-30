@@ -23,7 +23,7 @@ export function ElementEditor() {
             case "input":
                 return (
                     <div class="flex flex-col gap-2 w-full max-w-xs">
-                        <label class="labelSm">Username</label>
+                        <label class="label small">Username</label>
                         <input class="outlined p-2 w-full" placeholder="Enter text..." />
                     </div>
                 );

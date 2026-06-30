@@ -17,7 +17,7 @@ export function ElementList() {
             case "input":
                 return (
                     <div class="flex flex-col gap-2 w-full max-w-xs transform-[translateX(calc(50%))_scale(1.4)]">
-                        <label class="labelSm">Username</label>
+                        <label class="label small">Username</label>
                         <input class="outlined p-2 w-full" placeholder="Enter text..." />
                     </div>
                 );
@@ -82,8 +82,8 @@ export function ElementList() {
     return (
         <div class={"flex flex-col gap-8 p-8"}>
             <hgroup class={"flex flex-col gap-1"}>
-                <h2 class={"titleLg"}>UI Elements</h2>
-                <p class={"bodySm label"}>Configure the visual style of your component library</p>
+                <h2 class="title large">UI Elements</h2>
+                <p class="body small variant">Configure the visual style of your component library</p>
             </hgroup>
 
             <div class={"grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6"}>
@@ -99,8 +99,8 @@ export function ElementList() {
                                     <i class={"title"}>{category.icon}</i>
                                 </div>
                                 <div class={"flex flex-col gap-0"}>
-                                    <span class={"titleMd"}>{category.name}</span>
-                                    <span class={"bodySm label"}>{category.description}</span>
+                                    <span class="title medium">{category.name}</span>
+                                    <span class="body small variant">{category.description}</span>
                                 </div>
                             </hgroup>
 
