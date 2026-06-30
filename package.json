@@ -8,6 +8,7 @@
       "apps/cli",
       "apps/theme-builder",
       "apps/testBench",
+      "apps/lins-showcase",
       "packages/d1",
       "packages/solidDelta",
       "packages/lins",
