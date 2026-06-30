@@ -10,7 +10,7 @@
 @import "./nav.css";
 
 @layer defaults {
-
+    /* Palette tokens for the theme-builder app's own minimal LINS theme. */
     .minimalTheme.light {
         --primary-color: #202020;
         --on-primary-color: white;
@@ -77,12 +77,13 @@
 
     .background {
         --active-color: var(--background-color);
-        --on-active-color: var(--on-background);
+        --on-active-color: var(--on-background-color);
     }
 
     html, body, #app, .minimalTheme {
         background: var(--background-color);
         background-size: cover;
+        color: var(--on-background-color);
     }
 
     #app .pageNav, #app {

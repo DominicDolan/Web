@@ -1,9 +1,58 @@
+/*
+ * Navigation elements for the minimal theme.
+ */
 
+@layer base {
+    nav {
+        --current-color: var(--active-color, var(--primary-color));
+        --on-current-color: var(--on-active-color, var(--on-primary-color));
+    }
+
+    nav[aria-label="Breadcrumb"] > ol {
+        list-style: none;
+        padding: 0;
+    }
+}
 
 @layer elements {
+    @scope (body) to (.notMinimal) {
+        nav.top {
+            border-bottom: 1px solid oklab(from currentColor 70% a b / 0.5);
+            background: var(--surface-color);
+            color: var(--on-surface-color);
+        }
 
-    nav.top {
-        border-bottom: 1px solid oklab(from currentColor 70% a b / 0.5);
-        background: white;
+        nav.pageNav,
+        aside > nav {
+            background-color: oklch(from blue l c h / 0.03);
+            color: var(--on-surface-color);
+        }
+
+        nav a[aria-current="page"],
+        nav a.active {
+            color: var(--current-color);
+            font-weight: 700;
+        }
+
+        nav[aria-label="Breadcrumb"] {
+            color: oklab(from currentColor l a b / 0.7);
+        }
+
+        nav[aria-label="Breadcrumb"] > ol {
+            display: inline-flex;
+            gap: 0.4rem;
+            align-items: center;
+        }
+
+        nav[aria-label="Breadcrumb"] > ol > li {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        nav[aria-label="Breadcrumb"] > ol > li + li::before {
+            content: "/";
+            opacity: 0.5;
+        }
     }
 }

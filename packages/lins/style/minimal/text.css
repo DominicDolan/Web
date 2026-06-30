@@ -1,167 +1,358 @@
+/*
+ * Typography and inline text for the minimal theme.
+ *
+ * This is the concrete app theme used by theme-builder. Keep the canonical LINS
+ * API aligned with style/template/text.css, but fill the TODOs with the minimal
+ * visual voice. Compatibility aliases near the end keep older theme-builder
+ * markup working while the app migrates to role + size composition.
+ */
 
-:root {
-    --font-size-multiplier-magnitude: 1.2;
-    --font-family: 'Helvetica Neue', Arial, sans-serif;
-    --base-font-size: 16px;
-    --line-height: 1.5;
-    --heading-line-height: 1.2;
-    --heading-font-weight: 700;
+@layer defaults {
+    :root {
+        --font-family: "Helvetica Neue", Arial, sans-serif;
+        --base-font-size: 16px;
+        --font-size: var(--base-font-size);
+        --line-height: 1.5;
+        --heading-line-height: 1.2;
+        --heading-font-weight: 700;
+    }
 }
 
-
 @layer base {
-    h1, h2, h3, h4, h5, h6, .display, .headline, .title {
+    body {
         font-family: var(--font-family), sans-serif;
-        font-size: var(--font-size);
+        font-size: var(--base-font-size);
+        line-height: var(--line-height);
+        color: var(--on-background-color);
+    }
+
+    :where(h1, h2, h3, h4, h5, h6),
+    .display,
+    .headline,
+    .title,
+    .displayLg,
+    .displayMd,
+    .displaySm,
+    .headlineLg,
+    .headlineMd,
+    .headlineSm,
+    .titleLg,
+    .titleMd,
+    .titleSm,
+    .headingXl,
+    .headingLg,
+    .headingMd,
+    .headingSm,
+    .headingXs,
+    .headingXxs {
+        font-family: var(--font-family), sans-serif;
         line-height: var(--heading-line-height);
         font-weight: var(--heading-font-weight);
     }
 
-    .large {
-        --font-size-multiplier: var(--font-size-multiplier-magnitude);
-    }
-
-    .medium {
-        --font-size-multiplier: 1;
-    }
-
-    .small {
-        --font-size-multiplier: var(--font-size-multiplier-magnitude);
-    }
-
-    body {
+    .body,
+    .label,
+    .bodyLg,
+    .bodyMd,
+    .bodySm,
+    .labelLg,
+    .labelMd,
+    .labelSm {
         font-family: var(--font-family), sans-serif;
-        font-size: 16px;
-        line-height: 1.5;
-        color: var(--on-background);
+        line-height: var(--line-height);
+    }
+
+    /*noinspection CssInvalidHtmlTagReference*/
+    :where(
+        h1, h2, h3, h4, h5, h6,
+        p, li, dt, dd, small, figcaption, caption, time, legend, label,
+        button,
+        input[type=button], input[type=submit], input[type=reset], input[type=image],
+        input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+        textarea, select, input-shell,
+        [role="button"]:not(article), [role="tab"], [role="menuitem"],
+        nav, nav a, nav li,
+        article > section, article > footer,
+        section > footer, dialog > footer, form > footer, blockquote > footer,
+        form-field > output,
+        empty-state.empty
+    ),
+    .display, .headline, .title, .body, .label {
+        font-size: calc(var(--font-size, var(--base-font-size)) * var(--font-size-multiplier, 1));
     }
 
     hr {
         --hr-color: oklab(from currentColor 70% a b / 0.5);
+
         height: 1px;
         color: var(--hr-color);
         background: var(--hr-color);
-        font-size: 0;
         border: 0;
+        font-size: 0;
+    }
+
+    code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
     }
 }
 
 @layer elements {
-    h2, .displayLg {
-        font-size: 3rem;
-        line-height: 1.2;
-        font-weight: 700;
-    }
-    h1, .display {
-        font-size: 2.5rem;
-        line-height: 1.2;
-        font-weight: 700;
-    }
-    .displaySm {
-        font-size: 2rem;
-        line-height: 1.2;
-    }
-    h4, .headlineLg {
-        font-size: 2rem;
-        line-height: 1.2;
-        font-weight: 700;
-    }
-    h5, .headline {
-        font-size: 1.75rem;
-        line-height: 1.2;
-    }
+    @scope (body) to (.notMinimal) {
+        :where(
+            h1, h2,
+            main > hgroup > h1, main > hgroup > h2,
+            body > header h1, body > header h2,
+            [role="banner"] h1, [role="banner"] h2
+        ),
+        .display {
+            --font-size: 2.5rem;
+            line-height: 1.2;
+            font-weight: 700;
+        }
 
-    .headline.variant {
-        font-size: 1rem;
-        line-height: 1.2;
-        text-transform: uppercase;
-        font-weight: 700;
-        opacity: 0.7;
+        :where(
+            h3, h4, h5,
+            section > h1, section > h2, section > h3,
+            section > h4, section > h5, section > h6,
+            section > hgroup > h1, section > hgroup > h2,
+            section > hgroup > h3, section > hgroup > h4,
+            section > hgroup > h5, section > hgroup > h6
+        ),
+        .headline {
+            --font-size: 1.75rem;
+            line-height: 1.2;
+            font-weight: 700;
+        }
 
-    }
+        :where(
+            h6,
+            article > h1, article > h2, article > h3,
+            article > h4, article > h5, article > h6,
+            article > hgroup > h1, article > hgroup > h2,
+            article > hgroup > h3, article > hgroup > h4,
+            article > hgroup > h5, article > hgroup > h6,
+            dialog > h1, dialog > h2, dialog > h3,
+            dialog > h4, dialog > h5, dialog > h6,
+            dialog > hgroup > h1, dialog > hgroup > h2,
+            dialog > hgroup > h3, dialog > hgroup > h4,
+            dialog > hgroup > h5, dialog > hgroup > h6,
+            nav.top h1, nav.top h2, nav.top h3,
+            nav.top h4, nav.top h5, nav.top h6,
+            empty-state.empty > h1, empty-state.empty > h2,
+            empty-state.empty > h3, empty-state.empty > h4,
+            empty-state.empty > h5, empty-state.empty > h6,
+            empty-state.empty > hgroup > h1, empty-state.empty > hgroup > h2,
+            empty-state.empty > hgroup > h3, empty-state.empty > hgroup > h4,
+            empty-state.empty > hgroup > h5, empty-state.empty > hgroup > h6
+        ),
+        .title {
+            --font-size: 1.125rem;
+            line-height: 1.2;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
 
-    h6, .headlineSm {
-        font-size: 1.5rem;
-    }
+        :where(
+            p, dt, dd,
+            article > p, article > section,
+            article > section > p,
+            section > p,
+            ul > *, ol > *,
+            blockquote,
+            input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+            textarea, select, input-shell,
+            empty-state.empty,
+            empty-state > p
+        ),
+        .body {
+            --font-size: 0.875rem;
+            line-height: 1.5;
+        }
 
+        /*noinspection CssInvalidHtmlTagReference*/
+        :where(
+            button,
+            input[type=button], input[type=submit], input[type=reset], input[type=image],
+            [role="button"]:not(article),
+            [role="tab"], ul[role="tablist"] > li,
+            ul.chips > li,
+            nav, nav a, nav li,
+            ul.nav > li,
+            ul.menu > li, ul[role="menu"] > li,
+            ul.menu > [role="menuitem"], ul[role="menu"] > [role="menuitem"],
+            label, form-field > label, fieldset > legend
+        ),
+        .label {
+            --font-size: 0.875rem;
+            line-height: 1.5;
+            font-weight: 700;
+        }
 
-    .titleLg {
-        font-size: 1.25rem;
-        font-weight: 700;
-        line-height: 1.2;
-    }
-    :where(article > hgroup, article > h3), .title {
-        font-size: 1.125rem;
-        font-weight: 700;
-        line-height: 1.2;
-        color: var(--accent-color);
-    }
-    .titleSm {
-        font-size: 1rem;
-    }
-    .bodyLg {
-        font-size: 1rem;
-    }
-    :where(ul > *), .body {
-        font-size: 0.875rem;
-    }
-    .bodySm {
-        font-size: 0.75rem;
-    }
+        :where(
+            main > hgroup > p,
+            body > header hgroup > p,
+            [role="banner"] hgroup > p
+        ),
+        .display.variant {
+            --font-size: 1rem;
+            color: oklab(from currentColor l a b / 0.7);
+            font-weight: 500;
+        }
 
-    .labelLg, .label, .labelSm {
-        font-weight: 700;
-        opacity: 0.5;
-    }
+        :where(
+            section > hgroup > p,
+            section > header > p
+        ),
+        .headline.variant {
+            --font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: oklab(from currentColor l a b / 0.8);
+            font-weight: 700;
+            opacity: 0.85;
+        }
 
-    .labelLg {
-        font-size: 0.875rem;
-    }
-    .label {
-        font-size: 0.75rem;
-    }
-    .labelSm {
-        font-size: 0.625rem;
-    }
+        :where(
+            article > hgroup > p,
+            article > header > p,
+            dialog > hgroup > p,
+            dialog > header > p,
+            empty-state.empty > hgroup > p
+        ),
+        .title.variant {
+            --font-size: 0.875rem;
+            color: oklab(from currentColor l a b / 0.7);
+            font-weight: 500;
+        }
 
-    .headingXl {
-        font-size: 2.5rem;
-        line-height: 1.2;
-        font-weight: 700;
-    }
+        :where(
+            article > footer,
+            section > footer,
+            dialog > footer,
+            form > footer,
+            blockquote > footer
+        ),
+        .body.variant {
+            --font-size: 0.75rem;
+            color: oklab(from currentColor l a b / 0.7);
+        }
 
-    h2, .headingLg {
-        font-size: 2rem;
-        line-height: 1.2;
-        font-weight: 700;
-    }
+        :where(
+            small, figcaption, caption, time,
+            nav[aria-label="Breadcrumb"],
+            nav[aria-label="Breadcrumb"] > ol,
+            nav[aria-label="Breadcrumb"] > ol > li,
+            nav[aria-label="Breadcrumb"] a,
+            form-field > output
+        ),
+        .label.variant {
+            --font-size: 0.75rem;
+            color: oklab(from currentColor l a b / 0.65);
+            font-weight: 700;
+            opacity: 0.75;
+        }
 
-    h3, .headingMd {
-        font-size: 1.75rem;
-        line-height: 1.2;
-        font-weight: 700;
-    }
+        :where(
+            h1, h3, h6,
+            main > hgroup > h1,
+            body > header h1,
+            [role="banner"] h1,
+            section > h1, section > hgroup > h1,
+            empty-state.empty > h1, empty-state.empty > hgroup > h1
+        ), .large {
+            --font-size-multiplier: 1.2;
+        }
 
-    h1, h4, .headingSm {
-        font-size: 1.5rem;
-        line-height: 1.2;
-        font-weight: 700;
-    }
+        :where(
+            h2, h4,
+            button,
+            input[type=button], input[type=submit], input[type=reset], input[type=image],
+            [role="button"]:not(article),
+            [role="tab"], ul[role="tablist"] > li,
+            nav:not([aria-label="Breadcrumb"]), nav:not([aria-label="Breadcrumb"]) a,
+            article > h1, article > h2, article > h3,
+            article > h4, article > h5, article > h6,
+            article > hgroup > h1, article > hgroup > h2,
+            article > hgroup > h3, article > hgroup > h4,
+            article > hgroup > h5, article > hgroup > h6,
+            dialog > h1, dialog > h2, dialog > h3,
+            dialog > h4, dialog > h5, dialog > h6,
+            dialog > hgroup > h1, dialog > hgroup > h2,
+            dialog > hgroup > h3, dialog > hgroup > h4,
+            dialog > hgroup > h5, dialog > hgroup > h6,
+            input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+            textarea, select, input-shell
+        ), .medium {
+            --font-size-multiplier: 1;
+        }
 
-    h5, .headingXs {
-        font-size: 1.25rem;
-        line-height: 1.2;
-        font-weight: 700;
-    }
+        :where(
+            h5,
+            small, figcaption, caption, time,
+            main > hgroup > p,
+            body > header hgroup > p,
+            [role="banner"] hgroup > p,
+            section > hgroup > p,
+            section > header > p,
+            article > hgroup > p,
+            article > header > p,
+            dialog > hgroup > p,
+            dialog > header > p,
+            empty-state.empty > hgroup > p,
+            ul.chips > li,
+            nav[aria-label="Breadcrumb"],
+            nav[aria-label="Breadcrumb"] > ol,
+            nav[aria-label="Breadcrumb"] > ol > li,
+            nav[aria-label="Breadcrumb"] a,
+            form-field > label,
+            form-field > output,
+            fieldset > legend
+        ), .small {
+            --font-size-multiplier: 0.85;
+        }
 
-    h6, .headingXxs {
-        font-size: 1rem;
-        line-height: 1.2;
-        font-weight: 700;
-    }
+        /* Compatibility aliases for existing theme-builder markup. Prefer the
+         * role + size API above for new LINS style authoring UI.
+         */
+        .displayLg { font-size: 3rem; line-height: 1.2; font-weight: 700; }
+        .displayMd { font-size: 2.5rem; line-height: 1.2; font-weight: 700; }
+        .displaySm { font-size: 2rem; line-height: 1.2; font-weight: 700; }
 
-    h2, h3, h4, h5, h6 {
-        &.sectionHeading, section > &, section > hgroup > & {
+        .headlineLg { font-size: 2rem; line-height: 1.2; font-weight: 700; }
+        .headlineMd { font-size: 1.75rem; line-height: 1.2; font-weight: 700; }
+        .headlineSm { font-size: 1.5rem; line-height: 1.2; font-weight: 700; }
+
+        .titleLg { font-size: 1.25rem; line-height: 1.2; font-weight: 700; }
+        .titleMd { font-size: 1.125rem; line-height: 1.2; font-weight: 700; }
+        .titleSm { font-size: 1rem; line-height: 1.2; font-weight: 700; }
+
+        .bodyLg { font-size: 1rem; }
+        .bodyMd { font-size: 0.875rem; }
+        .bodySm { font-size: 0.75rem; }
+
+        .labelLg { font-size: 0.875rem; }
+        .labelMd { font-size: 0.75rem; }
+        .labelSm { font-size: 0.625rem; }
+
+        .labelLg,
+        .labelMd,
+        .labelSm {
+            font-weight: 700;
+            opacity: 0.65;
+        }
+
+        .label {
+            font-weight: 700;
+        }
+
+        .headingXl { font-size: 2.5rem; line-height: 1.2; font-weight: 700; }
+        .headingLg { font-size: 2rem; line-height: 1.2; font-weight: 700; }
+        .headingMd { font-size: 1.75rem; line-height: 1.2; font-weight: 700; }
+        .headingSm { font-size: 1.5rem; line-height: 1.2; font-weight: 700; }
+        .headingXs { font-size: 1.25rem; line-height: 1.2; font-weight: 700; }
+        .headingXxs { font-size: 1rem; line-height: 1.2; font-weight: 700; }
+
+        .sectionHeading {
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -169,36 +360,32 @@
             font-weight: 700;
         }
 
-        &.cardHeading, article > &, article > hgroup > & {
+        .cardHeading {
             font-size: 1.25rem;
             line-height: 1.2;
             font-weight: 700;
         }
-    }
 
-    section > hgroup {
-        font-size: 0.9rem;
-        padding-bottom: 0.5rem;
-
-        & > * {
-            line-height: 1rem;
+        section > hgroup {
+            padding-bottom: 0.5rem;
         }
-    }
 
-    hgroup > code {
-        font-size: 0.875rem;
-    }
-
-    code {
-        border-radius: 6px;
-        padding: 0.25rem;
-
-        &:focus-within {
-            outline: color-mix(in oklab, currentColor 25%, var(--surface-color)) 2px solid;
+        hgroup > code {
+            font-size: 0.875rem;
         }
-    }
 
-    li {
-        list-style-type: none;
+        code {
+            border-radius: 6px;
+            padding: 0.25rem;
+            background: color-mix(in oklab, currentColor 8%, transparent);
+
+            &:focus-within {
+                outline: color-mix(in oklab, currentColor 25%, var(--surface-color)) 2px solid;
+            }
+        }
+
+        li {
+            list-style-type: none;
+        }
     }
 }

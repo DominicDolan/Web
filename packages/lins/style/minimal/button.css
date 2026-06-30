@@ -1,8 +1,8 @@
 
 @layer base {
     button, input[type=button], input[type=submit], input[type=reset], input[type=image] {
-        --active-color: var(--primary-color);
-        --on-active-color: var(--on-primary-color);
+        --current-color: var(--active-color, var(--primary-color));
+        --on-current-color: var(--on-active-color, var(--on-primary-color));
 
         display: inline-block;
         font-weight: 500;
@@ -13,11 +13,12 @@
         padding: 0.5rem 0.9rem;
         line-height: 1.5;
         border-radius: 0.375rem;
-        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.2s ease;
+        transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.2s ease, outline-color 0.15s ease-in-out;
         cursor: pointer;
         background: transparent;
 
-        &:disabled {
+        &:disabled,
+        &[disabled] {
             opacity: 0.6;
             cursor: not-allowed;
         }
@@ -28,7 +29,7 @@
         text-decoration: none;
     }
 
-    [role=button] {
+     [role="button"] {
         cursor: pointer;
     }
 }
@@ -44,7 +45,6 @@
             }
 
             :where(&), &.outlined {
-                --current-color: var(--active-color, var(--primary-color));
                 color: var(--current-color);
 
                 --outline-color: oklab(from var(--current-color) 70% a b);
@@ -52,10 +52,12 @@
                 border: 1px solid var(--outline-color);
                 box-shadow: none;
 
-                &:hover {
+                &:hover:not(:disabled):not([disabled]) {
                     background-color: color-mix(in oklab, var(--current-color) 15%, transparent);
                 }
 
+                &[aria-pressed="true"],
+                &[aria-selected="true"],
                 &.active {
                     background-color: oklab(from var(--current-color) 80% a b);
                     --outline-color: oklab(from var(--current-color) 60% a b);
@@ -63,8 +65,6 @@
             }
 
             &.flat, &.elevated {
-                --current-color: var(--active-color, var(--primary-color));
-                --on-current-color: var(--on-active-color, var(--on-primary-color));
                 color: var(--on-current-color);
                 background: var(--current-color);
                 border: none;
@@ -78,7 +78,7 @@
                 box-shadow: none;
                 --outline-color: oklab(from var(--current-color) 80% a b);
                 border: 1px solid var(--outline-color);
-                &:hover, &:focus-visible {
+                &:hover:not(:disabled):not([disabled]), &:focus-visible {
                     background: color-mix(in oklab, var(--on-current-color) 15%, var(--current-color));
                 }
             }
@@ -88,7 +88,7 @@
                         0 4px 6px -1px var(--shadow-color),
                         0 2px 3px -1px var(--shadow-color);
 
-                &:hover, &:focus-visible {
+                &:hover:not(:disabled):not([disabled]), &:focus-visible {
                     box-shadow:
                             0 8px 12px -1px var(--shadow-color),
                             0 4px 6px -1px var(--shadow-color);
@@ -101,28 +101,24 @@
             }
 
             &.text {
-                --current-color: var(--active-color, var(--primary-color));
-                --on-current-color: var(--on-active-color, var(--on-primary-color));
                 color: var(--current-color);
                 background-color: transparent;
                 border: none;
                 box-shadow: none;
 
-                &:hover {
+                &:hover:not(:disabled):not([disabled]) {
                     background-color: color-mix(in oklab, var(--current-color) 15%, transparent);
                 }
             }
 
             &.plain {
-                --current-color: var(--active-color, var(--primary-color));
-                --on-current-color: var(--on-active-color, var(--on-primary-color));
                 color: oklab(from var(--current-color) l a b / 0.6);
                 background-color: transparent;
                 border: none;
                 box-shadow: none;
                 transition: color 0.15s ease-in-out;
 
-                &:hover {
+                &:hover:not(:disabled):not([disabled]) {
                     background-color: transparent;
                     color: var(--current-color);
                 }
@@ -134,7 +130,10 @@
             }
         }
 
-        [role=radiogroup] {
+        [role="radiogroup"] {
+            display: inline-flex;
+            gap: 0;
+
             button:first-child {
                 border-top-left-radius: 0.375rem;
                 border-bottom-left-radius: 0.375rem;
@@ -149,12 +148,26 @@
                 border-bottom-right-radius: 0.375rem;
             }
 
+            button[aria-checked="true"],
+            button[aria-selected="true"],
             button.active {
                 background-color: oklab(from var(--current-color) l a b / 0.2);
             }
         }
-        [role=radiogroup] button {
+        [role="radiogroup"] button {
             border-radius: 0;
+        }
+
+        a {
+            &[aria-current="page"],
+            &.active {
+                font-weight: 700;
+            }
+
+            &:hover,
+            &:focus-visible {
+                color: var(--active-color, var(--accent-color));
+            }
         }
     }
 }

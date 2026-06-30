@@ -1,6 +1,10 @@
+/*
+ * Overlay elements: Popover Menu and Dialog.
+ */
 
 @layer base {
-    [popover][role="menu"], [popover].menu {
+    [popover][role="menu"],
+    [popover].menu {
         position: fixed;
         margin: 0;
         border: none;
@@ -11,7 +15,43 @@
     }
 
     dialog {
-        background: transparent;
-    }
+        --current-color: var(--active-color, var(--surface-color));
+        --on-current-color: var(--on-active-color, var(--on-surface-color));
 
+        border: none;
+        background: transparent;
+        color: inherit;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notMinimal) {
+        [popover][role="menu"],
+        [popover].menu {
+            border-radius: 0.5rem;
+            background-color: var(--surface-color);
+            color: var(--on-surface-color);
+            box-shadow:
+                0 8px 12px -1px var(--shadow-color),
+                0 4px 6px -1px var(--shadow-color);
+        }
+
+        dialog {
+            border-radius: 1rem;
+            background-color: var(--current-color);
+            color: var(--on-current-color);
+            box-shadow:
+                0 16px 24px -6px var(--shadow-color),
+                0 8px 12px -4px var(--shadow-color);
+        }
+
+        dialog::backdrop {
+            background: oklab(from black l a b / 0.35);
+        }
+
+        dialog > footer,
+        form > footer {
+            color: oklab(from currentColor l a b / 0.75);
+        }
+    }
 }

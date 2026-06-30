@@ -1,13 +1,20 @@
 
 
 @layer base {
-    ul {
-        --active-color: var(--primary-color);
-        --on-active-color: var(--on-primary-color);
-
+    ul,
+    ol {
         --current-color: var(--active-color, var(--primary-color));
         --on-current-color: var(--on-active-color, var(--on-primary-color));
         padding: 0;
+    }
+
+    ul[role="tablist"],
+    ul[role="menu"],
+    ul.menu,
+    ul.nav,
+    ul.plain,
+    ul.chips {
+        list-style: none;
     }
 }
 
@@ -32,7 +39,12 @@
 
                 border: none;
 
-                &.active, &:has(.active) {
+                &[aria-current="page"],
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-current="page"]),
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
                     background: var(--current-color);
                     color: var(--on-current-color);
                 }
@@ -61,7 +73,12 @@
                 }
 
 
-                &.active, &:has(.active) {
+                &[aria-current="page"],
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-current="page"]),
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
                     --background-color: white;
                     border-left-color: var(--accent-color);
                     background: var(--background-color);
@@ -92,10 +109,18 @@
                 padding: 0.8rem 0.9rem;
             }
 
-            & > * {
+            & > li,
+            & > [role="menuitem"] {
                 display: block;
                 padding: 0.8rem 0.9rem;
                 cursor: pointer;
+
+                &:hover,
+                &[aria-selected="true"],
+                &[aria-current="page"],
+                &.active {
+                    background: color-mix(in oklab, var(--current-color) 10%, transparent);
+                }
             }
 
             &:hover {
@@ -116,7 +141,10 @@
                 cursor: pointer;
                 transition: color 0.15s ease-in-out;
 
-                &.active, &:has(.active) {
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
                     color: var(--current-color);
                     anchor-name: --active;
                 }
@@ -180,7 +208,10 @@
                 padding-inline: 0.6rem;
                 padding-block: 0.4rem;
                 cursor: pointer;
-                &.active, &:has(.active) {
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
                     color: var(--current-color);
                     anchor-name: --active;
                 }

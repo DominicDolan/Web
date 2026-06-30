@@ -3,7 +3,7 @@ import {Match, Show, Switch} from "solid-js";
 import {Navigate, useLocation} from "@web/router";
 import ContactUs from "~/app/contact/ContactUs/ContactUs";
 import {ThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
-import {TypefaceRole, typefaceRoles, TypefaceSize, typefaceSizes, TypefaceType} from "~/constants/TypefaceRoles";
+import {TypefaceRole, typefaceRoles, TypefaceType} from "~/constants/TypefaceRoles";
 import {ColorScope} from "~/app/colors/ColorEditor/ColorScope.ts";
 import {ColorEditor} from "~/app/colors/ColorEditor/ColorEditor.tsx";
 import {TypefaceEditor} from "~/app/typography/TypefaceEditor/TypefaceEditor.tsx";
