@@ -21,7 +21,7 @@ export async function getTypefaceDeltas(themeId: string) {
         .execute() as ModelDelta<TypefaceDefinition>[]
 }
 
-export async function getSingleTypefaceDeltas(themeId: string, role: TypefaceRole, size: TypefaceSize, type: TypefaceType) {
+export async function getSingleTypefaceDeltas(themeId: string, role: TypefaceRole, type: TypefaceType) {
     const db = useDatabaseTable(typefaceDefinitionSchema)
 
     const result = await db.getMany()
@@ -30,16 +30,17 @@ export async function getSingleTypefaceDeltas(themeId: string, role: TypefaceRol
 
     const grouped = groupBy(result, "id")
 
+    const deltas: ModelDelta<TypefaceDefinition>[] = []
     for (const id in grouped) {
-        const deltas = grouped[id]
-        const model = createModel(deltas)
+        const singleDeltas = grouped[id]
+        const model = createModel(singleDeltas)
 
-        if (model != undefined && model.role === role && model.size === size && model.type === type) {
-            return deltas
+        if (model != undefined && model.role === role && model.type === type) {
+            deltas.push(...singleDeltas)
         }
     }
 
-    return []
+    return deltas
 }
 
 export async function saveTypeface(typefaceDeltas: ModelDelta<TypefaceDefinition>[], themeId: string) {

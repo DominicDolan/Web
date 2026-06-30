@@ -1,9 +1,8 @@
-import {Accessor, type JSX} from "solid-js";
+import {Accessor} from "solid-js";
 import {ButtonRowField} from "~/app/typography/TypefaceEditor/TypefacePropertyButtonGroup";
 
 export type TextPropertyKey =
     | "font-family"
-    | "font-size"
     | "font-weight"
     | "line-height"
     | "letter-spacing"
@@ -14,7 +13,7 @@ export type TextPropertyKey =
 
 type PropertyConfig = {
     key: TextPropertyKey;
-    component: (props: {onInput: (value: string) => void, value: Accessor<string> }) => JSX.Element;
+    component: (props: {onInput: (value: string) => void, value: Accessor<string> }) => any;
 };
 
 export const propertyFields: PropertyConfig[] = [
@@ -28,22 +27,6 @@ export const propertyFields: PropertyConfig[] = [
                         id="fontFamily"
                         type="text"
                         placeholder="Roboto Flex, sans-serif"
-                        value={value()}
-                        onInput={(event) => onInput(event.currentTarget.value)}/>
-                </input-shell>
-            </form-field>
-        }
-    },
-    {
-        key: "font-size",
-        component({onInput, value}) {
-            return <form-field class="flex flex-col gap-2">
-                <label for="fontSize">Font Size</label>
-                <input-shell class="flex gap-2 h-full p-2">
-                    <input
-                        id="fontSize"
-                        type="text"
-                        placeholder="16px"
                         value={value()}
                         onInput={(event) => onInput(event.currentTarget.value)}/>
                 </input-shell>

@@ -13,10 +13,13 @@ export const useTypefaceListScope = defineScope(ThemeScope, (props) => {
 
     const [typefaces] = createModels(typefaceDeltas)
 
-    function getCssOrDefault(role: TypefaceRole, type: TypefaceType, size: TypefaceSize) {
-        const typeface = typefaces.find(t => t.role === role && t.type === type && t.size === size)
+    function getCssOrDefault(role: TypefaceRole, type: TypefaceType) {
+        const typeface = typefaces.find(t => t.role === role && t.type === type)
 
-        return typeface?.css ?? defaultTypefacesQueryObject[role][type][size].css
+        const mainCss = typeface?.css ?? defaultTypefacesQueryObject[role][type].css
+        const sizeCss = typeface?.mediumCss ?? defaultTypefacesQueryObject[role][type].mediumCss
+
+        return `${mainCss} ${sizeCss}`
     }
 
     return {

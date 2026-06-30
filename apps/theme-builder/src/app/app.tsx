@@ -18,10 +18,9 @@ export default function App() {
     function matchesTypographyPath() {
         const segments = location.segments()
         const hasRole = segments[3] != null && typefaceRoles.includes(segments[3].toLowerCase() as any)
-        const hasSize = segments[4] != null && typefaceSizes.includes(segments[4].toLowerCase() as any)
-        const hasType = segments[5] == null || segments[5] === "variant" || segments[5] === "default"
+        const hasType = segments[4] != null && (segments[4] === "variant" || segments[4] === "default")
 
-        return segments[0] === "editor" && segments[2] === "typography" && hasRole && hasSize && hasType;
+        return segments[0] === "editor" && segments[2] === "typography" && hasRole && hasType;
     }
 
     const categories = elementCategories.map(category => category.type)
@@ -42,7 +41,6 @@ export default function App() {
                     <TypefaceScope
                         themeId={location.segments()[1]}
                         role={location.segments()[3] as TypefaceRole}
-                        size={location.segments()[4] as TypefaceSize}
                         type={location.segments()[5] == null ? "default" : location.segments()[5] as TypefaceType}>
                         <TypefaceEditor/>
                     </TypefaceScope>
