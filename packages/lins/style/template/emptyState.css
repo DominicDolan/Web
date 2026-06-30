@@ -1,0 +1,78 @@
+/*
+ * Placeholder elements: Empty State and Skeleton.
+ *
+ * Category selectors:
+ *   - empty-state
+ *   - empty-state.skeleton
+ *   - empty-state.empty
+ *
+ * State hook:
+ *   - [aria-busy] for loading skeletons
+ */
+
+@keyframes template-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@layer base {
+    /*noinspection CssInvalidHtmlTagReference*/
+    empty-state {
+        display: block;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notTemplate) {
+        /*noinspection CssInvalidHtmlTagReference*/
+        empty-state.skeleton *:not(:has(> *)) {
+            pointer-events: none;
+            user-select: none;
+            border-radius: 0.25rem;
+
+            /* TODO: skeleton block colour. */
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        empty-state.skeleton[aria-busy] *:not(:has(> *)) {
+            /*
+             * Example animated skeleton pattern. Tune colours to your palette
+             * or remove animation for a quieter theme.
+             */
+            animation: template-shimmer 1.4s linear infinite;
+            background-size: 200% 100%;
+            /* background-image: linear-gradient(90deg, ...); */
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        empty-state.skeleton:not([aria-busy]) *:not(:has(> *)) {
+            /* TODO: non-busy placeholder style. */
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        empty-state.empty {
+            --current-color: var(--active-color, var(--surface-color));
+            --on-current-color: var(--on-active-color, var(--on-surface-color));
+
+            isolation: isolate;
+            position: relative;
+
+            /* TODO: empty-content surface/illustration style. */
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        empty-state.empty::after {
+            /*
+             * Optional decorative outline/illustration. Decorative absolute
+             * pseudo-elements are allowed; do not use this to place content.
+             */
+        }
+    }
+}
+
+

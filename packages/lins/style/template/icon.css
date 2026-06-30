@@ -1,0 +1,62 @@
+/*
+ * Icon elements.
+ *
+ * Category selector:
+ *   - i
+ *
+ * The minimal theme uses Material Symbols. This template does not import a
+ * remote font by default because icon families are theme/product decisions.
+ * If your theme standardises on a font, add @font-face here or import it from
+ * your app.
+ */
+
+/*
+@font-face {
+    font-family: "Your Icon Font";
+    font-style: normal;
+    font-weight: 100 700;
+    src: url("...") format("woff2");
+}
+*/
+
+@layer base {
+    i {
+        /* TODO: set the icon font-family used by this theme. */
+        /* font-family: "Your Icon Font", sans-serif; */
+
+        font-weight: normal;
+        font-style: normal;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        font-feature-settings: "liga";
+        -webkit-font-smoothing: antialiased;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notTemplate) {
+        i,
+        i.medium {
+            font-size: 1.3em;
+        }
+
+        i.large {
+            font-size: 1.5em;
+        }
+
+        i.xlarge {
+            font-size: 2em;
+        }
+
+        i.small {
+            font-size: 1em;
+        }
+    }
+}
+
+

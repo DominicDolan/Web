@@ -1,0 +1,185 @@
+@import "../reset.css";
+@import "./button.css";
+@import "./text.css";
+@import "./card.css";
+@import "./input.css";
+@import "./list.css";
+@import "./icon.css";
+@import "./popover.css";
+@import "./emptyState.css";
+@import "./nav.css";
+
+/*
+ * LINS theme template entrypoint.
+ *
+ * Copy this folder when starting a new theme, then rename:
+ *   - the folder:         style/template -> style/<your-theme>
+ *   - the root class:     .templateTheme -> .<yourTheme>Theme
+ *   - the opt-out class:  .notTemplate -> .not<YourTheme>
+ *
+ * This file owns the palette and cross-element role classes. Individual
+ * element files own how buttons, cards, inputs, lists, etc. use those tokens.
+ *
+ * LINS rule of thumb:
+ *   palette token -> role token -> element token -> actual CSS property
+ *
+ * Example:
+ *   --primary-color      defined on .templateTheme.light
+ *   --active-color       set by .primary
+ *   --current-color      resolved by button/article/input/etc.
+ *   background/color     applied inside that element's variant rules
+ */
+
+@layer defaults {
+	/*
+	 * Palette tokens.
+	 *
+	 * Keep these semantic rather than component-specific. A button does not
+	 * read --button-background directly; it reads --current-color, which may
+	 * resolve to one of these palette roles through the .primary/.accent/etc.
+	 * classes below.
+	 *
+	 * Each colour role has a matching "on" colour for readable foreground text
+	 * or icons placed on that role. For example, --on-primary-color should be
+	 * legible on --primary-color.
+	 */
+	.templateTheme.light {
+		/*
+		--primary-color: ...;
+		--on-primary-color: ...;
+
+		--secondary-color: ...;
+		--on-secondary-color: ...;
+
+		--surface-color: ...;
+		--on-surface-color: ...;
+
+		--background-color: ...;
+		--on-background-color: ...;
+
+		--accent-color: ...;
+		--on-accent-color: ...;
+
+		--success-color: ...;
+		--on-success-color: ...;
+
+		--warning-color: ...;
+		--on-warning-color: ...;
+
+		--error-color: ...;
+		--on-error-color: ...;
+
+		One shadow token keeps elevation parametric across the whole theme.
+		--shadow-color: ...;
+
+		color-scheme: light;
+		*/
+	}
+
+	/*
+	 * Optional dark palette.
+	 * Fill this in when your theme supports dark mode. Keep the same token
+	 * names so every element file continues to work unchanged.
+	 */
+	.templateTheme.dark {
+		/*
+		--primary-color: ...;
+		--on-primary-color: ...;
+		--surface-color: ...;
+		--on-surface-color: ...;
+		--background-color: ...;
+		--on-background-color: ...;
+		--shadow-color: ...;
+		color-scheme: dark;
+		*/
+	}
+
+	/*
+	 * Colour-role classes.
+	 *
+	 * These classes do not style an element directly. They translate the palette
+	 * tokens above into --active-color/--on-active-color. Element files then
+	 * resolve --current-color with a fallback that makes sense for that category.
+	 *
+	 * Keep these mappings in sync with the palette. If a theme renames, removes,
+	 * or adds palette roles, update the matching role classes here too. For
+	 * example, .primary should map to --primary-color and --on-primary-color;
+	 * .accent should map to --accent-color and --on-accent-color.
+	 *
+	 * You may add theme-specific role classes, but keep their names semantic
+	 * rather than component-specific. For example, .info is a reasonable colour
+	 * role; .saveButton is not.
+	 *
+	 * Example markup:
+	 *   <button class="accent elevated">Save</button>
+	 *   <article class="warning outlined">Quota almost full</article>
+	 */
+	.primary {
+		--active-color: var(--primary-color);
+		--on-active-color: var(--on-primary-color);
+	}
+
+	.secondary {
+		--active-color: var(--secondary-color);
+		--on-active-color: var(--on-secondary-color);
+	}
+
+	.accent {
+		--active-color: var(--accent-color);
+		--on-active-color: var(--on-accent-color);
+	}
+
+	.success {
+		--active-color: var(--success-color);
+		--on-active-color: var(--on-success-color);
+	}
+
+	.warning {
+		--active-color: var(--warning-color);
+		--on-active-color: var(--on-warning-color);
+	}
+
+	.error {
+		--active-color: var(--error-color);
+		--on-active-color: var(--on-error-color);
+	}
+
+	.surface {
+		--active-color: var(--surface-color);
+		--on-active-color: var(--on-surface-color);
+	}
+
+	.background {
+		--active-color: var(--background-color);
+		--on-active-color: var(--on-background-color);
+	}
+
+	/*
+	 * Document/application defaults.
+	 * Keep these broad rules sparse: this is where a theme establishes the
+	 * page surface and foreground colour, not where it lays out the app.
+	 */
+	html,
+	body,
+	#app,
+	.templateTheme {
+		background: var(--background-color);
+		color: var(--on-background-color);
+	}
+
+	/*
+	 * Optional app-specific hooks.
+	 * The minimal theme styles .pageNav and .themeSettings because the demo
+	 * app uses them. If your theme needs those hooks, uncomment/fill them here;
+	 * otherwise prefer element categories such as nav.pageNav in nav.css.
+	 */
+	/*
+	#app .pageNav,
+	#app {
+		color: var(--on-surface-color);
+		border-right: 1px solid color-mix(in oklab, currentColor 15%, transparent);
+	}
+	*/
+}
+
+
