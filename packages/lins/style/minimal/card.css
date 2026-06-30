@@ -1,7 +1,7 @@
 
 
 @layer base {
-    article, .card {
+    article {
         border-radius: 1rem;
         background-repeat: no-repeat;
         padding: 1rem;
@@ -13,7 +13,7 @@
 }
 
 @layer elements {
-    article, .card {
+    article {
         transition: box-shadow 0.2s ease-in-out;
 
         :where(&), &.flat, &.elevated {

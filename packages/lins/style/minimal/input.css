@@ -12,7 +12,8 @@
         resize: block;
     }
 
-    input:not([type=radio]), textarea, select, input-shell, input-shell::part(default-control) {
+    input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+    textarea, select, input-shell, input-shell::part(default-control) {
         --current-color: var(--active-color, var(--primary-color));
         --on-current-color: var(--on-active-color, var(--on-primary-color));
 
@@ -80,7 +81,8 @@
     }
 
     @scope (body) to (.notMinimal) {
-        input:not([type=radio]):not([type=checkbox]):not([type=range]), textarea, select, input-shell {
+        input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+        textarea, select, input-shell {
             border-radius: 0.5rem;
 
             :where(&), &.flat {
