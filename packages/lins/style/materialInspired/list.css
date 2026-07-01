@@ -1,0 +1,265 @@
+/*
+ * List elements: List, Tab List, Menu List.
+ *
+ * Category selectors:
+ *   - ul, ol, li
+ *   - ul[role="tablist"] and its > li tabs
+ *   - ul[role="menu"], ul.menu
+ *   - list variants such as .nav, .plain, .chips, .underlined, .inset
+ *
+ * Note: ul and ul[role="tablist"] are different element categories even
+ * though they share a tag. Keep their rules separate.
+ */
+
+@layer base {
+    ul,
+    ol {
+        --current-color: var(--active-color, var(--primary-color));
+        --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+        padding: 0;
+    }
+
+    ul[role="tablist"],
+    ul[role="menu"],
+    ul.menu,
+    ul.nav,
+    ul.plain,
+    ul.chips {
+        list-style: none;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notMaterialInspired) {
+        ul,
+        ol {
+            color: var(--on-surface-color);
+        }
+
+        ul.nav {
+            > li {
+                border-radius: var(--md-shape-full);
+                color: var(--on-surface-variant-color);
+                transition:
+                    color 0.15s ease-in-out,
+                    background-color 0.15s ease-in-out;
+
+                &:not(:has(> *)) {
+                    padding: 0.625rem 1rem;
+                }
+
+                > * {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    padding: 0.625rem 1rem;
+                    border-radius: inherit;
+                    color: inherit;
+                    text-decoration: none;
+                }
+
+                &[aria-current="page"],
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-current="page"]),
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    color: var(--current-color);
+                    background-color: color-mix(in oklab, var(--current-color) 14%, transparent);
+                    font-weight: 600;
+                }
+
+                &:hover:not(.active):not(:has(.active)) {
+                    background-color: color-mix(in oklab, currentColor 8%, transparent);
+                }
+            }
+
+            &.tonal {
+                padding: 0.25rem;
+                border-radius: var(--md-shape-large);
+                background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-container-low-color));
+            }
+        }
+
+        ul.plain {
+            > li {
+                padding-block: 0.375rem;
+                color: var(--on-surface-color);
+                border-block-end: 1px solid color-mix(in oklab, var(--on-surface-color) 8%, transparent);
+            }
+
+            > li:last-child {
+                border-block-end-color: transparent;
+            }
+        }
+
+        ul.menu,
+        ul[role="menu"] {
+            min-inline-size: 7rem;
+            padding: 0.5rem 0;
+            color: var(--on-surface-color);
+            background-color: var(--surface-container-color);
+            border: 1px solid transparent;
+            border-radius: var(--menu-radius);
+            box-shadow: var(--elevation-2);
+
+            &.elevated {
+                background-color: var(--surface-container-high-color);
+                box-shadow: var(--elevation-3);
+            }
+
+            &.tonal {
+                background-color: color-mix(in oklab, var(--current-color) 10%, var(--surface-container-color));
+            }
+
+            > li,
+            > [role="menuitem"] {
+                cursor: pointer;
+                padding: 0.75rem 1rem;
+                color: var(--on-surface-color);
+                transition:
+                    color 0.15s ease-in-out,
+                    background-color 0.15s ease-in-out;
+            }
+
+            > li:hover,
+            > [role="menuitem"]:hover {
+                background-color: color-mix(in oklab, currentColor 8%, transparent);
+            }
+
+            > li[aria-selected="true"],
+            > li[aria-current="page"],
+            > li.active,
+            > [role="menuitem"][aria-selected="true"],
+            > [role="menuitem"].active {
+                color: var(--current-color);
+                background-color: color-mix(in oklab, var(--current-color) 12%, transparent);
+                font-weight: 600;
+            }
+        }
+
+        ul.chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+
+            > li {
+                --current-color: var(--active-color, var(--primary-color));
+                --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+                display: inline-flex;
+                align-items: center;
+                gap: 0.375rem;
+                min-block-size: 2rem;
+                padding: 0.375rem 0.75rem;
+                color: var(--on-surface-variant-color);
+                background: transparent;
+                border: 1px solid var(--outline-color);
+                border-radius: var(--md-shape-small);
+                transition:
+                    color 0.15s ease-in-out,
+                    background-color 0.15s ease-in-out,
+                    border-color 0.15s ease-in-out;
+            }
+
+            > li:hover {
+                background-color: color-mix(in oklab, currentColor 8%, transparent);
+            }
+
+            > li[aria-selected="true"],
+            > li.active {
+                color: var(--on-current-color);
+                background-color: var(--current-color);
+                border-color: var(--current-color);
+            }
+
+            &.tonal > li {
+                color: color-mix(in oklab, var(--current-color) 74%, var(--on-surface-color));
+                background-color: color-mix(in oklab, var(--current-color) 10%, var(--surface-container-low-color));
+                border-color: transparent;
+            }
+        }
+
+        ul[role="tablist"] {
+            display: flex;
+            color: var(--on-surface-variant-color);
+            border-block-end: 1px solid var(--outline-variant-color);
+
+            > li {
+                position: relative;
+                cursor: pointer;
+                min-block-size: 3rem;
+                padding: 0.875rem 1rem;
+                color: inherit;
+                border-radius: var(--md-shape-small) var(--md-shape-small) 0 0;
+                transition:
+                    color 0.15s ease-in-out,
+                    background-color 0.15s ease-in-out;
+
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    color: var(--current-color);
+                    font-weight: 600;
+                }
+
+                &[aria-selected="true"]::after,
+                &.active::after,
+                &:has(> [aria-selected="true"])::after,
+                &:has(> .active)::after {
+                    content: "";
+                    position: absolute;
+                    inset-inline: 1rem;
+                    inset-block-end: -1px;
+                    block-size: 3px;
+                    border-radius: 3px 3px 0 0;
+                    background-color: var(--current-color);
+                }
+
+                &:hover:not([aria-selected="true"]):not(.active):not(:has(.active)) {
+                    background-color: color-mix(in oklab, currentColor 8%, transparent);
+                }
+            }
+        }
+
+        ul[role="tablist"].underlined {
+            /* A plain tablist already uses the underlined MD3 primary tab treatment. */
+        }
+
+        ul[role="tablist"].inset,
+        ul[role="tablist"].tonal {
+            gap: 0.25rem;
+            padding: 0.25rem;
+            border-block-end: none;
+            border-radius: var(--md-shape-full);
+            background-color: var(--surface-container-high-color);
+
+            > li {
+                min-block-size: 2.5rem;
+                padding: 0.625rem 1rem;
+                border-radius: var(--md-shape-full);
+
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    color: var(--on-current-color);
+                    background-color: var(--current-color);
+                }
+
+                &[aria-selected="true"]::after,
+                &.active::after,
+                &:has(> [aria-selected="true"])::after,
+                &:has(> .active)::after {
+                    content: none;
+                }
+            }
+        }
+
+        ul[role="tablist"].tonal {
+            background-color: color-mix(in oklab, var(--current-color) 10%, var(--surface-container-color));
+        }
+    }
+}

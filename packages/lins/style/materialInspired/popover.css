@@ -1,0 +1,103 @@
+/*
+ * Overlay elements: Popover Menu and Dialog.
+ *
+ * Category selectors:
+ *   - [popover][role="menu"], [popover].menu
+ *   - dialog
+ *   - dialog > footer
+ *
+ * Popover positioning often comes from JS, anchor positioning, or markup
+ * utilities. Keep this file focused on the overlay surface, border, shadow,
+ * backdrop, and motion.
+ */
+
+@layer base {
+    [popover][role="menu"],
+    [popover].menu {
+        --current-color: var(--active-color, var(--primary-color));
+        --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+        position: fixed;
+        margin: 0;
+        border: none;
+
+        &::backdrop {
+            background: transparent;
+        }
+    }
+
+    dialog {
+        --current-color: var(--active-color, var(--surface-color));
+        --on-current-color: var(--on-active-color, var(--on-surface-color));
+
+        border: none;
+        background: transparent;
+        color: inherit;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notMaterialInspired) {
+        [popover][role="menu"],
+        [popover].menu {
+            padding: 0.5rem 0;
+            color: var(--on-surface-color);
+            background-color: var(--surface-container-color);
+            border: 1px solid transparent;
+            border-radius: var(--menu-radius);
+            box-shadow: var(--elevation-2);
+        }
+
+        [popover][role="menu"].elevated,
+        [popover].menu.elevated {
+            background-color: var(--surface-container-high-color);
+            box-shadow: var(--elevation-4);
+        }
+
+        [popover][role="menu"].tonal,
+        [popover].menu.tonal {
+            background-color: color-mix(in oklab, var(--current-color) 10%, var(--surface-container-color));
+        }
+
+        dialog {
+            max-inline-size: min(35rem, calc(100vw - 2rem));
+            padding: 1.5rem;
+            color: var(--on-surface-color);
+            background-color: var(--surface-container-high-color);
+            border: 1px solid transparent;
+            border-radius: var(--dialog-radius);
+            box-shadow: var(--elevation-3);
+        }
+
+        dialog.elevated,
+        dialog:not(.tonal):not(.outlined) {
+            background-color: var(--surface-container-high-color);
+            box-shadow: var(--elevation-3);
+        }
+
+        dialog.tonal {
+            background-color: color-mix(in oklab, var(--current-color) 14%, var(--surface-container-high-color));
+            border-color: color-mix(in oklab, var(--current-color) 24%, transparent);
+        }
+
+        dialog.outlined {
+            background-color: var(--surface-container-low-color);
+            border-color: var(--outline-color);
+            box-shadow: var(--elevation-1);
+        }
+
+        dialog::backdrop {
+            background-color: color-mix(in oklab, black 38%, transparent);
+            backdrop-filter: blur(1px);
+        }
+
+        dialog > footer,
+        form > footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-block-start: 1.5rem;
+            color: var(--on-surface-variant-color);
+        }
+    }
+}

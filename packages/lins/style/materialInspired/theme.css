@@ -1,0 +1,166 @@
+@import "../reset.css";
+@import "./button.css";
+@import "./text.css";
+@import "./card.css";
+@import "./input.css";
+@import "./list.css";
+@import "./icon.css";
+@import "./popover.css";
+@import "./emptyState.css";
+@import "./nav.css";
+
+/*
+ * LINS Material Inspired theme entrypoint.
+ *
+ * The public theme class intentionally matches theme.ts:
+ *   className: "materialInspiredTheme"
+ *
+ * This file owns palette, role, shape, state-layer, and elevation tokens.
+ * Element files consume them through the LINS --current-color pattern.
+ */
+
+@layer defaults {
+    .materialInspiredTheme {
+        color-scheme: light;
+
+        --md-state-hover-opacity: 0.08;
+        --md-state-focus-opacity: 0.12;
+        --md-state-pressed-opacity: 0.12;
+        --md-state-dragged-opacity: 0.16;
+        --md-disabled-opacity: 0.38;
+        --md-disabled-container-opacity: 0.12;
+
+        --md-shape-extra-small: 0.25rem;
+        --md-shape-small: 0.5rem;
+        --md-shape-medium: 0.75rem;
+        --md-shape-large: 1rem;
+        --md-shape-extra-large: 1.75rem;
+        --md-shape-full: 999px;
+
+        --button-radius: var(--md-shape-full);
+        --input-radius: var(--md-shape-extra-small);
+        --card-radius: var(--md-shape-medium);
+        --dialog-radius: var(--md-shape-extra-large);
+        --menu-radius: var(--md-shape-extra-small);
+
+        --focus-ring-width: 3px;
+        --focus-ring-offset: 2px;
+
+        --elevation-0: none;
+        --elevation-1:
+            0 1px 2px 0 var(--shadow-color),
+            0 1px 3px 1px color-mix(in oklab, var(--shadow-color) 72%, transparent);
+        --elevation-2:
+            0 1px 2px 0 var(--shadow-color),
+            0 2px 6px 2px color-mix(in oklab, var(--shadow-color) 72%, transparent);
+        --elevation-3:
+            0 4px 8px 3px color-mix(in oklab, var(--shadow-color) 80%, transparent),
+            0 1px 3px 0 var(--shadow-color);
+        --elevation-4:
+            0 6px 10px 4px color-mix(in oklab, var(--shadow-color) 80%, transparent),
+            0 2px 3px 0 var(--shadow-color);
+        --elevation-5:
+            0 8px 12px 6px color-mix(in oklab, var(--shadow-color) 82%, transparent),
+            0 4px 4px 0 var(--shadow-color);
+
+        --surface-container-lowest-color: color-mix(in oklab, var(--surface-color) 96%, var(--primary-color) 4%);
+        --surface-container-low-color: color-mix(in oklab, var(--surface-color) 92%, var(--primary-color) 8%);
+        --surface-container-color: color-mix(in oklab, var(--surface-color) 88%, var(--primary-color) 12%);
+        --surface-container-high-color: color-mix(in oklab, var(--surface-color) 84%, var(--primary-color) 16%);
+        --surface-container-highest-color: color-mix(in oklab, var(--surface-color) 80%, var(--primary-color) 20%);
+        --outline-color: color-mix(in oklab, var(--on-surface-color) 24%, transparent);
+        --outline-variant-color: color-mix(in oklab, var(--on-surface-color) 12%, transparent);
+        --surface-variant-color: color-mix(in oklab, var(--surface-color) 86%, var(--secondary-color) 14%);
+        --on-surface-variant-color: color-mix(in oklab, var(--on-surface-color) 74%, var(--surface-color) 26%);
+    }
+
+    .materialInspiredTheme.light {
+        --primary-color: #6750a4;
+        --on-primary-color: #ffffff;
+        --secondary-color: #625b71;
+        --on-secondary-color: #ffffff;
+        --surface-color: #fffbfe;
+        --on-surface-color: #1d1b20;
+        --background-color: #fffbfe;
+        --on-background-color: #1d1b20;
+        --accent-color: #7d5260;
+        --on-accent-color: #ffffff;
+        --success-color: #386a20;
+        --on-success-color: #ffffff;
+        --warning-color: #825500;
+        --on-warning-color: #ffffff;
+        --error-color: #ba1a1a;
+        --on-error-color: #ffffff;
+        --shadow-color: oklab(0% 0 0 / 0.22);
+        color-scheme: light;
+    }
+
+    .materialInspiredTheme.dark {
+        --primary-color: #d0bcff;
+        --on-primary-color: #381e72;
+        --secondary-color: #ccc2dc;
+        --on-secondary-color: #332d41;
+        --surface-color: #1d1b20;
+        --on-surface-color: #e6e0e9;
+        --background-color: #141218;
+        --on-background-color: #e6e0e9;
+        --accent-color: #efb8c8;
+        --on-accent-color: #492532;
+        --success-color: #9bd67d;
+        --on-success-color: #0d3700;
+        --warning-color: #ffb95c;
+        --on-warning-color: #452b00;
+        --error-color: #ffb4ab;
+        --on-error-color: #690005;
+        --shadow-color: oklab(0% 0 0 / 0.55);
+        color-scheme: dark;
+    }
+
+    .primary {
+        --active-color: var(--primary-color);
+        --on-active-color: var(--on-primary-color);
+    }
+
+    .secondary {
+        --active-color: var(--secondary-color);
+        --on-active-color: var(--on-secondary-color);
+    }
+
+    .accent {
+        --active-color: var(--accent-color);
+        --on-active-color: var(--on-accent-color);
+    }
+
+    .success {
+        --active-color: var(--success-color);
+        --on-active-color: var(--on-success-color);
+    }
+
+    .warning {
+        --active-color: var(--warning-color);
+        --on-active-color: var(--on-warning-color);
+    }
+
+    .error {
+        --active-color: var(--error-color);
+        --on-active-color: var(--on-error-color);
+    }
+
+    .surface {
+        --active-color: var(--surface-color);
+        --on-active-color: var(--on-surface-color);
+    }
+
+    .background {
+        --active-color: var(--background-color);
+        --on-active-color: var(--on-background-color);
+    }
+
+    html,
+    body,
+    #app,
+    .materialInspiredTheme {
+        background: var(--background-color);
+        color: var(--on-background-color);
+    }
+}

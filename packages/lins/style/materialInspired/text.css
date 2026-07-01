@@ -1,0 +1,319 @@
+/*
+ * Typography and inline text.
+ */
+
+@layer defaults {
+    :root {
+        --font-family: Roboto, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --base-font-size: 16px;
+        --font-size: var(--base-font-size);
+        --line-height: 1.5;
+        --heading-line-height: 1.15;
+        --heading-font-weight: 400;
+        --label-font-weight: 500;
+    }
+}
+
+@layer base {
+    body {
+        font-family: var(--font-family), sans-serif;
+        font-size: var(--base-font-size);
+        line-height: var(--line-height);
+        color: var(--on-background-color);
+    }
+
+    :where(h1, h2, h3, h4, h5, h6),
+    .display,
+    .headline,
+    .title {
+        font-family: var(--font-family), sans-serif;
+        line-height: var(--heading-line-height);
+        font-weight: var(--heading-font-weight);
+    }
+
+    .body,
+    .label {
+        font-family: var(--font-family), sans-serif;
+        line-height: var(--line-height);
+    }
+
+    /*noinspection CssInvalidHtmlTagReference*/
+    :where(
+        h1, h2, h3, h4, h5, h6,
+        p, li, dt, dd, small, figcaption, caption, time, legend, label,
+        button,
+        input[type=button], input[type=submit], input[type=reset], input[type=image],
+        input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+        textarea, select, input-shell,
+        [role="button"]:not(article), [role="tab"], [role="menuitem"],
+        nav, nav a, nav li,
+        article > section, article > footer,
+        section > footer, dialog > footer, form > footer, blockquote > footer,
+        form-field > output,
+        empty-state.empty
+    ),
+    .display, .headline, .title, .body, .label {
+        font-size: calc(var(--font-size, var(--base-font-size)) * var(--font-size-multiplier, 1));
+    }
+
+    hr {
+        --hr-color: var(--outline-variant-color);
+
+        height: 1px;
+        color: var(--hr-color);
+        background: var(--hr-color);
+        border: 0;
+        font-size: 0;
+    }
+
+    code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notMaterialInspired) {
+        /*noinspection CssInvalidHtmlTagReference*/
+        :where(
+            h1, h2,
+            main > hgroup > h1, main > hgroup > h2,
+            body > header h1, body > header h2,
+            [role="banner"] h1, [role="banner"] h2
+        ),
+        .display {
+            --font-size: 2.8125rem;
+            line-height: 1.08;
+            font-weight: 400;
+            letter-spacing: -0.015em;
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        :where(
+            h3, h4, h5,
+            section > h1, section > h2, section > h3,
+            section > h4, section > h5, section > h6,
+            section > hgroup > h1, section > hgroup > h2,
+            section > hgroup > h3, section > hgroup > h4,
+            section > hgroup > h5, section > hgroup > h6
+        ),
+        .headline {
+            --font-size: 1.75rem;
+            line-height: 1.18;
+            font-weight: 400;
+            letter-spacing: 0;
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        :where(
+            h6,
+            article > h1, article > h2, article > h3,
+            article > h4, article > h5, article > h6,
+            article > hgroup > h1, article > hgroup > h2,
+            article > hgroup > h3, article > hgroup > h4,
+            article > hgroup > h5, article > hgroup > h6,
+            dialog > h1, dialog > h2, dialog > h3,
+            dialog > h4, dialog > h5, dialog > h6,
+            dialog > hgroup > h1, dialog > hgroup > h2,
+            dialog > hgroup > h3, dialog > hgroup > h4,
+            dialog > hgroup > h5, dialog > hgroup > h6,
+            nav.top h1, nav.top h2, nav.top h3,
+            nav.top h4, nav.top h5, nav.top h6,
+            empty-state.empty > h1, empty-state.empty > h2,
+            empty-state.empty > h3, empty-state.empty > h4,
+            empty-state.empty > h5, empty-state.empty > h6,
+            empty-state.empty > hgroup > h1, empty-state.empty > hgroup > h2,
+            empty-state.empty > hgroup > h3, empty-state.empty > hgroup > h4,
+            empty-state.empty > hgroup > h5, empty-state.empty > hgroup > h6
+        ),
+        .title {
+            --font-size: 1rem;
+            line-height: 1.35;
+            font-weight: 500;
+            letter-spacing: 0.00625em;
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        :where(
+            p, dt, dd,
+            article > p, article > section,
+            article > section > p,
+            section > p,
+            ul > *, ol > *,
+            blockquote,
+            input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+            textarea, select, input-shell,
+            empty-state.empty,
+            empty-state > p
+        ),
+        .body {
+            --font-size: 1rem;
+            line-height: 1.5;
+            font-weight: 400;
+            letter-spacing: 0.03125em;
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        :where(
+            button,
+            input[type=button], input[type=submit], input[type=reset], input[type=image],
+            [role="button"]:not(article),
+            [role="tab"], ul[role="tablist"] > li,
+            ul.chips > li,
+            nav, nav a, nav li,
+            ul.nav > li,
+            ul.menu > li, ul[role="menu"] > li,
+            ul.menu > [role="menuitem"], ul[role="menu"] > [role="menuitem"],
+            label, form-field > label, fieldset > legend
+        ),
+        .label {
+            --font-size: 0.875rem;
+            line-height: 1.25;
+            font-weight: var(--label-font-weight);
+            letter-spacing: 0.00625em;
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        :where(
+            main > hgroup > p,
+            body > header hgroup > p,
+            [role="banner"] hgroup > p
+        ),
+        .display.variant {
+            --font-size: 1.375rem;
+            line-height: 1.28;
+            color: var(--on-surface-variant-color);
+            letter-spacing: 0;
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        :where(
+            section > hgroup > p,
+            section > header > p
+        ),
+        .headline.variant {
+            --font-size: 1rem;
+            line-height: 1.5;
+            color: var(--on-surface-variant-color);
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        :where(
+            article > hgroup > p,
+            article > header > p,
+            dialog > hgroup > p,
+            dialog > header > p,
+            empty-state.empty > hgroup > p,
+            nav[aria-label="Breadcrumb"],
+            nav[aria-label="Breadcrumb"] > ol,
+            nav[aria-label="Breadcrumb"] > ol > li,
+            nav[aria-label="Breadcrumb"] a
+        ),
+        .title.variant {
+            --font-size: 0.875rem;
+            line-height: 1.4;
+            color: var(--on-surface-variant-color);
+            font-weight: 400;
+        }
+
+        :where(
+            article > footer,
+            section > footer,
+            dialog > footer,
+            form > footer,
+            blockquote > footer
+        ),
+        .body.variant {
+            --font-size: 0.875rem;
+            color: var(--on-surface-variant-color);
+        }
+
+        :where(
+            small, figcaption, caption, time,
+            form-field > output
+        ),
+        .label.variant {
+            --font-size: 0.75rem;
+            line-height: 1.35;
+            color: var(--on-surface-variant-color);
+            font-weight: 400;
+        }
+
+        :where(
+            h1, h3, h6,
+            main > hgroup > h1,
+            body > header h1,
+            [role="banner"] h1,
+            section > h1, section > hgroup > h1,
+            empty-state.empty > h1, empty-state.empty > hgroup > h1
+        ), .large {
+            --font-size-multiplier: 1.2;
+        }
+
+        :where(
+            h2, h4,
+            button,
+            input[type=button], input[type=submit], input[type=reset], input[type=image],
+            [role="button"]:not(article),
+            [role="tab"], ul[role="tablist"] > li,
+            nav:not([aria-label="Breadcrumb"]), nav:not([aria-label="Breadcrumb"]) a,
+            article > h1, article > h2, article > h3,
+            article > h4, article > h5, article > h6,
+            article > hgroup > h1, article > hgroup > h2,
+            article > hgroup > h3, article > hgroup > h4,
+            article > hgroup > h5, article > hgroup > h6,
+            dialog > h1, dialog > h2, dialog > h3,
+            dialog > h4, dialog > h5, dialog > h6,
+            dialog > hgroup > h1, dialog > hgroup > h2,
+            dialog > hgroup > h3, dialog > hgroup > h4,
+            dialog > hgroup > h5, dialog > hgroup > h6,
+            input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+            textarea, select, input-shell
+        ), .medium {
+            --font-size-multiplier: 1;
+        }
+
+        :where(
+            h5,
+            small, figcaption, caption, time,
+            main > hgroup > p,
+            body > header hgroup > p,
+            [role="banner"] hgroup > p,
+            section > hgroup > p,
+            section > header > p,
+            article > hgroup > p,
+            article > header > p,
+            dialog > hgroup > p,
+            dialog > header > p,
+            empty-state.empty > hgroup > p,
+            ul.chips > li,
+            nav[aria-label="Breadcrumb"],
+            nav[aria-label="Breadcrumb"] > ol,
+            nav[aria-label="Breadcrumb"] > ol > li,
+            nav[aria-label="Breadcrumb"] a,
+            form-field > label,
+            form-field > output,
+            fieldset > legend
+        ), .small {
+            --font-size-multiplier: 0.85;
+        }
+
+        code {
+            padding: 0.125em 0.375em;
+            color: var(--on-surface-color);
+            background-color: var(--surface-container-highest-color);
+            border: 1px solid var(--outline-variant-color);
+            border-radius: var(--md-shape-extra-small);
+            font-size: 0.875em;
+        }
+
+        code:focus-within {
+            outline: var(--focus-ring-width) solid var(--primary-color);
+            outline-offset: var(--focus-ring-offset);
+        }
+
+        li {
+            list-style-type: none;
+        }
+    }
+}
+

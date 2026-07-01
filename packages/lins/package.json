@@ -2,6 +2,9 @@
   "name": "@web/lins",
   "version": "0.0.0",
   "type": "module",
+  "scripts": {
+    "add-theme": "node ./scripts/add-theme.mjs"
+  },
   "exports": {
     "./layout": "./layout/index.ts",
     "./minimal.css": "./style/minimal/theme.css",
@@ -10,6 +13,9 @@
     "./foundry.css": "./style/foundry/theme.css",
     "./foundry": "./style/foundry/theme.ts",
     "./foundry.ts": "./style/foundry/theme.ts",
+    "./materialInspired.css": "./style/materialInspired/theme.css",
+    "./materialInspired": "./style/materialInspired/theme.ts",
+    "./materialInspired.ts": "./style/materialInspired/theme.ts",
     "./themes": "./style/themes.ts",
     "./theme-info": "./style/themeInfo.ts",
     "./reset.css": "./style/reset.css",
