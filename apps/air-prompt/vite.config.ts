@@ -1,7 +1,7 @@
-import {solidServerFunctions} from "@web/server-functions";
-import solidPlugin from "vite-plugin-solid";
 import {defineConfig} from "vite";
+import solidPlugin from "vite-plugin-solid";
 import tailwindcss from "@tailwindcss/vite";
+import {solidServerFunctions} from "@web/server-functions";
 import {getPlatformProxy} from "wrangler";
 
 let cloudflareProxyPromise: Promise<Awaited<ReturnType<typeof getPlatformProxy>>> | undefined;
@@ -27,7 +27,7 @@ export default defineConfig({
             },
         }),
         solidPlugin(),
-        tailwindcss()
+        tailwindcss(),
     ],
-    resolve: {tsconfigPaths: true}
-})
+    resolve: {tsconfigPaths: true},
+});

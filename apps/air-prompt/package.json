@@ -1,0 +1,33 @@
+{
+  "name": "@web/air-prompt",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --port 3001",
+    "check": "tsc --noEmit --project tsconfig.json",
+    "generate:schema": "generate-schema src/models migrations",
+    "apply:schema": "wrangler d1 migrations apply DB --local --config ./wrangler.jsonc",
+    "apply:schema:prod": "wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc"
+  },
+  "dependencies": {
+    "solid-js": "catalog:",
+    "@solidjs/web": "catalog:",
+    "@paralleldrive/cuid2": "3.3.0",
+    "@web/components": "workspace:*",
+    "@web/utils": "workspace:*",
+    "@web/schema": "workspace:*",
+    "@web/server-functions": "workspace:*",
+    "tailwindcss": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "vite-plugin-solid": "catalog:",
+    "vite": "catalog:",
+    "@web/d1": "workspace:*",
+    "wrangler": "catalog:",
+    "@web/lins": "workspace:*",
+    "@web/solid-delta": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}

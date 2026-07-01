@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 import {createInterface} from "node:readline/promises";
-import {access, copyFile, mkdir, readdir, readFile, unlink, writeFile} from "node:fs/promises";
+import {access, copyFile, mkdir, readdir, readFile, writeFile} from "node:fs/promises";
 import path from "node:path";
 
 const TEMPLATE_APP_NAME = "appTemplate";
-const EXCLUDE_DIRS = new Set(["node_modules", ".output", ".mf"]);
+const EXCLUDE_DIRS = new Set(["node_modules", ".output", ".mf", ".wrangler"]);
 const EXCLUDE_FILES = new Set([".DS_Store"]);
 
 function toKebab(input: string): string {
@@ -67,7 +67,6 @@ async function updatePackageJson(
     includeD1: boolean,
     includeLins: boolean,
     includeDelta: boolean,
-    cssFramework: "unocss" | "tailwind"
 ): Promise<void> {
     const pkgPath = path.join(appDir, "package.json");
     const raw = await readFile(pkgPath, "utf8");
@@ -76,81 +75,75 @@ async function updatePackageJson(
     pkg.name = packageName;
 
     pkg.dependencies ??= {};
-    pkg.devDependencies ??= {};
+    pkg.scripts ??= {};
 
-    if (cssFramework === "tailwind") {
-        delete pkg.dependencies["unocss"];
-        pkg.devDependencies["tailwindcss"] = pkg.devDependencies["tailwindcss"] ?? "^4.1.0";
-        pkg.devDependencies["postcss"] = pkg.devDependencies["postcss"] ?? "^8.4.49";
-        pkg.devDependencies["autoprefixer"] = pkg.devDependencies["autoprefixer"] ?? "^10.4.20";
+    if (includeD1) {
+        pkg.dependencies["@web/d1"] = pkg.dependencies["@web/d1"] ?? "workspace:*";
+        pkg.dependencies["wrangler"] = pkg.dependencies["wrangler"] ?? "catalog:";
+        pkg.scripts["generate:schema"] = "generate-schema src/models migrations";
+        pkg.scripts["apply:schema"] = "wrangler d1 migrations apply DB --local --config ./wrangler.jsonc";
+        pkg.scripts["apply:schema:prod"] = "wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc";
     } else {
-        pkg.dependencies["unocss"] = pkg.dependencies["unocss"] ?? "66.6.0";
-    }
-    pkg.dependencies["@web/components"] = pkg.dependencies["@web/components"] ?? "*";
-    pkg.dependencies["@web/utils"] = pkg.dependencies["@web/utils"] ?? "*";
-    pkg.dependencies["@web/schema"] = pkg.dependencies["@web/schema"] ?? "*";
-
-    if (!includeD1) {
         delete pkg.dependencies["@web/d1"];
-        if (pkg.scripts) {
-            delete pkg.scripts["generate:schema"];
-            delete pkg.scripts["migrate:local"];
-            delete pkg.scripts["migrate:prod"];
-        }
     }
 
-    if (!includeLins) {
+    if (includeLins) {
+        pkg.dependencies["@web/lins"] = pkg.dependencies["@web/lins"] ?? "workspace:*";
+    } else {
         delete pkg.dependencies["@web/lins"];
     }
 
-    if (!includeDelta) {
-        delete pkg.dependencies["@web/solidDelta"];
+    if (includeDelta) {
+        pkg.dependencies["@web/solid-delta"] = pkg.dependencies["@web/solid-delta"] ?? "workspace:*";
+    } else {
+        delete pkg.dependencies["@web/solid-delta"];
     }
 
     await writeFile(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
 }
 
-async function updateCssFramework(appDir: string, cssFramework: "unocss" | "tailwind"): Promise<void> {
-    const unoConfigPath = path.join(appDir, "uno.config.ts");
-    const appConfigPath = path.join(appDir, "app.config.ts");
-    const appConfigTailwindPath = path.join(appDir, "app.config.tailwind.ts");
-    const appCssPath = path.join(appDir, "src", "app.css");
-    const appTailwindCssPath = path.join(appDir, "src", "app.tailwind.css");
-
-    if (cssFramework === "tailwind") {
-        if (await pathExists(unoConfigPath)) {
-            await unlink(unoConfigPath);
-        }
-
-        if (await pathExists(appConfigTailwindPath)) {
-            await copyFile(appConfigTailwindPath, appConfigPath);
-            await unlink(appConfigTailwindPath);
-        }
-
-        if (await pathExists(appTailwindCssPath)) {
-            await copyFile(appTailwindCssPath, appCssPath);
-            await unlink(appTailwindCssPath);
-        }
-
-        const appTsxPath = path.join(appDir, "src", "app.tsx");
-        if (await pathExists(appTsxPath)) {
-            const raw = await readFile(appTsxPath, "utf8");
-            const updated = raw.replace(
-                /import\s+"virtual:uno\.css";\s*/g,
-                'import "./app.css";\n',
-            );
-            await writeFile(appTsxPath, updated);
-        }
-
+async function updateViteConfig(appDir: string, includeD1: boolean): Promise<void> {
+    const viteConfigPath = path.join(appDir, "vite.config.ts");
+    if (!includeD1 || !(await pathExists(viteConfigPath))) {
         return;
     }
 
-    if (await pathExists(appConfigTailwindPath)) {
-        await unlink(appConfigTailwindPath);
-    }
-    if (await pathExists(appTailwindCssPath)) {
-        await unlink(appTailwindCssPath);
-    }
+    const content = `import {defineConfig} from "vite";
+import solidPlugin from "vite-plugin-solid";
+import tailwindcss from "@tailwindcss/vite";
+import {solidServerFunctions} from "@web/server-functions";
+import {getPlatformProxy} from "wrangler";
+
+let cloudflareProxyPromise: Promise<Awaited<ReturnType<typeof getPlatformProxy>>> | undefined;
+
+export default defineConfig({
+    appType: "spa",
+    plugins: [
+        solidServerFunctions({
+            serverEntry: "./src/server.tsx",
+            async createRequestContext() {
+                cloudflareProxyPromise ??= getPlatformProxy({
+                    configPath: "./wrangler.jsonc",
+                });
+
+                const proxy = await cloudflareProxyPromise;
+
+                return {
+                    cloudflare: {
+                        env: proxy.env,
+                        context: proxy.ctx,
+                    },
+                };
+            },
+        }),
+        solidPlugin(),
+        tailwindcss(),
+    ],
+    resolve: {tsconfigPaths: true},
+});
+`;
+
+    await writeFile(viteConfigPath, content);
 }
 
 async function updateWranglerConfig(appDir: string, appSlug: string, includeD1: boolean): Promise<void> {
@@ -169,14 +162,13 @@ async function updateWranglerConfig(appDir: string, appSlug: string, includeD1: 
     config.name = appSlug;
 
     if (includeD1) {
-        const d1 = [
+        config.d1_databases = [
             {
                 binding: "DB",
                 database_name: `${appSlug}-db`,
                 database_id: "REPLACE_ME",
             },
         ];
-        config.d1_databases = d1;
     } else {
         delete config.d1_databases;
     }
@@ -188,11 +180,14 @@ async function updateWorkspace(rootDir: string, appFolder: string): Promise<void
     const rootPkgPath = path.join(rootDir, "package.json");
     const raw = await readFile(rootPkgPath, "utf8");
     const pkg = JSON.parse(raw);
-    const ws: string[] = Array.isArray(pkg.workspaces) ? pkg.workspaces : [];
 
-    if (!ws.includes("apps/*") && !ws.includes(`apps/${appFolder}`)) {
-        ws.push(`apps/${appFolder}`);
-        pkg.workspaces = ws;
+    pkg.workspaces ??= {};
+    const packages: string[] = Array.isArray(pkg.workspaces.packages) ? pkg.workspaces.packages : [];
+    const entry = `apps/${appFolder}`;
+
+    if (!packages.includes("apps/*") && !packages.includes(entry)) {
+        packages.push(entry);
+        pkg.workspaces.packages = packages;
         await writeFile(rootPkgPath, JSON.stringify(pkg, null, 2) + "\n");
     }
 }
@@ -228,9 +223,7 @@ async function main(): Promise<void> {
 
     const includeD1 = await promptYesNo(rl, "Include @web/d1?", true);
     const includeLins = await promptYesNo(rl, "Include @web/lins?", true);
-    const includeDelta = await promptYesNo(rl, "Include @web/solidDelta?", true);
-    const cssAnswer = (await rl.question("CSS framework (unocss/tailwind) [unocss]: ")).trim().toLowerCase();
-    const cssFramework = cssAnswer === "tailwind" ? "tailwind" : "unocss";
+    const includeDelta = await promptYesNo(rl, "Include @web/solid-delta?", true);
 
     rl.close();
 
@@ -244,8 +237,8 @@ async function main(): Promise<void> {
 
     await copyDir(templateDir, targetDir);
 
-    await updatePackageJson(targetDir, packageName, includeD1, includeLins, includeDelta, cssFramework);
-    await updateCssFramework(targetDir, cssFramework);
+    await updatePackageJson(targetDir, packageName, includeD1, includeLins, includeDelta);
+    await updateViteConfig(targetDir, includeD1);
     await updateWranglerConfig(targetDir, appSlug, includeD1);
     await updateWorkspace(rootDir, appFolder);
 
@@ -261,3 +254,4 @@ main().catch((err) => {
     console.error(err instanceof Error ? err.message : err);
     process.exit(1);
 });
+

@@ -4,21 +4,24 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev --port 3001",
-    "build": "vinxi build",
-    "start": "vinxi start"
+    "dev": "vite dev --port 3001",
+    "check": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
+    "solid-js": "catalog:",
+    "@solidjs/web": "catalog:",
     "@paralleldrive/cuid2": "3.3.0",
-    "@vinxi/server-functions": "0.5.1",
-    "solid-js": "2.0.0-beta.14",
-    "@solidjs/web": "2.0.0-beta.14",
-    "@tailwindcss/vite": "4.2.2",
-    "unocss": "66.6.0",
-    "vinxi": "0.5.11",
-    "@web/vinxi": "workspace:*"
+    "@web/components": "workspace:*",
+    "@web/utils": "workspace:*",
+    "@web/schema": "workspace:*",
+    "@web/server-functions": "workspace:*",
+    "tailwindcss": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "vite-plugin-solid": "catalog:",
+    "vite": "catalog:"
   },
   "devDependencies": {
-    "vite-tsconfig-paths": "6.1.1"
+    "typescript": "catalog:"
   }
 }
+
