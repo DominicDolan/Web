@@ -9,3 +9,4 @@ bun.lock
 /.wrangler/
 /apps/**/.wrangler/
 /apps/**/.output/
+/apps/**/dist/

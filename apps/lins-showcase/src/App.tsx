@@ -3,6 +3,7 @@ import "./style.css";
 
 import minimalCss from "@web/lins/minimal.css?url";
 import foundryCss from "@web/lins/foundry.css?url";
+import materialInspiredCss from "@web/lins/materialInspired.css?url";
 import { linsThemes, type LinsElementCategoryInfo, type LinsThemeInfo, type LinsVariantInfo } from "@web/lins/themes";
 
 type ThemeOption = {
@@ -13,13 +14,14 @@ type ThemeOption = {
 const themeCssById: Record<string, string> = {
   minimal: minimalCss,
   foundry: foundryCss,
+  materialInspired: materialInspiredCss,
 };
 
 const themeMetadata: readonly LinsThemeInfo[] = linsThemes;
 
 const themes: ThemeOption[] = themeMetadata.map((meta) => ({
   meta,
-  css: themeCssById[meta.id],
+  css: themeCssById[meta.id] ?? minimalCss,
 }));
 
 function category(theme: LinsThemeInfo, id: string): LinsElementCategoryInfo | undefined {
