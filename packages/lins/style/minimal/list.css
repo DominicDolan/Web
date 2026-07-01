@@ -49,7 +49,7 @@
                     color: var(--on-current-color);
                 }
 
-                &:hover:not(.active):not(:has(.active)) {
+                &:hover:not(.active):not(:has(.active)):not([aria-current="page"]):not(:has(> [aria-current="page"])):not([aria-selected="true"]):not(:has(> [aria-selected="true"])) {
                     background: color-mix(in oklab, var(--current-color) 10%, transparent);
                 }
             }
@@ -128,7 +128,7 @@
             }
         }
 
-        ul[role="tablist"].underlined {
+        :where(ul[role="tablist"]:not(.inset)), ul[role="tablist"].underlined {
             position: relative;
             anchor-scope: all;
 

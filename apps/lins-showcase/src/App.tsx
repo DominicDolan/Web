@@ -336,7 +336,7 @@ function App() {
 
                 <form-field class="flex flex-col gap-1">
                   <label>Email Address</label>
-                  <input-shell>
+                  <input-shell class="flex gap-2 items-center">
                     <i>mail</i>
                     <input type="email" placeholder="john@example.com" required />
                   </input-shell>
@@ -478,28 +478,32 @@ function App() {
 
             <div class="flex gap-3">
               <button class="outlined" onClick={() => {
-                (document.getElementById("demo-dialog") as HTMLDialogElement)?.showModal();
+                ;(document.getElementById("demo-dialog") as HTMLDialogElement)?.showModal();
               }}>
                 Open Dialog
               </button>
             </div>
 
-            <dialog id="demo-dialog">
-              <hgroup>
-                <h3>Confirm Action</h3>
-                <p>This action cannot be undone.</p>
-              </hgroup>
-              <section class="p-4">
-                <p>Are you sure you want to proceed with this action? All changes will be permanent.</p>
-              </section>
-              <footer class="flex gap-2 justify-end">
-                <button class="text" onClick={() => {
-                  (document.getElementById("demo-dialog") as HTMLDialogElement)?.close();
-                }}>Cancel</button>
-                <button class="flat error" onClick={() => {
-                  (document.getElementById("demo-dialog") as HTMLDialogElement)?.close();
-                }}>Confirm</button>
-              </footer>
+            <dialog id="demo-dialog" closedby="any" class="h-full w-full" popover>
+              <div class="h-full w-full flex items-center justify-center">
+                <article>
+                  <hgroup>
+                    <h3>Confirm Action</h3>
+                    <p>This action cannot be undone.</p>
+                  </hgroup>
+                  <section class="p-4">
+                    <p>Are you sure you want to proceed with this action? All changes will be permanent.</p>
+                  </section>
+                  <footer class="flex gap-2 justify-end">
+                    <button class="text" onClick={() => {
+                      ;(document.getElementById("demo-dialog") as HTMLDialogElement)?.close();
+                    }}>Cancel</button>
+                    <button class="flat error" onClick={() => {
+                      (document.getElementById("demo-dialog") as HTMLDialogElement)?.close();
+                    }}>Confirm</button>
+                  </footer>
+                </article>
+              </div>
             </dialog>
           </section>
 
