@@ -119,16 +119,16 @@ export function TypefaceEditor() {
                             </Match>
                             <Match when={activeTab() === "code"}>
                                 <div class="flex flex-col gap-6">
-                                    <article class="inset flex flex-col gap-4">
+                                    <article class="inset flex flex-col gap-4 p-0">
                                         <CssEditor selector={selector()} content={indentCss(getCssOrDefault())} />
                                     </article>
-                                    <article class="inset flex flex-col gap-4">
+                                    <article class="inset flex flex-col gap-4 p-0">
                                         <CssEditor selector={".large"} content={indentCss(getLargeCssOrDefault())} />
                                     </article>
-                                    <article class="inset flex flex-col gap-4">
+                                    <article class="inset flex flex-col gap-4 p-0">
                                         <CssEditor selector={".medium"} content={indentCss(getMediumCssOrDefault())} />
                                     </article>
-                                    <article class="inset flex flex-col gap-4">
+                                    <article class="inset flex flex-col gap-4 p-0">
                                         <CssEditor selector={".small"} content={indentCss(getSmallCssOrDefault())} />
                                     </article>
                                 </div>

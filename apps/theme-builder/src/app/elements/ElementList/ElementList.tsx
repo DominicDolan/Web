@@ -96,7 +96,7 @@ export function ElementList() {
                         >
                             <hgroup class={"flex items-center gap-4"}>
                                 <div class={"flex h-12 w-12 items-center justify-center"}>
-                                    <i class={"title"}>{category.icon}</i>
+                                    <i class={"large"}>{category.icon}</i>
                                 </div>
                                 <div class={"flex flex-col gap-0"}>
                                     <span class="title medium">{category.name}</span>

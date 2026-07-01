@@ -144,7 +144,9 @@ export function ElementEditor() {
                                                 aria-selected={String(variant.name === activeElementVariant()?.name)}
                                                 class="elevated flex flex-col min-h-60 aspect-square"
                                                 onClick={() => setActiveVariant(variant.name)}>
-                                    <h4 class="title variant">{variant.name}</h4>
+                                    <div>
+                                        <code>.{variant.name}</code>
+                                    </div>
                                     <div class="flex flex-col grow items-center justify-center w-full">
                                         {renderPreview(variant)}
                                     </div>

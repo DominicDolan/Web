@@ -109,8 +109,8 @@ function App() {
           <nav>
             <ul class="nav flex flex-col gap-1">
               {["dashboard", "components", "forms", "settings"].map((item) => (
-                <li aria-current={sideNavItem() === item ? "page" : undefined}>
-                  <a href="#" onClick={() => setSideNavItem(item)}>
+                <li>
+                  <a href="#" aria-current={sideNavItem() === item ? "page" : undefined} onClick={() => setSideNavItem(item)}>
                     <i>{item === "dashboard" ? "dashboard" : item === "components" ? "widgets" : item === "forms" ? "edit_note" : "settings"}</i> {titleCase(item)}
                   </a>
                 </li>

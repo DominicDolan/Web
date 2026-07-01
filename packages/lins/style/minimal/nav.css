@@ -28,12 +28,6 @@
             color: var(--on-surface-color);
         }
 
-        nav a[aria-current="page"],
-        nav a.active {
-            color: var(--current-color);
-            font-weight: 700;
-        }
-
         nav[aria-label="Breadcrumb"] {
             color: oklab(from currentColor l a b / 0.7);
         }
