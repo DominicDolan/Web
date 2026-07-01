@@ -27,21 +27,29 @@
 @layer elements {
     @scope (body) to (.notFoundry) {
         nav.top {
-            /* TODO: top app-bar border/background/shadow. */
+            color: var(--on-surface-color);
+            background: var(--surface-color);
+            border-block-end: 1px solid var(--foundry-border-color);
+            box-shadow: 0 2px 0 color-mix(in oklab, black 12%, transparent);
         }
 
         nav.pageNav,
         aside > nav {
-            /* TODO: side/page navigation surface. Avoid page-level width here. */
+            color: var(--on-surface-color);
+            background: color-mix(in oklab, var(--surface-color) 88%, var(--background-color));
+            border-inline-end: 1px solid var(--foundry-border-color);
         }
 
         nav a[aria-current="page"],
         nav a.active {
-            /* TODO: current navigation link state. */
+            color: var(--current-color);
+            font-weight: 800;
+            text-decoration-color: var(--accent-color);
         }
 
         nav[aria-label="Breadcrumb"] {
-            /* TODO: breadcrumb container typography/colour. */
+            color: var(--foundry-muted-color);
+            font-family: var(--mono-font-family), monospace;
         }
 
         nav[aria-label="Breadcrumb"] > ol {
@@ -51,15 +59,19 @@
              * once the visual rhythm is known.
              */
             display: inline-flex;
-            /* TODO: breadcrumb item gap. */
+              gap: 0.45rem;
+              align-items: center;
         }
 
         nav[aria-label="Breadcrumb"] > ol > li {
-            /* TODO: breadcrumb item style. */
+              color: inherit;
         }
 
         nav[aria-label="Breadcrumb"] > ol > li + li::before {
-            /* TODO: decorative separator, e.g. content: "/"; opacity: .5; */
+              content: "/";
+              margin-inline-end: 0.45rem;
+              color: var(--accent-color);
+              opacity: 0.8;
         }
     }
 }

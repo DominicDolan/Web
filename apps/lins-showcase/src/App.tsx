@@ -1,14 +1,30 @@
-import { createSignal, For } from "solid-js";
-import "./layout.css";
+import { createSignal, createEffect, For } from "solid-js";
+import "./style.css";
+
+import minimalCss from "@web/lins/minimal.css?url";
+import foundryCss from "@web/lins/foundry.css?url";
 
 const themes = [
-  { id: "minimal", label: "Minimal", class: "minimalTheme" },
+  { id: "minimal", label: "Minimal", class: "minimalTheme", css: minimalCss },
+  { id: "foundry", label: "Foundry", class: "foundryTheme", css: foundryCss },
 ];
 
 function App() {
   const [currentTheme, setCurrentTheme] = createSignal(themes[0]);
   const [activeTab, setActiveTab] = createSignal("overview");
   const [sideNavItem, setSideNavItem] = createSignal("dashboard");
+
+  createEffect(() => {
+    const theme = currentTheme();
+    let link = document.getElementById("lins-theme") as HTMLLinkElement | null;
+    if (!link) {
+      link = document.createElement("link");
+      link.id = "lins-theme";
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+    link.href = theme.css;
+  });
 
   return (
     <div class={`${currentTheme().class} light min-h-screen`} id="app">

@@ -21,7 +21,8 @@
         /* Soft layout: cards almost always need internal breathing room. */
         padding: 1rem;
         background-repeat: no-repeat;
-        /* TODO: border-radius for card surfaces. */
+        border-radius: var(--surface-radius, 0.375rem);
+        border: 1px solid transparent;
 
         transition:
             color 0.2s ease-in-out,
@@ -45,80 +46,92 @@
              * group to make the default explicit.
              */
             :where(&),
-            &.elevated {
-                /* TODO: default/elevated card surface. */
-                /* Example:
-                 * background-color: var(--current-color);
-                 * color: var(--on-current-color);
-                 * box-shadow: 0 8px 12px -1px var(--shadow-color);
-                 */
+            &.outlined,
+            :where(& &) {
+                color: var(--on-surface-color);
+                background: var(--foundry-panel-color, var(--surface-color));
+                border-color: var(--foundry-border-color);
+                box-shadow: none;
             }
 
             &.flat {
-                /* TODO: filled card without elevation. */
+                color: var(--on-current-color);
+                background: var(--current-color);
+                border-color: color-mix(in oklab, var(--on-current-color) 18%, transparent);
+                box-shadow: none;
             }
 
-            &.outlined,
-            :where(& &) {
-                /*
-                 * Nested cards often default to outlined so surfaces do not
-                 * stack excessive elevation. Because :where(& &) is zero
-                 * specificity, article.elevated inside another article can win.
-                 */
+            &.elevated {
+                color: var(--on-current-color);
+                background: var(--current-color);
+                border-color: color-mix(in oklab, var(--on-current-color) 20%, transparent);
+                box-shadow:
+                    0 2px 0 color-mix(in oklab, black 22%, transparent),
+                    0 10px 18px -14px var(--shadow-color);
             }
 
             &.tonal {
-                /* TODO: low-opacity active-colour tint. */
+                color: var(--on-surface-color);
+                background: color-mix(in oklab, var(--current-color) 12%, var(--surface-color));
+                border-color: color-mix(in oklab, var(--current-color) 48%, var(--foundry-border-color));
             }
 
             &.inset {
-                /* TODO: recessed/inner-shadow surface. */
+                color: var(--on-surface-color);
+                background: color-mix(in oklab, var(--background-color) 72%, black 4%);
+                border-color: color-mix(in oklab, var(--foundry-border-color) 85%, black 10%);
+                box-shadow: inset 0 2px 5px color-mix(in oklab, black 20%, transparent);
             }
 
             &.highlighted {
-                /*
-                 * TODO: accent bar, marker, or other highlighted treatment.
-                 * Decorative pseudo-elements are allowed in a theme; avoid
-                 * positioning real content here.
-                 */
+                color: var(--on-surface-color);
+                background: var(--foundry-panel-color, var(--surface-color));
+                border-color: color-mix(in oklab, var(--current-color) 58%, var(--foundry-border-color));
+                border-inline-start: 0.4rem solid var(--current-color);
             }
 
             &.text {
-                /* TODO: no chrome, useful for grouped text/card semantics. */
+                color: inherit;
+                background: transparent;
+                border-color: transparent;
+                box-shadow: none;
             }
 
             &[role="button"]:hover,
             &[role="button"]:focus-visible {
-                /* TODO: interactive card affordance. */
+                border-color: color-mix(in oklab, var(--current-color) 70%, var(--foundry-border-color));
+                box-shadow:
+                    0 0 0 1px color-mix(in oklab, var(--current-color) 34%, transparent),
+                    0 8px 16px -14px var(--shadow-color);
             }
 
             &[aria-selected="false"] {
-                /* TODO: muted/deselected state. */
+                opacity: 0.58;
+                filter: saturate(0.62);
             }
 
             &[aria-selected="true"],
             &.active {
-                /* TODO: selected/current card state, if your components use it. */
+                border-color: var(--accent-color);
+                box-shadow:
+                    inset 0 0 0 1px var(--accent-color),
+                    0 6px 16px -14px var(--shadow-color);
             }
 
             > hgroup,
             > h3 {
-                /*
-                 * Context hook for card headings. Typography defaults live in
-                 * text.css; add only card-specific colour/border/etc. here.
-                 */
+                color: inherit;
+                border-block-end: 1px solid color-mix(in oklab, currentColor 18%, transparent);
+                padding-block-end: 0.65rem;
             }
 
             > section {
-                /* TODO: card body surface refinements, if any. */
+                color: color-mix(in oklab, currentColor 88%, var(--foundry-muted-color));
             }
 
             > footer {
-                /*
-                 * Soft layout may be acceptable here if every card footer in
-                 * the design reads as an action row. Otherwise leave empty and
-                 * let markup utilities control layout.
-                 */
+                border-block-start: 1px solid color-mix(in oklab, currentColor 16%, transparent);
+                padding-block-start: 0.75rem;
             }
         }
     }

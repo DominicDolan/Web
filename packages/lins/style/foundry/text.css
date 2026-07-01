@@ -20,13 +20,14 @@
          * Unopinionated typography baseline. Themes are free to replace any of
          * these, but the names are part of the LINS contract.
          */
-        --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --font-family: "IBM Plex Sans", "Roboto Flex", "Inter Tight", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --mono-font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
         --base-font-size: 16px;
         /* Fallback only. Implementations should set --font-size in the role rules below. */
         --font-size: var(--base-font-size);
         --line-height: 1.5;
-        --heading-line-height: 1.2;
-        --heading-font-weight: 700;
+        --heading-line-height: 1.08;
+        --heading-font-weight: 800;
     }
 }
 
@@ -86,7 +87,7 @@
     }
 
     hr {
-        --hr-color: color-mix(in oklab, currentColor 35%, transparent);
+        --hr-color: color-mix(in oklab, currentColor 42%, transparent);
 
         height: 1px;
         color: var(--hr-color);
@@ -96,7 +97,7 @@
     }
 
     code {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        font-family: var(--mono-font-family), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
     }
 }
 
@@ -115,6 +116,7 @@
          * them during a theme implementation when your content model needs it.
          */
 
+        /*noinspection CssInvalidHtmlTagReference*/
         :where(
             h1, h2,
             main > hgroup > h1, main > hgroup > h2,
@@ -122,10 +124,14 @@
             [role="banner"] h1, [role="banner"] h2
         ),
         .display {
-            /* TODO: --font-size: ...; */
-            /* TODO: display typeface treatment. */
+            --font-size: 3.25rem;
+
+            font-weight: 900;
+            letter-spacing: -0.055em;
+            text-transform: uppercase;
         }
 
+        /*noinspection CssInvalidHtmlTagReference*/
         :where(
             h3, h4, h5,
             section > h1, section > h2, section > h3,
@@ -135,10 +141,14 @@
             section > hgroup > h5, section > hgroup > h6
         ),
         .headline {
-            /* TODO: --font-size: ...; */
-            /* TODO: headline typeface treatment. */
+            --font-size: 2rem;
+
+            font-weight: 850;
+            letter-spacing: -0.035em;
+            text-transform: uppercase;
         }
 
+        /*noinspection CssInvalidHtmlTagReference*/
         :where(
             h6,
             article > h1, article > h2, article > h3,
@@ -161,10 +171,13 @@
             empty-state.empty > hgroup > h5, empty-state.empty > hgroup > h6
         ),
         .title {
-            /* TODO: --font-size: ...; */
-            /* TODO: title typeface treatment, including card-heading defaults. */
+            --font-size: 1.22rem;
+
+            font-weight: 760;
+            letter-spacing: -0.015em;
         }
 
+        /*noinspection CssInvalidHtmlTagReference*/
         :where(
             p, dt, dd,
             article > p, article > section,
@@ -178,10 +191,13 @@
             empty-state > p
         ),
         .body {
-            /* TODO: --font-size: ...; */
-            /* TODO: body typeface treatment. */
+            --font-size: 1rem;
+
+            font-weight: 440;
+            letter-spacing: 0;
         }
 
+        /*noinspection CssInvalidHtmlTagReference*/
         /*noinspection CssInvalidHtmlTagReference*/
         :where(
             button,
@@ -196,8 +212,11 @@
             label, form-field > label, fieldset > legend
         ),
         .label {
-            /* TODO: --font-size: ...; */
-            /* TODO: label typeface treatment. */
+            --font-size: 0.82rem;
+
+            font-weight: 760;
+            letter-spacing: 0.075em;
+            text-transform: uppercase;
         }
 
         /*
@@ -214,8 +233,12 @@
             [role="banner"] hgroup > p
         ),
         .display.variant {
-            /* TODO: --font-size: ...; */
-            /* TODO: display variant treatment. */
+            --font-size: 1.45rem;
+
+            color: var(--foundry-muted-color);
+            font-weight: 620;
+            letter-spacing: -0.018em;
+            text-transform: none;
         }
 
         :where(
@@ -223,8 +246,12 @@
             section > header > p
         ),
         .headline.variant {
-            /* TODO: --font-size: ...; */
-            /* TODO: headline variant treatment and section-heading defaults. */
+            --font-size: 1.05rem;
+
+            color: var(--foundry-muted-color);
+            font-weight: 720;
+            letter-spacing: 0.055em;
+            text-transform: uppercase;
         }
 
         :where(
@@ -239,8 +266,11 @@
             nav[aria-label="Breadcrumb"] a
         ),
         .title.variant {
-            /* TODO: --font-size: ...; */
-            /* TODO: title variant treatment and section-heading defaults. */
+            --font-size: 0.95rem;
+
+            color: var(--foundry-muted-color);
+            font-weight: 620;
+            letter-spacing: 0.01em;
         }
 
         :where(
@@ -251,8 +281,10 @@
             blockquote > footer
         ),
         .body.variant {
-            /* TODO: --font-size: ...; */
-            /* TODO: body variant treatment. */
+            --font-size: 0.95rem;
+
+            color: var(--foundry-muted-color);
+            font-weight: 460;
         }
 
         :where(
@@ -260,8 +292,12 @@
             form-field > output
         ),
         .label.variant {
-            /* TODO: --font-size: ...; */
-            /* TODO: label variant treatment. */
+            --font-size: 0.78rem;
+
+            color: var(--foundry-muted-color);
+            font-weight: 720;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         /*
@@ -330,15 +366,17 @@
 
 
         code {
-            /*
-             * TODO: inline-code chip surface (background, border-radius, padding).
-             * Padding is acceptable soft layout for a chip; the radius is a
-             * theme decision.
-             */
+            color: var(--accent-color);
+            background: color-mix(in oklab, var(--accent-color) 10%, var(--surface-color));
+            border: 1px solid color-mix(in oklab, var(--accent-color) 34%, transparent);
+            border-radius: 0.2rem;
+            padding: 0.08em 0.32em;
+            font-size: 0.92em;
         }
 
         code:focus-within {
-            /* TODO: focus ring for editable/interactive code fragments. */
+            outline: var(--focus-ring-width, 2px) solid var(--accent-color);
+            outline-offset: 2px;
         }
 
         li {

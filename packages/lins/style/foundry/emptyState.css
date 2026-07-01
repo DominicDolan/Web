@@ -10,7 +10,7 @@
  *   - [aria-busy] for loading skeletons
  */
 
-@keyframes template-shimmer {
+@keyframes foundry-scan {
     0% {
         background-position: -200% 0;
     }
@@ -34,7 +34,10 @@
             pointer-events: none;
             user-select: none;
 
-            /* TODO: skeleton block border-radius and base colour. */
+            color: transparent;
+            background-color: color-mix(in oklab, currentColor 13%, var(--surface-color));
+            border: 1px solid color-mix(in oklab, currentColor 16%, transparent);
+            border-radius: 0.18rem;
         }
 
         /*noinspection CssInvalidHtmlTagReference*/
@@ -43,14 +46,19 @@
              * Example animated skeleton pattern. Tune colours to your palette
              * or remove animation for a quieter theme.
              */
-            animation: template-shimmer 1.4s linear infinite;
+            animation: foundry-scan 1.15s linear infinite;
             background-size: 200% 100%;
-            /* background-image: linear-gradient(90deg, ...); */
+            background-image: linear-gradient(
+                90deg,
+                color-mix(in oklab, currentColor 8%, var(--surface-color)),
+                color-mix(in oklab, var(--accent-color) 16%, var(--surface-color)),
+                color-mix(in oklab, currentColor 8%, var(--surface-color))
+            );
         }
 
         /*noinspection CssInvalidHtmlTagReference*/
         empty-state.skeleton:not([aria-busy]) *:not(:has(> *)) {
-            /* TODO: non-busy placeholder style. */
+            opacity: 0.72;
         }
 
         /*noinspection CssInvalidHtmlTagReference*/
@@ -61,15 +69,23 @@
             isolation: isolate;
             position: relative;
 
-            /* TODO: empty-content surface/illustration style. */
+            color: var(--on-surface-color);
+            background:
+                linear-gradient(135deg, color-mix(in oklab, var(--accent-color) 8%, transparent), transparent 42%),
+                var(--foundry-panel-color, var(--surface-color));
+            border: 1px dashed color-mix(in oklab, var(--current-color) 48%, var(--foundry-border-color));
+            border-radius: var(--surface-radius, 0.375rem);
+            padding: 1.25rem;
         }
 
         /*noinspection CssInvalidHtmlTagReference*/
         empty-state.empty::after {
-            /*
-             * Optional decorative outline/illustration. Decorative absolute
-             * pseudo-elements are allowed; do not use this to place content.
-             */
+            content: "";
+            position: absolute;
+            inset: 0.45rem;
+            pointer-events: none;
+            border: 1px solid color-mix(in oklab, var(--accent-color) 30%, transparent);
+            clip-path: polygon(0 0, 3rem 0, 3rem 1px, 1px 1px, 1px 3rem, 0 3rem, 0 0, 100% 0, 100% 3rem, calc(100% - 1px) 3rem, calc(100% - 1px) 1px, calc(100% - 3rem) 1px, calc(100% - 3rem) 0, 100% 0, 100% 100%, calc(100% - 3rem) 100%, calc(100% - 3rem) calc(100% - 1px), calc(100% - 1px) calc(100% - 1px), calc(100% - 1px) calc(100% - 3rem), 100% calc(100% - 3rem), 100% 100%, 0 100%, 0 calc(100% - 3rem), 1px calc(100% - 3rem), 1px calc(100% - 1px), 3rem calc(100% - 1px), 3rem 100%, 0 100%);
         }
     }
 }

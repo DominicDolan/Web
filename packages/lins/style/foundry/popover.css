@@ -37,26 +37,38 @@
     @scope (body) to (.notFoundry) {
         [popover][role="menu"],
         [popover].menu {
-            /* TODO: popover/menu panel surface, radius, shadow, border. */
+            color: var(--on-surface-color);
+            background: var(--surface-color);
+            border: 1px solid var(--foundry-border-color);
+            border-radius: var(--surface-radius, 0.375rem);
+            box-shadow:
+                0 2px 0 color-mix(in oklab, black 16%, transparent),
+                0 14px 24px -18px var(--shadow-color);
         }
 
         dialog {
-            /* TODO: dialog panel surface, radius, border, shadow. */
+            color: var(--on-current-color);
+            background: var(--current-color);
+            border: 1px solid var(--foundry-border-color);
+            border-radius: var(--surface-radius, 0.375rem);
+            box-shadow:
+                0 2px 0 color-mix(in oklab, black 20%, transparent),
+                0 24px 44px -30px var(--shadow-color);
         }
 
         dialog::backdrop {
-            /* TODO: modal backdrop tint/blur. */
+            background: oklab(from var(--background-color) l a b / 0.72);
+            backdrop-filter: grayscale(0.35) contrast(1.08);
         }
 
         dialog > footer {
-            /*
-             * Context hook for dialog actions. A small gap/inline row may be a
-             * reasonable soft default; leave empty if layout utilities own it.
-             */
+            border-block-start: 1px solid color-mix(in oklab, currentColor 16%, transparent);
+            padding-block-start: 0.75rem;
         }
 
         form > footer {
-            /* TODO: form action row appearance, if any. */
+            border-block-start: 1px solid color-mix(in oklab, currentColor 14%, transparent);
+            padding-block-start: 0.75rem;
         }
     }
 }

@@ -9,71 +9,48 @@
 @import "./emptyState.css";
 @import "./nav.css";
 
-/*
- * LINS theme template entrypoint.
- *
- * Copy this folder when starting a new theme, then rename:
- *   - the folder:         style/template -> style/<your-theme>
- *   - the root class:     .templateTheme -> .<yourTheme>Theme
- *   - the opt-out class:  .notFoundry -> .not<YourTheme>
- *
- * This file owns the palette and cross-element role classes. Individual
- * element files own how buttons, cards, inputs, lists, etc. use those tokens.
- *
- * LINS rule of thumb:
- *   palette token -> role token -> element token -> actual CSS property
- *
- * Example:
- *   --primary-color      defined on .templateTheme.light
- *   --active-color       set by .primary
- *   --current-color      resolved by button/article/input/etc.
- *   background/color     applied inside that element's variant rules
- */
+/* Foundry: industrial, technical, high-contrast LINS theme. */
 
 @layer defaults {
-	/*
-	 * Palette tokens.
-	 *
-	 * Keep these semantic rather than component-specific. A button does not
-	 * read --button-background directly; it reads --current-color, which may
-	 * resolve to one of these palette roles through the .primary/.accent/etc.
-	 * classes below.
-	 *
-	 * Each colour role has a matching "on" colour for readable foreground text
-	 * or icons placed on that role. For example, --on-primary-color should be
-	 * legible on --primary-color.
-	 */
 	.foundryTheme.light {
-		/*
-		--primary-color: ...;
-		--on-primary-color: ...;
+		--primary-color: #171a1f;
+		--on-primary-color: #f8fafc;
 
-		--secondary-color: ...;
-		--on-secondary-color: ...;
+		--secondary-color: #465260;
+		--on-secondary-color: #f8fafc;
 
-		--surface-color: ...;
-		--on-surface-color: ...;
+		--surface-color: #f7f5ef;
+		--on-surface-color: #15171a;
 
-		--background-color: ...;
-		--on-background-color: ...;
+		--background-color: #d9d7cf;
+		--on-background-color: #171a1f;
 
-		--accent-color: ...;
-		--on-accent-color: ...;
+		--accent-color: #ff6a00;
+		--on-accent-color: #1b1208;
 
-		--success-color: ...;
-		--on-success-color: ...;
+		--success-color: #147d55;
+		--on-success-color: #f2fff9;
 
-		--warning-color: ...;
-		--on-warning-color: ...;
+		--warning-color: #d89b00;
+		--on-warning-color: #1f1700;
 
-		--error-color: ...;
-		--on-error-color: ...;
+		--error-color: #b3212c;
+		--on-error-color: #fff7f7;
 
-		One shadow token keeps elevation parametric across the whole theme.
-		--shadow-color: ...;
+		--shadow-color: oklab(from #111827 l a b / 0.32);
+		--foundry-border-color: color-mix(in oklab, var(--on-background-color) 28%, transparent);
+		--foundry-muted-color: color-mix(in oklab, var(--on-background-color) 62%, var(--background-color));
+		--foundry-panel-color: color-mix(in oklab, var(--surface-color) 86%, var(--background-color));
+		--foundry-rail-color: var(--accent-color);
+
+		--button-radius: 0.25rem;
+		--surface-radius: 0.375rem;
+		--control-radius: 0.25rem;
+		--focus-ring-width: 2px;
+		--font-family: "IBM Plex Sans", "Roboto Flex", "Inter Tight", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+		--mono-font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
 		color-scheme: light;
-		*/
 	}
 
 	/*
@@ -82,16 +59,44 @@
 	 * names so every element file continues to work unchanged.
 	 */
 	.foundryTheme.dark {
-		/*
-		--primary-color: ...;
-		--on-primary-color: ...;
-		--surface-color: ...;
-		--on-surface-color: ...;
-		--background-color: ...;
-		--on-background-color: ...;
-		--shadow-color: ...;
+		--primary-color: #f3f4f6;
+		--on-primary-color: #111318;
+
+		--secondary-color: #9aa6b2;
+		--on-secondary-color: #111318;
+
+		--surface-color: #22272f;
+		--on-surface-color: #eceff3;
+
+		--background-color: #111318;
+		--on-background-color: #e6e8eb;
+
+		--accent-color: #ff7a1a;
+		--on-accent-color: #201000;
+
+		--success-color: #26c281;
+		--on-success-color: #071b12;
+
+		--warning-color: #ffbd2e;
+		--on-warning-color: #1e1600;
+
+		--error-color: #ff5c66;
+		--on-error-color: #2a070a;
+
+		--shadow-color: oklab(from black l a b / 0.58);
+		--foundry-border-color: color-mix(in oklab, var(--on-background-color) 24%, transparent);
+		--foundry-muted-color: color-mix(in oklab, var(--on-background-color) 58%, var(--background-color));
+		--foundry-panel-color: color-mix(in oklab, var(--surface-color) 88%, var(--background-color));
+		--foundry-rail-color: var(--accent-color);
+
+		--button-radius: 0.25rem;
+		--surface-radius: 0.375rem;
+		--control-radius: 0.25rem;
+		--focus-ring-width: 2px;
+		--font-family: "IBM Plex Sans", "Roboto Flex", "Inter Tight", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+		--mono-font-family: "JetBrains Mono", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
 		color-scheme: dark;
-		*/
 	}
 
 	/*
@@ -167,19 +172,20 @@
 		color: var(--on-background-color);
 	}
 
+	.foundryTheme {
+		accent-color: var(--accent-color);
+	}
+
 	/*
 	 * Optional app-specific hooks.
 	 * The minimal theme styles .pageNav and .themeSettings because the demo
 	 * app uses them. If your theme needs those hooks, uncomment/fill them here;
 	 * otherwise prefer element categories such as nav.pageNav in nav.css.
 	 */
-	/*
-	#app .pageNav,
-	#app {
-		color: var(--on-surface-color);
-		border-right: 1px solid color-mix(in oklab, currentColor 15%, transparent);
+	#app.foundryTheme,
+	.foundryTheme #app {
+		color: var(--on-background-color);
 	}
-	*/
 }
 
 
