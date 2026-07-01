@@ -4,7 +4,7 @@ import "./style.css";
 import minimalCss from "@web/lins/minimal.css?url";
 import foundryCss from "@web/lins/foundry.css?url";
 
-const themes = [
+const themes: Array<{ id: string, label: string, class: string, css: string }> = [
   { id: "minimal", label: "Minimal", class: "minimalTheme", css: minimalCss },
   { id: "foundry", label: "Foundry", class: "foundryTheme", css: foundryCss },
 ];
@@ -33,7 +33,7 @@ function App() {
         <h1 class="title large">LINS Showcase</h1>
         <div class="flex-1" />
         <For each={themes}>
-          {(theme) => (
+          {(theme: (typeof themes)[number]) => (
             <button
               class={theme.id === currentTheme().id ? "flat" : "text"}
               onClick={() => setCurrentTheme(theme)}

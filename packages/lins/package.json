@@ -5,7 +5,13 @@
   "exports": {
     "./layout": "./layout/index.ts",
     "./minimal.css": "./style/minimal/theme.css",
+    "./minimal": "./style/minimal/theme.ts",
+    "./minimal.ts": "./style/minimal/theme.ts",
     "./foundry.css": "./style/foundry/theme.css",
+    "./foundry": "./style/foundry/theme.ts",
+    "./foundry.ts": "./style/foundry/theme.ts",
+    "./themes": "./style/themes.ts",
+    "./theme-info": "./style/themeInfo.ts",
     "./reset.css": "./style/reset.css",
     "./elements": "./elements/index.ts"
   }
