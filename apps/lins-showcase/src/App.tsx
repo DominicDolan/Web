@@ -1,21 +1,67 @@
-import { createSignal, createEffect, For } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import "./style.css";
 
 import minimalCss from "@web/lins/minimal.css?url";
 import foundryCss from "@web/lins/foundry.css?url";
+import { linsThemes, type LinsElementCategoryInfo, type LinsThemeInfo, type LinsVariantInfo } from "@web/lins/themes";
 
-const themes: Array<{ id: string, label: string, class: string, css: string }> = [
-  { id: "minimal", label: "Minimal", class: "minimalTheme", css: minimalCss },
-  { id: "foundry", label: "Foundry", class: "foundryTheme", css: foundryCss },
-];
+type ThemeOption = {
+  meta: LinsThemeInfo;
+  css: string;
+};
+
+const themeCssById: Record<string, string> = {
+  minimal: minimalCss,
+  foundry: foundryCss,
+};
+
+const themeMetadata: readonly LinsThemeInfo[] = linsThemes;
+
+const themes: ThemeOption[] = themeMetadata.map((meta) => ({
+  meta,
+  css: themeCssById[meta.id],
+}));
+
+function category(theme: LinsThemeInfo, id: string): LinsElementCategoryInfo | undefined {
+  return theme.elementCategories.find((elementCategory) => elementCategory.id === id);
+}
+
+function variants(theme: LinsThemeInfo, categoryId: string): readonly LinsVariantInfo[] {
+  return category(theme, categoryId)?.variants ?? [];
+}
+
+function titleCase(value: string): string {
+  return value
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function sampleTextForVariant(variant: LinsVariantInfo): string {
+  return variant.name || titleCase(variant.id);
+}
+
+function isTypographyRole(variant: LinsVariantInfo): boolean {
+  return ["display", "headline", "title", "body", "label"].includes(variant.id);
+}
+
+function isTypographySize(variant: LinsVariantInfo): boolean {
+  return ["large", "medium", "small"].includes(variant.id);
+}
 
 function App() {
   const [currentTheme, setCurrentTheme] = createSignal(themes[0]);
+  const [currentColorThemeId, setCurrentColorThemeId] = createSignal(themes[0]?.meta.colorThemes[0]?.id ?? "light");
   const [activeTab, setActiveTab] = createSignal("overview");
   const [sideNavItem, setSideNavItem] = createSignal("dashboard");
 
-  createEffect(() => {
-    const theme = currentTheme();
+  const currentColorTheme = () => {
+    const theme = currentTheme().meta;
+    return theme.colorThemes.find((colorTheme) => colorTheme.id === currentColorThemeId()) ?? theme.colorThemes[0];
+  };
+
+  const colorValueForRole = (roleId: string) => currentColorTheme()?.colors.find((color) => color.role === roleId);
+
+  createEffect(currentTheme, (theme) => {
     let link = document.getElementById("lins-theme") as HTMLLinkElement | null;
     if (!link) {
       link = document.createElement("link");
@@ -24,119 +70,162 @@ function App() {
       document.head.appendChild(link);
     }
     link.href = theme.css;
+
+    if (!theme.meta.colorThemes.some((colorTheme) => colorTheme.id === currentColorThemeId())) {
+      setCurrentColorThemeId(theme.meta.colorThemes[0]?.id ?? "light");
+    }
   });
 
+  const theme = () => currentTheme().meta;
+  const colorTheme = () => currentColorTheme();
+
   return (
-    <div class={`${currentTheme().class} light min-h-screen`} id="app">
-      {/* Top Navigation */}
+    <div class={`${theme().className} ${colorTheme()?.className ?? "light"} min-h-screen`} id="app">
       <nav class="top flex items-center gap-4 px-6 py-3">
         <h1 class="title large">LINS Showcase</h1>
         <div class="flex-1" />
-        <For each={themes}>
-          {(theme: (typeof themes)[number]) => (
-            <button
-              class={theme.id === currentTheme().id ? "flat" : "text"}
-              onClick={() => setCurrentTheme(theme)}
-            >
-              {theme.label}
-            </button>
-          )}
-        </For>
-        <button class="icon"><i>dark_mode</i></button>
+        {themes.map((themeOption) => (
+          <button
+            class={themeOption.meta.id === theme().id ? "flat" : "text"}
+            onClick={() => setCurrentTheme(themeOption)}
+          >
+            {themeOption.meta.name}
+          </button>
+        ))}
+        {theme().colorThemes.map((themeMode) => (
+          <button
+            class={themeMode.id === currentColorThemeId() ? "flat" : "text"}
+            onClick={() => setCurrentColorThemeId(themeMode.id)}
+          >
+            {themeMode.name}
+          </button>
+        ))}
       </nav>
 
       <div class="flex flex-1">
-        {/* Side Navigation */}
         <aside class="w-64 shrink-0 p-4">
           <nav>
             <ul class="nav flex flex-col gap-1">
-              <li aria-current={sideNavItem() === "dashboard" ? "page" : undefined}>
-                <a href="#" onClick={() => setSideNavItem("dashboard")}>
-                  <i>dashboard</i> Dashboard
-                </a>
-              </li>
-              <li aria-current={sideNavItem() === "components" ? "page" : undefined}>
-                <a href="#" onClick={() => setSideNavItem("components")}>
-                  <i>widgets</i> Components
-                </a>
-              </li>
-              <li aria-current={sideNavItem() === "forms" ? "page" : undefined}>
-                <a href="#" onClick={() => setSideNavItem("forms")}>
-                  <i>edit_note</i> Forms
-                </a>
-              </li>
-              <li aria-current={sideNavItem() === "settings" ? "page" : undefined}>
-                <a href="#" onClick={() => setSideNavItem("settings")}>
-                  <i>settings</i> Settings
-                </a>
-              </li>
+              {["dashboard", "components", "forms", "settings"].map((item) => (
+                <li aria-current={sideNavItem() === item ? "page" : undefined}>
+                  <a href="#" onClick={() => setSideNavItem(item)}>
+                    <i>{item === "dashboard" ? "dashboard" : item === "components" ? "widgets" : item === "forms" ? "edit_note" : "settings"}</i> {titleCase(item)}
+                  </a>
+                </li>
+              ))}
             </ul>
           </nav>
         </aside>
 
-        {/* Main Content */}
         <main class="flex-1 p-8 flex flex-col gap-8 overflow-y-auto">
-          {/* Breadcrumb */}
           <nav aria-label="Breadcrumb">
             <ol class="flex gap-2">
               <li><a href="#">Home</a></li>
-              <li><a href="#">Components</a></li>
-              <li><a href="#" aria-current="page">Showcase</a></li>
+              <li><a href="#">Themes</a></li>
+              <li><a href="#" aria-current="page">{theme().name}</a></li>
             </ol>
           </nav>
 
-          {/* Page Header */}
           <hgroup class="flex flex-col gap-1">
-            <h1 class="display large">Component Showcase</h1>
-            <p class="display small variant">Explore the full range of LINS styled elements</p>
+            <h1 class="display large">{theme().name} Showcase</h1>
+            <p class="display small variant">{theme().description}</p>
           </hgroup>
 
-          {/* Tab Navigation */}
           <ul role="tablist" class="flex gap-2">
-            <li
-              aria-selected={activeTab() === "overview" ? "true" : "false"}
-              onClick={() => setActiveTab("overview")}
-            >Overview</li>
-            <li
-              aria-selected={activeTab() === "cards" ? "true" : "false"}
-              onClick={() => setActiveTab("cards")}
-            >Cards</li>
-            <li
-              aria-selected={activeTab() === "forms" ? "true" : "false"}
-              onClick={() => setActiveTab("forms")}
-            >Forms</li>
-            <li
-              aria-selected={activeTab() === "lists" ? "true" : "false"}
-              onClick={() => setActiveTab("lists")}
-            >Lists</li>
+            {["overview", "cards", "forms", "lists"].map((tab) => (
+              <li
+                aria-selected={activeTab() === tab ? "true" : "false"}
+                onClick={() => setActiveTab(tab)}
+              >
+                {titleCase(tab)}
+              </li>
+            ))}
           </ul>
 
-          {/* Buttons Section */}
+          <section class="flex flex-col gap-4">
+            <hgroup>
+              <h2>Theme Metadata</h2>
+              <p>Theme identity, colour themes, and exported element categories</p>
+            </hgroup>
+
+            <article class="outlined flex flex-col gap-5 p-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <p class="label small variant">Theme class</p>
+                  <code>{theme().className}</code>
+                </div>
+                <div>
+                  <p class="label small variant">Colour theme</p>
+                  <code>{colorTheme()?.className}</code>
+                </div>
+                <div>
+                  <p class="label small variant">Categories</p>
+                  <code>{theme().elementCategories.length}</code>
+                </div>
+              </div>
+
+              <ul class="chips flex flex-wrap gap-2">
+                {theme().elementCategories.map((elementCategory) => (
+                  <li title={elementCategory.description}>{elementCategory.name}</li>
+                ))}
+              </ul>
+            </article>
+          </section>
+
+          <section class="flex flex-col gap-4">
+            <hgroup>
+              <h2>Colours</h2>
+              <p>Only colour roles and palette values exported by the active theme are shown</p>
+            </hgroup>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {theme().colors.map((colorRole) => {
+                const colorValue = colorValueForRole(colorRole.id);
+                return (
+                  <article class={`tonal ${colorRole.id} flex flex-col gap-3 p-5`}>
+                    <h3>{colorRole.name}</h3>
+                    <p>{colorRole.description}</p>
+                    <dl class="flex flex-col gap-1">
+                      <div>
+                        <dt class="label small variant">Token</dt>
+                        <dd class="label small"><code>{colorRole.cssVariable}</code></dd>
+                      </div>
+                      <div>
+                        <dt class="label small variant">Value</dt>
+                        <dd class="label small"><code>{colorValue?.color ?? "—"}</code></dd>
+                      </div>
+                      <div>
+                        <dt class="label small variant">On value</dt>
+                        <dd class="label small"><code>{colorValue?.onColor ?? "—"}</code></dd>
+                      </div>
+                    </dl>
+                  </article>
+                );
+              })}
+            </div>
+
+            <div class="flex flex-wrap gap-3 items-center">
+              {theme().colors.map((colorRole) => (
+                <button class={`flat ${colorRole.id}`}>{colorRole.name}</button>
+              ))}
+            </div>
+          </section>
+
           <section class="flex flex-col gap-4">
             <hgroup>
               <h2>Buttons</h2>
-              <p>All button variants and states</p>
+              <p>{category(theme(), "button")?.description}</p>
             </hgroup>
 
             <div class="flex flex-wrap gap-3 items-center">
-              <button class="elevated">Elevated</button>
-              <button class="flat">Flat</button>
-              <button class="outlined">Outlined</button>
-              <button class="text">Text</button>
-              <button class="plain">Plain</button>
-              <button class="icon"><i>favorite</i></button>
+              {variants(theme(), "button").map((variant) => (
+                <button class={variant.className} title={variant.description}>
+                  {variant.id === "icon" ? <i>favorite</i> : sampleTextForVariant(variant)}
+                </button>
+              ))}
               <button class="flat" disabled>Disabled</button>
             </div>
 
-            <div class="flex flex-wrap gap-3 items-center">
-              <button class="flat primary">Primary</button>
-              <button class="flat accent">Accent</button>
-              <button class="flat success">Success</button>
-              <button class="flat warning">Warning</button>
-              <button class="flat error">Error</button>
-            </div>
-
-            {/* Radio Group / Segmented Buttons */}
             <div role="radiogroup" aria-label="View mode">
               <button aria-checked="true">Grid</button>
               <button>List</button>
@@ -144,198 +233,110 @@ function App() {
             </div>
           </section>
 
-          {/* Cards Section */}
           <section class="flex flex-col gap-4">
             <hgroup>
               <h2>Cards & Surfaces</h2>
-              <p>Surface variants and interactive cards</p>
+              <p>{category(theme(), "card")?.description}</p>
             </hgroup>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <article class="elevated flex flex-col gap-4 p-6">
-                <hgroup>
-                  <h3>Elevated Card</h3>
-                  <p>With shadow, popping off the page</p>
-                </hgroup>
-                <section>
-                  <p>This is the default card appearance with a box shadow for depth.</p>
-                </section>
-                <footer class="flex gap-2">
-                  <button class="text">Cancel</button>
-                  <button class="flat">Action</button>
-                </footer>
-              </article>
-
-              <article class="flat flex flex-col gap-4 p-6">
-                <hgroup>
-                  <h3>Flat Card</h3>
-                  <p>Filled surface, no shadow</p>
-                </hgroup>
-                <section>
-                  <p>A flat surface for less visual emphasis while still having a distinct background.</p>
-                </section>
-                <footer class="flex gap-2">
-                  <button class="text">Learn More</button>
-                </footer>
-              </article>
-
-              <article class="outlined flex flex-col gap-4 p-6">
-                <hgroup>
-                  <h3>Outlined Card</h3>
-                  <p>Border only, no fill</p>
-                </hgroup>
-                <section>
-                  <p>Medium emphasis with a subtle border. Great for nested content.</p>
-                </section>
-                <footer class="flex gap-2">
-                  <button class="outlined">Details</button>
-                </footer>
-              </article>
-
-              <article class="tonal flex flex-col gap-4 p-6">
-                <hgroup>
-                  <h3>Tonal Card</h3>
-                  <p>Low-opacity colour background</p>
-                </hgroup>
-                <section>
-                  <p>A gentle tint of the active colour for subtle emphasis.</p>
-                </section>
-              </article>
-
-              <article class="inset flex flex-col gap-4 p-6">
-                <hgroup>
-                  <h3>Inset Card</h3>
-                  <p>Recessed inner shadow</p>
-                </hgroup>
-                <section>
-                  <p>An inset surface that feels embedded into the background.</p>
-                </section>
-              </article>
-
-              <article role="button" class="outlined flex flex-col gap-4 p-6">
-                <hgroup>
-                  <h3>Interactive Card</h3>
-                  <p>Click me — I have hover states</p>
-                </hgroup>
-                <section>
-                  <p>Cards with role="button" gain pointer cursor and hover elevation.</p>
-                </section>
-              </article>
+              {variants(theme(), "card").map((variant) => (
+                <article class={`${variant.className} flex flex-col gap-4 p-6`}>
+                  <hgroup>
+                    <h3>{variant.name} Card</h3>
+                    <p>{variant.default ? "Default card variant" : variant.description}</p>
+                  </hgroup>
+                  <section>
+                    <p>{variant.description}</p>
+                  </section>
+                  <footer class="flex gap-2">
+                    <button class="text">Cancel</button>
+                    <button class="flat">Action</button>
+                  </footer>
+                </article>
+              ))}
             </div>
 
-            {/* Nested Card */}
             <article class="elevated flex flex-col gap-4 p-6">
               <hgroup>
                 <h3>Nested Cards</h3>
-                <p>Cards inside cards auto-demote to outlined</p>
+                <p>Nested-card behaviour is controlled by the active theme CSS</p>
               </hgroup>
               <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <article class="flex flex-col gap-3 p-4">
                   <h4>Nested Item A</h4>
-                  <p>Auto-outlined nested card</p>
+                  <p>Context styling comes from the card category.</p>
                 </article>
                 <article class="flex flex-col gap-3 p-4">
                   <h4>Nested Item B</h4>
-                  <p>Auto-outlined nested card</p>
+                  <p>Authors can still override with explicit variants.</p>
                 </article>
               </section>
             </article>
 
-            {/* Colour role cards */}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <article class="tonal success flex flex-col gap-3 p-5">
-                <h3>Success</h3>
-                <p>Operation completed successfully.</p>
+              <article aria-selected="true" role={"button"} class="outlined flex flex-col gap-3 p-5">
+                <h3>Selected</h3>
+                <p>This card is selected with aria-selected=&quot;true&quot;.</p>
               </article>
-              <article class="tonal warning flex flex-col gap-3 p-5">
-                <h3>Warning</h3>
-                <p>You are approaching your storage limit.</p>
+              <article aria-selected="false" role={"button"} class="outlined flex flex-col gap-3 p-5">
+                <h3>Deselected</h3>
+                <p>This card is deselected with aria-selected=&quot;false&quot;.</p>
               </article>
-              <article class="tonal error flex flex-col gap-3 p-5">
-                <h3>Error</h3>
-                <p>Something went wrong. Please try again.</p>
+              <article role={"button"} class="outlined flex flex-col gap-3 p-5">
+                <h3>Interactive</h3>
+                <p>Cards with role=&quot;button&quot; gain interactive states.</p>
               </article>
             </div>
           </section>
 
-          {/* Typography Section */}
           <section class="flex flex-col gap-4">
             <hgroup>
               <h2>Typography</h2>
-              <p>The composable type scale</p>
+              <p>{category(theme(), "typography")?.description}</p>
             </hgroup>
 
             <article class="outlined flex flex-col gap-6 p-6">
-              <div class="flex flex-col gap-2">
-                <p class="display large">Display Large</p>
-                <p class="display medium">Display Medium</p>
-                <p class="display small">Display Small</p>
-              </div>
+              {variants(theme(), "typography").filter(isTypographyRole).map((role) => (
+                <div class="flex flex-col gap-2">
+                  {variants(theme(), "typography").filter(isTypographySize).map((size) => (
+                    <p class={`${role.className} ${size.className}`}>{role.name} {size.name}</p>
+                  ))}
+                  {variants(theme(), "typography").some((variant) => variant.id === "variant") && (
+                    <p class={`${role.className} medium variant`}>{role.name} Variant</p>
+                  )}
+                </div>
+              ))}
               <hr />
-              <div class="flex flex-col gap-2">
-                <p class="headline large">Headline Large</p>
-                <p class="headline medium">Headline Medium</p>
-                <p class="headline small">Headline Small</p>
-              </div>
-              <hr />
-              <div class="flex flex-col gap-2">
-                <p class="title large">Title Large</p>
-                <p class="title medium">Title Medium</p>
-                <p class="title small">Title Small</p>
-              </div>
-              <hr />
-              <div class="flex flex-col gap-2">
-                <p class="body large">Body Large</p>
-                <p class="body medium">Body Medium</p>
-                <p class="body small">Body Small</p>
-              </div>
-              <hr />
-              <div class="flex flex-col gap-2">
-                <p class="label large">Label Large</p>
-                <p class="label medium">Label Medium</p>
-                <p class="label small">Label Small</p>
-              </div>
-              <hr />
-              <div class="flex flex-col gap-2">
-                <p class="title medium variant">Title Variant (muted/secondary)</p>
-                <p class="body medium variant">Body Variant (muted/secondary)</p>
-                <p class="label medium variant">Label Variant (muted/secondary)</p>
-              </div>
+              <p>Inline <code>code</code> and horizontal rules come from the inline text category.</p>
             </article>
           </section>
 
-          {/* Forms Section */}
           <section class="flex flex-col gap-4">
             <hgroup>
               <h2>Forms & Inputs</h2>
-              <p>Text inputs, selects, checkboxes, and form fields</p>
+              <p>{category(theme(), "text-input")?.description}</p>
             </hgroup>
 
             <article class="elevated p-6">
-              <form class="flex flex-col gap-5" onSubmit={(e) => e.preventDefault()}>
+              <form class="flex flex-col gap-5" onSubmit={(event) => event.preventDefault()}>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <form-field class="flex flex-col gap-1">
-                    <label>First Name</label>
-                    <input-shell>
-                      <input type="text" placeholder="John" required />
-                    </input-shell>
-                    <output></output>
-                  </form-field>
-
-                  <form-field class="flex flex-col gap-1">
-                    <label>Last Name</label>
-                    <input-shell>
-                      <input type="text" placeholder="Doe" required />
-                    </input-shell>
-                    <output></output>
-                  </form-field>
+                  {variants(theme(), "text-input").map((variant) => (
+                    <form-field class="flex flex-col gap-1">
+                      <label>{variant.name} Input</label>
+                      <input-shell class={variant.className} title={variant.description}>
+                        <input type="text" placeholder={`${variant.name} input`} />
+                      </input-shell>
+                      <output>{variant.description}</output>
+                    </form-field>
+                  ))}
                 </div>
 
                 <form-field class="flex flex-col gap-1">
                   <label>Email Address</label>
                   <input-shell>
                     <i>mail</i>
-                    <input type="email" placeholder="john@example.com" />
+                    <input type="email" placeholder="john@example.com" required />
                   </input-shell>
                   <output></output>
                 </form-field>
@@ -361,9 +362,6 @@ function App() {
                     <input type="checkbox" id="terms" />
                     <label for="terms">I agree to the terms</label>
                   </form-field>
-                </div>
-
-                <div class="flex gap-4 items-center">
                   <form-field class="flex items-center gap-2">
                     <input type="radio" name="plan" id="free" checked />
                     <label for="free">Free</label>
@@ -371,10 +369,6 @@ function App() {
                   <form-field class="flex items-center gap-2">
                     <input type="radio" name="plan" id="pro" />
                     <label for="pro">Pro</label>
-                  </form-field>
-                  <form-field class="flex items-center gap-2">
-                    <input type="radio" name="plan" id="enterprise" />
-                    <label for="enterprise">Enterprise</label>
                   </form-field>
                 </div>
 
@@ -386,136 +380,98 @@ function App() {
             </article>
           </section>
 
-          {/* Lists & Chips Section */}
           <section class="flex flex-col gap-4">
             <hgroup>
-              <h2>Lists & Chips</h2>
-              <p>Navigation lists, chip sets, and menus</p>
+              <h2>Lists, Chips & Tabs</h2>
+              <p>List variants are read from the active theme metadata.</p>
             </hgroup>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <article class="outlined flex flex-col gap-4 p-5">
-                <h3>Navigation List</h3>
-                <ul class="nav flex flex-col gap-1">
-                  <li aria-current="page"><a href="#">Dashboard</a></li>
-                  <li><a href="#">Analytics</a></li>
-                  <li><a href="#">Reports</a></li>
-                  <li><a href="#">Settings</a></li>
-                </ul>
-              </article>
-
-              <article class="outlined flex flex-col gap-4 p-5">
-                <h3>Chip List</h3>
-                <ul class="chips flex flex-wrap gap-2">
-                  <li>TypeScript</li>
-                  <li>CSS</li>
-                  <li>HTML</li>
-                  <li>SolidJS</li>
-                  <li>Tailwind</li>
-                  <li>LINS</li>
-                </ul>
-              </article>
-
-              <article class="outlined flex flex-col gap-4 p-5">
-                <h3>Plain List</h3>
-                <ul class="plain flex flex-col gap-1">
-                  <li>Item one with plain styling</li>
-                  <li>Item two with plain styling</li>
-                  <li>Item three with plain styling</li>
-                </ul>
-              </article>
+              {variants(theme(), "list").map((variant) => (
+                <article class="outlined flex flex-col gap-4 p-5">
+                  <h3>{variant.name}</h3>
+                  <p>{variant.description}</p>
+                  <ul class={`${variant.className} ${variant.id === "chips" ? "flex flex-wrap gap-2" : "flex flex-col gap-1"}`}>
+                    <li aria-current={variant.id === "nav" ? "page" : undefined}><a href="#">Dashboard</a></li>
+                    <li><a href="#">Analytics</a></li>
+                    <li><a href="#">Reports</a></li>
+                    <li><a href="#">Settings</a></li>
+                  </ul>
+                </article>
+              ))}
             </div>
 
-            {/* Underlined Tabs */}
-            <article class="outlined flex flex-col gap-4 p-5">
-              <h3>Underlined Tabs</h3>
-              <ul role="tablist" class="underlined flex gap-2">
-                <li aria-selected="true">Overview</li>
-                <li aria-selected="false">Analytics</li>
-                <li aria-selected="false">Reports</li>
-                <li aria-selected="false">Export</li>
-              </ul>
-            </article>
-
-            {/* Inset Tabs */}
-            <article class="outlined flex flex-col gap-4 p-5">
-              <h3>Inset Tabs</h3>
-              <ul role="tablist" class="inset flex gap-2">
-                <li aria-selected="true">Day</li>
-                <li aria-selected="false">Week</li>
-                <li aria-selected="false">Month</li>
-              </ul>
-            </article>
+            {variants(theme(), "tab-list").map((variant) => (
+              <article class="outlined flex flex-col gap-4 p-5">
+                <h3>{variant.name} Tabs</h3>
+                <p>{variant.description}</p>
+                <ul role="tablist" class={`${variant.className} flex gap-2`}>
+                  <li aria-selected="true">Overview</li>
+                  <li aria-selected="false">Analytics</li>
+                  <li aria-selected="false">Reports</li>
+                  <li aria-selected="false">Export</li>
+                </ul>
+              </article>
+            ))}
           </section>
 
-          {/* Icons Section */}
           <section class="flex flex-col gap-4">
             <hgroup>
               <h2>Icons</h2>
-              <p>Material Symbols icon sizes</p>
+              <p>{category(theme(), "icon")?.description}</p>
             </hgroup>
 
             <div class="flex items-end gap-6">
-              <div class="flex flex-col items-center gap-2">
-                <i class="small">home</i>
-                <span class="label small variant">Small</span>
-              </div>
-              <div class="flex flex-col items-center gap-2">
-                <i class="medium">home</i>
-                <span class="label small variant">Medium</span>
-              </div>
-              <div class="flex flex-col items-center gap-2">
-                <i class="large">home</i>
-                <span class="label small variant">Large</span>
-              </div>
-              <div class="flex flex-col items-center gap-2">
-                <i class="xlarge">home</i>
-                <span class="label small variant">XLarge</span>
-              </div>
+              {variants(theme(), "icon").map((variant) => (
+                <div class="flex flex-col items-center gap-2">
+                  <i class={variant.className}>home</i>
+                  <span class="label small variant">{variant.name}</span>
+                </div>
+              ))}
             </div>
 
             <div class="flex gap-3">
-              <button class="icon"><i>settings</i></button>
-              <button class="icon"><i>favorite</i></button>
-              <button class="icon"><i>share</i></button>
-              <button class="icon"><i>delete</i></button>
-              <button class="icon"><i>more_vert</i></button>
+              {["settings", "favorite", "share", "delete", "more_vert"].map((icon) => (
+                <button class="icon"><i>{icon}</i></button>
+              ))}
             </div>
           </section>
 
-          {/* Empty States Section */}
           <section class="flex flex-col gap-4">
             <hgroup>
               <h2>Empty States & Loading</h2>
-              <p>Skeleton loaders and empty content placeholders</p>
+              <p>{category(theme(), "empty-state")?.description}</p>
             </hgroup>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <article class="outlined flex flex-col gap-3 p-5">
-                <h3>Loading Skeleton</h3>
-                <empty-state class="skeleton flex flex-col gap-3 p-4" aria-busy="true">
-                  <div class="h-4 w-3/4"></div>
-                  <div class="h-4 w-1/2"></div>
-                  <div class="h-4 w-5/6"></div>
-                </empty-state>
-              </article>
-
-              <article class="outlined flex flex-col gap-3 p-5">
-                <h3>Empty Content</h3>
-                <empty-state class="empty flex flex-col items-center gap-4 p-8">
-                  <i class="xlarge">inbox</i>
-                  <h3>No results found</h3>
-                  <p>Try adjusting your search filters.</p>
-                </empty-state>
-              </article>
+              {variants(theme(), "empty-state").map((variant) => (
+                <article class="outlined flex flex-col gap-3 p-5">
+                  <h3>{variant.name}</h3>
+                  <p>{variant.description}</p>
+                  <empty-state class={`${variant.className} ${variant.id === "empty" ? "flex flex-col items-center gap-4 p-8" : "flex flex-col gap-3 p-4"}`} aria-busy={variant.id === "skeleton" ? "true" : undefined}>
+                    {variant.id === "skeleton" ? (
+                      <>
+                        <div class="h-4 w-3/4"></div>
+                        <div class="h-4 w-1/2"></div>
+                        <div class="h-4 w-5/6"></div>
+                      </>
+                    ) : (
+                      <>
+                        <i class="xlarge">inbox</i>
+                        <h3>No results found</h3>
+                        <p>Try adjusting your search filters.</p>
+                      </>
+                    )}
+                  </empty-state>
+                </article>
+              ))}
             </div>
           </section>
 
-          {/* Dialog Section */}
           <section class="flex flex-col gap-4">
             <hgroup>
               <h2>Dialogs & Popovers</h2>
-              <p>Modal dialogs and floating menus</p>
+              <p>{category(theme(), "dialog")?.description}</p>
             </hgroup>
 
             <div class="flex gap-3">
@@ -545,30 +501,6 @@ function App() {
             </dialog>
           </section>
 
-          {/* Selected/Deselected Cards */}
-          <section class="flex flex-col gap-4">
-            <hgroup>
-              <h2>Selection States</h2>
-              <p>Cards and elements with selection indicators</p>
-            </hgroup>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <article aria-selected="true" role="button" class="outlined flex flex-col gap-3 p-5">
-                <h3>Selected</h3>
-                <p>This card is selected (aria-selected="true")</p>
-              </article>
-              <article aria-selected="false" role="button" class="outlined flex flex-col gap-3 p-5">
-                <h3>Deselected</h3>
-                <p>This card is deselected (aria-selected="false")</p>
-              </article>
-              <article role="button" class="outlined flex flex-col gap-3 p-5">
-                <h3>Neutral</h3>
-                <p>This card has no selection state</p>
-              </article>
-            </div>
-          </section>
-
-          {/* Data Display - Label/Value pairs */}
           <section class="flex flex-col gap-4">
             <hgroup>
               <h2>Data Display</h2>
@@ -577,43 +509,19 @@ function App() {
 
             <article class="outlined p-6">
               <dl class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="flex flex-col gap-1">
-                  <dt class="label medium variant">Status</dt>
-                  <dd class="label medium">Active</dd>
-                </div>
-                <div class="flex flex-col gap-1">
-                  <dt class="label medium variant">Plan</dt>
-                  <dd class="label medium">Enterprise</dd>
-                </div>
-                <div class="flex flex-col gap-1">
-                  <dt class="label medium variant">Members</dt>
-                  <dd class="label medium">24</dd>
-                </div>
-                <div class="flex flex-col gap-1">
-                  <dt class="label medium variant">Created</dt>
-                  <dd class="label medium">Jan 2024</dd>
-                </div>
+                {[
+                  ["Status", "Active"],
+                  ["Theme", theme().name],
+                  ["Mode", colorTheme()?.name ?? "Default"],
+                  ["Variants", String(theme().elementCategories.reduce((total, elementCategory) => total + elementCategory.variants.length, 0))],
+                ].map(([label, value]) => (
+                  <div class="flex flex-col gap-1">
+                    <dt class="label medium variant">{label}</dt>
+                    <dd class="label medium">{value}</dd>
+                  </div>
+                ))}
               </dl>
             </article>
-          </section>
-
-          {/* Highlighted Card */}
-          <section class="flex flex-col gap-4">
-            <hgroup>
-              <h2>Highlighted Cards</h2>
-              <p>Cards with accent bars</p>
-            </hgroup>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <article class="highlighted flex flex-col gap-3 p-5">
-                <h3>Important Notice</h3>
-                <p>This card has a vertical accent bar via the highlighted variant.</p>
-              </article>
-              <article class="highlighted accent flex flex-col gap-3 p-5">
-                <h3>Feature Update</h3>
-                <p>Highlighted with accent colour role applied.</p>
-              </article>
-            </div>
           </section>
 
         </main>

@@ -1,19 +1,33 @@
-import type {BareElementTag} from "@web/lins/elements"
+import "@solidjs/web";
 
 interface SolidClassAttribute {
-    class: string | JSX.ClassList //Record<string | boolean> | Array<string | Record<string | boolean>>
+    class: string
     ["aria-selected"]: string | boolean
 }
+
+interface LinsCustomElements {
+    ["input-shell"]: any
+    ["form-field"]: any
+    ["empty-state"]: any
+    ["toast-stack"]: any
+    ["progress-bar"]: any
+}
+
 declare module '@solidjs/web' {
-    namespace JSX {
+    export namespace JSX {
+        //noinspection JSUnusedGlobalSymbols
         interface HTMLAttributes<T> extends SolidClassAttribute {}
 
-        interface IntrinsicElements {
-            ["input-shell"]: any
-            ["form-field"]: any
-            ["empty-state"]: any
-            ["toast-stack"]: any
-            ["progress-bar"]: any
-        }
+        //noinspection JSUnusedGlobalSymbols
+        interface IntrinsicElements extends LinsCustomElements {}
     }
 }
+
+declare global {
+    namespace JSX {
+        //noinspection JSUnusedGlobalSymbols
+        interface IntrinsicElements extends LinsCustomElements {}
+    }
+}
+
+export {};
