@@ -25,6 +25,7 @@
     "@web/d1": "workspace:*",
     "wrangler": "catalog:",
     "@web/lins": "workspace:*",
+    "@web/router": "workspace:*",
     "@web/solid-delta": "workspace:*"
   },
   "devDependencies": {
