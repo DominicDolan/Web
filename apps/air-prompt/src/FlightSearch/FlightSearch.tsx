@@ -12,15 +12,26 @@ import {
 } from "./FlightFilterSchema";
 import {FlightCard} from "./FlightCard";
 import {searchFlights} from "./FlightSearch.server";
+import {generateFlightFilterSchemaFromPrompt} from "./FlightSchemaGenerator.server";
 import type {FlightSearchRequest} from "./FlightSearchTypes";
 import {formatPrice} from "./FlightSearchUtils";
 
 const today = new Date();
 const defaultFilterSchema = createDefaultFlightFilterSchema(today);
+const suggestedPrompts = [
+    "I want to find the cheapest flight anywhere this month",
+    "Find nonstop weekend flights from JFK to Europe",
+    "Show business class flights to Tokyo in August",
+    "Find family flights with low baggage costs",
+];
 
 export function FlightSearch() {
-    const [filterSchema] = createSignal<FlightFilterSchema>(defaultFilterSchema);
+    const [filterSchema, setFilterSchema] = createSignal<FlightFilterSchema>(defaultFilterSchema);
     const [filters, setFilters] = createSignal<FlightFilterValues>(createDefaultFlightFilterValues(defaultFilterSchema));
+    const [prompt, setPrompt] = createSignal("");
+    const [generatingFilters, setGeneratingFilters] = createSignal(false);
+    const [promptError, setPromptError] = createSignal<string>();
+    const [generatedSummary, setGeneratedSummary] = createSignal<string>();
     const [loading, setLoading] = createSignal(false);
     const [error, setError] = createSignal<string>();
     const [hasSearched, setHasSearched] = createSignal(false);
@@ -40,6 +51,41 @@ export function FlightSearch() {
             ...current,
             [key]: value,
         }));
+    }
+
+    async function onGenerateFilters() {
+        setGeneratingFilters(true);
+        setPromptError(undefined);
+        setGeneratedSummary(undefined);
+
+        try {
+            const result = await generateFlightFilterSchemaFromPrompt(prompt());
+
+            if (!result.ok) {
+                setPromptError(result.userErrorMessage);
+                return;
+            }
+
+            setFilterSchema(result.schema);
+            setFilters(createDefaultFlightFilterValues(result.schema));
+            setGeneratedSummary(result.summary);
+            setResults(undefined);
+            setHasSearched(false);
+            setError(undefined);
+        } catch (caught) {
+            setPromptError(caught instanceof Error ? caught.message : "Unable to generate filters right now.");
+        } finally {
+            setGeneratingFilters(false);
+        }
+    }
+
+    function onResetGeneratedFilters() {
+        setFilterSchema(defaultFilterSchema);
+        setFilters(createDefaultFlightFilterValues(defaultFilterSchema));
+        setGeneratedSummary(undefined);
+        setPromptError(undefined);
+        setResults(undefined);
+        setHasSearched(false);
     }
 
     async function onSubmit(event: SubmitEvent) {
@@ -72,6 +118,55 @@ export function FlightSearch() {
                 <p class="display small variant">Compare Google Flights results with booking-site filters while keeping the API key on the server.</p>
             </hgroup>
         </header>
+
+        <section class="max-w-7xl w-full mx-auto elevated p-5 flex flex-col gap-4">
+            <header class="flex flex-col gap-2">
+                <h2>Generate filters with AI</h2>
+                <p>Describe the flight search experience you want. The server first checks that the prompt is a flight-filter request, then asks a model to return a declarative schema.</p>
+            </header>
+
+            <section class="flex flex-col gap-2" aria-label="Suggested prompts">
+                <small>Suggested prompts</small>
+                <div class="flex flex-wrap gap-2">
+                    <For each={suggestedPrompts}>{(suggestion) =>
+                        <button class="outlined" type="button" onClick={() => setPrompt(suggestion)}>{suggestion}</button>
+                    }</For>
+                </div>
+            </section>
+
+            <form-field class="flex flex-col gap-2">
+                <label for="filter-prompt">Prompt</label>
+                <textarea
+                    id="filter-prompt"
+                    rows="5"
+                    value={prompt()}
+                    onInput={(event) => setPrompt(event.currentTarget.value)}
+                    placeholder="Example: I want to find the cheapest flight anywhere this month"
+                />
+            </form-field>
+
+            <footer class="flex flex-col gap-3 md:flex-row md:items-center">
+                <button class="flat flex items-center justify-center gap-2" type="button" disabled={generatingFilters()} onClick={onGenerateFilters}>
+                    <i aria-hidden="true">auto_awesome</i>
+                    <span>{generatingFilters() ? "Generating filters" : "Generate filter schema"}</span>
+                </button>
+                <button class="outlined" type="button" disabled={generatingFilters()} onClick={onResetGeneratedFilters}>Reset default filters</button>
+            </footer>
+
+            <Show when={promptError()}>
+                {(message) => <article class="outlined error p-4" role="alert">
+                    <h3>Could not generate filters</h3>
+                    <p>{message()}</p>
+                </article>}
+            </Show>
+
+            <Show when={generatedSummary()}>
+                {(summary) => <article class="tonal primary p-4">
+                    <h3>Generated schema applied</h3>
+                    <p>{summary()}</p>
+                </article>}
+            </Show>
+        </section>
 
         <section class="max-w-7xl w-full mx-auto grid gap-6 xl:grid-cols-[24rem_1fr]">
             <article class="elevated p-5">
@@ -258,6 +353,29 @@ function FlightFilterControl(props: FlightFilterControlProps) {
                 <FilterHelperText text={field().helperText} />
             </form-field>}
         </Match>
+
+        <Match when={props.field.kind === "multi-select" && props.field}>
+            {(field) => <form-field class="flex flex-col gap-2">
+                <label>{field().label}</label>
+                <div class="flex flex-wrap gap-2" role="group" aria-label={field().label}>
+                    <For each={field().options}>{(option) => {
+                        const selected = createMemo(() => {
+                            const current = value();
+                            return Array.isArray(current) && current.includes(option.value);
+                        });
+
+                        return <button
+                            type="button"
+                            class={selected() ? "tonal" : "outlined"}
+                            aria-pressed={selected() ? "true" : "false"}
+                            disabled={disabled()}
+                            onClick={() => props.onChange(field().key, toggleStringArrayValue(value(), option.value))}
+                        >{option.label}</button>;
+                    }}</For>
+                </div>
+                <FilterHelperText text={field().helperText} />
+            </form-field>}
+        </Match>
     </Switch>;
 }
 
@@ -289,6 +407,11 @@ function parseNumberInput(value: string, optional: boolean | undefined) {
     if (!value && optional) return undefined;
     const parsed = Number(value);
     return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function toggleStringArrayValue(value: FlightFilterValue, option: string) {
+    const values = Array.isArray(value) ? value : [];
+    return values.includes(option) ? values.filter((item) => item !== option) : [...values, option];
 }
 
 function getDateMin(field: Extract<FlightFilter, {kind: "date"}>, values: FlightFilterValues) {

@@ -1,7 +1,7 @@
 import type {FlightSearchRequest} from "./FlightSearchTypes";
 import {addDays, formatDateInput} from "./FlightSearchUtils";
 
-export type FlightFilterValue = string | number | undefined;
+export type FlightFilterValue = string | number | string[] | undefined;
 
 export type FlightFilterValues = Record<string, FlightFilterValue>;
 
@@ -17,7 +17,7 @@ export type FlightFilterOption = {
 };
 
 export type FlightFilterBase = {
-    key: keyof FlightSearchRequest;
+    key: keyof FlightSearchRequest | string;
     label: string;
     helperText?: string;
     defaultValue?: FlightFilterValue;
@@ -57,7 +57,12 @@ export type FlightSelectFilter = FlightFilterBase & {
     options: FlightFilterOption[];
 };
 
-export type FlightFilter = FlightRadioFilter | FlightTextFilter | FlightDateFilter | FlightNumberFilter | FlightSelectFilter;
+export type FlightMultiSelectFilter = FlightFilterBase & {
+    kind: "multi-select";
+    options: FlightFilterOption[];
+};
+
+export type FlightFilter = FlightRadioFilter | FlightTextFilter | FlightDateFilter | FlightNumberFilter | FlightSelectFilter | FlightMultiSelectFilter;
 
 export type FlightFilterSection = {
     title?: string;
@@ -66,7 +71,7 @@ export type FlightFilterSection = {
 };
 
 export type FlightStaticFilter = {
-    key: keyof FlightSearchRequest;
+    key: keyof FlightSearchRequest | string;
     value: FlightFilterValue;
     label: string;
     message: string;
