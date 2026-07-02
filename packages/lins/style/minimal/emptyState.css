@@ -59,10 +59,10 @@
 
             content: "";
             position: absolute;
-            inset: 1rem;
+            inset: 0.25rem;
             pointer-events: none;
             border: 2px dashed var(--border-color);
-            border-radius: 1.5rem;
+            border-radius: 1rem;
         }
     }
 }

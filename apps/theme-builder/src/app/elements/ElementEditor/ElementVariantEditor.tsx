@@ -19,7 +19,7 @@ export function ElementVariantEditor(props: { variant: ElementVariantDefinition,
             </section>
         </div>
         <article class="elevated flex flex-col gap-6">
-            <article class="inset">
+            <article class="inset p-0">
                 <CssEditor selector={elementCategory().selector} content={""}></CssEditor>
             </article>
             <article class="outlined min-w-100 grow">
