@@ -10,6 +10,8 @@ export default defineConfig(({mode}) => {
     const env = loadEnv(mode, process.cwd(), "");
     process.env.SERF_API_KEY ??= env.SERF_API_KEY;
     process.env.SERP_API_KEY ??= env.SERP_API_KEY;
+    process.env.OPEN_ROUTER_API_KEY ??= env.OPEN_ROUTER_API_KEY;
+    process.env.OPENROUTER_API_KEY ??= env.OPENROUTER_API_KEY;
 
     return {
         appType: "spa",
