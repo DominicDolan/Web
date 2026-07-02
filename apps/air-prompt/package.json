@@ -28,6 +28,7 @@
     "@web/solid-delta": "workspace:*"
   },
   "devDependencies": {
+    "@types/node": "25.0.9",
     "typescript": "catalog:"
   }
 }

@@ -10,3 +10,4 @@ bun.lock
 /apps/**/.wrangler/
 /apps/**/.output/
 /apps/**/dist/
+/apps/air-prompt/.env
