@@ -15,6 +15,7 @@ import {searchFlights} from "./FlightSearch.server";
 import {generateFlightFilterSchemaFromPrompt} from "./FlightSchemaGenerator.server";
 import type {FlightSearchRequest} from "./FlightSearchTypes";
 import {formatPrice} from "./FlightSearchUtils";
+import styles from "./FlightSearch.module.css";
 
 const today = new Date();
 const defaultFilterSchema = createDefaultFlightFilterSchema(today);
@@ -113,45 +114,36 @@ export function FlightSearch() {
                     <li><A href="/" matches={() => true} aria-current="page">Air Prompt</A></li>
                 </ol>
             </nav>
-            <hgroup class="flex flex-col gap-2">
-                <h1 class="display large">Search flights</h1>
-                <p class="display small variant">Compare Google Flights results with booking-site filters while keeping the API key on the server.</p>
-            </hgroup>
         </header>
 
-        <section class="max-w-7xl w-full mx-auto elevated p-5 flex flex-col gap-4">
-            <header class="flex flex-col gap-2">
-                <h2>Generate filters with AI</h2>
-                <p>Describe the flight search experience you want. The server first checks that the prompt is a flight-filter request, then asks a model to return a declarative schema.</p>
+        <article class={`${styles.promptComposer} max-w-7xl w-full mx-auto elevated p-5 flex flex-col gap-4`}>
+            <header class={`${styles.promptComposerHeader} flex flex-col gap-2`}>
+                <p class={styles.promptEyebrow}>Generative filter builder</p>
             </header>
 
-            <section class="flex flex-col gap-2" aria-label="Suggested prompts">
-                <small>Suggested prompts</small>
+            <section class={`${styles.suggestions} flex flex-col gap-2`} aria-label="Suggested prompts">
                 <div class="flex flex-wrap gap-2">
                     <For each={suggestedPrompts}>{(suggestion) =>
-                        <button class="outlined" type="button" onClick={() => setPrompt(suggestion)}>{suggestion}</button>
+                        <button class={`${styles.suggestionChip} outlined`} type="button" onClick={() => setPrompt(suggestion)}>{suggestion}</button>
                     }</For>
                 </div>
             </section>
 
-            <form-field class="flex flex-col gap-2">
-                <label for="filter-prompt">Prompt</label>
-                <textarea
-                    id="filter-prompt"
-                    rows="5"
-                    value={prompt()}
-                    onInput={(event) => setPrompt(event.currentTarget.value)}
-                    placeholder="Example: I want to find the cheapest flight anywhere this month"
-                />
+            <form-field class={`${styles.promptField} flex flex-col gap-2`}>
+                <div class={styles.promptInputRow}>
+                    <textarea
+                        id="filter-prompt"
+                        rows="2"
+                        value={prompt()}
+                        onInput={(event) => setPrompt(event.currentTarget.value)}
+                        placeholder="Example: I want to find the cheapest flight anywhere this month"
+                    />
+                    <button class={`${styles.generateButton} flat`} type="button" disabled={generatingFilters()} onClick={onGenerateFilters} aria-label="Generate filter schema">
+                        <i aria-hidden="true">auto_awesome</i>
+                        <span>{generatingFilters() ? "Generating" : "Generate"}</span>
+                    </button>
+                </div>
             </form-field>
-
-            <footer class="flex flex-col gap-3 md:flex-row md:items-center">
-                <button class="flat flex items-center justify-center gap-2" type="button" disabled={generatingFilters()} onClick={onGenerateFilters}>
-                    <i aria-hidden="true">auto_awesome</i>
-                    <span>{generatingFilters() ? "Generating filters" : "Generate filter schema"}</span>
-                </button>
-                <button class="outlined" type="button" disabled={generatingFilters()} onClick={onResetGeneratedFilters}>Reset default filters</button>
-            </footer>
 
             <Show when={promptError()}>
                 {(message) => <article class="outlined error p-4" role="alert">
@@ -166,7 +158,7 @@ export function FlightSearch() {
                     <p>{summary()}</p>
                 </article>}
             </Show>
-        </section>
+        </article>
 
         <section class="max-w-7xl w-full mx-auto grid gap-6 xl:grid-cols-[24rem_1fr]">
             <article class="elevated p-5">
@@ -207,6 +199,9 @@ export function FlightSearch() {
                             <i aria-hidden="true">search</i>
                             <span>{loading() ? "Searching" : "Search flights"}</span>
                         </button>
+                        <Show when={generatedSummary()}>
+                            <button class="outlined" type="button" disabled={generatingFilters() || loading()} onClick={onResetGeneratedFilters}>Reset default filters</button>
+                        </Show>
                         <small>Use IATA airport codes or city airport IDs supported by Google Flights.</small>
                     </footer>
                 </form>
