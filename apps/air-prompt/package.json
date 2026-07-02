@@ -18,7 +18,6 @@
     "@web/utils": "workspace:*",
     "@web/schema": "workspace:*",
     "@web/server-functions": "workspace:*",
-    "@earendil-works/pi-coding-agent": "0.80.3",
     "tailwindcss": "catalog:",
     "@tailwindcss/vite": "catalog:",
     "vite-plugin-solid": "catalog:",

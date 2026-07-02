@@ -2,25 +2,25 @@ import {Match, Show, Switch, createSignal} from "solid-js";
 import {A, useLocation} from "@web/router";
 import {FlightDetails} from "~/FlightDetails/FlightDetails";
 import {FlightSearch} from "~/FlightSearch/FlightSearch";
-import {runPiOpenRouterProof, type PiProofResult} from "~/PiProof.server";
+import {runOpenRouterProof, type OpenRouterProofResult} from "~/OpenRouterProof.server";
 
 export default function App() {
     const location = useLocation();
-    const [piLoading, setPiLoading] = createSignal(false);
-    const [piError, setPiError] = createSignal<string>();
-    const [piProof, setPiProof] = createSignal<PiProofResult>();
+    const [openRouterLoading, setOpenRouterLoading] = createSignal(false);
+    const [openRouterError, setOpenRouterError] = createSignal<string>();
+    const [openRouterProof, setOpenRouterProof] = createSignal<OpenRouterProofResult>();
 
-    async function onRunPiProof() {
-        setPiLoading(true);
-        setPiError(undefined);
+    async function onRunOpenRouterProof() {
+        setOpenRouterLoading(true);
+        setOpenRouterError(undefined);
 
         try {
-            setPiProof(await runPiOpenRouterProof());
+            setOpenRouterProof(await runOpenRouterProof());
         } catch (caught) {
-            setPiProof(undefined);
-            setPiError(caught instanceof Error ? caught.message : "Unable to run the Pi SDK proof right now.");
+            setOpenRouterProof(undefined);
+            setOpenRouterError(caught instanceof Error ? caught.message : "Unable to run the OpenRouter proof right now.");
         } finally {
-            setPiLoading(false);
+            setOpenRouterLoading(false);
         }
     }
 
@@ -28,23 +28,23 @@ export default function App() {
         <section class="max-w-7xl w-full mx-auto elevated p-5 flex flex-col gap-3">
             <header class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <hgroup>
-                    <h2>Pi SDK OpenRouter proof</h2>
-                    <p>Runs a server function that creates a Pi coding agent SDK session and sends one prompt through OpenRouter.</p>
+                    <h2>OpenRouter proof</h2>
+                    <p>Runs a server function that sends one prompt directly to the OpenRouter API.</p>
                 </hgroup>
-                <button class="flat flex items-center justify-center gap-2" type="button" disabled={piLoading()} onClick={onRunPiProof}>
+                <button class="flat flex items-center justify-center gap-2" type="button" disabled={openRouterLoading()} onClick={onRunOpenRouterProof}>
                     <i aria-hidden="true">smart_toy</i>
-                    <span>{piLoading() ? "Running proof" : "Run Pi proof"}</span>
+                    <span>{openRouterLoading() ? "Running proof" : "Run OpenRouter proof"}</span>
                 </button>
             </header>
 
-            <Show when={piError()}>
+            <Show when={openRouterError()}>
                 {(message) => <article class="outlined error p-4" role="alert">
-                    <h3>Pi proof failed</h3>
+                    <h3>OpenRouter proof failed</h3>
                     <p>{message()}</p>
                 </article>}
             </Show>
 
-            <Show when={piProof()}>
+            <Show when={openRouterProof()}>
                 {(proof) => <article class="tonal primary p-4 flex flex-col gap-2">
                     <h3>OpenRouter responded</h3>
                     <p>{proof().text}</p>
