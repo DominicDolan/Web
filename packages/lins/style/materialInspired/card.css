@@ -101,6 +101,19 @@
                 box-shadow: none;
             }
 
+            &.magic {
+                position: relative;
+                overflow: hidden;
+                isolation: isolate;
+                color: var(--on-surface-color);
+                border-color: color-mix(in oklab, var(--primary-color) 22%, var(--outline-variant-color));
+                background:
+                    radial-gradient(circle at 8% 0%, color-mix(in oklab, var(--primary-color) 16%, transparent) 0 10rem, transparent 62%),
+                    radial-gradient(circle at 92% 70%, color-mix(in oklab, var(--accent-color) 12%, transparent) 0 8rem, transparent 44%),
+                    linear-gradient(135deg, var(--surface-container-high-color), var(--surface-container-low-color));
+                box-shadow: var(--elevation-2);
+            }
+
             &[role="button"]:hover,
             &[role="button"]:focus-visible {
                 background-image: linear-gradient(

@@ -15,7 +15,6 @@ import {searchFlights} from "./FlightSearch.server";
 import {generateFlightFilterSchemaFromPrompt} from "./FlightSchemaGenerator.server";
 import type {FlightSearchRequest} from "./FlightSearchTypes";
 import {formatPrice} from "./FlightSearchUtils";
-import styles from "./FlightSearch.module.css";
 
 const today = new Date();
 const defaultFilterSchema = createDefaultFlightFilterSchema(today);
@@ -116,29 +115,30 @@ export function FlightSearch() {
             </nav>
         </header>
 
-        <article class={`${styles.promptComposer} max-w-7xl w-full mx-auto elevated p-5 flex flex-col gap-4`}>
-            <header class={`${styles.promptComposerHeader} flex flex-col gap-2`}>
-                <p class={styles.promptEyebrow}>Generative filter builder</p>
+        <article class="magic max-w-7xl w-full mx-auto p-5 flex flex-col gap-4">
+            <header class="flex flex-col gap-2 max-w-4xl">
+                <p class="label small primary">Generative filter builder</p>
             </header>
 
-            <section class={`${styles.suggestions} flex flex-col gap-2`} aria-label="Suggested prompts">
+            <section class="flex flex-col gap-2" aria-label="Suggested prompts">
                 <div class="flex flex-wrap gap-2">
                     <For each={suggestedPrompts}>{(suggestion) =>
-                        <button class={`${styles.suggestionChip} outlined`} type="button" onClick={() => setPrompt(suggestion)}>{suggestion}</button>
+                        <button class="outlined" type="button" onClick={() => setPrompt(suggestion)}>{suggestion}</button>
                     }</For>
                 </div>
             </section>
 
-            <form-field class={`${styles.promptField} flex flex-col gap-2`}>
-                <div class={styles.promptInputRow}>
+            <form-field class="magic flex flex-col gap-2">
+                <div class="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-stretch">
                     <textarea
+                        class="magic"
                         id="filter-prompt"
                         rows="2"
                         value={prompt()}
                         onInput={(event) => setPrompt(event.currentTarget.value)}
                         placeholder="Example: I want to find the cheapest flight anywhere this month"
                     />
-                    <button class={`${styles.generateButton} flat`} type="button" disabled={generatingFilters()} onClick={onGenerateFilters} aria-label="Generate filter schema">
+                    <button class="flat flex items-center justify-center gap-2 md:self-stretch" type="button" disabled={generatingFilters()} onClick={onGenerateFilters} aria-label="Generate filter schema">
                         <i aria-hidden="true">auto_awesome</i>
                         <span>{generatingFilters() ? "Generating" : "Generate"}</span>
                     </button>

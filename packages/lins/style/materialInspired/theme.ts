@@ -63,6 +63,7 @@ export const materialInspiredThemeInfo = {
                 { id: "elevated", className: "elevated", name: "Elevated", description: "Default Material-like elevated card with surface colour and soft ambient/shadow elevation." },
                 { id: "flat", className: "flat", name: "Filled", description: "Filled surface card using a subtle surface-container tone without prominent shadow." },
                 { id: "outlined", className: "outlined", name: "Outlined", description: "Low-emphasis card with transparent or surface fill and a fine outline; also appropriate for nested cards." },
+                { id: "magic", className: "magic", name: "Magic", description: "Expressive gradient surface with soft primary/accent colour washes, subtle outline, and gentle elevation for generative or high-delight moments." },
                 { id: "text", className: "text", name: "Text", description: "Chrome-free content block for lightweight sections." },
             ],
         },
@@ -136,6 +137,7 @@ export const materialInspiredThemeInfo = {
                 { id: "tonal", className: "tonal", name: "Tonal", description: "Soft active-colour field treatment for search, filters, or highlighted entry." },
                 { id: "elevated", className: "elevated", name: "Elevated", description: "Surface field with subtle elevation for search bars and composer controls." },
                 { id: "quiet", className: "quiet", name: "Quiet", description: "Low-emphasis field treatment for dense filter and inline-edit contexts." },
+                { id: "magic", className: "magic", name: "Magic", description: "Expressive gradient field treatment with softened glow, decorative primary/accent border, and stronger text and placeholder contrast." },
             ],
         },
         {
@@ -152,7 +154,9 @@ export const materialInspiredThemeInfo = {
             file: "style/materialInspired/input.css",
             selectors: ["form-field", "fieldset", "form-field output"],
             description: "Label/control/supporting-text grouping with Material-like helper/error text, required markers, and restrained fieldset styling.",
-            variants: [],
+            variants: [
+                { id: "magic", className: "magic", name: "Magic", description: "Composer-style form-field treatment that strengthens label contrast to pair with magic text inputs." },
+            ],
         },
         {
             id: "list",

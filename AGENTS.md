@@ -2,6 +2,14 @@
 
 This repository uses Solid 2 beta. Be careful with APIs whose signatures changed from Solid 1.
 
+## Collaborative agent workflow
+
+Work in a collaborative mode with the user. Do the requested task, then summarize what changed and refer the user to run any checks they want locally.
+
+Do **not** constantly run TypeScript error checks, builds, test suites, or other broad verification commands just to confirm everything is okay. Only run those checks when the user explicitly asks for them or when they are narrowly required for the specific task.
+
+If a requirement is unclear, ambiguous, or has multiple reasonable interpretations, stop and ask the user for clarification instead of guessing what to do.
+
 ## Solid 2 `createEffect`
 
 `createEffect` requires both a compute function and an effect function:
