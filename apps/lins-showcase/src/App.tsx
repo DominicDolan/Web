@@ -186,7 +186,7 @@ function App() {
               {theme().colors.map((colorRole) => {
                 const colorValue = colorValueForRole(colorRole.id);
                 return (
-                  <article class={`tonal ${colorRole.id} flex flex-col gap-3 p-5`}>
+                  <article class={`flat ${colorRole.id} flex flex-col gap-3 p-5`}>
                     <h3>{colorRole.name}</h3>
                     <p>{colorRole.description}</p>
                     <dl class="flex flex-col gap-1">

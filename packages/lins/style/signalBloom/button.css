@@ -154,10 +154,13 @@
 			}
 
 			&.pop {
-				background-image: linear-gradient(135deg, color-mix(in oklab, var(--current-color) 92%, white), var(--current-color));
-				color: var(--on-current-color);
+				background:
+					radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--accent-color) 24%, transparent), transparent 48%),
+					linear-gradient(135deg, color-mix(in oklab, var(--current-color) 20%, var(--surface-color)), color-mix(in oklab, var(--current-color) 10%, var(--surface-color)));
+				border-color: color-mix(in oklab, var(--current-color) 36%, var(--signal-bloom-border-color));
+				color: var(--on-surface-color);
 				box-shadow:
-					0 0 0 1px color-mix(in oklab, var(--on-current-color) 18%, transparent) inset,
+					0 0 0 1px color-mix(in oklab, var(--surface-color) 58%, transparent) inset,
 					0 10px 22px -14px var(--current-color),
 					0 18px 36px -24px var(--shadow-color);
 			}

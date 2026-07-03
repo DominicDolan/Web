@@ -94,9 +94,11 @@
 
 		dialog.pop {
 			background:
-				radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--accent-color) 24%, transparent), transparent 38%),
-				linear-gradient(135deg, color-mix(in oklab, var(--active-color, var(--primary-color)) 18%, var(--surface-color)), var(--surface-color));
-			border-color: color-mix(in oklab, var(--active-color, var(--primary-color)) 24%, transparent);
+				radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--accent-color) 22%, transparent), transparent 40%),
+				radial-gradient(circle at 0% 100%, color-mix(in oklab, var(--active-color, var(--primary-color)) 14%, transparent), transparent 46%),
+				linear-gradient(135deg, color-mix(in oklab, var(--active-color, var(--primary-color)) 12%, var(--surface-color)), var(--surface-color));
+			color: var(--on-surface-color);
+			border-color: color-mix(in oklab, var(--active-color, var(--primary-color)) 30%, var(--signal-bloom-border-color));
 			box-shadow: var(--elevation-3), 0 0 36px -22px var(--active-color, var(--primary-color));
 		}
 
