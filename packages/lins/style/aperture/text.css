@@ -20,13 +20,14 @@
          * Unopinionated typography baseline. Themes are free to replace any of
          * these, but the names are part of the LINS contract.
          */
-        --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --font-family: Inter, Geist, "Avenir Next", "IBM Plex Sans", "Source Sans 3", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        --mono-font-family: "Cascadia Code", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
         --base-font-size: 16px;
         /* Fallback only. Implementations should set --font-size in the role rules below. */
         --font-size: var(--base-font-size);
-        --line-height: 1.5;
-        --heading-line-height: 1.2;
-        --heading-font-weight: 700;
+        --line-height: 1.58;
+        --heading-line-height: 1.16;
+        --heading-font-weight: 650;
     }
 }
 
@@ -96,7 +97,7 @@
     }
 
     code {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+        font-family: var(--mono-font-family), monospace;
     }
 }
 
@@ -122,8 +123,11 @@
             [role="banner"] h1, [role="banner"] h2
         ),
         .display {
-            /* TODO: --font-size: ...; */
-            /* TODO: display typeface treatment. */
+            --font-size: 3rem;
+            line-height: 1.08;
+            font-weight: 680;
+            letter-spacing: -0.045em;
+            color: color-mix(in oklab, currentColor 90%, var(--primary-color));
         }
 
         :where(
@@ -135,8 +139,11 @@
             section > hgroup > h5, section > hgroup > h6
         ),
         .headline {
-            /* TODO: --font-size: ...; */
-            /* TODO: headline typeface treatment. */
+            --font-size: 1.9rem;
+            line-height: 1.14;
+            font-weight: 650;
+            letter-spacing: -0.032em;
+            color: color-mix(in oklab, currentColor 88%, var(--primary-color));
         }
 
         :where(
@@ -161,8 +168,11 @@
             empty-state.empty > hgroup > h5, empty-state.empty > hgroup > h6
         ),
         .title {
-            /* TODO: --font-size: ...; */
-            /* TODO: title typeface treatment, including card-heading defaults. */
+            --font-size: 1.12rem;
+            line-height: 1.24;
+            font-weight: 640;
+            letter-spacing: -0.018em;
+            color: color-mix(in oklab, currentColor 86%, var(--primary-color));
         }
 
         :where(
@@ -178,8 +188,10 @@
             empty-state > p
         ),
         .body {
-            /* TODO: --font-size: ...; */
-            /* TODO: body typeface treatment. */
+            --font-size: 0.96rem;
+            line-height: 1.62;
+            font-weight: 420;
+            letter-spacing: -0.004em;
         }
 
         /*noinspection CssInvalidHtmlTagReference*/
@@ -196,8 +208,10 @@
             label, form-field > label, fieldset > legend
         ),
         .label {
-            /* TODO: --font-size: ...; */
-            /* TODO: label typeface treatment. */
+            --font-size: 0.84rem;
+            line-height: 1.35;
+            font-weight: 620;
+            letter-spacing: 0.018em;
         }
 
         /*
@@ -214,8 +228,11 @@
             [role="banner"] hgroup > p
         ),
         .display.variant {
-            /* TODO: --font-size: ...; */
-            /* TODO: display variant treatment. */
+            --font-size: 1.08rem;
+            line-height: 1.55;
+            font-weight: 420;
+            letter-spacing: -0.01em;
+            color: color-mix(in oklab, currentColor 66%, var(--aperture-muted-color));
         }
 
         :where(
@@ -223,8 +240,11 @@
             section > header > p
         ),
         .headline.variant {
-            /* TODO: --font-size: ...; */
-            /* TODO: headline variant treatment and section-heading defaults. */
+            --font-size: 0.98rem;
+            line-height: 1.45;
+            font-weight: 520;
+            letter-spacing: 0.012em;
+            color: color-mix(in oklab, currentColor 68%, var(--aperture-muted-color));
         }
 
         :where(
@@ -239,8 +259,11 @@
             nav[aria-label="Breadcrumb"] a
         ),
         .title.variant {
-            /* TODO: --font-size: ...; */
-            /* TODO: title variant treatment and section-heading defaults. */
+            --font-size: 0.9rem;
+            line-height: 1.45;
+            font-weight: 480;
+            letter-spacing: 0;
+            color: color-mix(in oklab, currentColor 64%, var(--aperture-muted-color));
         }
 
         :where(
@@ -251,8 +274,8 @@
             blockquote > footer
         ),
         .body.variant {
-            /* TODO: --font-size: ...; */
-            /* TODO: body variant treatment. */
+            --font-size: 0.84rem;
+            color: color-mix(in oklab, currentColor 62%, var(--aperture-muted-color));
         }
 
         :where(
@@ -260,8 +283,10 @@
             form-field > output
         ),
         .label.variant {
-            /* TODO: --font-size: ...; */
-            /* TODO: label variant treatment. */
+            --font-size: 0.76rem;
+            font-weight: 560;
+            letter-spacing: 0.028em;
+            color: color-mix(in oklab, currentColor 58%, var(--aperture-muted-color));
         }
 
         /*
@@ -277,7 +302,7 @@
             section > h1, section > hgroup > h1,
             empty-state.empty > h1, empty-state.empty > hgroup > h1
         ), .large {
-            --font-size-multiplier: 1.2;
+            --font-size-multiplier: 1.18;
         }
 
         :where(
@@ -325,20 +350,29 @@
             form-field > output,
             fieldset > legend
         ), .small {
-            --font-size-multiplier: 0.85;
+            --font-size-multiplier: 0.86;
         }
 
 
+        section > hgroup {
+            padding-bottom: 0.6rem;
+        }
+
+        hgroup > code {
+            font-size: 0.86rem;
+        }
+
         code {
-            /*
-             * TODO: inline-code chip surface (background, border-radius, padding).
-             * Padding is acceptable soft layout for a chip; the radius is a
-             * theme decision.
-             */
+            padding: 0.16em 0.36em;
+            border-radius: var(--aperture-radius-xs);
+            background-color: color-mix(in oklab, var(--accent-color) 8%, var(--surface-color));
+            color: color-mix(in oklab, var(--primary-color) 82%, var(--accent-color));
+            box-shadow: inset 0 0 0 1px color-mix(in oklab, currentColor 12%, transparent);
         }
 
         code:focus-within {
-            /* TODO: focus ring for editable/interactive code fragments. */
+            outline: 2px solid color-mix(in oklab, var(--aperture-focus-color) 58%, transparent);
+            outline-offset: 2px;
         }
 
         li {

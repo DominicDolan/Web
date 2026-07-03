@@ -42,18 +42,20 @@
         font-size: 1rem;
         line-height: 1.5;
         background-clip: padding-box;
-        border: none;
-        /* TODO: input border-radius. Themes usually share this with --button-radius. */
+        border: 1px solid transparent;
+        border-radius: var(--input-radius);
+        color: inherit;
 
         transition:
-            color 0.15s ease-in-out,
-            background-color 0.15s ease-in-out,
-            border-color 0.15s ease-in-out,
-            box-shadow 0.15s ease-in-out,
-            outline-color 0.15s ease-in-out;
+            color var(--aperture-duration) var(--aperture-ease),
+            background-color var(--aperture-duration) var(--aperture-ease),
+            border-color var(--aperture-duration) var(--aperture-ease),
+            box-shadow var(--aperture-duration) var(--aperture-ease),
+            outline-color var(--aperture-duration) var(--aperture-ease);
 
         &::placeholder {
-            opacity: 0.75;
+            color: color-mix(in oklab, currentColor 52%, transparent);
+            opacity: 1;
         }
 
         &:disabled,
@@ -77,6 +79,11 @@
     input[type=radio],
     input[type=range] {
         accent-color: var(--accent-color);
+    }
+
+    select,
+    ::picker(select) {
+        appearance: base-select;
     }
 }
 
@@ -110,7 +117,8 @@
             display: block;
             min-height: 1lh;
             color: var(--error-color);
-            /* TODO: validation message font-size. */
+            font-size: 0.78rem;
+            font-weight: 560;
         }
     }
 
@@ -122,35 +130,53 @@
         input-shell {
             :where(&),
             &.flat {
-                /* TODO: default/flat text-field chrome. */
+                background-color: color-mix(in oklab, var(--surface-color) 82%, var(--background-color));
+                color: var(--on-surface-color);
+                border-color: color-mix(in oklab, var(--on-surface-color) 12%, transparent);
+                box-shadow: inset 0 1px 0 color-mix(in oklab, var(--surface-color) 76%, transparent);
             }
 
             &.outlined,
             :where(article &) {
-                /*
-                 * Context example: controls inside cards may default to outlined.
-                 * Because :where(article &) is zero specificity, explicit input
-                 * variants still win.
-                 */
+                background-color: transparent;
+                color: inherit;
+                border-color: color-mix(in oklab, var(--current-color) 28%, var(--aperture-border-color));
+                box-shadow: none;
             }
 
             &.elevated {
-                /* TODO: raised input surface, if your theme supports it. */
+                background-color: var(--surface-color);
+                color: var(--on-surface-color);
+                border-color: color-mix(in oklab, var(--on-surface-color) 8%, transparent);
+                box-shadow: var(--elevation-1);
             }
 
             &.tonal,
             :where(form.tonal &) {
-                /* TODO: form-level tonal context and explicit tonal variant. */
+                background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+                color: color-mix(in oklab, var(--current-color) 82%, var(--on-surface-color));
+                border-color: color-mix(in oklab, var(--current-color) 18%, transparent);
+                box-shadow: none;
+            }
+
+            &.quiet {
+                background-color: transparent;
+                color: inherit;
+                border-color: color-mix(in oklab, currentColor 11%, transparent);
+                box-shadow: none;
             }
 
             &:focus-visible,
             &:focus-within {
-                /* TODO: focus ring/outline for native controls and input-shell. */
+                outline: var(--focus-ring-width) solid color-mix(in oklab, var(--aperture-focus-color) 66%, transparent);
+                outline-offset: var(--focus-ring-offset);
+                border-color: color-mix(in oklab, var(--accent-color) 46%, transparent);
             }
 
             &:invalid,
             &[aria-invalid="true"] {
-                /* TODO: invalid state for native controls. */
+                border-color: color-mix(in oklab, var(--error-color) 64%, transparent);
+                outline-color: color-mix(in oklab, var(--error-color) 64%, transparent);
             }
         }
 
@@ -159,7 +185,8 @@
         input-shell:has(textarea:invalid),
         input-shell:has(select:invalid),
         input-shell[aria-invalid="true"] {
-            /* TODO: invalid state when the custom shell contains the real control. */
+            border-color: color-mix(in oklab, var(--error-color) 64%, transparent);
+            outline: 1px solid color-mix(in oklab, var(--error-color) 52%, transparent);
         }
 
         /*noinspection CssInvalidHtmlTagReference*/
@@ -167,7 +194,9 @@
         label:has(+ textarea[required])::after,
         label:has(+ select[required])::after,
         label:has(+ input-shell [required])::after {
-            /* TODO: required marker. Keep it visual; do not replace semantic required attributes. */
+            content: " *";
+            color: var(--error-color);
+            font-weight: 640;
         }
     }
 }

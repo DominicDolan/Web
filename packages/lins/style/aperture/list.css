@@ -33,19 +33,21 @@
 @layer elements {
     @scope (body) to (.notAperture) {
         ul.nav {
-            /*
-             * Navigation-list variant. Use this when a list of links/actions is
-             * not semantically a <nav> landmark by itself.
-             */
             > li {
-                /* TODO: nav-list item typography, radius, and interaction. */
+                border-radius: var(--aperture-radius-sm);
+                color: color-mix(in oklab, currentColor 74%, var(--secondary-color));
+                transition:
+                    color var(--aperture-duration) var(--aperture-ease),
+                    background-color var(--aperture-duration) var(--aperture-ease),
+                    box-shadow var(--aperture-duration) var(--aperture-ease);
 
                 &:not(:has(> *)) {
-                    /* Optional soft layout for text-only items. */
+                    padding: 0.5rem 0.72rem;
                 }
 
                 > * {
-                    /* Optional soft layout for linked items. */
+                    display: block;
+                    padding: 0.5rem 0.72rem;
                 }
 
                 &[aria-current="page"],
@@ -54,29 +56,76 @@
                 &:has(> [aria-current="page"]),
                 &:has(> [aria-selected="true"]),
                 &:has(> .active) {
-                    /* TODO: active/current nav item state. */
+                    color: var(--current-color);
+                    background-color: color-mix(in oklab, var(--current-color) 10%, var(--surface-color));
+                    box-shadow: inset 3px 0 0 var(--current-color);
                 }
 
-                &:hover:not(.active):not(:has(.active)) {
-                    /* TODO: hover state for inactive items. */
+                &:hover:not(.active):not(:has(.active)):not([aria-current="page"]):not(:has(> [aria-current="page"])):not([aria-selected="true"]):not(:has(> [aria-selected="true"])) {
+                    color: var(--current-color);
+                    background-color: color-mix(in oklab, var(--current-color) 7%, transparent);
                 }
             }
         }
 
         ul.plain {
             > li {
-                /* TODO: plain list item surface/marker treatment. */
+                border-radius: var(--aperture-radius-sm);
+                border-inline-start: 2px solid color-mix(in oklab, currentColor 14%, transparent);
+
+                &:not(:has(> *)) {
+                    padding: 0.58rem 0.72rem;
+                }
+
+                > * {
+                    display: block;
+                    padding: 0.58rem 0.72rem;
+                }
+
+                &[aria-current="page"],
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-current="page"]),
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    border-inline-start-color: var(--accent-color);
+                    background-color: color-mix(in oklab, var(--accent-color) 7%, var(--surface-color));
+                }
             }
         }
 
         ul.menu,
         ul[role="menu"] {
-            /* TODO: floating menu surface. Usually pairs with popover.css. */
+            list-style: none;
+            border: 1px solid var(--aperture-border-color);
+            border-radius: var(--menu-radius);
+            background-color: var(--surface-color);
+            color: var(--on-surface-color);
+            box-shadow: var(--elevation-2);
+
+            &:not(:has(> *)) {
+                padding: 0.5rem 0.65rem;
+            }
+
+            &.glass {
+                background-color: var(--aperture-surface-glass);
+                backdrop-filter: blur(16px) saturate(1.06);
+            }
 
             > li,
             > [role="menuitem"] {
+                display: block;
+                padding: 0.58rem 0.72rem;
+                border-radius: var(--aperture-radius-sm);
                 cursor: pointer;
-                /* TODO: menu item padding, hover, selected/current states. */
+
+                &:hover,
+                &[aria-selected="true"],
+                &[aria-current="page"],
+                &.active {
+                    background-color: color-mix(in oklab, var(--current-color) 9%, transparent);
+                    color: var(--current-color);
+                }
             }
         }
 
@@ -89,55 +138,131 @@
                 display: inline-flex;
                 align-items: center;
 
-                /* TODO: chip border-radius, padding, font-size, line-height, colour. */
+                padding: 0.24rem 0.52rem;
+                border: 1px solid color-mix(in oklab, var(--current-color) 22%, transparent);
+                border-radius: var(--aperture-radius-round);
+                background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+                color: color-mix(in oklab, var(--current-color) 82%, var(--on-surface-color));
+                font-size: 0.78rem;
+                font-weight: 560;
+                line-height: 1.25;
             }
         }
 
         ul[role="tablist"] {
-            /*
-             * Base tab-list appearance. Keep horizontal/vertical layout out of
-             * the theme unless every design using this theme should agree.
-             */
+            --tab-indicator-color: var(--active-color, var(--accent-color));
+            color: color-mix(in oklab, currentColor 62%, var(--secondary-color));
+
             > li {
+                padding: 0.48rem 0.68rem;
+                border-radius: var(--aperture-radius-sm);
                 cursor: pointer;
+                transition:
+                    color var(--aperture-duration) var(--aperture-ease),
+                    background-color var(--aperture-duration) var(--aperture-ease),
+                    box-shadow var(--aperture-duration) var(--aperture-ease);
 
                 &[aria-selected="true"],
                 &.active,
                 &:has(> [aria-selected="true"]),
                 &:has(> .active) {
-                    /* TODO: selected tab state. */
+                    color: var(--tab-indicator-color);
                 }
 
                 &:hover:not([aria-selected="true"]):not(.active):not(:has(.active)) {
-                    /* TODO: hover state for unselected tabs. */
+                    color: var(--current-color);
+                    background-color: color-mix(in oklab, var(--current-color) 7%, transparent);
                 }
             }
         }
 
+        :where(ul[role="tablist"]:not(.inset):not(.framed)),
         ul[role="tablist"].underlined {
-            /*
-             * Example variant: underline selected tab.
-             * The minimal theme uses CSS anchor positioning here. If you use
-             * that technique, keep it as decorative state styling.
-             */
+            position: relative;
+            anchor-scope: all;
+
             > li {
-                /* TODO: underlined tab item. */
+                border-radius: 0;
+
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    anchor-name: --active;
+                }
             }
 
             &::after {
-                /* TODO: decorative underline indicator. */
+                content: "";
+                position: absolute;
+                inset-block-end: 0;
+                height: 2px;
+                background-color: var(--tab-indicator-color);
+                transition:
+                    left 180ms var(--aperture-ease),
+                    right 180ms var(--aperture-ease);
+                position-anchor: --active;
+                left: anchor(left);
+                right: anchor(right);
             }
         }
 
         ul[role="tablist"].inset {
-            /* TODO: recessed segmented-tab container. */
+            isolation: isolate;
+            position: relative;
+            display: inline-flex;
+            gap: 0.25rem;
+            padding: 0.25rem;
+            border-radius: var(--aperture-radius-round);
+            background-color: color-mix(in oklab, var(--background-color) 78%, var(--surface-color));
+            box-shadow: var(--inset-elevation);
+            anchor-scope: all;
 
             > li {
-                /* TODO: inset tab item. */
+                border-radius: var(--aperture-radius-round);
+
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    anchor-name: --active;
+                }
             }
 
             &::after {
-                /* TODO: decorative selected pill/indicator. */
+                content: "";
+                position: absolute;
+                z-index: -1;
+                background-color: var(--surface-color);
+                border-radius: var(--aperture-radius-round);
+                box-shadow: var(--elevation-1);
+                transition:
+                    left 180ms var(--aperture-ease),
+                    right 180ms var(--aperture-ease);
+                position-anchor: --active;
+                left: anchor(left);
+                right: anchor(right);
+                top: anchor(top);
+                bottom: anchor(bottom);
+            }
+        }
+
+        ul[role="tablist"].framed {
+            border: 1px solid var(--aperture-border-color);
+            border-radius: var(--aperture-radius-md);
+            background-color: color-mix(in oklab, var(--surface-color) 72%, transparent);
+            box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--surface-color) 64%, transparent);
+
+            > li {
+                border-radius: var(--aperture-radius-sm);
+
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    background-color: var(--surface-color);
+                    box-shadow: inset 0 -2px 0 var(--tab-indicator-color);
+                }
             }
         }
     }

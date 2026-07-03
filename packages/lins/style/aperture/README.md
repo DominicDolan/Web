@@ -1,31 +1,45 @@
 # LINS Theme Aperture
 
-This folder is a starter scaffold for new LINS themes. It mirrors the canonical
-`style/minimal/` theme, but keeps opinionated appearance mostly empty and
-commented.
+Aperture is a calm, editorial LINS theme for documentation, product screens,
+dashboards, content cards, and gallery-like interfaces. It uses warm neutral
+surfaces, deep ink typography, a precise lens-blue accent, thin strokes, and
+soft optical elevation.
 
-## How to start a new theme
+## Root classes
 
-1. Copy `packages/lins/style/aperture/` to `packages/lins/style/<your-theme>/`.
-2. Rename `.aperture` in `theme.css` to your public root theme class.
-3. Rename `.notAperture` in every file to your opt-out class.
-4. Fill in the TODO selectors under `@layer elements`.
-5. Keep invariant resets and soft defaults in `@layer base`.
+- Theme root: `.apertureTheme`
+- Light palette: `.light`
+- Dark palette: `.dark`
+- Scoped opt-out: `.notAperture`
 
-## What is already included
+Example:
 
-- Imports matching the `minimal` theme file layout.
-- Palette tokens and role classes (`.primary`, `.accent`, `.surface`, etc.).
-- Base/reset styles for buttons, cards, inputs, text, lists, navigation,
-  popovers, empty states, and icons.
-- Empty or lightly seeded selectors for documented variants, states, and
-  context hooks.
-- Inline comments explaining when to use elements, variants, states, context,
-  `:where()`, `@scope`, and the `--current-color` pattern.
+```html
+<body class="apertureTheme light">
+  <article class="framed">
+    <h2>Aperture card</h2>
+    <p>Quiet hierarchy with a gallery-like frame.</p>
+  </article>
+</body>
+```
 
-## Design rule
+## Theme-specific variants
 
-Prefer filling selectors with colour, typography, border, shadow, surface, and
-motion. Add layout only when it is a genuinely unopinionated default that app
-utility classes can override.
+Aperture implements the conventional LINS variants and adds restrained
+editorial treatments where appropriate:
+
+- `.glass` for translucent frosted sheets, popovers, dialogs, menus, nav, and cards.
+- `.framed` for gallery-inspired borders on cards, tabs, popovers, dialogs, and empty states.
+- `.quiet` for lower-emphasis cards, buttons, inputs, nav, and lists.
+- `.focus` for precise accent-framed emphasis on cards and buttons.
+
+## Authoring notes
+
+The CSS follows `LINS_STYLE.md` conventions:
+
+- palette roles map through `--active-color` and resolve per element as `--current-color`;
+- defaults use `:where(...)` so explicit variants override cleanly;
+- state uses native hooks such as `:focus-visible`, `[aria-selected="true"]`, `[aria-current="page"]`, and `:invalid`;
+- context hooks such as `article article`, `dialog > footer`, and breadcrumb lists stay selector-based;
+- layout defaults are limited to soft, easily overridden affordances like padding, inline-flex controls, and chip spacing.
 

@@ -21,8 +21,7 @@
 
 @layer base {
     i {
-        /* TODO: set the icon font-family used by this theme. */
-        /* font-family: "Your Icon Font", sans-serif; */
+        font-family: "Material Symbols Outlined", "Material Symbols Rounded", "Material Icons", sans-serif;
 
         font-weight: normal;
         font-style: normal;
@@ -34,6 +33,7 @@
         word-wrap: normal;
         direction: ltr;
         font-feature-settings: "liga";
+        font-variation-settings: "FILL" 0, "wght" 400, "GRAD" -25, "opsz" 24;
         -webkit-font-smoothing: antialiased;
     }
 }
@@ -42,19 +42,22 @@
     @scope (body) to (.notAperture) {
         i,
         i.medium {
-            /* TODO: medium icon size, e.g. font-size: 1.3em; */
+            font-size: 1.25em;
         }
 
         i.large {
-            /* TODO: large icon size, e.g. font-size: 1.5em; */
+            font-size: 1.5em;
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" -25, "opsz" 32;
         }
 
         i.xlarge {
-            /* TODO: extra-large icon size, e.g. font-size: 2em; */
+            font-size: 2em;
+            font-variation-settings: "FILL" 0, "wght" 380, "GRAD" -25, "opsz" 40;
         }
 
         i.small {
-            /* TODO: small icon size, e.g. font-size: 1em; */
+            font-size: 1em;
+            font-variation-settings: "FILL" 0, "wght" 420, "GRAD" -25, "opsz" 20;
         }
     }
 }

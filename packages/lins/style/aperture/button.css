@@ -17,49 +17,61 @@
     input[type=button],
     input[type=submit],
     input[type=reset],
-    input[type=image] {
+    input[type=image],
+    [role="button"]:not(article) {
         /* Resolve colour through the standard LINS four-step cascade. */
         --current-color: var(--active-color, var(--primary-color));
         --on-current-color: var(--on-active-color, var(--on-primary-color));
 
         /* Soft layout: sensible for every button and easy for utilities to override. */
-        display: inline-block;
-        padding: 0.5rem 0.9rem;
-        line-height: 1.5;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45em;
+        padding: 0.54rem 0.92rem;
+        line-height: 1.25;
         text-align: center;
         vertical-align: middle;
+        font-weight: 620;
+        letter-spacing: 0.01em;
 
         user-select: none;
         cursor: pointer;
 
-        border: none;
+        border: 1px solid transparent;
+        border-radius: var(--button-radius);
         background: transparent;
-        /* TODO: --button-radius / border-radius. Themes typically share one
-         * radius token between buttons and inputs so segmented radio groups
-         * line up; pick that here. */
-        /* TODO: font-weight for the theme's button voice (e.g. 500–700). */
+        color: inherit;
+        text-decoration: none;
 
         transition:
-            color 0.15s ease-in-out,
-            background-color 0.15s ease-in-out,
-            border-color 0.15s ease-in-out,
-            box-shadow 0.2s ease,
-            outline-color 0.15s ease-in-out;
+            color var(--aperture-duration) var(--aperture-ease),
+            background-color var(--aperture-duration) var(--aperture-ease),
+            border-color var(--aperture-duration) var(--aperture-ease),
+            box-shadow 180ms var(--aperture-ease),
+            outline-color var(--aperture-duration) var(--aperture-ease),
+            translate 180ms var(--aperture-ease);
 
         &:disabled,
-        &[disabled] {
-            opacity: 0.6;
+        &[disabled],
+        &[aria-disabled="true"] {
+            opacity: 0.54;
             cursor: not-allowed;
         }
     }
 
     a {
+        --current-color: var(--active-color, var(--accent-color));
+        --on-current-color: var(--on-active-color, var(--on-accent-color));
+
         color: inherit;
         text-decoration: none;
-    }
-
-    [role="button"] {
-        cursor: pointer;
+        text-underline-offset: 0.18em;
+        transition:
+            color var(--aperture-duration) var(--aperture-ease),
+            text-decoration-color var(--aperture-duration) var(--aperture-ease),
+            background-color var(--aperture-duration) var(--aperture-ease),
+            outline-color var(--aperture-duration) var(--aperture-ease);
     }
 }
 
@@ -73,112 +85,176 @@
         input[type=button],
         input[type=submit],
         input[type=reset],
-        input[type=image] {
-            /*
-             * Default variant pattern.
-             * :where(&) has zero specificity, so explicit classes like .flat or
-             * .text can override the default without a specificity fight.
-             */
+        input[type=image],
+        [role="button"]:not(article) {
             :where(&),
             &.outlined {
-                /* TODO: medium-emphasis/border-only button look. */
-                /* Example:
-                 * color: var(--current-color);
-                 * border: 1px solid color-mix(in oklab, var(--current-color) 55%, transparent);
-                 * background: transparent;
-                 */
+                color: var(--current-color);
+                background-color: color-mix(in oklab, var(--surface-color) 62%, transparent);
+                border-color: color-mix(in oklab, var(--current-color) 34%, var(--aperture-border-color));
+                box-shadow: inset 0 1px 0 color-mix(in oklab, var(--surface-color) 82%, transparent);
             }
 
             &.flat {
-                /* TODO: filled, no-elevation high-emphasis button. */
+                color: var(--on-current-color);
+                background-color: var(--current-color);
+                border-color: color-mix(in oklab, var(--on-current-color) 10%, transparent);
+                box-shadow: none;
             }
 
             &.elevated {
-                /* TODO: filled button with a shadow/elevation treatment. */
+                color: var(--on-current-color);
+                background-color: var(--current-color);
+                border-color: color-mix(in oklab, var(--on-current-color) 12%, transparent);
+                box-shadow: var(--elevation-1);
             }
 
             &.tonal {
-                /* TODO: low-opacity tint using --current-color. */
+                color: color-mix(in oklab, var(--current-color) 86%, var(--on-surface-color));
+                background-color: color-mix(in oklab, var(--current-color) 10%, var(--surface-color));
+                border-color: color-mix(in oklab, var(--current-color) 15%, transparent);
+                box-shadow: none;
             }
 
             &.text {
-                /* TODO: text-only button; normally no border or surface. */
+                padding-inline: 0.45rem;
+                color: var(--current-color);
+                background-color: transparent;
+                border-color: transparent;
+                box-shadow: none;
             }
 
             &.plain {
-                /* TODO: extra-subtle button, often muted until hover. */
+                color: color-mix(in oklab, currentColor 72%, var(--current-color));
+                background-color: transparent;
+                border-color: transparent;
+                box-shadow: none;
             }
 
             &.icon {
-                /*
-                 * Icon-only buttons are conventionally square — keep aspect-ratio
-                 * as soft layout. The radius is a theme decision: 50% for circular,
-                 * a smaller value for rounded-square.
-                 */
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
+                padding: 0.54rem;
                 aspect-ratio: 1;
-                /* TODO: border-radius for icon-only buttons. */
+                border-radius: 50%;
             }
 
-            &:hover:not(:disabled):not([disabled]) {
-                /* TODO: shared hover affordance if variants do not define their own. */
+            &.quiet {
+                color: color-mix(in oklab, currentColor 76%, var(--secondary-color));
+                background-color: color-mix(in oklab, var(--surface-color) 48%, transparent);
+                border-color: color-mix(in oklab, currentColor 12%, transparent);
+                box-shadow: none;
+            }
+
+            &.focus {
+                color: var(--current-color);
+                background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+                border-color: color-mix(in oklab, var(--accent-color) 62%, transparent);
+                box-shadow:
+                    inset 3px 0 0 var(--accent-color),
+                    0 0 0 1px color-mix(in oklab, var(--accent-color) 18%, transparent);
+            }
+
+            &:hover:not(:disabled):not([disabled]):not([aria-disabled="true"]) {
+                translate: 0 -1px;
+            }
+
+            &.outlined:hover:not(:disabled):not([disabled]):not([aria-disabled="true"]),
+            &.tonal:hover:not(:disabled):not([disabled]):not([aria-disabled="true"]),
+            &.quiet:hover:not(:disabled):not([disabled]):not([aria-disabled="true"]),
+            &.focus:hover:not(:disabled):not([disabled]):not([aria-disabled="true"]),
+            &:where(:not(.flat):not(.elevated):not(.text):not(.plain)):hover:not(:disabled):not([disabled]):not([aria-disabled="true"]) {
+                background-color: color-mix(in oklab, var(--current-color) 14%, var(--surface-color));
+                border-color: color-mix(in oklab, var(--current-color) 40%, var(--aperture-border-color));
+            }
+
+            &.flat:hover:not(:disabled):not([disabled]):not([aria-disabled="true"]),
+            &.elevated:hover:not(:disabled):not([disabled]):not([aria-disabled="true"]) {
+                background-color: color-mix(in oklab, var(--on-current-color) 8%, var(--current-color));
+            }
+
+            &.elevated:hover:not(:disabled):not([disabled]):not([aria-disabled="true"]) {
+                box-shadow: var(--elevation-2);
+            }
+
+            &.text:hover:not(:disabled):not([disabled]):not([aria-disabled="true"]),
+            &.plain:hover:not(:disabled):not([disabled]):not([aria-disabled="true"]) {
+                background-color: color-mix(in oklab, var(--current-color) 9%, transparent);
+                box-shadow: none;
             }
 
             &:focus-visible {
-                /* TODO: accessible focus ring. Prefer outline over box-shadow-only rings. */
+                outline: var(--focus-ring-width) solid color-mix(in oklab, var(--aperture-focus-color) 70%, transparent);
+                outline-offset: var(--focus-ring-offset);
             }
 
             &[aria-pressed="true"],
             &[aria-selected="true"],
             &.active {
-                /*
-                 * Prefer ARIA for state, but support .active because routers and
-                 * UI libraries often emit it. Keep these visually identical.
-                 */
+                background-color: color-mix(in oklab, var(--current-color) 16%, var(--surface-color));
+                border-color: color-mix(in oklab, var(--current-color) 46%, transparent);
+                color: var(--current-color);
+                box-shadow: inset 0 1px 2px color-mix(in oklab, var(--shadow-color) 42%, transparent);
             }
         }
 
         [role="radiogroup"] {
-            /*
-             * Radio groups often render as joined segmented buttons.
-             * Keep only unopinionated grouping affordances here; fill the exact
-             * borders/backgrounds once the theme voice is known.
-             */
             display: inline-flex;
             gap: 0;
+            border-radius: var(--button-radius);
+            background-color: color-mix(in oklab, var(--background-color) 72%, var(--surface-color));
+            box-shadow:
+                inset 0 0 0 1px var(--aperture-border-color),
+                var(--inset-elevation);
 
             & > button {
                 border-radius: 0;
+                background-color: transparent;
+                border-color: transparent;
+                box-shadow: none;
+                color: color-mix(in oklab, currentColor 70%, var(--secondary-color));
             }
 
-            /* TODO: re-apply the button radius on the first/last segment ends
-             * once the shared --button-radius is chosen, e.g.
-             *   & > button:first-child { border-start-start-radius: var(--button-radius);
-             *                            border-end-start-radius: var(--button-radius); }
-             *   & > button:last-child  { border-start-end-radius:  var(--button-radius);
-             *                            border-end-end-radius:    var(--button-radius); }
-             */
+            & > button:first-child {
+                border-start-start-radius: var(--button-radius);
+                border-end-start-radius: var(--button-radius);
+            }
+
+            & > button:last-child {
+                border-start-end-radius: var(--button-radius);
+                border-end-end-radius: var(--button-radius);
+            }
 
             & > button[aria-checked="true"],
             & > button[aria-selected="true"],
             & > button.active {
-                /* TODO: selected segment state. */
+                background-color: var(--surface-color);
+                color: var(--current-color);
+                box-shadow: var(--elevation-1);
             }
         }
 
-        a {
-            /* TODO: link colour/underline style. */
+        a:not([role="button"]) {
+            color: var(--current-color);
+            text-decoration-line: underline;
+            text-decoration-thickness: 0.07em;
+            text-decoration-color: color-mix(in oklab, var(--current-color) 32%, transparent);
 
             &[aria-current="page"],
             &.active {
-                /* TODO: current route/page link state. */
+                color: color-mix(in oklab, var(--current-color) 82%, var(--primary-color));
+                font-weight: 640;
+                text-decoration-color: currentColor;
             }
 
             &:hover,
             &:focus-visible {
-                /* TODO: link interaction affordance. */
+                color: color-mix(in oklab, var(--current-color) 82%, var(--accent-color));
+                text-decoration-color: currentColor;
+            }
+
+            &:focus-visible {
+                outline: 2px solid color-mix(in oklab, var(--aperture-focus-color) 64%, transparent);
+                outline-offset: 0.18em;
+                border-radius: 0.2em;
             }
         }
     }

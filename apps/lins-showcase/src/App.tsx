@@ -5,6 +5,7 @@ import minimalCss from "@web/lins/minimal.css?url";
 import foundryCss from "@web/lins/foundry.css?url";
 import materialInspiredCss from "@web/lins/materialInspired.css?url";
 import signalBloomCss from "@web/lins/signalBloom.css?url";
+import apertureCss from "@web/lins/aperture.css?url";
 import { linsThemes, type LinsElementCategoryInfo, type LinsThemeInfo, type LinsVariantInfo } from "@web/lins/themes";
 
 type ThemeOption = {
@@ -17,6 +18,7 @@ const themeCssById: Record<string, string> = {
   foundry: foundryCss,
   materialInspired: materialInspiredCss,
   signalBloom: signalBloomCss,
+  aperture: apertureCss,
 };
 
 const themeMetadata: readonly LinsThemeInfo[] = linsThemes;

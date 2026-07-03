@@ -26,22 +26,46 @@
 
 @layer elements {
     @scope (body) to (.notAperture) {
+        nav {
+            color: color-mix(in oklab, currentColor 82%, var(--secondary-color));
+        }
+
         nav.top {
-            /* TODO: top app-bar border/background/shadow. */
+            background-color: color-mix(in oklab, var(--surface-color) 88%, transparent);
+            color: var(--on-surface-color);
+            border-bottom: 1px solid var(--aperture-border-color);
+            box-shadow: 0 1px 0 color-mix(in oklab, var(--surface-color) 70%, transparent);
+        }
+
+        nav.glass {
+            background-color: var(--aperture-surface-glass);
+            border-color: color-mix(in oklab, var(--surface-color) 42%, var(--aperture-border-color));
+            backdrop-filter: blur(18px) saturate(1.06);
+        }
+
+        nav.quiet {
+            background-color: transparent;
+            border-color: transparent;
+            box-shadow: none;
         }
 
         nav.pageNav,
         aside > nav {
-            /* TODO: side/page navigation surface. Avoid page-level width here. */
+            background-color: color-mix(in oklab, var(--surface-color) 48%, transparent);
+            color: var(--on-surface-color);
+            border: 1px solid color-mix(in oklab, var(--on-surface-color) 9%, transparent);
+            border-radius: var(--aperture-radius-md);
         }
 
         nav a[aria-current="page"],
         nav a.active {
-            /* TODO: current navigation link state. */
+            color: var(--active-color, var(--accent-color));
+            font-weight: 650;
+            text-decoration-color: currentColor;
         }
 
         nav[aria-label="Breadcrumb"] {
-            /* TODO: breadcrumb container typography/colour. */
+            color: color-mix(in oklab, currentColor 60%, var(--aperture-muted-color));
         }
 
         nav[aria-label="Breadcrumb"] > ol {
@@ -51,15 +75,19 @@
              * once the visual rhythm is known.
              */
             display: inline-flex;
-            /* TODO: breadcrumb item gap. */
+            align-items: center;
+            gap: 0.4rem;
         }
 
         nav[aria-label="Breadcrumb"] > ol > li {
-            /* TODO: breadcrumb item style. */
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         nav[aria-label="Breadcrumb"] > ol > li + li::before {
-            /* TODO: decorative separator, e.g. content: "/"; opacity: .5; */
+            content: "/";
+            color: color-mix(in oklab, currentColor 42%, transparent);
         }
     }
 }
