@@ -1,0 +1,203 @@
+/*
+ * Surface elements: Card.
+ *
+ * Category selectors:
+ *   - article
+ *   - article article                  nested card context
+ *   - article[role="button"]           interactive card state/augmentation
+ *   - article[aria-selected="false"]   deselected state
+ *
+ * Cards are a good example of the LINS distinction between:
+ *   - variants: .elevated, .flat, .outlined, .tonal, .inset, .highlighted, .text
+ *   - states:   [role="button"], :hover, [aria-selected]
+ *   - context:  article article, article > footer, article > hgroup
+ */
+
+@layer base {
+    article {
+        --current-color: var(--active-color, var(--surface-color));
+        --on-current-color: var(--on-active-color, var(--on-surface-color));
+
+        padding: 1rem;
+        border: 1px solid transparent;
+        border-radius: var(--card-radius);
+        background-repeat: no-repeat;
+        color: inherit;
+
+        transition:
+            color var(--signal-bloom-duration) var(--signal-bloom-ease),
+            background-color var(--signal-bloom-duration) var(--signal-bloom-ease),
+            background-image var(--signal-bloom-duration) var(--signal-bloom-ease),
+            border-color var(--signal-bloom-duration) var(--signal-bloom-ease),
+            box-shadow 220ms var(--signal-bloom-ease),
+            opacity var(--signal-bloom-duration) var(--signal-bloom-ease),
+            translate 220ms var(--signal-bloom-ease);
+    }
+
+    article[role="button"] {
+        cursor: pointer;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notSignalBloom) {
+        article {
+            :where(&),
+            &.flat {
+                background-color: var(--current-color);
+                color: var(--on-current-color);
+                border-color: color-mix(in oklab, var(--on-current-color) 7%, transparent);
+                box-shadow: none;
+            }
+
+            &.elevated {
+                background-color: var(--current-color);
+                color: var(--on-current-color);
+                border-color: color-mix(in oklab, var(--on-current-color) 8%, transparent);
+                box-shadow: var(--elevation-2);
+            }
+
+            &.outlined,
+            :where(& &) {
+                /*
+                 * Nested cards often default to outlined so surfaces do not
+                 * stack excessive elevation. Because :where(& &) is zero
+                 * specificity, article.elevated inside another article can win.
+                 */
+                --current-color: var(--active-color, var(--primary-color));
+                --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+                background-color: color-mix(in oklab, var(--surface-color) 56%, transparent);
+                color: inherit;
+                border-color: color-mix(in oklab, var(--current-color) 28%, var(--signal-bloom-border-color));
+                box-shadow: none;
+            }
+
+            &.tonal {
+                --current-color: var(--active-color, var(--primary-color));
+                --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+                background-color: color-mix(in oklab, var(--current-color) 12%, var(--surface-color));
+                color: color-mix(in oklab, var(--current-color) 76%, var(--on-surface-color));
+                border-color: color-mix(in oklab, var(--current-color) 14%, transparent);
+                box-shadow: none;
+            }
+
+            &.inset {
+                background-color: color-mix(in oklab, var(--background-color) 78%, var(--current-color) 22%);
+                color: var(--on-background-color);
+                border-color: color-mix(in oklab, var(--current-color) 12%, transparent);
+                box-shadow:
+                    inset 0 1px 2px color-mix(in oklab, var(--shadow-color) 48%, transparent),
+                    inset 0 10px 28px -24px var(--current-color);
+            }
+
+            &.highlighted {
+                --current-color: var(--active-color, var(--primary-color));
+                --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+                position: relative;
+                isolation: isolate;
+                background:
+                    radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--current-color) 18%, transparent), transparent 42%),
+                    var(--surface-color);
+                color: var(--on-surface-color);
+                border-color: color-mix(in oklab, var(--current-color) 20%, transparent);
+                box-shadow: var(--elevation-1);
+            }
+
+            &.highlighted::before {
+                content: "";
+                position: absolute;
+                inset-block: 0.85rem;
+                inset-inline-start: 0.85rem;
+                width: 0.32rem;
+                border-radius: var(--signal-bloom-radius-pill);
+                background: linear-gradient(var(--current-color), color-mix(in oklab, var(--accent-color) 78%, var(--current-color)));
+                box-shadow: 0 0 18px -6px var(--current-color);
+            }
+
+            &.text {
+                background: transparent;
+                border-color: transparent;
+                box-shadow: none;
+                color: inherit;
+            }
+
+            &.glow {
+                --current-color: var(--active-color, var(--primary-color));
+                --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+                background-color: color-mix(in oklab, var(--surface-color) 88%, var(--current-color) 12%);
+                color: var(--on-surface-color);
+                border-color: color-mix(in oklab, var(--current-color) 22%, transparent);
+                box-shadow: var(--glow-elevation);
+            }
+
+            &.gradient {
+                --current-color: var(--active-color, var(--primary-color));
+                --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+                background:
+                    linear-gradient(135deg, color-mix(in oklab, var(--current-color) 18%, var(--surface-color)), color-mix(in oklab, var(--accent-color) 14%, var(--surface-color)));
+                color: var(--on-surface-color);
+                border-color: color-mix(in oklab, var(--current-color) 16%, transparent);
+                box-shadow: var(--elevation-1);
+            }
+
+            &.soft {
+                --current-color: var(--active-color, var(--primary-color));
+                --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+                background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+                color: color-mix(in oklab, var(--on-surface-color) 88%, var(--current-color));
+                border-color: color-mix(in oklab, var(--current-color) 10%, transparent);
+                box-shadow: none;
+            }
+
+            &.pop {
+                --current-color: var(--active-color, var(--primary-color));
+                --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+                background:
+                    radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--accent-color) 24%, transparent), transparent 40%),
+                    linear-gradient(135deg, color-mix(in oklab, var(--current-color) 88%, var(--surface-color)), var(--current-color));
+                color: var(--on-current-color);
+                border-color: color-mix(in oklab, var(--on-current-color) 16%, transparent);
+                box-shadow: var(--elevation-3);
+            }
+
+            &[role="button"]:hover,
+            &[role="button"]:focus-visible {
+                translate: 0 -2px;
+                box-shadow: var(--elevation-2);
+            }
+
+            &[role="button"]:focus-visible {
+                outline: var(--focus-ring-width) solid color-mix(in oklab, var(--signal-bloom-focus-color) 66%, transparent);
+                outline-offset: var(--focus-ring-offset);
+            }
+
+            &[aria-selected="false"] {
+                opacity: 0.64;
+                filter: saturate(0.72);
+            }
+
+            &[aria-selected="true"],
+            &.active {
+                border-color: color-mix(in oklab, var(--active-color, var(--accent-color)) 42%, transparent);
+                box-shadow: var(--glow-elevation);
+            }
+
+            > hgroup,
+            > h3 {
+                color: color-mix(in oklab, var(--active-color, var(--primary-color)) 76%, currentColor);
+            }
+
+            > footer {
+                color: color-mix(in oklab, currentColor 72%, var(--signal-bloom-muted-color));
+            }
+        }
+    }
+}
+

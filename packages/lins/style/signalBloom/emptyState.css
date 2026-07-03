@@ -1,0 +1,110 @@
+/*
+ * Placeholder elements: Empty State and Skeleton.
+ *
+ * Category selectors:
+ *   - empty-state
+ *   - empty-state.skeleton
+ *   - empty-state.empty
+ *
+ * State hook:
+ *   - [aria-busy] for loading skeletons
+ */
+
+@keyframes signalBloom-shimmer {
+	0% {
+		background-position: -200% 0;
+	}
+
+	100% {
+		background-position: 200% 0;
+	}
+}
+
+@layer base {
+	/*noinspection CssInvalidHtmlTagReference*/
+	empty-state {
+		display: block;
+	}
+}
+
+@layer elements {
+	@scope (body) to (.notSignalBloom) {
+		/*noinspection CssInvalidHtmlTagReference*/
+		empty-state.skeleton *:not(:has(> *)) {
+			pointer-events: none;
+			user-select: none;
+			border-radius: var(--signal-bloom-radius-sm);
+			color: transparent;
+			background-color: color-mix(in oklab, var(--primary-color) 9%, var(--surface-color));
+			box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent-color) 8%, transparent);
+		}
+
+		/*noinspection CssInvalidHtmlTagReference*/
+		empty-state.skeleton[aria-busy] *:not(:has(> *)) {
+			animation: signalBloom-shimmer 1.35s linear infinite;
+			background-size: 200% 100%;
+			background-image: linear-gradient(
+				90deg,
+				color-mix(in oklab, var(--primary-color) 8%, var(--surface-color)),
+				color-mix(in oklab, var(--accent-color) 18%, var(--surface-color)),
+				color-mix(in oklab, var(--secondary-color) 10%, var(--surface-color))
+			);
+		}
+
+		/*noinspection CssInvalidHtmlTagReference*/
+		empty-state.skeleton:not([aria-busy]) *:not(:has(> *)) {
+			opacity: 0.72;
+			filter: saturate(0.8);
+		}
+
+		/*noinspection CssInvalidHtmlTagReference*/
+		empty-state.empty {
+			--current-color: var(--active-color, var(--primary-color));
+			--on-current-color: var(--on-active-color, var(--on-primary-color));
+
+			isolation: isolate;
+			position: relative;
+			border: 1px dashed color-mix(in oklab, var(--current-color) 34%, transparent);
+			border-radius: var(--card-radius);
+			background:
+				radial-gradient(circle at 50% 0%, color-mix(in oklab, var(--accent-color) 14%, transparent), transparent 45%),
+				linear-gradient(135deg, color-mix(in oklab, var(--current-color) 8%, var(--surface-color)), color-mix(in oklab, var(--surface-color) 82%, var(--background-color)));
+			color: color-mix(in oklab, var(--on-surface-color) 84%, var(--current-color));
+			box-shadow: var(--elevation-1);
+			padding: 1.2rem;
+			overflow: hidden;
+		}
+
+		/*noinspection CssInvalidHtmlTagReference*/
+		empty-state.empty::after {
+			content: "";
+			position: absolute;
+			inset: 0.75rem;
+			z-index: -1;
+			border-radius: calc(var(--card-radius) - 0.35rem);
+			background:
+				radial-gradient(circle at 78% 24%, color-mix(in oklab, var(--secondary-color) 18%, transparent), transparent 18%),
+				radial-gradient(circle at 22% 70%, color-mix(in oklab, var(--accent-color) 16%, transparent), transparent 20%);
+			opacity: 0.75;
+		}
+
+		/*noinspection CssInvalidHtmlTagReference*/
+		empty-state.empty.gradient {
+			background:
+				linear-gradient(135deg, color-mix(in oklab, var(--current-color) 15%, var(--surface-color)), color-mix(in oklab, var(--accent-color) 12%, var(--surface-color))),
+				var(--surface-color);
+		}
+
+		/*noinspection CssInvalidHtmlTagReference*/
+		empty-state.empty.glow {
+			box-shadow: var(--glow-elevation);
+			border-style: solid;
+		}
+
+		/*noinspection CssInvalidHtmlTagReference*/
+		empty-state.empty.soft {
+			background: color-mix(in oklab, var(--current-color) 6%, var(--surface-color));
+			box-shadow: none;
+		}
+	}
+}

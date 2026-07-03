@@ -1,0 +1,160 @@
+@import "../reset.css";
+@import "./button.css";
+@import "./text.css";
+@import "./card.css";
+@import "./input.css";
+@import "./list.css";
+@import "./icon.css";
+@import "./popover.css";
+@import "./emptyState.css";
+@import "./nav.css";
+
+/* Signal Bloom: expressive, optimistic, soft-saturated LINS theme. */
+
+@layer defaults {
+	.signalBloomTheme {
+		--signal-bloom-radius-xs: 0.55rem;
+		--signal-bloom-radius-sm: 0.8rem;
+		--signal-bloom-radius-md: 1rem;
+		--signal-bloom-radius-lg: 1.35rem;
+		--signal-bloom-radius-xl: 1.75rem;
+		--signal-bloom-radius-pill: 999px;
+
+		--button-radius: var(--signal-bloom-radius-pill);
+		--input-radius: var(--signal-bloom-radius-md);
+		--card-radius: var(--signal-bloom-radius-lg);
+		--menu-radius: var(--signal-bloom-radius-md);
+		--dialog-radius: var(--signal-bloom-radius-xl);
+		--focus-ring-width: 3px;
+		--focus-ring-offset: 2px;
+
+		--font-family: "Plus Jakarta Sans", Manrope, Inter, "Nunito Sans", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+		--mono-font-family: "Cascadia Code", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+		--signal-bloom-ease: cubic-bezier(0.2, 0, 0, 1);
+		--signal-bloom-duration: 190ms;
+		--signal-bloom-border-color: color-mix(in oklab, var(--on-surface-color) 14%, transparent);
+		--signal-bloom-border-strong-color: color-mix(in oklab, var(--primary-color) 34%, var(--signal-bloom-border-color));
+		--signal-bloom-muted-color: color-mix(in oklab, var(--on-background-color) 62%, var(--background-color));
+		--signal-bloom-surface-muted-color: color-mix(in oklab, var(--on-surface-color) 58%, var(--surface-color));
+		--signal-bloom-surface-tint: color-mix(in oklab, var(--surface-color) 88%, var(--primary-color) 12%);
+		--signal-bloom-surface-soft: color-mix(in oklab, var(--surface-color) 82%, var(--background-color));
+		--signal-bloom-tonal-surface: color-mix(in oklab, var(--active-color, var(--primary-color)) 11%, var(--surface-color));
+		--signal-bloom-focus-color: color-mix(in oklab, var(--accent-color) 70%, var(--primary-color));
+		--signal-bloom-glow-color: color-mix(in oklab, var(--active-color, var(--primary-color)) 40%, transparent);
+
+		--elevation-1:
+			0 1px 2px color-mix(in oklab, var(--shadow-color) 64%, transparent),
+			0 8px 18px -14px var(--shadow-color);
+		--elevation-2:
+			0 8px 18px -12px var(--shadow-color),
+			0 16px 34px -22px color-mix(in oklab, var(--primary-color) 34%, transparent);
+		--elevation-3:
+			0 14px 28px -16px var(--shadow-color),
+			0 24px 52px -28px color-mix(in oklab, var(--primary-color) 42%, transparent);
+		--glow-elevation:
+			0 0 0 1px color-mix(in oklab, var(--active-color, var(--accent-color)) 24%, transparent),
+			0 0 26px -10px var(--signal-bloom-glow-color),
+			0 14px 34px -24px var(--shadow-color);
+
+		accent-color: var(--accent-color);
+	}
+
+	.signalBloomTheme.light {
+		--primary-color: #5b5cf6;
+		--on-primary-color: #ffffff;
+		--secondary-color: #f05f8d;
+		--on-secondary-color: #ffffff;
+		--surface-color: #ffffff;
+		--on-surface-color: #17172f;
+		--background-color: #f1f4ff;
+		--on-background-color: #181833;
+		--accent-color: #00b8d9;
+		--on-accent-color: #031a22;
+		--success-color: #20b26b;
+		--on-success-color: #f4fff9;
+		--warning-color: #f4a51c;
+		--on-warning-color: #241500;
+		--error-color: #ee466a;
+		--on-error-color: #fff8fa;
+		--shadow-color: oklab(from #222260 l a b / 0.22);
+		color-scheme: light;
+	}
+
+	.signalBloomTheme.dark {
+		--primary-color: #a7a8ff;
+		--on-primary-color: #11112a;
+		--secondary-color: #ff8bae;
+		--on-secondary-color: #2a0714;
+		--surface-color: #232443;
+		--on-surface-color: #f1f3ff;
+		--background-color: #111229;
+		--on-background-color: #eff1ff;
+		--accent-color: #57e2ff;
+		--on-accent-color: #00212a;
+		--success-color: #53dda0;
+		--on-success-color: #062316;
+		--warning-color: #ffc857;
+		--on-warning-color: #261700;
+		--error-color: #ff7891;
+		--on-error-color: #2d0710;
+		--shadow-color: oklab(from black l a b / 0.56);
+		color-scheme: dark;
+	}
+
+	.primary {
+		--active-color: var(--primary-color);
+		--on-active-color: var(--on-primary-color);
+	}
+
+	.secondary {
+		--active-color: var(--secondary-color);
+		--on-active-color: var(--on-secondary-color);
+	}
+
+	.accent {
+		--active-color: var(--accent-color);
+		--on-active-color: var(--on-accent-color);
+	}
+
+	.success {
+		--active-color: var(--success-color);
+		--on-active-color: var(--on-success-color);
+	}
+
+	.warning {
+		--active-color: var(--warning-color);
+		--on-active-color: var(--on-warning-color);
+	}
+
+	.error {
+		--active-color: var(--error-color);
+		--on-active-color: var(--on-error-color);
+	}
+
+	.surface {
+		--active-color: var(--surface-color);
+		--on-active-color: var(--on-surface-color);
+	}
+
+	.background {
+		--active-color: var(--background-color);
+		--on-active-color: var(--on-background-color);
+	}
+
+	html,
+	body,
+	#app,
+	.signalBloomTheme {
+		background:
+			radial-gradient(circle at 8% 0%, color-mix(in oklab, var(--primary-color) 15%, transparent), transparent 32rem),
+			radial-gradient(circle at 100% 8%, color-mix(in oklab, var(--accent-color) 13%, transparent), transparent 34rem),
+			var(--background-color);
+		color: var(--on-background-color);
+	}
+
+	#app.signalBloomTheme,
+	.signalBloomTheme #app {
+		color: var(--on-background-color);
+	}
+}

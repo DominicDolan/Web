@@ -1,0 +1,115 @@
+/*
+ * Overlay elements: Popover Menu and Dialog.
+ *
+ * Category selectors:
+ *   - [popover][role="menu"], [popover].menu
+ *   - dialog
+ *   - dialog > footer
+ *
+ * Popover positioning often comes from JS, anchor positioning, or markup
+ * utilities. Keep this file focused on the overlay surface, border, shadow,
+ * backdrop, and motion.
+ */
+
+@layer base {
+	[popover][role="menu"],
+	[popover].menu {
+		--current-color: var(--active-color, var(--primary-color));
+		--on-current-color: var(--on-active-color, var(--on-primary-color));
+
+		position: fixed;
+		margin: 0;
+		border: none;
+
+		&::backdrop {
+			background: transparent;
+		}
+	}
+
+	dialog {
+		--current-color: var(--active-color, var(--surface-color));
+		--on-current-color: var(--on-active-color, var(--on-surface-color));
+
+		border: none;
+		background: transparent;
+		color: inherit;
+	}
+}
+
+@layer elements {
+	@scope (body) to (.notSignalBloom) {
+		[popover][role="menu"],
+		[popover].menu {
+			border: 1px solid var(--signal-bloom-border-color);
+			border-radius: var(--menu-radius);
+			background: color-mix(in oklab, var(--surface-color) 94%, var(--primary-color));
+			color: var(--on-surface-color);
+			box-shadow: var(--elevation-2);
+			padding: 0.35rem;
+		}
+
+		[popover][role="menu"].glow,
+		[popover].menu.glow {
+			box-shadow: var(--glow-elevation);
+			border-color: color-mix(in oklab, var(--active-color, var(--accent-color)) 22%, transparent);
+		}
+
+		[popover][role="menu"].gradient,
+		[popover].menu.gradient {
+			background:
+				linear-gradient(135deg, color-mix(in oklab, var(--primary-color) 10%, var(--surface-color)), color-mix(in oklab, var(--accent-color) 9%, var(--surface-color))),
+				var(--surface-color);
+		}
+
+		[popover][role="menu"].soft,
+		[popover].menu.soft {
+			background: color-mix(in oklab, var(--active-color, var(--primary-color)) 7%, var(--surface-color));
+			box-shadow: var(--elevation-1);
+		}
+
+		dialog {
+			border: 1px solid var(--signal-bloom-border-color);
+			border-radius: var(--dialog-radius);
+			background: var(--surface-color);
+			color: var(--on-surface-color);
+			box-shadow: var(--elevation-3);
+			padding: 1.15rem;
+		}
+
+		dialog.glow {
+			box-shadow: var(--glow-elevation);
+			border-color: color-mix(in oklab, var(--active-color, var(--accent-color)) 22%, transparent);
+		}
+
+		dialog.gradient {
+			background:
+				radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--accent-color) 18%, transparent), transparent 42%),
+				linear-gradient(135deg, color-mix(in oklab, var(--primary-color) 9%, var(--surface-color)), var(--surface-color));
+		}
+
+		dialog.soft {
+			background: color-mix(in oklab, var(--active-color, var(--primary-color)) 6%, var(--surface-color));
+			box-shadow: var(--elevation-1);
+		}
+
+		dialog.pop {
+			background:
+				radial-gradient(circle at 100% 0%, color-mix(in oklab, var(--accent-color) 24%, transparent), transparent 38%),
+				linear-gradient(135deg, color-mix(in oklab, var(--active-color, var(--primary-color)) 18%, var(--surface-color)), var(--surface-color));
+			border-color: color-mix(in oklab, var(--active-color, var(--primary-color)) 24%, transparent);
+			box-shadow: var(--elevation-3), 0 0 36px -22px var(--active-color, var(--primary-color));
+		}
+
+		dialog::backdrop {
+			background:
+				radial-gradient(circle at 50% 20%, color-mix(in oklab, var(--primary-color) 18%, transparent), transparent 34rem),
+				color-mix(in oklab, var(--background-color) 72%, black 28%);
+			backdrop-filter: blur(0.28rem) saturate(1.08);
+		}
+
+		dialog > footer,
+		form > footer {
+			color: color-mix(in oklab, currentColor 72%, var(--signal-bloom-muted-color));
+		}
+	}
+}

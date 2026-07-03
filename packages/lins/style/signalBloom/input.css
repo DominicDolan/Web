@@ -1,0 +1,218 @@
+/*
+ * Form elements: Text Input, Choice Input, Form Field.
+ *
+ * Category selectors:
+ *   - text-like input types, textarea, select, input-shell
+ *   - input[type=checkbox], input[type=radio], input[type=range]
+ *   - form-field, fieldset, form-field output
+ *
+ * Keep the long :not() input selector in sync with the docs: text-like inputs
+ * are everything except radio, checkbox, range, color, file, image, button,
+ * submit, and reset.
+ */
+
+@layer base {
+	fieldset {
+		border: none;
+		outline: none;
+		padding: 0;
+	}
+
+	/*noinspection CssInvalidHtmlTagReference*/
+	form-field {
+		display: block;
+		color: inherit;
+	}
+
+	textarea {
+		box-sizing: content-box;
+		min-height: 3lh;
+		resize: block;
+	}
+
+	/*noinspection CssInvalidHtmlTagReference*/
+	input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+	textarea,
+	select,
+	/*noinspection CssInvalidHtmlTagReference*/
+	input-shell,
+	input-shell::part(default-control) {
+		--current-color: var(--active-color, var(--primary-color));
+		--on-current-color: var(--on-active-color, var(--on-primary-color));
+
+		padding: 0.58rem 0.85rem;
+		font-size: 1rem;
+		line-height: 1.45;
+		background-clip: padding-box;
+		border: 1px solid transparent;
+		border-radius: var(--input-radius);
+		color: var(--on-surface-color);
+		caret-color: var(--current-color);
+
+		transition:
+			color var(--signal-bloom-duration) var(--signal-bloom-ease),
+			background-color var(--signal-bloom-duration) var(--signal-bloom-ease),
+			border-color var(--signal-bloom-duration) var(--signal-bloom-ease),
+			box-shadow var(--signal-bloom-duration) var(--signal-bloom-ease),
+			outline-color var(--signal-bloom-duration) var(--signal-bloom-ease);
+
+		&::placeholder {
+			color: color-mix(in oklab, var(--on-surface-color) 52%, var(--current-color));
+			opacity: 0.78;
+		}
+
+		&:disabled,
+		&[disabled] {
+			cursor: not-allowed;
+			opacity: 0.55;
+			filter: saturate(0.7);
+		}
+	}
+
+	input[type=color] {
+		padding: 0.125rem 0.25rem;
+		border-radius: var(--input-radius);
+	}
+
+	input-shell,
+	input-shell::part(default-control) {
+		cursor: text;
+	}
+
+	input[type=checkbox],
+	input[type=radio],
+	input[type=range] {
+		accent-color: var(--active-color, var(--accent-color));
+	}
+}
+
+@layer elements {
+	/*noinspection CssInvalidHtmlTagReference*/
+	input-shell {
+		& input,
+		& select,
+		& textarea,
+		&::part(default-control) {
+			border: none;
+			outline: none;
+			padding: 0;
+			background-color: transparent;
+			min-height: 100%;
+			width: 100%;
+			box-shadow: none;
+
+			&:focus-visible {
+				outline: none;
+			}
+		}
+	}
+
+	/*noinspection CssInvalidHtmlTagReference*/
+	form-field {
+		& > label,
+		& > legend,
+		fieldset > legend {
+			color: color-mix(in oklab, var(--on-background-color) 74%, var(--primary-color));
+			font-weight: 720;
+		}
+
+		output {
+			display: block;
+			min-height: 1lh;
+			color: var(--error-color);
+			font-weight: 680;
+		}
+	}
+
+	@scope (body) to (.notSignalBloom) {
+		/*noinspection CssInvalidHtmlTagReference*/
+		input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+		textarea,
+		select,
+		input-shell {
+			:where(&),
+			&.tonal,
+			:where(form.tonal &) {
+				background-color: color-mix(in oklab, var(--current-color) 9%, var(--surface-color));
+				border-color: color-mix(in oklab, var(--current-color) 14%, transparent);
+				box-shadow: inset 0 1px 1px color-mix(in oklab, var(--shadow-color) 22%, transparent);
+			}
+
+			&.flat {
+				background-color: var(--surface-color);
+				border-color: var(--signal-bloom-border-color);
+				box-shadow: none;
+			}
+
+			&.outlined,
+			:where(article &) {
+				background-color: transparent;
+				border-color: color-mix(in oklab, var(--current-color) 34%, var(--signal-bloom-border-color));
+				box-shadow: none;
+			}
+
+			&.elevated {
+				background-color: var(--surface-color);
+				border-color: color-mix(in oklab, var(--on-surface-color) 7%, transparent);
+				box-shadow: var(--elevation-1);
+			}
+
+			&.pill {
+				border-radius: var(--signal-bloom-radius-pill);
+				padding-inline: 1rem;
+			}
+
+			&.glow {
+				background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+				border-color: color-mix(in oklab, var(--current-color) 28%, transparent);
+				box-shadow: var(--glow-elevation);
+			}
+
+			&.soft {
+				background-color: color-mix(in oklab, var(--current-color) 6%, var(--surface-color));
+				border-color: color-mix(in oklab, var(--current-color) 9%, transparent);
+				box-shadow: none;
+			}
+
+			&:focus-visible,
+			&:focus-within {
+				outline: var(--focus-ring-width) solid color-mix(in oklab, var(--signal-bloom-focus-color) 62%, transparent);
+				outline-offset: var(--focus-ring-offset);
+				border-color: color-mix(in oklab, var(--current-color) 62%, transparent);
+				box-shadow:
+					0 0 0 1px color-mix(in oklab, var(--current-color) 26%, transparent),
+					0 0 20px -10px var(--current-color);
+			}
+
+			&:invalid,
+			&[aria-invalid="true"] {
+				--current-color: var(--error-color);
+				--on-current-color: var(--on-error-color);
+				border-color: color-mix(in oklab, var(--error-color) 64%, transparent);
+				box-shadow: 0 0 0 1px color-mix(in oklab, var(--error-color) 18%, transparent);
+			}
+		}
+
+		/*noinspection CssInvalidHtmlTagReference*/
+		input-shell:has(input:invalid),
+		input-shell:has(textarea:invalid),
+		input-shell:has(select:invalid),
+		input-shell[aria-invalid="true"] {
+			--current-color: var(--error-color);
+			--on-current-color: var(--on-error-color);
+			border-color: color-mix(in oklab, var(--error-color) 64%, transparent);
+			box-shadow: 0 0 0 1px color-mix(in oklab, var(--error-color) 18%, transparent);
+		}
+
+		/*noinspection CssInvalidHtmlTagReference*/
+		label:has(+ input[required])::after,
+		label:has(+ textarea[required])::after,
+		label:has(+ select[required])::after,
+		label:has(+ input-shell [required])::after {
+			content: " *";
+			color: var(--secondary-color);
+			font-weight: 800;
+		}
+	}
+}
+

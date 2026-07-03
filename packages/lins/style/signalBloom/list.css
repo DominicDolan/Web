@@ -1,0 +1,268 @@
+/*
+ * List elements: List, Tab List, Menu List.
+ *
+ * Category selectors:
+ *   - ul, ol, li
+ *   - ul[role="tablist"] and its > li tabs
+ *   - ul[role="menu"], ul.menu
+ *   - list variants such as .nav, .plain, .chips, .underlined, .inset
+ *
+ * Note: ul and ul[role="tablist"] are different element categories even
+ * though they share a tag. Keep their rules separate.
+ */
+
+@layer base {
+	ul,
+	ol {
+		--current-color: var(--active-color, var(--primary-color));
+		--on-current-color: var(--on-active-color, var(--on-primary-color));
+		padding: 0;
+	}
+
+	ul[role="tablist"],
+	ul[role="menu"],
+	ul.menu,
+	ul.nav,
+	ul.plain,
+	ul.chips {
+		list-style: none;
+	}
+}
+
+@layer elements {
+	@scope (body) to (.notSignalBloom) {
+		ul.nav {
+			> li {
+				border-radius: var(--signal-bloom-radius-pill);
+				border: 1px solid transparent;
+				transition:
+					background-color var(--signal-bloom-duration) var(--signal-bloom-ease),
+					color var(--signal-bloom-duration) var(--signal-bloom-ease),
+					box-shadow var(--signal-bloom-duration) var(--signal-bloom-ease);
+
+				&:not(:has(> *)) {
+					padding: 0.52rem 0.78rem;
+				}
+
+				> * {
+					display: block;
+					padding: 0.52rem 0.78rem;
+					border-radius: inherit;
+				}
+
+				&[aria-current="page"],
+				&[aria-selected="true"],
+				&.active,
+				&:has(> [aria-current="page"]),
+				&:has(> [aria-selected="true"]),
+				&:has(> .active) {
+					background: color-mix(in oklab, var(--current-color) 15%, var(--surface-color));
+					border-color: color-mix(in oklab, var(--current-color) 18%, transparent);
+					color: var(--current-color);
+					box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--current-color) 9%, transparent);
+				}
+
+				&:hover:not(.active):not(:has(.active)):not([aria-current="page"]):not(:has(> [aria-current="page"])):not([aria-selected="true"]):not(:has(> [aria-selected="true"])) {
+					background: color-mix(in oklab, var(--current-color) 9%, transparent);
+				}
+			}
+		}
+
+		ul.plain {
+			> li {
+				border-radius: var(--signal-bloom-radius-md);
+				border: 1px solid transparent;
+				transition: background-color var(--signal-bloom-duration) var(--signal-bloom-ease), border-color var(--signal-bloom-duration) var(--signal-bloom-ease);
+
+				&:not(:has(> *)) {
+					padding: 0.68rem 0.8rem;
+				}
+
+				> * {
+					display: block;
+					padding: 0.68rem 0.8rem;
+				}
+
+				&[aria-current="page"],
+				&[aria-selected="true"],
+				&.active,
+				&:has(> [aria-current="page"]),
+				&:has(> [aria-selected="true"]),
+				&:has(> .active) {
+					background: color-mix(in oklab, var(--current-color) 10%, var(--surface-color));
+					border-color: color-mix(in oklab, var(--current-color) 18%, transparent);
+					color: var(--current-color);
+				}
+			}
+		}
+
+		ul.soft > li {
+			background: color-mix(in oklab, var(--current-color) 6%, var(--surface-color));
+			border-color: color-mix(in oklab, var(--current-color) 8%, transparent);
+		}
+
+		ul.menu,
+		ul[role="menu"] {
+			border: 1px solid var(--signal-bloom-border-color);
+			border-radius: var(--menu-radius);
+			background: color-mix(in oklab, var(--surface-color) 94%, var(--primary-color));
+			box-shadow: var(--elevation-2);
+			padding: 0.35rem;
+
+			&.glow {
+				box-shadow: var(--glow-elevation);
+				border-color: color-mix(in oklab, var(--active-color, var(--accent-color)) 22%, transparent);
+			}
+
+			&.soft {
+				background: color-mix(in oklab, var(--active-color, var(--primary-color)) 7%, var(--surface-color));
+				box-shadow: var(--elevation-1);
+			}
+
+			> li,
+			> [role="menuitem"] {
+				display: block;
+				padding: 0.58rem 0.72rem;
+				border-radius: var(--signal-bloom-radius-sm);
+				cursor: pointer;
+				transition: background-color var(--signal-bloom-duration) var(--signal-bloom-ease), color var(--signal-bloom-duration) var(--signal-bloom-ease);
+
+				&:hover,
+				&[aria-selected="true"],
+				&[aria-current="page"],
+				&.active {
+					background: color-mix(in oklab, var(--current-color) 12%, transparent);
+					color: var(--current-color);
+				}
+			}
+		}
+
+		ul.chips {
+			> li {
+				--current-color: var(--active-color, var(--primary-color));
+				--on-current-color: var(--on-active-color, var(--on-primary-color));
+
+				display: inline-flex;
+				align-items: center;
+				gap: 0.35em;
+				border-radius: var(--signal-bloom-radius-md);
+				border: 1px solid color-mix(in oklab, var(--current-color) 18%, transparent);
+				background: color-mix(in oklab, var(--current-color) 13%, var(--surface-color));
+				color: color-mix(in oklab, var(--current-color) 86%, var(--on-surface-color));
+				padding: 0.28rem 0.58rem;
+				font-weight: 720;
+				line-height: 1.2;
+				transition: background-color var(--signal-bloom-duration) var(--signal-bloom-ease), color var(--signal-bloom-duration) var(--signal-bloom-ease), box-shadow var(--signal-bloom-duration) var(--signal-bloom-ease);
+
+				&[aria-selected="true"],
+				&.active {
+					background: var(--current-color);
+					color: var(--on-current-color);
+					box-shadow: var(--elevation-1);
+				}
+			}
+
+			&.pill > li,
+			> li.pill {
+				border-radius: var(--signal-bloom-radius-pill);
+				padding-inline: 0.72rem;
+			}
+
+			&.soft > li,
+			> li.soft {
+				background: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+				border-color: color-mix(in oklab, var(--current-color) 10%, transparent);
+			}
+		}
+
+		:where(ul[role="tablist"]:not(.inset):not(.pill)),
+		ul[role="tablist"].underlined {
+			position: relative;
+			anchor-scope: all;
+			--underline-color: color-mix(in oklab, var(--current-color) 82%, var(--accent-color));
+			color: color-mix(in oklab, currentColor 58%, var(--current-color));
+
+			> li {
+				padding-inline: 0.7rem;
+				padding-block: 0.48rem;
+				border-radius: var(--signal-bloom-radius-sm);
+				cursor: pointer;
+				transition: color var(--signal-bloom-duration) var(--signal-bloom-ease), background-color var(--signal-bloom-duration) var(--signal-bloom-ease);
+
+				&[aria-selected="true"],
+				&.active,
+				&:has(> [aria-selected="true"]),
+				&:has(> .active) {
+					color: var(--current-color);
+					anchor-name: --active;
+				}
+
+				&:hover:not([aria-selected="true"]):not(.active):not(:has(.active)) {
+					background: color-mix(in oklab, var(--current-color) 8%, transparent);
+					color: var(--current-color);
+				}
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				bottom: -0.08rem;
+				height: 0.18rem;
+				border-radius: var(--signal-bloom-radius-pill);
+				background: linear-gradient(90deg, var(--underline-color), var(--accent-color));
+				box-shadow: 0 0 14px -6px var(--underline-color);
+				transition: left 220ms var(--signal-bloom-ease), right 220ms var(--signal-bloom-ease);
+				position-anchor: --active;
+				left: anchor(left);
+				right: anchor(right);
+			}
+		}
+
+		ul[role="tablist"].inset,
+		ul[role="tablist"].pill {
+			position: relative;
+			isolation: isolate;
+			display: inline-flex;
+			gap: 0.25rem;
+			padding: 0.25rem;
+			border-radius: var(--signal-bloom-radius-pill);
+			background: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+			box-shadow: inset 0 0 0 1px var(--signal-bloom-border-color);
+			anchor-scope: all;
+
+			> li {
+				padding: 0.48rem 0.76rem;
+				border-radius: var(--signal-bloom-radius-pill);
+				cursor: pointer;
+				color: color-mix(in oklab, currentColor 62%, var(--current-color));
+
+				&[aria-selected="true"],
+				&.active,
+				&:has(> [aria-selected="true"]),
+				&:has(> .active) {
+					color: var(--on-current-color);
+					anchor-name: --active;
+				}
+			}
+
+			&::after {
+				content: "";
+				position: absolute;
+				z-index: -1;
+				position-anchor: --active;
+				left: anchor(left);
+				right: anchor(right);
+				top: anchor(top);
+				bottom: anchor(bottom);
+				border-radius: var(--signal-bloom-radius-pill);
+				background: var(--current-color);
+				box-shadow: var(--elevation-1);
+				transition: left 220ms var(--signal-bloom-ease), right 220ms var(--signal-bloom-ease);
+			}
+		}
+
+		ul[role="tablist"].glow::after {
+			box-shadow: var(--glow-elevation);
+		}
+	}
+}
