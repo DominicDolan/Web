@@ -1,0 +1,355 @@
+/*
+ * Typography and inline text.
+ *
+ * Category selectors:
+ *   - body
+ *   - h1-h6
+ *   - .display/.headline/.title/.body/.label composed with .small/.medium/.large
+ *   - .variant for muted/secondary type
+ *   - code, hr
+ *   - heading contexts such as section > hgroup > h* and article > hgroup > *
+ *
+ * The type scale below is intentionally fill-ready. A new theme can change the
+ * font family, weights, letter spacing, or sizes while keeping the same class
+ * API.
+ */
+
+@layer defaults {
+    :root {
+        /*
+         * Unopinionated typography baseline. Themes are free to replace any of
+         * these, but the names are part of the LINS contract.
+         */
+        --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --base-font-size: 16px;
+        /* Fallback only. Implementations should set --font-size in the role rules below. */
+        --font-size: var(--base-font-size);
+        --line-height: 1.5;
+        --heading-line-height: 1.2;
+        --heading-font-weight: 700;
+    }
+}
+
+@layer base {
+    body {
+        font-family: var(--font-family), sans-serif;
+        font-size: var(--base-font-size);
+        line-height: var(--line-height);
+        color: var(--on-background-color);
+    }
+
+    /*
+     * Heading-like typography (font-family, line-height, weight).
+     * Tag defaults sit inside :where() so explicit role/size classes always win.
+     */
+    :where(h1, h2, h3, h4, h5, h6),
+    .display,
+    .headline,
+    .title {
+        font-family: var(--font-family), sans-serif;
+        line-height: var(--heading-line-height);
+        font-weight: var(--heading-font-weight);
+    }
+
+    .body,
+    .label {
+        font-family: var(--font-family), sans-serif;
+        line-height: var(--line-height);
+    }
+
+    /*
+     * Universal font-size resolution.
+     *
+     * Anything that opts into the LINS scale picks up its size from the
+     * combination of a role size (--font-size, set by .display/.headline/etc.
+     * or by a :where() default) and a size multiplier (--font-size-multiplier,
+     * set by .small/.medium/.large or by a :where() default).
+     *
+     * h-tags sit inside :where() so author classes win without specificity wars.
+     */
+    :where(
+        h1, h2, h3, h4, h5, h6,
+        p, li, dt, dd, small, figcaption, caption, time, legend, label,
+        button,
+        input[type=button], input[type=submit], input[type=reset], input[type=image],
+        input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+        textarea, select, input-shell,
+        [role="button"]:not(article), [role="tab"], [role="menuitem"],
+        nav, nav a, nav li,
+        article > section, article > footer,
+        section > footer, dialog > footer, form > footer, blockquote > footer,
+        form-field > output,
+        empty-state.empty
+    ),
+    .display, .headline, .title, .body, .label {
+        font-size: calc(var(--font-size, var(--base-font-size)) * var(--font-size-multiplier, 1));
+    }
+
+    hr {
+        --hr-color: color-mix(in oklab, currentColor 35%, transparent);
+
+        height: 1px;
+        color: var(--hr-color);
+        background: var(--hr-color);
+        border: 0;
+        font-size: 0;
+    }
+
+    code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notAperture) {
+        /*
+         * Typeface roles compose with size classes:
+         *   <h1 class="display large">Hero</h1>
+         *   <p class="title medium variant">Subtitle</p>
+         *
+         * Each typeface has its own fill-ready rule. Put its full visual
+         * treatment here: --font-size, weight, letter-spacing, transform,
+         * colour, etc. Tag/context defaults belong in :where(...); the explicit
+         * class remains authoritative and easy to override. The defaults below
+         * are a starter map for common website semantics; change them or add to
+         * them during a theme implementation when your content model needs it.
+         */
+
+        :where(
+            h1, h2,
+            main > hgroup > h1, main > hgroup > h2,
+            body > header h1, body > header h2,
+            [role="banner"] h1, [role="banner"] h2
+        ),
+        .display {
+            /* TODO: --font-size: ...; */
+            /* TODO: display typeface treatment. */
+        }
+
+        :where(
+            h3, h4, h5,
+            section > h1, section > h2, section > h3,
+            section > h4, section > h5, section > h6,
+            section > hgroup > h1, section > hgroup > h2,
+            section > hgroup > h3, section > hgroup > h4,
+            section > hgroup > h5, section > hgroup > h6
+        ),
+        .headline {
+            /* TODO: --font-size: ...; */
+            /* TODO: headline typeface treatment. */
+        }
+
+        :where(
+            h6,
+            article > h1, article > h2, article > h3,
+            article > h4, article > h5, article > h6,
+            article > hgroup > h1, article > hgroup > h2,
+            article > hgroup > h3, article > hgroup > h4,
+            article > hgroup > h5, article > hgroup > h6,
+            dialog > h1, dialog > h2, dialog > h3,
+            dialog > h4, dialog > h5, dialog > h6,
+            dialog > hgroup > h1, dialog > hgroup > h2,
+            dialog > hgroup > h3, dialog > hgroup > h4,
+            dialog > hgroup > h5, dialog > hgroup > h6,
+            nav.top h1, nav.top h2, nav.top h3,
+            nav.top h4, nav.top h5, nav.top h6,
+            empty-state.empty > h1, empty-state.empty > h2,
+            empty-state.empty > h3, empty-state.empty > h4,
+            empty-state.empty > h5, empty-state.empty > h6,
+            empty-state.empty > hgroup > h1, empty-state.empty > hgroup > h2,
+            empty-state.empty > hgroup > h3, empty-state.empty > hgroup > h4,
+            empty-state.empty > hgroup > h5, empty-state.empty > hgroup > h6
+        ),
+        .title {
+            /* TODO: --font-size: ...; */
+            /* TODO: title typeface treatment, including card-heading defaults. */
+        }
+
+        :where(
+            p, dt, dd,
+            article > p, article > section,
+            article > section > p,
+            section > p,
+            ul > *, ol > *,
+            blockquote,
+            input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+            textarea, select, input-shell,
+            empty-state.empty,
+            empty-state > p
+        ),
+        .body {
+            /* TODO: --font-size: ...; */
+            /* TODO: body typeface treatment. */
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        :where(
+            button,
+            input[type=button], input[type=submit], input[type=reset], input[type=image],
+            [role="button"]:not(article),
+            [role="tab"], ul[role="tablist"] > li,
+            ul.chips > li,
+            nav, nav a, nav li,
+            ul.nav > li,
+            ul.menu > li, ul[role="menu"] > li,
+            ul.menu > [role="menuitem"], ul[role="menu"] > [role="menuitem"],
+            label, form-field > label, fieldset > legend
+        ),
+        .label {
+            /* TODO: --font-size: ...; */
+            /* TODO: label typeface treatment. */
+        }
+
+        /*
+         * Typeface variants. A variant may set a different --font-size than its
+         * base typeface, then add its own muted/secondary visual treatment.
+         * Context defaults attach here too rather than living as standalone
+         * selectors. Treat these as implementation defaults too: change, remove,
+         * or extend them for the content patterns your theme supports.
+         */
+
+        :where(
+            main > hgroup > p,
+            body > header hgroup > p,
+            [role="banner"] hgroup > p
+        ),
+        .display.variant {
+            /* TODO: --font-size: ...; */
+            /* TODO: display variant treatment. */
+        }
+
+        :where(
+            section > hgroup > p,
+            section > header > p
+        ),
+        .headline.variant {
+            /* TODO: --font-size: ...; */
+            /* TODO: headline variant treatment and section-heading defaults. */
+        }
+
+        :where(
+            article > hgroup > p,
+            article > header > p,
+            dialog > hgroup > p,
+            dialog > header > p,
+            empty-state.empty > hgroup > p,
+            nav[aria-label="Breadcrumb"],
+            nav[aria-label="Breadcrumb"] > ol,
+            nav[aria-label="Breadcrumb"] > ol > li,
+            nav[aria-label="Breadcrumb"] a
+        ),
+        .title.variant {
+            /* TODO: --font-size: ...; */
+            /* TODO: title variant treatment and section-heading defaults. */
+        }
+
+        :where(
+            article > footer,
+            section > footer,
+            dialog > footer,
+            form > footer,
+            blockquote > footer
+        ),
+        .body.variant {
+            /* TODO: --font-size: ...; */
+            /* TODO: body variant treatment. */
+        }
+
+        :where(
+            small, figcaption, caption, time,
+            form-field > output
+        ),
+        .label.variant {
+            /* TODO: --font-size: ...; */
+            /* TODO: label variant treatment. */
+        }
+
+        /*
+         * Size → --font-size-multiplier. Tag/context defaults in :where().
+         * These are starter defaults; implementations can change or add to them
+         * alongside the role mappings above.
+         */
+        :where(
+            h1, h3, h6,
+            main > hgroup > h1,
+            body > header h1,
+            [role="banner"] h1,
+            section > h1, section > hgroup > h1,
+            empty-state.empty > h1, empty-state.empty > hgroup > h1
+        ), .large {
+            --font-size-multiplier: 1.2;
+        }
+
+        :where(
+            h2, h4,
+            button,
+            input[type=button], input[type=submit], input[type=reset], input[type=image],
+            [role="button"]:not(article),
+            [role="tab"], ul[role="tablist"] > li,
+            nav:not([aria-label="Breadcrumb"]), nav:not([aria-label="Breadcrumb"]) a,
+            article > h1, article > h2, article > h3,
+            article > h4, article > h5, article > h6,
+            article > hgroup > h1, article > hgroup > h2,
+            article > hgroup > h3, article > hgroup > h4,
+            article > hgroup > h5, article > hgroup > h6,
+            dialog > h1, dialog > h2, dialog > h3,
+            dialog > h4, dialog > h5, dialog > h6,
+            dialog > hgroup > h1, dialog > hgroup > h2,
+            dialog > hgroup > h3, dialog > hgroup > h4,
+            dialog > hgroup > h5, dialog > hgroup > h6,
+            input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+            textarea, select, input-shell
+        ), .medium {
+            --font-size-multiplier: 1;
+        }
+
+        :where(
+            h5,
+            small, figcaption, caption, time,
+            main > hgroup > p,
+            body > header hgroup > p,
+            [role="banner"] hgroup > p,
+            section > hgroup > p,
+            section > header > p,
+            article > hgroup > p,
+            article > header > p,
+            dialog > hgroup > p,
+            dialog > header > p,
+            empty-state.empty > hgroup > p,
+            ul.chips > li,
+            nav[aria-label="Breadcrumb"],
+            nav[aria-label="Breadcrumb"] > ol,
+            nav[aria-label="Breadcrumb"] > ol > li,
+            nav[aria-label="Breadcrumb"] a,
+            form-field > label,
+            form-field > output,
+            fieldset > legend
+        ), .small {
+            --font-size-multiplier: 0.85;
+        }
+
+
+        code {
+            /*
+             * TODO: inline-code chip surface (background, border-radius, padding).
+             * Padding is acceptable soft layout for a chip; the radius is a
+             * theme decision.
+             */
+        }
+
+        code:focus-within {
+            /* TODO: focus ring for editable/interactive code fragments. */
+        }
+
+        li {
+            /*
+             * Many LINS list categories remove native bullets. If your theme
+             * wants normal document lists to keep bullets, move this rule into
+             * ul.plain/nav/menu/tablist variants in list.css instead.
+             */
+            list-style-type: none;
+        }
+    }
+}
+
+

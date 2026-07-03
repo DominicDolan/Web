@@ -1,0 +1,175 @@
+/*
+ * Form elements: Text Input, Choice Input, Form Field.
+ *
+ * Category selectors:
+ *   - text-like input types, textarea, select, input-shell
+ *   - input[type=checkbox], input[type=radio], input[type=range]
+ *   - form-field, fieldset, form-field output
+ *
+ * Keep the long :not() input selector in sync with the docs: text-like inputs
+ * are everything except radio, checkbox, range, color, file, image, button,
+ * submit, and reset.
+ */
+
+@layer base {
+    fieldset {
+        border: none;
+        outline: none;
+        padding: 0;
+    }
+
+    /*noinspection CssInvalidHtmlTagReference*/
+    form-field {
+        display: block;
+    }
+
+    textarea {
+        box-sizing: content-box;
+        min-height: 3lh;
+        resize: block;
+    }
+
+    /*noinspection CssInvalidHtmlTagReference*/
+    input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+    textarea,
+    select,
+    input-shell,
+    input-shell::part(default-control) {
+        --current-color: var(--active-color, var(--primary-color));
+        --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        background-clip: padding-box;
+        border: none;
+        /* TODO: input border-radius. Themes usually share this with --button-radius. */
+
+        transition:
+            color 0.15s ease-in-out,
+            background-color 0.15s ease-in-out,
+            border-color 0.15s ease-in-out,
+            box-shadow 0.15s ease-in-out,
+            outline-color 0.15s ease-in-out;
+
+        &::placeholder {
+            opacity: 0.75;
+        }
+
+        &:disabled,
+        &[disabled] {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+    }
+
+    input[type=color] {
+        padding: 0.125rem 0.25rem;
+    }
+
+    /*noinspection CssInvalidHtmlTagReference*/
+    input-shell,
+    input-shell::part(default-control) {
+        cursor: text;
+    }
+
+    input[type=checkbox],
+    input[type=radio],
+    input[type=range] {
+        accent-color: var(--accent-color);
+    }
+}
+
+@layer elements {
+    /*
+     * Custom input-shell components should visually behave like native inputs,
+     * while their inner native controls are reset so the shell owns the chrome.
+     */
+    /*noinspection CssInvalidHtmlTagReference*/
+    input-shell {
+        & input,
+        & select,
+        & textarea,
+        &::part(default-control) {
+            border: none;
+            outline: none;
+            padding: 0;
+            background-color: transparent;
+            min-height: 100%;
+            width: 100%;
+
+            &:focus-visible {
+                outline: none;
+            }
+        }
+    }
+
+    /*noinspection CssInvalidHtmlTagReference*/
+    form-field {
+        output {
+            display: block;
+            min-height: 1lh;
+            color: var(--error-color);
+            /* TODO: validation message font-size. */
+        }
+    }
+
+    @scope (body) to (.notAperture) {
+        /*noinspection CssInvalidHtmlTagReference*/
+        input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+        textarea,
+        select,
+        input-shell {
+            :where(&),
+            &.flat {
+                /* TODO: default/flat text-field chrome. */
+            }
+
+            &.outlined,
+            :where(article &) {
+                /*
+                 * Context example: controls inside cards may default to outlined.
+                 * Because :where(article &) is zero specificity, explicit input
+                 * variants still win.
+                 */
+            }
+
+            &.elevated {
+                /* TODO: raised input surface, if your theme supports it. */
+            }
+
+            &.tonal,
+            :where(form.tonal &) {
+                /* TODO: form-level tonal context and explicit tonal variant. */
+            }
+
+            &:focus-visible,
+            &:focus-within {
+                /* TODO: focus ring/outline for native controls and input-shell. */
+            }
+
+            &:invalid,
+            &[aria-invalid="true"] {
+                /* TODO: invalid state for native controls. */
+            }
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        input-shell:has(input:invalid),
+        input-shell:has(textarea:invalid),
+        input-shell:has(select:invalid),
+        input-shell[aria-invalid="true"] {
+            /* TODO: invalid state when the custom shell contains the real control. */
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        label:has(+ input[required])::after,
+        label:has(+ textarea[required])::after,
+        label:has(+ select[required])::after,
+        label:has(+ input-shell [required])::after {
+            /* TODO: required marker. Keep it visual; do not replace semantic required attributes. */
+        }
+    }
+}
+
+
