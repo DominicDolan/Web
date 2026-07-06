@@ -24,6 +24,7 @@
     "./aperture.ts": "./style/aperture/theme.ts",
     "./themes": "./style/themes.ts",
     "./theme-info": "./style/themeInfo.ts",
+    "./generator": "./src/generator/index.ts",
     "./reset.css": "./style/reset.css",
     "./base.css": "./style/base.css",
     "./elements": "./elements/index.ts"

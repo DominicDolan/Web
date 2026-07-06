@@ -4,5 +4,5 @@
     "paths": {
     }
   },
-  "include": ["elements/**/*.ts", "style/**/*.ts"]
+  "include": ["elements/**/*.ts", "style/**/*.ts", "src/**/*.ts"]
 }
