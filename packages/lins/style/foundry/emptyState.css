@@ -20,13 +20,6 @@
     }
 }
 
-@layer base {
-    /*noinspection CssInvalidHtmlTagReference*/
-    empty-state {
-        display: block;
-    }
-}
-
 @layer elements {
     @scope (body) to (.notFoundry) {
         /*noinspection CssInvalidHtmlTagReference*/

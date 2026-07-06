@@ -12,18 +12,6 @@
  * list itself is the stylable category.
  */
 
-@layer base {
-    nav {
-        --current-color: var(--active-color, var(--primary-color));
-        --on-current-color: var(--on-active-color, var(--on-primary-color));
-    }
-
-    nav[aria-label="Breadcrumb"] > ol {
-        list-style: none;
-        padding: 0;
-    }
-}
-
 @layer elements {
     @scope (body) to (.notTemplate) {
         nav.top {

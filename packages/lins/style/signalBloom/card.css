@@ -13,32 +13,6 @@
  *   - context:  article article, article > footer, article > hgroup
  */
 
-@layer base {
-    article {
-        --current-color: var(--active-color, var(--surface-color));
-        --on-current-color: var(--on-active-color, var(--on-surface-color));
-
-        padding: 1rem;
-        border: 1px solid transparent;
-        border-radius: var(--card-radius);
-        background-repeat: no-repeat;
-        color: inherit;
-
-        transition:
-            color var(--signal-bloom-duration) var(--signal-bloom-ease),
-            background-color var(--signal-bloom-duration) var(--signal-bloom-ease),
-            background-image var(--signal-bloom-duration) var(--signal-bloom-ease),
-            border-color var(--signal-bloom-duration) var(--signal-bloom-ease),
-            box-shadow 220ms var(--signal-bloom-ease),
-            opacity var(--signal-bloom-duration) var(--signal-bloom-ease),
-            translate 220ms var(--signal-bloom-ease);
-    }
-
-    article[role="button"] {
-        cursor: pointer;
-    }
-}
-
 @layer elements {
     @scope (body) to (.notSignalBloom) {
         article {

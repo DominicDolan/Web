@@ -11,28 +11,6 @@
  * backdrop, and motion.
  */
 
-@layer base {
-    [popover][role="menu"],
-    [popover].menu {
-        position: fixed;
-        margin: 0;
-        border: none;
-
-        &::backdrop {
-            background: transparent;
-        }
-    }
-
-    dialog {
-        --current-color: var(--active-color, var(--surface-color));
-        --on-current-color: var(--on-active-color, var(--on-surface-color));
-
-        border: none;
-        background: transparent;
-        color: inherit;
-    }
-}
-
 @layer elements {
     @scope (body) to (.notFoundry) {
         [popover][role="menu"],

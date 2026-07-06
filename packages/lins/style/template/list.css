@@ -11,25 +11,6 @@
  * though they share a tag. Keep their rules separate.
  */
 
-@layer base {
-    ul,
-    ol {
-        --current-color: var(--active-color, var(--primary-color));
-        --on-current-color: var(--on-active-color, var(--on-primary-color));
-
-        padding: 0;
-    }
-
-    ul[role="tablist"],
-    ul[role="menu"],
-    ul.menu,
-    ul.nav,
-    ul.plain,
-    ul.chips {
-        list-style: none;
-    }
-}
-
 @layer elements {
     @scope (body) to (.notTemplate) {
         ul.nav {
