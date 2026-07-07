@@ -31,6 +31,7 @@ export type {
 } from "./spec.ts";
 
 export { defineLinsTheme } from "./themeDefinition.ts";
+export { parseLinsStylesheet } from "../parser/linsThemeParser.ts";
 
 export type {
     LinsDefinedTheme,
@@ -48,4 +49,11 @@ export type {
     LinsThemeTypographyDefinition,
     LinsVariantThemeDefinition,
 } from "./themeDefinition.ts";
+
+export type {
+    LinsParsedStylesheet,
+    LinsStylesheetParseOptions,
+    LinsStylesheetParseWarning,
+    LinsStylesheetParseWarningCode,
+} from "../parser/linsThemeParser.ts";
 

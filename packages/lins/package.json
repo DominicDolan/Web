@@ -4,10 +4,16 @@
   "type": "module",
   "scripts": {
     "add-theme": "node ./scripts/add-theme.mjs",
-    "generate-theme": "bun ./scripts/generate-theme.ts"
+    "generate-theme": "bun ./scripts/generate-theme.ts",
+    "test": "vitest --run",
+    "check": "tsc --noEmit"
   },
   "dependencies": {
     "@web/utils": "workspace:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vitest": "catalog:"
   },
   "exports": {
     "./layout": "./layout/index.ts",
@@ -30,6 +36,7 @@
     "./themes": "./style/themes.ts",
     "./theme-info": "./style/themeInfo.ts",
     "./generator": "./src/generator/index.ts",
+    "./parser": "./src/parser/index.ts",
     "./reset.css": "./style/reset.css",
     "./base.css": "./style/base.css",
     "./elements": "./elements/index.ts"
