@@ -6,6 +6,9 @@
     "add-theme": "node ./scripts/add-theme.mjs",
     "generate-theme": "bun ./scripts/generate-theme.ts"
   },
+  "dependencies": {
+    "@web/utils": "workspace:"
+  },
   "exports": {
     "./layout": "./layout/index.ts",
     "./minimal.css": "./style/minimal/theme.css",
