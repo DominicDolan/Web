@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "add-theme": "node ./scripts/add-theme.mjs"
+    "add-theme": "node ./scripts/add-theme.mjs",
+    "generate-theme": "bun ./scripts/generate-theme.ts"
   },
   "exports": {
     "./layout": "./layout/index.ts",
@@ -20,6 +21,7 @@
     "./signalBloom": "./style/signalBloom/theme.ts",
     "./signalBloom.ts": "./style/signalBloom/theme.ts",
     "./aperture.css": "./style/aperture/theme.css",
+    "./aperture-generated.css": "./generated/themes/aperture/theme.css",
     "./aperture": "./style/aperture/theme.ts",
     "./aperture.ts": "./style/aperture/theme.ts",
     "./themes": "./style/themes.ts",

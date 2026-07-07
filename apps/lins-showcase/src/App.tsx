@@ -5,7 +5,8 @@ import minimalCss from "@web/lins/minimal.css?url";
 import foundryCss from "@web/lins/foundry.css?url";
 import materialInspiredCss from "@web/lins/materialInspired.css?url";
 import signalBloomCss from "@web/lins/signalBloom.css?url";
-import apertureCss from "@web/lins/aperture.css?url";
+import apertureStaticCss from "@web/lins/aperture.css?url";
+import apertureGeneratedCss from "@web/lins/aperture-generated.css?url";
 import { linsThemes, type LinsElementCategoryInfo, type LinsThemeInfo, type LinsVariantInfo } from "@web/lins/themes";
 
 type ThemeOption = {
@@ -18,15 +19,29 @@ const themeCssById: Record<string, string> = {
   foundry: foundryCss,
   materialInspired: materialInspiredCss,
   signalBloom: signalBloomCss,
-  aperture: apertureCss,
+  aperture: apertureGeneratedCss,
 };
 
 const themeMetadata: readonly LinsThemeInfo[] = linsThemes;
 
-const themes: ThemeOption[] = themeMetadata.map((meta) => ({
-  meta,
-  css: themeCssById[meta.id] ?? minimalCss,
-}));
+const themes: ThemeOption[] = themeMetadata.flatMap((meta) => {
+  if (meta.id !== "aperture") {
+    return [{ meta, css: themeCssById[meta.id] ?? minimalCss }];
+  }
+
+  return [
+    {
+      meta: {
+        ...meta,
+        id: "aperture-static",
+        name: "Aperture (Static)",
+        description: "Previous hand-authored Aperture CSS kept for side-by-side comparison.",
+      },
+      css: apertureStaticCss,
+    },
+    { meta, css: apertureGeneratedCss },
+  ];
+});
 
 function category(theme: LinsThemeInfo, id: string): LinsElementCategoryInfo | undefined {
   return theme.elementCategories.find((elementCategory) => elementCategory.id === id);

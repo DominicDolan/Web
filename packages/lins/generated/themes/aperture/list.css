@@ -1,0 +1,169 @@
+@layer elements {
+    @scope (body) to (.notAperture) {
+        ul,
+        ol {
+            &.nav {
+                > li {
+                    border-radius: var(--aperture-radius-sm);
+                    color: color-mix(in oklab, currentColor 74%, var(--secondary-color));
+                    transition: color var(--aperture-duration) var(--aperture-ease), background-color var(--aperture-duration) var(--aperture-ease), box-shadow var(--aperture-duration) var(--aperture-ease);
+
+                    &:not(:has(> *)) { padding: 0.5rem 0.72rem; }
+                    > * { display: block; padding: 0.5rem 0.72rem; }
+                    &[aria-current="page"], &[aria-selected="true"], &.active, &:has(> [aria-current="page"]), &:has(> [aria-selected="true"]), &:has(> .active) {
+                        color: var(--current-color);
+                        background-color: color-mix(in oklab, var(--current-color) 10%, var(--surface-color));
+                        box-shadow: inset 3px 0 0 var(--current-color);
+                    }
+                    &:hover:not(.active):not(:has(.active)):not([aria-current="page"]):not(:has(> [aria-current="page"])):not([aria-selected="true"]):not(:has(> [aria-selected="true"])) {
+                        color: var(--current-color);
+                        background-color: color-mix(in oklab, var(--current-color) 7%, transparent);
+                    }
+                }
+            }
+
+            &.plain {
+                > li {
+                    border-radius: var(--aperture-radius-sm);
+                    border-inline-start: 2px solid color-mix(in oklab, currentColor 14%, transparent);
+                    &:not(:has(> *)) { padding: 0.58rem 0.72rem; }
+                    > * { display: block; padding: 0.58rem 0.72rem; }
+                    &[aria-current="page"], &[aria-selected="true"], &.active, &:has(> [aria-current="page"]), &:has(> [aria-selected="true"]), &:has(> .active) {
+                        border-inline-start-color: var(--accent-color);
+                        background-color: color-mix(in oklab, var(--accent-color) 7%, var(--surface-color));
+                    }
+                }
+            }
+
+            &.chips {
+                > li {
+                    --current-color: var(--active-color, var(--primary-color));
+                    --on-current-color: var(--on-active-color, var(--on-primary-color));
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 0.24rem 0.52rem;
+                    border: 1px solid color-mix(in oklab, var(--current-color) 22%, transparent);
+                    border-radius: var(--aperture-radius-round);
+                    background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+                    color: color-mix(in oklab, var(--current-color) 82%, var(--on-surface-color));
+                    font-size: 0.78rem;
+                    font-weight: 560;
+                    line-height: 1.25;
+                }
+            }
+
+            &.quiet {
+                color: color-mix(in oklab, currentColor 68%, var(--aperture-muted-color));
+            }
+        }
+
+        ul[role="tablist"] {
+            --tab-indicator-color: var(--active-color, var(--accent-color));
+            color: color-mix(in oklab, currentColor 62%, var(--secondary-color));
+            > li {
+                padding: 0.48rem 0.68rem;
+                border-radius: var(--aperture-radius-sm);
+                cursor: pointer;
+                transition: color var(--aperture-duration) var(--aperture-ease), background-color var(--aperture-duration) var(--aperture-ease), box-shadow var(--aperture-duration) var(--aperture-ease);
+                &[aria-selected="true"], &.active, &:has(> [aria-selected="true"]), &:has(> .active) { color: var(--tab-indicator-color); }
+                &:hover:not([aria-selected="true"]):not(.active):not(:has(.active)) {
+                    color: var(--current-color);
+                    background-color: color-mix(in oklab, var(--current-color) 7%, transparent);
+                }
+            }
+
+            :where(&),
+            &.underlined {
+                position: relative;
+                anchor-scope: all;
+                > li {
+                    border-radius: 0;
+                    &[aria-selected="true"], &.active, &:has(> [aria-selected="true"]), &:has(> .active) { anchor-name: --active; }
+                }
+                &::after {
+                    content: "";
+                    position: absolute;
+                    inset-block-end: 0;
+                    height: 2px;
+                    background-color: var(--tab-indicator-color);
+                    transition: left 180ms var(--aperture-ease), right 180ms var(--aperture-ease);
+                    position-anchor: --active;
+                    left: anchor(left);
+                    right: anchor(right);
+                }
+            }
+
+            &.inset {
+                isolation: isolate;
+                position: relative;
+                display: inline-flex;
+                gap: 0.25rem;
+                padding: 0.25rem;
+                border-radius: var(--aperture-radius-round);
+                background-color: color-mix(in oklab, var(--background-color) 78%, var(--surface-color));
+                box-shadow: var(--inset-elevation);
+                anchor-scope: all;
+                > li {
+                    border-radius: var(--aperture-radius-round);
+                    &[aria-selected="true"], &.active, &:has(> [aria-selected="true"]), &:has(> .active) { anchor-name: --active; }
+                }
+                &::after {
+                    content: "";
+                    position: absolute;
+                    z-index: -1;
+                    background-color: var(--surface-color);
+                    border-radius: var(--aperture-radius-round);
+                    box-shadow: var(--elevation-1);
+                    transition: left 180ms var(--aperture-ease), right 180ms var(--aperture-ease);
+                    position-anchor: --active;
+                    left: anchor(left); right: anchor(right); top: anchor(top); bottom: anchor(bottom);
+                }
+            }
+
+            &.framed {
+                border: 1px solid var(--aperture-border-color);
+                border-radius: var(--aperture-radius-md);
+                background-color: color-mix(in oklab, var(--surface-color) 72%, transparent);
+                box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--surface-color) 64%, transparent);
+                > li {
+                    border-radius: var(--aperture-radius-sm);
+                    &[aria-selected="true"], &.active, &:has(> [aria-selected="true"]), &:has(> .active) {
+                        background-color: var(--surface-color);
+                        box-shadow: inset 0 -2px 0 var(--tab-indicator-color);
+                    }
+                }
+            }
+        }
+
+        ul[role="menu"],
+        ul.menu {
+            list-style: none;
+            border: 1px solid var(--aperture-border-color);
+            border-radius: var(--menu-radius);
+            background-color: var(--surface-color);
+            color: var(--on-surface-color);
+            box-shadow: var(--elevation-2);
+            &:not(:has(> *)) { padding: 0.5rem 0.65rem; }
+
+            &.glass {
+                background-color: var(--aperture-surface-glass);
+                backdrop-filter: blur(16px) saturate(1.06);
+            }
+
+            & > li,
+            & > [role="menuitem"] {
+                display: block;
+                padding: 0.58rem 0.72rem;
+                border-radius: var(--aperture-radius-sm);
+                cursor: pointer;
+                &:hover,
+                &[aria-selected="true"],
+                &[aria-current="page"],
+                &.active {
+                    background-color: color-mix(in oklab, var(--current-color) 9%, transparent);
+                    color: var(--current-color);
+                }
+            }
+        }
+    }
+}

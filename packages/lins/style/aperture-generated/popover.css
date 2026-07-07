@@ -1,0 +1,62 @@
+@layer elements {
+    @scope (body) to (.notAperture) {
+        [popover][role="menu"],
+        [popover].menu {
+            border: 1px solid var(--aperture-border-color);
+            border-radius: var(--menu-radius);
+            background-color: var(--surface-color);
+            color: var(--on-surface-color);
+            box-shadow: var(--elevation-3);
+
+            &.glass {
+                background-color: var(--aperture-surface-glass);
+                border-color: color-mix(in oklab, var(--surface-color) 45%, var(--aperture-border-color));
+                backdrop-filter: blur(18px) saturate(1.08);
+            }
+
+            &.framed {
+                border-color: color-mix(in oklab, var(--accent-color) 28%, var(--aperture-border-color));
+                box-shadow:
+                    inset 0 0 0 1px color-mix(in oklab, var(--surface-color) 64%, transparent),
+                    var(--elevation-3);
+            }
+        }
+
+        dialog {
+            border: 1px solid var(--aperture-border-color);
+            border-radius: var(--dialog-radius);
+            background-color: var(--current-color);
+            color: var(--on-current-color);
+            box-shadow: var(--elevation-3);
+
+            &.glass {
+                background-color: var(--aperture-surface-glass);
+                border-color: color-mix(in oklab, var(--surface-color) 45%, var(--aperture-border-color));
+                backdrop-filter: blur(20px) saturate(1.06);
+            }
+
+            &.framed {
+                border-color: color-mix(in oklab, var(--accent-color) 26%, var(--aperture-border-color));
+                box-shadow:
+                    inset 0 0 0 1px color-mix(in oklab, var(--surface-color) 62%, transparent),
+                    var(--elevation-3);
+            }
+
+            dialog::backdrop {
+                background-color: color-mix(in oklab, var(--background-color) 54%, black 32%);
+                backdrop-filter: blur(3px);
+            }
+
+            dialog > footer {
+                display: flex;
+                gap: 0.55rem;
+                border-top: 1px solid color-mix(in oklab, currentColor 10%, transparent);
+                color: color-mix(in oklab, currentColor 76%, var(--aperture-muted-color));
+            }
+
+            form > footer {
+                color: color-mix(in oklab, currentColor 72%, var(--aperture-muted-color));
+            }
+        }
+    }
+}

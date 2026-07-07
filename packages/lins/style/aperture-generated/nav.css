@@ -1,0 +1,62 @@
+@layer elements {
+    @scope (body) to (.notAperture) {
+        nav {
+            color: color-mix(in oklab, currentColor 82%, var(--secondary-color));
+
+            &.top {
+                background-color: color-mix(in oklab, var(--surface-color) 88%, transparent);
+                color: var(--on-surface-color);
+                border-bottom: 1px solid var(--aperture-border-color);
+                box-shadow: 0 1px 0 color-mix(in oklab, var(--surface-color) 70%, transparent);
+            }
+
+            :where(aside > &),
+            &.pageNav {
+                background-color: color-mix(in oklab, var(--surface-color) 48%, transparent);
+                color: var(--on-surface-color);
+                border: 1px solid color-mix(in oklab, var(--on-surface-color) 9%, transparent);
+                border-radius: var(--aperture-radius-md);
+            }
+
+            &.glass {
+                background-color: var(--aperture-surface-glass);
+                border-color: color-mix(in oklab, var(--surface-color) 42%, var(--aperture-border-color));
+                backdrop-filter: blur(18px) saturate(1.06);
+            }
+
+            &.quiet {
+                background-color: transparent;
+                border-color: transparent;
+                box-shadow: none;
+            }
+
+            nav a[aria-current="page"],
+            nav a.active {
+                color: var(--active-color, var(--accent-color));
+                font-weight: 650;
+                text-decoration-color: currentColor;
+            }
+        }
+
+        nav[aria-label="Breadcrumb"] {
+            color: color-mix(in oklab, currentColor 60%, var(--aperture-muted-color));
+
+            & > ol {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+            }
+
+            & > ol > li {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+            }
+
+            & > ol > li + li::before {
+                content: "/";
+                color: color-mix(in oklab, currentColor 42%, transparent);
+            }
+        }
+    }
+}

@@ -1,0 +1,143 @@
+@layer defaults {
+    :root {
+        --font-family: Inter, Geist, "Avenir Next", "IBM Plex Sans", "Source Sans 3", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        --mono-font-family: "Cascadia Code", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        --base-font-size: 16px;
+        --font-size: var(--base-font-size);
+        --line-height: 1.58;
+        --heading-line-height: 1.16;
+        --heading-font-weight: 650;
+    }
+}
+
+@layer elements {
+    @scope (body) to (.notAperture) {
+        :where(h1, h2, main > hgroup > h1, main > hgroup > h2, body > header h1, body > header h2, [role="banner"] h1, [role="banner"] h2),
+        .display {
+            --font-size: 3rem;
+            line-height: 1.08;
+            font-weight: 680;
+            letter-spacing: -0.045em;
+            color: color-mix(in oklab, currentColor 90%, var(--primary-color));
+        }
+
+        :where(h3, h4, h5, section > h1, section > h2, section > h3, section > h4, section > h5, section > h6, section > hgroup > h1, section > hgroup > h2, section > hgroup > h3, section > hgroup > h4, section > hgroup > h5, section > hgroup > h6),
+        .headline {
+            --font-size: 1.9rem;
+            line-height: 1.14;
+            font-weight: 650;
+            letter-spacing: -0.032em;
+            color: color-mix(in oklab, currentColor 88%, var(--primary-color));
+        }
+
+        :where(h6, article > h1, article > h2, article > h3, article > h4, article > h5, article > h6, article > hgroup > h1, article > hgroup > h2, article > hgroup > h3, article > hgroup > h4, article > hgroup > h5, article > hgroup > h6, dialog > h1, dialog > h2, dialog > h3, dialog > h4, dialog > h5, dialog > h6, dialog > hgroup > h1, dialog > hgroup > h2, dialog > hgroup > h3, dialog > hgroup > h4, dialog > hgroup > h5, dialog > hgroup > h6, nav.top h1, nav.top h2, nav.top h3, nav.top h4, nav.top h5, nav.top h6, empty-state.empty > h1, empty-state.empty > h2, empty-state.empty > h3, empty-state.empty > h4, empty-state.empty > h5, empty-state.empty > h6, empty-state.empty > hgroup > h1, empty-state.empty > hgroup > h2, empty-state.empty > hgroup > h3, empty-state.empty > hgroup > h4, empty-state.empty > hgroup > h5, empty-state.empty > hgroup > h6),
+        .title {
+            --font-size: 1.12rem;
+            line-height: 1.24;
+            font-weight: 640;
+            letter-spacing: -0.018em;
+            color: color-mix(in oklab, currentColor 86%, var(--primary-color));
+        }
+
+        :where(p, dt, dd, article > p, article > section, article > section > p, section > p, ul > *, ol > *, blockquote, input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]), textarea, select, input-shell, empty-state.empty, empty-state > p),
+        .body {
+            --font-size: 0.96rem;
+            line-height: 1.62;
+            font-weight: 420;
+            letter-spacing: -0.004em;
+        }
+
+        :where(button, input[type=button], input[type=submit], input[type=reset], input[type=image], [role="button"]:not(article), [role="tab"], ul[role="tablist"] > li, ul.chips > li, nav, nav a, nav li, ul.nav > li, ul.menu > li, ul[role="menu"] > li, ul.menu > [role="menuitem"], ul[role="menu"] > [role="menuitem"], label, form-field > label, fieldset > legend),
+        .label {
+            --font-size: 0.84rem;
+            line-height: 1.35;
+            font-weight: 620;
+            letter-spacing: 0.018em;
+        }
+
+        :where(main > hgroup > p, body > header hgroup > p, [role="banner"] hgroup > p),
+        .display.variant {
+            --font-size: 1.08rem;
+            line-height: 1.55;
+            font-weight: 420;
+            letter-spacing: -0.01em;
+            color: color-mix(in oklab, currentColor 66%, var(--aperture-muted-color));
+        }
+
+        :where(section > hgroup > p, section > header > p),
+        .headline.variant {
+            --font-size: 0.98rem;
+            line-height: 1.45;
+            font-weight: 520;
+            letter-spacing: 0.012em;
+            color: color-mix(in oklab, currentColor 68%, var(--aperture-muted-color));
+        }
+
+        :where(article > hgroup > p, article > header > p, dialog > hgroup > p, dialog > header > p, empty-state.empty > hgroup > p, nav[aria-label="Breadcrumb"], nav[aria-label="Breadcrumb"] > ol, nav[aria-label="Breadcrumb"] > ol > li, nav[aria-label="Breadcrumb"] a),
+        .title.variant {
+            --font-size: 0.9rem;
+            line-height: 1.45;
+            font-weight: 480;
+            letter-spacing: 0;
+            color: color-mix(in oklab, currentColor 64%, var(--aperture-muted-color));
+        }
+
+        :where(article > footer, section > footer, dialog > footer, form > footer, blockquote > footer),
+        .body.variant {
+            --font-size: 0.84rem;
+            color: color-mix(in oklab, currentColor 62%, var(--aperture-muted-color));
+        }
+
+        :where(small, figcaption, caption, time, form-field output, [popover] > output, [popover] > output.snackbar, [popover] > output.tooltip),
+        .label.variant {
+            --font-size: 0.76rem;
+            font-weight: 560;
+            letter-spacing: 0.028em;
+            color: color-mix(in oklab, currentColor 58%, var(--aperture-muted-color));
+        }
+
+        :where(h1, h3, h6, main > hgroup > h1, body > header h1, [role="banner"] h1, section > h1, section > hgroup > h1, empty-state.empty > h1, empty-state.empty > hgroup > h1),
+        .large {
+            --font-size-multiplier: 1.18;
+        }
+
+        :where(h2, h4, button, input[type=button], input[type=submit], input[type=reset], input[type=image], [role="button"]:not(article), [role="tab"], ul[role="tablist"] > li, nav:not([aria-label="Breadcrumb"]), nav:not([aria-label="Breadcrumb"]) a, article > h1, article > h2, article > h3, article > h4, article > h5, article > h6, article > hgroup > h1, article > hgroup > h2, article > hgroup > h3, article > hgroup > h4, article > hgroup > h5, article > hgroup > h6, dialog > h1, dialog > h2, dialog > h3, dialog > h4, dialog > h5, dialog > h6, dialog > hgroup > h1, dialog > hgroup > h2, dialog > hgroup > h3, dialog > hgroup > h4, dialog > hgroup > h5, dialog > hgroup > h6, input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]), textarea, select, input-shell),
+        .medium {
+            --font-size-multiplier: 1;
+        }
+
+        :where(h5, small, figcaption, caption, time, main > hgroup > p, body > header hgroup > p, [role="banner"] hgroup > p, section > hgroup > p, section > header > p, article > hgroup > p, article > header > p, dialog > hgroup > p, dialog > header > p, empty-state.empty > hgroup > p, ul.chips > li, nav[aria-label="Breadcrumb"], nav[aria-label="Breadcrumb"] > ol, nav[aria-label="Breadcrumb"] > ol > li, nav[aria-label="Breadcrumb"] a, form-field > label, form-field output, [popover] > output, [popover] > output.snackbar, [popover] > output.tooltip, fieldset > legend),
+        .small {
+            --font-size-multiplier: 0.86;
+        }
+
+        section > hgroup {
+            padding-bottom: 0.6rem;
+        }
+
+        hgroup > code {
+            font-size: 0.86rem;
+        }
+
+        code,
+        hr,
+        li {
+            code {
+                padding: 0.16em 0.36em;
+                border-radius: var(--aperture-radius-xs);
+                background-color: color-mix(in oklab, var(--accent-color) 8%, var(--surface-color));
+                color: color-mix(in oklab, var(--primary-color) 82%, var(--accent-color));
+                box-shadow: inset 0 0 0 1px color-mix(in oklab, currentColor 12%, transparent);
+            }
+
+            code:focus-within {
+                outline: 2px solid color-mix(in oklab, var(--aperture-focus-color) 58%, transparent);
+                outline-offset: 2px;
+            }
+
+            li {
+                list-style-type: none;
+            }
+        }
+    }
+}

@@ -1,0 +1,89 @@
+@layer elements {
+    @scope (body) to (.notAperture) {
+        input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+        textarea,
+        select,
+        input-shell {
+            :where(&),
+            &.flat {
+                background-color: color-mix(in oklab, var(--surface-color) 82%, var(--background-color));
+                color: var(--on-surface-color);
+                border-color: color-mix(in oklab, var(--on-surface-color) 12%, transparent);
+                box-shadow: inset 0 1px 0 color-mix(in oklab, var(--surface-color) 76%, transparent);
+            }
+
+            &.outlined {
+                background-color: transparent;
+                color: inherit;
+                border-color: color-mix(in oklab, var(--current-color) 28%, var(--aperture-border-color));
+                box-shadow: none;
+            }
+
+            &.elevated {
+                background-color: var(--surface-color);
+                color: var(--on-surface-color);
+                border-color: color-mix(in oklab, var(--on-surface-color) 8%, transparent);
+                box-shadow: var(--elevation-1);
+            }
+
+            &.tonal {
+                background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+                color: color-mix(in oklab, var(--current-color) 82%, var(--on-surface-color));
+                border-color: color-mix(in oklab, var(--current-color) 18%, transparent);
+                box-shadow: none;
+            }
+
+            &.quiet {
+                background-color: transparent;
+                color: inherit;
+                border-color: color-mix(in oklab, currentColor 11%, transparent);
+                box-shadow: none;
+            }
+
+            &:focus-visible,
+            &:focus-within {
+                outline: var(--focus-ring-width) solid color-mix(in oklab, var(--aperture-focus-color) 66%, transparent);
+                outline-offset: var(--focus-ring-offset);
+                border-color: color-mix(in oklab, var(--accent-color) 46%, transparent);
+            }
+
+            &:invalid,
+            &[aria-invalid="true"] {
+                border-color: color-mix(in oklab, var(--error-color) 64%, transparent);
+                outline-color: color-mix(in oklab, var(--error-color) 64%, transparent);
+            }
+
+            input-shell input,
+            input-shell select,
+            input-shell textarea,
+            input-shell::part(default-control) {
+                border: none;
+                outline: none;
+                padding: 0;
+                background-color: transparent;
+                min-height: 100%;
+                width: 100%;
+                &:focus-visible {
+                    outline: none;
+                }
+            }
+
+            input-shell:has(input:invalid),
+            input-shell:has(textarea:invalid),
+            input-shell:has(select:invalid),
+            input-shell[aria-invalid="true"] {
+                border-color: color-mix(in oklab, var(--error-color) 64%, transparent);
+                outline: 1px solid color-mix(in oklab, var(--error-color) 52%, transparent);
+            }
+
+            label:has(+ input[required])::after,
+            label:has(+ textarea[required])::after,
+            label:has(+ select[required])::after,
+            label:has(+ input-shell [required])::after {
+                content: " *";
+                color: var(--error-color);
+                font-weight: 640;
+            }
+        }
+    }
+}

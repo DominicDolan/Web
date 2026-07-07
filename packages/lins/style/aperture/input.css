@@ -12,29 +12,6 @@
  */
 
 @layer elements {
-    /*
-     * Custom input-shell components should visually behave like native inputs,
-     * while their inner native controls are reset so the shell owns the chrome.
-     */
-    /*noinspection CssInvalidHtmlTagReference*/
-    input-shell {
-        & input,
-        & select,
-        & textarea,
-        &::part(default-control) {
-            border: none;
-            outline: none;
-            padding: 0;
-            background-color: transparent;
-            min-height: 100%;
-            width: 100%;
-
-            &:focus-visible {
-                outline: none;
-            }
-        }
-    }
-
     /*noinspection CssInvalidHtmlTagReference*/
     form-field {
         output {
