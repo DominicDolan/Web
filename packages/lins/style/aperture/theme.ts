@@ -1,20 +1,12 @@
-import type { LinsThemeInfo } from "../themeInfo.ts";
+import { defineLinsTheme } from "../../src/generator";
+import type { LinsThemeDefinition } from "../../src/generator";
 
-export const apertureThemeInfo = {
+export const apertureThemeInfo = defineLinsTheme({
     id: "aperture",
     name: "Aperture",
     className: "apertureTheme",
     description: "A calm, editorial LINS theme with warm neutrals, soft optical elevation, precise typography, and gallery-like surface framing.",
-    colors: [
-        { id: "primary", name: "Primary", cssVariable: "--primary-color", onCssVariable: "--on-primary-color", description: "Deep ink colour for primary actions, selected states, strong text, and high-contrast UI chrome." },
-        { id: "secondary", name: "Secondary", cssVariable: "--secondary-color", onCssVariable: "--on-secondary-color", description: "Muted slate role for supporting actions, secondary navigation, and low-emphasis chrome." },
-        { id: "surface", name: "Surface", cssVariable: "--surface-color", onCssVariable: "--on-surface-color", description: "Clean sheet colour for cards, dialogs, popovers, menus, and framed content surfaces." },
-        { id: "background", name: "Background", cssVariable: "--background-color", onCssVariable: "--on-background-color", description: "Gallery-like page background and its readable foreground colour." },
-        { id: "accent", name: "Accent", cssVariable: "--accent-color", onCssVariable: "--on-accent-color", description: "Lens-blue accent for focus rings, links, active rails, highlights, and editorial markers." },
-        { id: "success", name: "Success", cssVariable: "--success-color", onCssVariable: "--on-success-color", description: "Calm positive status colour for completion, confirmation, and valid states." },
-        { id: "warning", name: "Warning", cssVariable: "--warning-color", onCssVariable: "--on-warning-color", description: "Restrained amber status colour for cautionary states and non-destructive warnings." },
-        { id: "error", name: "Error", cssVariable: "--error-color", onCssVariable: "--on-error-color", description: "Refined crimson role for destructive actions, invalid states, and validation feedback." },
-    ],
+    stylesheets: ["button", "text", "card", "input", "list", "icon", "popover", "empty-state", "navigation"],
     colorThemes: [
         {
             id: "light",
@@ -22,16 +14,17 @@ export const apertureThemeInfo = {
             className: "light",
             colorScheme: "light",
             description: "Warm editorial light palette with porcelain background, white sheets, ink-blue primary text, and lens-blue accents.",
-            colors: [
-                { role: "primary", color: "#172033", onColor: "#f8fbff" },
-                { role: "secondary", color: "#5e6878", onColor: "#ffffff" },
-                { role: "surface", color: "#fffdf8", onColor: "#172033" },
-                { role: "background", color: "#f4f0e8", onColor: "#1c2433" },
-                { role: "accent", color: "#2f74d0", onColor: "#ffffff" },
-                { role: "success", color: "#2f7d5c", onColor: "#f4fff9" },
-                { role: "warning", color: "#b47a12", onColor: "#fff8e8" },
-                { role: "error", color: "#b83a4b", onColor: "#fff7f8" },
-            ],
+            colors: {
+                primary: ["#172033", "#f8fbff"],
+                secondary: ["#5e6878", "#ffffff"],
+                surface: ["#fffdf8", "#172033"],
+                background: ["#f4f0e8", "#1c2433"],
+                accent: ["#2f74d0", "#ffffff"],
+                success: ["#2f7d5c", "#f4fff9"],
+                warning: ["#b47a12", "#fff8e8"],
+                error: ["#b83a4b", "#fff7f8"],
+            },
+            tokens: { "--shadow-color": "oklab(from #172033 l a b / 0.18)" },
         },
         {
             id: "dark",
@@ -39,237 +32,679 @@ export const apertureThemeInfo = {
             className: "dark",
             colorScheme: "dark",
             description: "Quiet dark palette with blue-black background, graphite surfaces, soft foregrounds, and luminous lens-blue accents.",
-            colors: [
-                { role: "primary", color: "#edf4ff", onColor: "#111827" },
-                { role: "secondary", color: "#9aa8bc", onColor: "#101722" },
-                { role: "surface", color: "#1d2430", onColor: "#edf2f8" },
-                { role: "background", color: "#111722", onColor: "#e7ecf4" },
-                { role: "accent", color: "#70a7ff", onColor: "#07152b" },
-                { role: "success", color: "#6fcf9f", onColor: "#062015" },
-                { role: "warning", color: "#e4b557", onColor: "#241800" },
-                { role: "error", color: "#ef7c8d", onColor: "#2a0710" },
-            ],
+            colors: {
+                primary: ["#edf4ff", "#111827"],
+                secondary: ["#9aa8bc", "#101722"],
+                surface: ["#1d2430", "#edf2f8"],
+                background: ["#111722", "#e7ecf4"],
+                accent: ["#70a7ff", "#07152b"],
+                success: ["#6fcf9f", "#062015"],
+                warning: ["#e4b557", "#241800"],
+                error: ["#ef7c8d", "#2a0710"],
+            },
+            tokens: { "--shadow-color": "oklab(from black l a b / 0.48)" },
         },
     ],
-    elementCategories: [
+    typography: {
+        defaults: {
+            css: `--font-family: Inter, Geist, "Avenir Next", "IBM Plex Sans", "Source Sans 3", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+--mono-font-family: "Cascadia Code", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+--base-font-size: 16px;
+--font-size: var(--base-font-size);
+--line-height: 1.58;
+--heading-line-height: 1.16;
+--heading-font-weight: 650;`,
+        },
+        roles: {
+            display: { css: `--font-size: 3rem;
+line-height: 1.08;
+font-weight: 680;
+letter-spacing: -0.045em;
+color: color-mix(in oklab, currentColor 90%, var(--primary-color));` },
+            headline: { css: `--font-size: 1.9rem;
+line-height: 1.14;
+font-weight: 650;
+letter-spacing: -0.032em;
+color: color-mix(in oklab, currentColor 88%, var(--primary-color));` },
+            title: { css: `--font-size: 1.12rem;
+line-height: 1.24;
+font-weight: 640;
+letter-spacing: -0.018em;
+color: color-mix(in oklab, currentColor 86%, var(--primary-color));` },
+            body: { css: `--font-size: 0.96rem;
+line-height: 1.62;
+font-weight: 420;
+letter-spacing: -0.004em;` },
+            label: { css: `--font-size: 0.84rem;
+line-height: 1.35;
+font-weight: 620;
+letter-spacing: 0.018em;` },
+        },
+        roleVariants: {
+            "display.variant": { css: `--font-size: 1.08rem;
+line-height: 1.55;
+font-weight: 420;
+letter-spacing: -0.01em;
+color: color-mix(in oklab, currentColor 66%, var(--aperture-muted-color));` },
+            "headline.variant": { css: `--font-size: 0.98rem;
+line-height: 1.45;
+font-weight: 520;
+letter-spacing: 0.012em;
+color: color-mix(in oklab, currentColor 68%, var(--aperture-muted-color));` },
+            "title.variant": { css: `--font-size: 0.9rem;
+line-height: 1.45;
+font-weight: 480;
+letter-spacing: 0;
+color: color-mix(in oklab, currentColor 64%, var(--aperture-muted-color));` },
+            "body.variant": { css: `--font-size: 0.84rem;
+color: color-mix(in oklab, currentColor 62%, var(--aperture-muted-color));` },
+            "label.variant": { css: `--font-size: 0.76rem;
+font-weight: 560;
+letter-spacing: 0.028em;
+color: color-mix(in oklab, currentColor 58%, var(--aperture-muted-color));` },
+        },
+        sizes: {
+            large: { css: "--font-size-multiplier: 1.18;" },
+            medium: { css: "--font-size-multiplier: 1;" },
+            small: { css: "--font-size-multiplier: 0.86;" },
+        },
+        raw: [
+            { selector: "section > hgroup", css: "padding-bottom: 0.6rem;" },
+            { selector: "hgroup > code", css: "font-size: 0.86rem;" },
+        ],
+    },
+    icons: {
+        family: "Material Symbols Outlined",
+        sizes: {
+            medium: "1.25em",
+            large: "1.5em",
+            xlarge: "2em",
+            small: "1em",
+        },
+    },
+    categories: {
+        card: {
+            variants: {
+                elevated: { default: true, css: `background-color: var(--current-color);
+color: var(--on-current-color);
+border-color: color-mix(in oklab, var(--on-current-color) 8%, transparent);
+box-shadow: var(--elevation-1);` },
+                flat: { css: `background-color: var(--current-color);
+color: var(--on-current-color);
+border-color: color-mix(in oklab, var(--on-current-color) 7%, transparent);
+box-shadow: none;` },
+                outlined: { css: `--current-color: var(--active-color, var(--primary-color));
+--on-current-color: var(--on-active-color, var(--on-primary-color));
+background-color: color-mix(in oklab, var(--surface-color) 46%, transparent);
+color: inherit;
+border-color: color-mix(in oklab, var(--current-color) 22%, var(--aperture-border-color));
+box-shadow: none;` },
+                tonal: { css: `--current-color: var(--active-color, var(--primary-color));
+--on-current-color: var(--on-active-color, var(--on-primary-color));
+background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+color: color-mix(in oklab, var(--current-color) 78%, var(--on-surface-color));
+border-color: color-mix(in oklab, var(--current-color) 13%, transparent);
+box-shadow: none;` },
+                inset: { css: `background-color: color-mix(in oklab, var(--background-color) 84%, var(--current-color));
+color: var(--on-background-color);
+border-color: color-mix(in oklab, var(--on-background-color) 9%, transparent);
+box-shadow: var(--inset-elevation);` },
+                highlighted: { css: `--current-color: var(--active-color, var(--accent-color));
+--on-current-color: var(--on-active-color, var(--on-accent-color));
+position: relative;
+isolation: isolate;
+background-color: var(--surface-color);
+color: var(--on-surface-color);
+border-color: color-mix(in oklab, var(--current-color) 18%, var(--aperture-border-color));
+box-shadow: var(--elevation-1);`, contexts: { marker: { selector: "&::before", css: `content: "";
+position: absolute;
+inset-block: 0.9rem;
+inset-inline-start: 0.9rem;
+width: 0.18rem;
+border-radius: var(--aperture-radius-round);
+background-color: var(--current-color);` } } },
+                text: { css: `background-color: transparent;
+border-color: transparent;
+box-shadow: none;
+color: inherit;` },
+                glass: { css: `background-color: var(--aperture-surface-glass);
+color: var(--on-surface-color);
+border-color: color-mix(in oklab, var(--surface-color) 46%, var(--aperture-border-color));
+box-shadow: var(--elevation-2);
+backdrop-filter: blur(18px) saturate(1.08);` },
+                framed: { css: `background:
+    linear-gradient(var(--surface-color), var(--surface-color)) padding-box,
+    linear-gradient(135deg, color-mix(in oklab, var(--primary-color) 32%, transparent), color-mix(in oklab, var(--accent-color) 24%, transparent)) border-box;
+color: var(--on-surface-color);
+border-color: transparent;
+box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--surface-color) 72%, transparent),
+    var(--elevation-1);` },
+                quiet: { css: `background-color: color-mix(in oklab, var(--surface-color) 54%, transparent);
+color: color-mix(in oklab, currentColor 78%, var(--aperture-muted-color));
+border-color: color-mix(in oklab, currentColor 9%, transparent);
+box-shadow: none;` },
+                focus: { css: `--current-color: var(--active-color, var(--accent-color));
+--on-current-color: var(--on-active-color, var(--on-accent-color));
+background-color: var(--surface-color);
+color: var(--on-surface-color);
+border-color: color-mix(in oklab, var(--current-color) 46%, transparent);
+box-shadow:
+    inset 3px 0 0 var(--current-color),
+    0 0 0 1px color-mix(in oklab, var(--current-color) 12%, transparent),
+    var(--elevation-1);` },
+            },
+            states: {
+                interactive: { css: `translate: 0 -2px;
+box-shadow: var(--elevation-2);` },
+                "interactive-focus": { selector: "&[role=\"button\"]:focus-visible", css: `outline: var(--focus-ring-width) solid color-mix(in oklab, var(--aperture-focus-color) 68%, transparent);
+outline-offset: var(--focus-ring-offset);` },
+                deselected: { css: `opacity: 0.62;
+filter: saturate(0.76);` },
+                selected: { css: `border-color: color-mix(in oklab, var(--active-color, var(--accent-color)) 48%, transparent);
+box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--active-color, var(--accent-color)) 20%, transparent),
+    var(--elevation-2);` },
+            },
+            parts: {
+                header: { selector: ["> hgroup", "> h3"], css: "color: color-mix(in oklab, var(--active-color, var(--primary-color)) 78%, currentColor);" },
+                body: { selector: "> section", css: "color: color-mix(in oklab, currentColor 88%, var(--aperture-surface-muted-color));" },
+                footer: { selector: "> footer", css: "color: color-mix(in oklab, currentColor 68%, var(--aperture-muted-color));" },
+            },
+        },
+        button: {
+            variants: {
+                outlined: { default: true, css: `color: var(--current-color);
+background-color: color-mix(in oklab, var(--surface-color) 62%, transparent);
+border-color: color-mix(in oklab, var(--current-color) 34%, var(--aperture-border-color));
+box-shadow: inset 0 1px 0 color-mix(in oklab, var(--surface-color) 82%, transparent);` },
+                flat: { css: `color: var(--on-current-color);
+background-color: var(--current-color);
+border-color: color-mix(in oklab, var(--on-current-color) 10%, transparent);
+box-shadow: none;` },
+                elevated: { css: `color: var(--on-current-color);
+background-color: var(--current-color);
+border-color: color-mix(in oklab, var(--on-current-color) 12%, transparent);
+box-shadow: var(--elevation-1);` },
+                tonal: { css: `color: color-mix(in oklab, var(--current-color) 86%, var(--on-surface-color));
+background-color: color-mix(in oklab, var(--current-color) 10%, var(--surface-color));
+border-color: color-mix(in oklab, var(--current-color) 15%, transparent);
+box-shadow: none;` },
+                text: { css: `padding-inline: 0.45rem;
+color: var(--current-color);
+background-color: transparent;
+border-color: transparent;
+box-shadow: none;` },
+                plain: { css: `color: color-mix(in oklab, currentColor 72%, var(--current-color));
+background-color: transparent;
+border-color: transparent;
+box-shadow: none;` },
+                icon: { css: `padding: 0.54rem;
+aspect-ratio: 1;
+border-radius: 50%;` },
+                quiet: { css: `color: color-mix(in oklab, currentColor 76%, var(--secondary-color));
+background-color: color-mix(in oklab, var(--surface-color) 48%, transparent);
+border-color: color-mix(in oklab, currentColor 12%, transparent);
+box-shadow: none;` },
+                focus: { css: `color: var(--current-color);
+background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+border-color: color-mix(in oklab, var(--accent-color) 62%, transparent);
+box-shadow:
+    inset 3px 0 0 var(--accent-color),
+    0 0 0 1px color-mix(in oklab, var(--accent-color) 18%, transparent);` },
+            },
+            states: {
+                hover: { css: "translate: 0 -1px;" },
+                "hover-muted": { selector: ["&.outlined:hover:not(:disabled):not([disabled]):not([aria-disabled=\"true\"])", "&.tonal:hover:not(:disabled):not([disabled]):not([aria-disabled=\"true\"])", "&.quiet:hover:not(:disabled):not([disabled]):not([aria-disabled=\"true\"])", "&.focus:hover:not(:disabled):not([disabled]):not([aria-disabled=\"true\"])", "&:where(:not(.flat):not(.elevated):not(.text):not(.plain)):hover:not(:disabled):not([disabled]):not([aria-disabled=\"true\"])"], css: `background-color: color-mix(in oklab, var(--current-color) 14%, var(--surface-color));
+border-color: color-mix(in oklab, var(--current-color) 40%, var(--aperture-border-color));` },
+                "hover-filled": { selector: ["&.flat:hover:not(:disabled):not([disabled]):not([aria-disabled=\"true\"])", "&.elevated:hover:not(:disabled):not([disabled]):not([aria-disabled=\"true\"])"] , css: "background-color: color-mix(in oklab, var(--on-current-color) 8%, var(--current-color));" },
+                "hover-elevated": { selector: "&.elevated:hover:not(:disabled):not([disabled]):not([aria-disabled=\"true\"])", css: "box-shadow: var(--elevation-2);" },
+                "hover-text": { selector: ["&.text:hover:not(:disabled):not([disabled]):not([aria-disabled=\"true\"])", "&.plain:hover:not(:disabled):not([disabled]):not([aria-disabled=\"true\"])"] , css: `background-color: color-mix(in oklab, var(--current-color) 9%, transparent);
+box-shadow: none;` },
+                focus: { css: `outline: var(--focus-ring-width) solid color-mix(in oklab, var(--aperture-focus-color) 70%, transparent);
+outline-offset: var(--focus-ring-offset);` },
+                active: { css: `background-color: color-mix(in oklab, var(--current-color) 16%, var(--surface-color));
+border-color: color-mix(in oklab, var(--current-color) 46%, transparent);
+color: var(--current-color);
+box-shadow: inset 0 1px 2px color-mix(in oklab, var(--shadow-color) 42%, transparent);` },
+            },
+        },
+        "radio-group": {
+            root: { css: `display: inline-flex;
+gap: 0;
+border-radius: var(--button-radius);
+background-color: color-mix(in oklab, var(--background-color) 72%, var(--surface-color));
+box-shadow:
+    inset 0 0 0 1px var(--aperture-border-color),
+    var(--inset-elevation);` },
+            parts: {
+                button: { css: `border-radius: 0;
+background-color: transparent;
+border-color: transparent;
+box-shadow: none;
+color: color-mix(in oklab, currentColor 70%, var(--secondary-color));` },
+                "first-button": { selector: "& > button:first-child", css: `border-start-start-radius: var(--button-radius);
+border-end-start-radius: var(--button-radius);` },
+                "last-button": { selector: "& > button:last-child", css: `border-start-end-radius: var(--button-radius);
+border-end-end-radius: var(--button-radius);` },
+                "selected-button": { css: `background-color: var(--surface-color);
+color: var(--current-color);
+box-shadow: var(--elevation-1);` },
+            },
+        },
+        link: {
+            root: { css: `color: var(--current-color);
+text-decoration-line: underline;
+text-decoration-thickness: 0.07em;
+text-decoration-color: color-mix(in oklab, var(--current-color) 32%, transparent);` },
+            states: {
+                current: { css: `color: color-mix(in oklab, var(--current-color) 82%, var(--primary-color));
+font-weight: 640;
+text-decoration-color: currentColor;` },
+                interactive: { css: `color: color-mix(in oklab, var(--current-color) 82%, var(--accent-color));
+text-decoration-color: currentColor;` },
+                focus: { selector: "&:focus-visible", css: `outline: 2px solid color-mix(in oklab, var(--aperture-focus-color) 64%, transparent);
+outline-offset: 0.18em;
+border-radius: 0.2em;` },
+            },
+        },
+        "inline-text": {
+            parts: {
+                code: { css: `padding: 0.16em 0.36em;
+border-radius: var(--aperture-radius-xs);
+background-color: color-mix(in oklab, var(--accent-color) 8%, var(--surface-color));
+color: color-mix(in oklab, var(--primary-color) 82%, var(--accent-color));
+box-shadow: inset 0 0 0 1px color-mix(in oklab, currentColor 12%, transparent);` },
+                "code-focus": { css: `outline: 2px solid color-mix(in oklab, var(--aperture-focus-color) 58%, transparent);
+outline-offset: 2px;` },
+                "list-item": { css: "list-style-type: none;" },
+            },
+        },
+        "text-input": {
+            variants: {
+                flat: { default: true, css: `background-color: color-mix(in oklab, var(--surface-color) 82%, var(--background-color));
+color: var(--on-surface-color);
+border-color: color-mix(in oklab, var(--on-surface-color) 12%, transparent);
+box-shadow: inset 0 1px 0 color-mix(in oklab, var(--surface-color) 76%, transparent);` },
+                outlined: { css: `background-color: transparent;
+color: inherit;
+border-color: color-mix(in oklab, var(--current-color) 28%, var(--aperture-border-color));
+box-shadow: none;` },
+                elevated: { css: `background-color: var(--surface-color);
+color: var(--on-surface-color);
+border-color: color-mix(in oklab, var(--on-surface-color) 8%, transparent);
+box-shadow: var(--elevation-1);` },
+                tonal: { css: `background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+color: color-mix(in oklab, var(--current-color) 82%, var(--on-surface-color));
+border-color: color-mix(in oklab, var(--current-color) 18%, transparent);
+box-shadow: none;` },
+                quiet: { css: `background-color: transparent;
+color: inherit;
+border-color: color-mix(in oklab, currentColor 11%, transparent);
+box-shadow: none;` },
+            },
+            states: {
+                focus: { css: `outline: var(--focus-ring-width) solid color-mix(in oklab, var(--aperture-focus-color) 66%, transparent);
+outline-offset: var(--focus-ring-offset);
+border-color: color-mix(in oklab, var(--accent-color) 46%, transparent);` },
+                invalid: { css: `border-color: color-mix(in oklab, var(--error-color) 64%, transparent);
+outline-color: color-mix(in oklab, var(--error-color) 64%, transparent);` },
+            },
+            parts: {
+                "input-shell-control": { css: `border: none;
+outline: none;
+padding: 0;
+background-color: transparent;
+min-height: 100%;
+width: 100%;
+&:focus-visible {
+    outline: none;
+}` },
+                "shell-invalid": { css: `border-color: color-mix(in oklab, var(--error-color) 64%, transparent);
+outline: 1px solid color-mix(in oklab, var(--error-color) 52%, transparent);` },
+                "required-marker": { css: `content: " *";
+color: var(--error-color);
+font-weight: 640;` },
+            },
+        },
+        "checkbox-input": {},
+        "radio-input": {},
+        "range-input": {},
+        list: {
+            variants: {
+                nav: { css: `> li {
+    border-radius: var(--aperture-radius-sm);
+    color: color-mix(in oklab, currentColor 74%, var(--secondary-color));
+    transition: color var(--aperture-duration) var(--aperture-ease), background-color var(--aperture-duration) var(--aperture-ease), box-shadow var(--aperture-duration) var(--aperture-ease);
+
+    &:not(:has(> *)) { padding: 0.5rem 0.72rem; }
+    > * { display: block; padding: 0.5rem 0.72rem; }
+    &[aria-current="page"], &[aria-selected="true"], &.active, &:has(> [aria-current="page"]), &:has(> [aria-selected="true"]), &:has(> .active) {
+        color: var(--current-color);
+        background-color: color-mix(in oklab, var(--current-color) 10%, var(--surface-color));
+        box-shadow: inset 3px 0 0 var(--current-color);
+    }
+    &:hover:not(.active):not(:has(.active)):not([aria-current="page"]):not(:has(> [aria-current="page"])):not([aria-selected="true"]):not(:has(> [aria-selected="true"])) {
+        color: var(--current-color);
+        background-color: color-mix(in oklab, var(--current-color) 7%, transparent);
+    }
+}` },
+                plain: { css: `> li {
+    border-radius: var(--aperture-radius-sm);
+    border-inline-start: 2px solid color-mix(in oklab, currentColor 14%, transparent);
+    &:not(:has(> *)) { padding: 0.58rem 0.72rem; }
+    > * { display: block; padding: 0.58rem 0.72rem; }
+    &[aria-current="page"], &[aria-selected="true"], &.active, &:has(> [aria-current="page"]), &:has(> [aria-selected="true"]), &:has(> .active) {
+        border-inline-start-color: var(--accent-color);
+        background-color: color-mix(in oklab, var(--accent-color) 7%, var(--surface-color));
+    }
+}` },
+                chips: { css: `> li {
+    --current-color: var(--active-color, var(--primary-color));
+    --on-current-color: var(--on-active-color, var(--on-primary-color));
+    display: inline-flex;
+    align-items: center;
+    padding: 0.24rem 0.52rem;
+    border: 1px solid color-mix(in oklab, var(--current-color) 22%, transparent);
+    border-radius: var(--aperture-radius-round);
+    background-color: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+    color: color-mix(in oklab, var(--current-color) 82%, var(--on-surface-color));
+    font-size: 0.78rem;
+    font-weight: 560;
+    line-height: 1.25;
+}` },
+                quiet: { css: "color: color-mix(in oklab, currentColor 68%, var(--aperture-muted-color));" },
+            },
+        },
+        "tab-list": {
+            root: { css: `--tab-indicator-color: var(--active-color, var(--accent-color));
+color: color-mix(in oklab, currentColor 62%, var(--secondary-color));
+> li {
+    padding: 0.48rem 0.68rem;
+    border-radius: var(--aperture-radius-sm);
+    cursor: pointer;
+    transition: color var(--aperture-duration) var(--aperture-ease), background-color var(--aperture-duration) var(--aperture-ease), box-shadow var(--aperture-duration) var(--aperture-ease);
+    &[aria-selected="true"], &.active, &:has(> [aria-selected="true"]), &:has(> .active) { color: var(--tab-indicator-color); }
+    &:hover:not([aria-selected="true"]):not(.active):not(:has(.active)) {
+        color: var(--current-color);
+        background-color: color-mix(in oklab, var(--current-color) 7%, transparent);
+    }
+}` },
+            variants: {
+                underlined: { default: true, css: `position: relative;
+anchor-scope: all;
+> li {
+    border-radius: 0;
+    &[aria-selected="true"], &.active, &:has(> [aria-selected="true"]), &:has(> .active) { anchor-name: --active; }
+}
+&::after {
+    content: "";
+    position: absolute;
+    inset-block-end: 0;
+    height: 2px;
+    background-color: var(--tab-indicator-color);
+    transition: left 180ms var(--aperture-ease), right 180ms var(--aperture-ease);
+    position-anchor: --active;
+    left: anchor(left);
+    right: anchor(right);
+}` },
+                inset: { css: `isolation: isolate;
+position: relative;
+display: inline-flex;
+gap: 0.25rem;
+padding: 0.25rem;
+border-radius: var(--aperture-radius-round);
+background-color: color-mix(in oklab, var(--background-color) 78%, var(--surface-color));
+box-shadow: var(--inset-elevation);
+anchor-scope: all;
+> li {
+    border-radius: var(--aperture-radius-round);
+    &[aria-selected="true"], &.active, &:has(> [aria-selected="true"]), &:has(> .active) { anchor-name: --active; }
+}
+&::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    background-color: var(--surface-color);
+    border-radius: var(--aperture-radius-round);
+    box-shadow: var(--elevation-1);
+    transition: left 180ms var(--aperture-ease), right 180ms var(--aperture-ease);
+    position-anchor: --active;
+    left: anchor(left); right: anchor(right); top: anchor(top); bottom: anchor(bottom);
+}` },
+                framed: { css: `border: 1px solid var(--aperture-border-color);
+border-radius: var(--aperture-radius-md);
+background-color: color-mix(in oklab, var(--surface-color) 72%, transparent);
+box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--surface-color) 64%, transparent);
+> li {
+    border-radius: var(--aperture-radius-sm);
+    &[aria-selected="true"], &.active, &:has(> [aria-selected="true"]), &:has(> .active) {
+        background-color: var(--surface-color);
+        box-shadow: inset 0 -2px 0 var(--tab-indicator-color);
+    }
+}` },
+            },
+        },
+        "menu-list": {
+            root: { css: `list-style: none;
+border: 1px solid var(--aperture-border-color);
+border-radius: var(--menu-radius);
+background-color: var(--surface-color);
+color: var(--on-surface-color);
+box-shadow: var(--elevation-2);
+&:not(:has(> *)) { padding: 0.5rem 0.65rem; }` },
+            variants: {
+                menu: { default: true },
+                glass: { css: `background-color: var(--aperture-surface-glass);
+backdrop-filter: blur(16px) saturate(1.06);` },
+            },
+            parts: {
+                item: { css: `display: block;
+padding: 0.58rem 0.72rem;
+border-radius: var(--aperture-radius-sm);
+cursor: pointer;
+&:hover,
+&[aria-selected="true"],
+&[aria-current="page"],
+&.active {
+    background-color: color-mix(in oklab, var(--current-color) 9%, transparent);
+    color: var(--current-color);
+}` },
+            },
+        },
+        navigation: {
+            root: { css: "color: color-mix(in oklab, currentColor 82%, var(--secondary-color));" },
+            variants: {
+                top: { css: `background-color: color-mix(in oklab, var(--surface-color) 88%, transparent);
+color: var(--on-surface-color);
+border-bottom: 1px solid var(--aperture-border-color);
+box-shadow: 0 1px 0 color-mix(in oklab, var(--surface-color) 70%, transparent);` },
+                pageNav: { applyAsDefault: ["aside > &"], css: `background-color: color-mix(in oklab, var(--surface-color) 48%, transparent);
+color: var(--on-surface-color);
+border: 1px solid color-mix(in oklab, var(--on-surface-color) 9%, transparent);
+border-radius: var(--aperture-radius-md);` },
+                glass: { css: `background-color: var(--aperture-surface-glass);
+border-color: color-mix(in oklab, var(--surface-color) 42%, var(--aperture-border-color));
+backdrop-filter: blur(18px) saturate(1.06);` },
+                quiet: { css: `background-color: transparent;
+border-color: transparent;
+box-shadow: none;` },
+            },
+            states: {
+                "current-link": { css: `color: var(--active-color, var(--accent-color));
+font-weight: 650;
+text-decoration-color: currentColor;` },
+            },
+        },
+        breadcrumb: {
+            root: { css: "color: color-mix(in oklab, currentColor 60%, var(--aperture-muted-color));" },
+            parts: {
+                track: { css: `display: inline-flex;
+align-items: center;
+gap: 0.4rem;` },
+                item: { css: `display: inline-flex;
+align-items: center;
+gap: 0.4rem;` },
+                separator: { css: `content: "/";
+color: color-mix(in oklab, currentColor 42%, transparent);` },
+            },
+        },
+        popover: {
+            root: { css: `border: 1px solid var(--aperture-border-color);
+border-radius: var(--menu-radius);
+background-color: var(--surface-color);
+color: var(--on-surface-color);
+box-shadow: var(--elevation-3);` },
+            variants: {
+                menu: { default: true },
+                glass: { css: `background-color: var(--aperture-surface-glass);
+border-color: color-mix(in oklab, var(--surface-color) 45%, var(--aperture-border-color));
+backdrop-filter: blur(18px) saturate(1.08);` },
+                framed: { css: `border-color: color-mix(in oklab, var(--accent-color) 28%, var(--aperture-border-color));
+box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--surface-color) 64%, transparent),
+    var(--elevation-3);` },
+            },
+        },
+        dialog: {
+            root: { css: `border: 1px solid var(--aperture-border-color);
+border-radius: var(--dialog-radius);
+background-color: var(--current-color);
+color: var(--on-current-color);
+box-shadow: var(--elevation-3);` },
+            variants: {
+                glass: { css: `background-color: var(--aperture-surface-glass);
+border-color: color-mix(in oklab, var(--surface-color) 45%, var(--aperture-border-color));
+backdrop-filter: blur(20px) saturate(1.06);` },
+                framed: { css: `border-color: color-mix(in oklab, var(--accent-color) 26%, var(--aperture-border-color));
+box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--surface-color) 62%, transparent),
+    var(--elevation-3);` },
+            },
+            parts: {
+                backdrop: { css: `background-color: color-mix(in oklab, var(--background-color) 54%, black 32%);
+backdrop-filter: blur(3px);` },
+                footer: { css: `display: flex;
+gap: 0.55rem;
+border-top: 1px solid color-mix(in oklab, currentColor 10%, transparent);
+color: color-mix(in oklab, currentColor 76%, var(--aperture-muted-color));` },
+                "form-footer": { css: "color: color-mix(in oklab, currentColor 72%, var(--aperture-muted-color));" },
+            },
+        },
+        "empty-state-skeleton": {
+            states: {
+                busy: { css: `animation: aperture-shimmer 1.4s linear infinite;
+background-size: 200% 100%;
+background-image: linear-gradient(
+    90deg,
+    color-mix(in oklab, currentColor 7%, var(--surface-color)) 25%,
+    color-mix(in oklab, currentColor 13%, var(--surface-color)) 37%,
+    color-mix(in oklab, currentColor 7%, var(--surface-color)) 63%
+);` },
+                "not-busy": { css: "background-color: color-mix(in oklab, currentColor 9%, var(--surface-color));" },
+            },
+            parts: {
+                "skeleton-block": { css: `pointer-events: none;
+user-select: none;
+border-radius: var(--aperture-radius-xs);
+color: transparent;` },
+            },
+        },
+        "empty-state-empty": {
+            root: { css: `--current-color: var(--active-color, var(--surface-color));
+--on-current-color: var(--on-active-color, var(--on-surface-color));
+isolation: isolate;
+position: relative;
+padding: 1.25rem;
+border: 1px dashed color-mix(in oklab, var(--accent-color) 28%, var(--aperture-border-color));
+border-radius: var(--card-radius);
+background-color: color-mix(in oklab, var(--current-color) 78%, transparent);
+color: var(--on-current-color);
+box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--surface-color) 58%, transparent);` },
+            variants: {
+                framed: { css: `border-style: solid;
+border-color: color-mix(in oklab, var(--accent-color) 34%, var(--aperture-border-color));
+box-shadow: var(--elevation-1);` },
+            },
+            parts: {
+                "empty-decoration": { css: `content: "";
+position: absolute;
+pointer-events: none;
+inset: 0.55rem;
+border: 1px solid color-mix(in oklab, var(--accent-color) 10%, transparent);
+border-radius: calc(var(--card-radius) - 0.35rem);` },
+            },
+        },
+        icon: {
+            variants: {
+                small: { css: "font-variation-settings: \"FILL\" 0, \"wght\" 420, \"GRAD\" -25, \"opsz\" 20;" },
+                medium: { default: true },
+                large: { css: "font-variation-settings: \"FILL\" 0, \"wght\" 400, \"GRAD\" -25, \"opsz\" 32;" },
+                xlarge: { css: "font-variation-settings: \"FILL\" 0, \"wght\" 380, \"GRAD\" -25, \"opsz\" 40;" },
+            },
+        },
+    },
+    appDefaults: [
         {
-            id: "card",
-            name: "Card",
-            file: "style/aperture/card.css",
-            selectors: ["article"],
-            description: "Editorial sheet and framed-content surfaces for cards, nested cards, interactive cards, and selection states.",
-            variants: [
-                { id: "elevated", className: "elevated", name: "Elevated", default: true, description: "Default floating sheet with surface colour, quiet border, and soft optical shadow." },
-                { id: "flat", className: "flat", name: "Flat", description: "Clean surface sheet without elevation for dense content and embedded panels." },
-                { id: "outlined", className: "outlined", name: "Outlined", description: "Transparent or surface-backed panel with a low-contrast editorial stroke; also the nested-card default." },
-                { id: "tonal", className: "tonal", name: "Tonal", description: "Very pale active-colour wash for low-emphasis callouts and grouped content." },
-                { id: "inset", className: "inset", name: "Inset", description: "Recessed editorial well using the background colour and subtle inner shadow." },
-                { id: "highlighted", className: "highlighted", name: "Highlighted", description: "Quiet card with a precise accent rail or small editorial marker." },
-                { id: "text", className: "text", name: "Text", description: "Chrome-free content block with transparent background." },
-                { id: "glass", className: "glass", name: "Glass", description: "Translucent frosted sheet for special panels, overlays, or app-bar-adjacent content." },
-                { id: "framed", className: "framed", name: "Framed", description: "Gallery-inspired frame treatment with a refined border and restrained inner surface." },
-                { id: "quiet", className: "quiet", name: "Quiet", description: "Lowest-emphasis surface treatment for supporting or background content." },
-                { id: "focus", className: "focus", name: "Focus", description: "Editorial emphasis treatment with a stronger focus frame or accent line." },
-            ],
+            selector: "@keyframes aperture-shimmer",
+            scoped: false,
+            css: `0% { background-position: -200% 0; }
+100% { background-position: 200% 0; }`,
         },
         {
-            id: "button",
-            name: "Button",
-            file: "style/aperture/button.css",
-            selectors: ["button", "input[type=button]", "input[type=submit]", "input[type=reset]", "input[type=image]", "[role=button]"],
-            description: "Precise professional action controls with restrained colour, balanced radii, and clear focus affordances.",
-            variants: [
-                { id: "outlined", className: "outlined", name: "Outlined", default: true, description: "Default low-emphasis action with a thin current-colour border and subtle hover wash." },
-                { id: "flat", className: "flat", name: "Flat", description: "Solid high-emphasis action using the active colour with minimal shadow." },
-                { id: "elevated", className: "elevated", name: "Elevated", description: "Primary action with soft elevation and a gentle lift on interaction." },
-                { id: "tonal", className: "tonal", name: "Tonal", description: "Soft active-colour tint for secondary actions." },
-                { id: "text", className: "text", name: "Text", description: "Chrome-free text action for toolbars and inline actions." },
-                { id: "plain", className: "plain", name: "Plain", description: "Very quiet action that relies on typography and hover colour rather than chrome." },
-                { id: "icon", className: "icon", name: "Icon", description: "Circular or softly rounded icon-only action with centred content." },
-                { id: "quiet", className: "quiet", name: "Quiet", description: "Understated secondary action with less contrast than the default outlined button." },
-                { id: "focus", className: "focus", name: "Focus", description: "High-clarity emphasis button with a precise accent frame." },
-            ],
+            selector: ".apertureTheme",
+            scoped: false,
+            css: `--aperture-radius-xs: 0.35rem;
+--aperture-radius-sm: 0.55rem;
+--aperture-radius-md: 0.8rem;
+--aperture-radius-lg: 1.05rem;
+--aperture-radius-xl: 1.35rem;
+--aperture-radius-round: 999px;
+--button-radius: var(--aperture-radius-sm);
+--input-radius: var(--aperture-radius-sm);
+--card-radius: var(--aperture-radius-lg);
+--menu-radius: var(--aperture-radius-md);
+--dialog-radius: var(--aperture-radius-xl);
+--focus-ring-width: 2px;
+--focus-ring-offset: 2px;
+--font-family: Inter, Geist, "Avenir Next", "IBM Plex Sans", "Source Sans 3", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+--mono-font-family: "Cascadia Code", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+--aperture-ease: ease-out;
+--aperture-duration: 160ms;
+--aperture-border-color: color-mix(in oklab, var(--on-surface-color) 13%, transparent);
+--aperture-border-strong-color: color-mix(in oklab, var(--primary-color) 28%, var(--aperture-border-color));
+--aperture-muted-color: color-mix(in oklab, var(--on-background-color) 62%, var(--background-color));
+--aperture-surface-muted-color: color-mix(in oklab, var(--on-surface-color) 60%, var(--surface-color));
+--aperture-surface-soft: color-mix(in oklab, var(--surface-color) 84%, var(--background-color));
+--aperture-surface-glass: color-mix(in oklab, var(--surface-color) 78%, transparent);
+--aperture-focus-color: color-mix(in oklab, var(--accent-color) 72%, var(--primary-color));
+--aperture-tonal-surface: color-mix(in oklab, var(--active-color, var(--accent-color)) 9%, var(--surface-color));
+--elevation-1:
+    0 1px 2px color-mix(in oklab, var(--shadow-color) 46%, transparent),
+    0 8px 22px -18px var(--shadow-color);
+--elevation-2:
+    0 4px 10px -8px var(--shadow-color),
+    0 16px 36px -28px var(--shadow-color);
+--elevation-3:
+    0 12px 24px -18px var(--shadow-color),
+    0 28px 58px -38px var(--shadow-color);
+--inset-elevation:
+    inset 0 1px 2px color-mix(in oklab, var(--shadow-color) 42%, transparent),
+    inset 0 12px 28px -28px var(--primary-color);
+accent-color: var(--accent-color);`,
         },
         {
-            id: "radio-group",
-            name: "Radio Group",
-            file: "style/aperture/button.css",
-            selectors: ["[role=radiogroup]", "[role=radiogroup] > button"],
-            description: "Refined segmented-control row with joined strokes and a quiet selected state.",
-            variants: [],
+            selector: ["html", "body", "#app", ".apertureTheme"],
+            scoped: false,
+            css: `background: var(--background-color);
+color: var(--on-background-color);`,
         },
         {
-            id: "link",
-            name: "Link",
-            file: "style/aperture/button.css",
-            selectors: ["a"],
-            description: "Lens-blue links with restrained underline, hover, focus, and current-page treatments.",
-            variants: [],
-        },
-        {
-            id: "typography",
-            name: "Typography",
-            file: "style/aperture/text.css",
-            selectors: ["body", "h1", "h2", "h3", "h4", "h5", "h6", ".display", ".headline", ".title", ".body", ".label"],
-            description: "Editorial type scale with crisp headings, readable body copy, precise labels, and muted secondary variants.",
-            variants: [
-                { id: "display", className: "display", name: "Display", description: "Elegant page-identity and hero type with generous scale and controlled weight." },
-                { id: "headline", className: "headline", name: "Headline", description: "Architectural section-heading role with refined hierarchy." },
-                { id: "title", className: "title", name: "Title", description: "Balanced component/card title role." },
-                { id: "body", className: "body", name: "Body", description: "High-readability reading and form-control type role." },
-                { id: "label", className: "label", name: "Label", description: "Compact precise text for actions, navigation, labels, tabs, and metadata." },
-                { id: "large", className: "large", name: "Large", description: "Larger presentation of a type role." },
-                { id: "medium", className: "medium", name: "Medium", default: true, description: "Default size multiplier for a type role." },
-                { id: "small", className: "small", name: "Small", description: "Reduced size for captions, supporting copy, metadata, and dense UI." },
-                { id: "variant", className: "variant", name: "Variant", description: "Muted secondary treatment for subtitles, captions, breadcrumbs, and supporting copy." },
-            ],
-        },
-        {
-            id: "inline-text",
-            name: "Inline Text",
-            file: "style/aperture/text.css",
-            selectors: ["code", "hr"],
-            description: "Subtle inline code chips and quiet horizontal rules that preserve the editorial rhythm.",
-            variants: [],
-        },
-        {
-            id: "text-input",
-            name: "Text Input",
-            file: "style/aperture/input.css",
-            selectors: ["input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset])", "textarea", "select", "input-shell"],
-            description: "Professional text fields, textareas, selects, and custom input shells with calm focus rings and soft borders.",
-            variants: [
-                { id: "flat", className: "flat", name: "Flat", default: true, description: "Default filled field with low-contrast surface and quiet border." },
-                { id: "outlined", className: "outlined", name: "Outlined", description: "Transparent field with precise current-colour outline; useful inside cards and dense forms." },
-                { id: "elevated", className: "elevated", name: "Elevated", description: "Surface-coloured field with subtle optical elevation." },
-                { id: "tonal", className: "tonal", name: "Tonal", description: "Pale active-colour input treatment for search, filter, and highlighted entry fields." },
-                { id: "quiet", className: "quiet", name: "Quiet", description: "Minimal field treatment for low-emphasis filter and inline-edit contexts." },
-            ],
-        },
-        {
-            id: "choice-input",
-            name: "Choice Input",
-            file: "style/aperture/input.css",
-            selectors: ["input[type=checkbox]", "input[type=radio]", "input[type=range]"],
-            description: "Native choice controls using the lens-blue accent colour with calm focus treatment.",
-            variants: [],
-        },
-        {
-            id: "form-field",
-            name: "Form Field",
-            file: "style/aperture/input.css",
-            selectors: ["form-field", "fieldset", "form-field output"],
-            description: "Label/control/feedback grouping with refined labels, subtle required markers, and restrained validation output.",
-            variants: [],
-        },
-        {
-            id: "list",
-            name: "List",
-            file: "style/aperture/list.css",
-            selectors: ["ul", "ol", "li", "ul.nav", "ul.plain", "ul.chips"],
-            description: "Plain lists, quiet navigation lists, and low-emphasis editorial chip sets.",
-            variants: [
-                { id: "nav", className: "nav", name: "Navigation List", description: "Quiet navigation rows with subtle hover wash and clear active route treatment." },
-                { id: "plain", className: "plain", name: "Plain List", description: "Unbulleted content list with restrained row rhythm." },
-                { id: "chips", className: "chips", name: "Chips", description: "Small framed or tonal chips with refined label typography." },
-                { id: "quiet", className: "quiet", name: "Quiet", description: "Extra-muted list treatment for metadata and secondary collections." },
-            ],
-        },
-        {
-            id: "tab-list",
-            name: "Tab List",
-            file: "style/aperture/list.css",
-            selectors: ["ul[role=tablist]", "ul[role=tablist] > li"],
-            description: "Understated tab-list category with precise active indicators and low-contrast inactive labels.",
-            variants: [
-                { id: "underlined", className: "underlined", name: "Underlined", default: true, description: "Default editorial tabs with a thin accent underline for the selected tab." },
-                { id: "inset", className: "inset", name: "Inset", description: "Soft segmented-control treatment with a quiet recessed track." },
-                { id: "framed", className: "framed", name: "Framed", description: "Gallery-frame tab treatment for content-heavy pages." },
-            ],
-        },
-        {
-            id: "menu-list",
-            name: "Menu List",
-            file: "style/aperture/list.css",
-            selectors: ["ul[role=menu]", "ul.menu"],
-            description: "Floating menu list surface with soft shadow, rounded corners, and quiet selected/hover states.",
-            variants: [
-                { id: "menu", className: "menu", name: "Menu", default: true, description: "Class-based menu-list entry point matching ul[role=menu]." },
-                { id: "glass", className: "glass", name: "Glass", description: "Translucent frosted menu treatment for elevated app surfaces." },
-            ],
-        },
-        {
-            id: "navigation",
-            name: "Navigation",
-            file: "style/aperture/nav.css",
-            selectors: ["nav", "nav.top", "nav.pageNav", "aside > nav"],
-            description: "Quiet navigation landmarks with subtle surfaces, thin dividers, and active states based on weight, underline, or tonal rails.",
-            variants: [
-                { id: "top", className: "top", name: "Top", description: "Top app-bar navigation with clean surface, optional glass treatment, and thin lower divider." },
-                { id: "pageNav", className: "pageNav", name: "Page Nav", description: "Side/page navigation with subtle sectioning and active route emphasis." },
-                { id: "glass", className: "glass", name: "Glass", description: "Frosted navigation surface for overlays or premium app shells." },
-                { id: "quiet", className: "quiet", name: "Quiet", description: "Minimal navigation treatment for content-first pages." },
-            ],
-        },
-        {
-            id: "breadcrumb",
-            name: "Breadcrumb",
-            file: "style/aperture/nav.css",
-            selectors: ["nav[aria-label=Breadcrumb]", "nav[aria-label=Breadcrumb] > ol"],
-            description: "Muted title-variant breadcrumb track with refined separators and a slightly stronger current item.",
-            variants: [],
-        },
-        {
-            id: "popover",
-            name: "Popover",
-            file: "style/aperture/popover.css",
-            selectors: ["[popover][role=menu]", "[popover].menu"],
-            description: "Floating sheet popover with soft optical shadow, refined border, and optional glass treatment.",
-            variants: [
-                { id: "menu", className: "menu", name: "Menu", default: true, description: "Class-based popover menu entry point matching [popover][role=menu]." },
-                { id: "glass", className: "glass", name: "Glass", description: "Translucent frosted popover surface." },
-                { id: "framed", className: "framed", name: "Framed", description: "Popover with gallery-like border definition." },
-            ],
-        },
-        {
-            id: "dialog",
-            name: "Dialog",
-            file: "style/aperture/popover.css",
-            selectors: ["dialog", "dialog > footer"],
-            description: "Premium modal sheet with soft shadow, subtle border, clear title hierarchy, and restrained backdrop treatment.",
-            variants: [
-                { id: "glass", className: "glass", name: "Glass", description: "Frosted dialog treatment for special modal surfaces." },
-                { id: "framed", className: "framed", name: "Framed", description: "Editorial dialog with stronger frame and internal separation." },
-            ],
-        },
-        {
-            id: "empty-state",
-            name: "Empty State",
-            file: "style/aperture/emptyState.css",
-            selectors: ["empty-state", "empty-state.skeleton", "empty-state.empty"],
-            description: "Editorial placeholder element for low-contrast skeletons and framed empty-content panels.",
-            variants: [
-                { id: "skeleton", className: "skeleton", name: "Skeleton", description: "Soft neutral placeholder blocks with slow, low-contrast shimmer while aria-busy is present." },
-                { id: "empty", className: "empty", name: "Empty", description: "Helpful empty-content panel with faint dashed frame and muted illustration space." },
-                { id: "framed", className: "framed", name: "Framed", description: "Gallery-like empty state with stronger border composition." },
-            ],
-        },
-        {
-            id: "icon",
-            name: "Icon",
-            file: "style/aperture/icon.css",
-            selectors: ["i"],
-            description: "Material Symbols-compatible icon element with optical sizes that align to Aperture typography.",
-            variants: [
-                { id: "small", className: "small", name: "Small", description: "Icon rendered at 1em for inline and metadata use." },
-                { id: "medium", className: "medium", name: "Medium", default: true, description: "Default icon size around 1.25em for controls and navigation." },
-                { id: "large", className: "large", name: "Large", description: "Larger icon size around 1.5em for empty states and prominent actions." },
-                { id: "xlarge", className: "xlarge", name: "Extra Large", description: "Extra-large icon size around 2em for hero, dialog, or empty-state moments." },
-            ],
+            selector: ["#app.apertureTheme", ".apertureTheme #app"],
+            scoped: false,
+            css: "color: var(--on-background-color);",
         },
     ],
-} as const satisfies LinsThemeInfo;
+} as const satisfies LinsThemeDefinition);
 
 export default apertureThemeInfo;
-
-

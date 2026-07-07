@@ -28,12 +28,12 @@ export type {
     LinsTypographySizeId,
     LinsTypographySizeSpec,
     LinsTypographySpec,
-    LinsVariantSpec,
 } from "./spec.ts";
 
 export { defineLinsTheme } from "./themeDefinition.ts";
 
 export type {
+    LinsDefinedTheme,
     LinsCategoryThemeDefinition,
     LinsColorScheme,
     LinsCssTokenRecord,

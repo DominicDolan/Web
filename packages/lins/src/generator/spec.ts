@@ -37,27 +37,9 @@ export interface LinsElementCategorySpec {
     readonly stylesheetId: string;
     readonly selectors: readonly string[];
     readonly description: string;
-    readonly variants?: readonly LinsVariantSpec[];
     readonly states?: readonly LinsSelectorSlotSpec[];
     /** Non-variant sub-parts or related selectors emitted for this category. */
     readonly parts?: readonly LinsSelectorSlotSpec[];
-    readonly scaffoldComment?: string;
-}
-
-export interface LinsVariantSpec {
-    readonly id: string;
-    readonly className: string;
-    readonly name: string;
-    /** Defaults to `&.${className}` when omitted. Use this for alias selectors such as `ul.menu`. */
-    readonly selectors?: readonly string[];
-    /**
-     * Relative selectors that should share this variant's declarations as zero-specificity defaults.
-     * The generator wraps each value in :where(...), so theme definitions never need to spell that out.
-     */
-    readonly applyAsDefault?: readonly string[];
-    /** Variant-owned context/part selectors, such as tab items or selected indicators inside a tab-list variant. */
-    readonly contexts?: readonly LinsSelectorSlotSpec[];
-    readonly description: string;
     readonly scaffoldComment?: string;
 }
 
@@ -123,7 +105,7 @@ export const LINS_STYLESHEET_SPECS = [
     { id: "list", fileName: "list.css", importPath: "./list.css", categoryIds: ["list", "tab-list", "menu-list"] },
     { id: "icon", fileName: "icon.css", importPath: "./icon.css", categoryIds: ["icon"] },
     { id: "popover", fileName: "popover.css", importPath: "./popover.css", categoryIds: ["popover", "dialog"] },
-    { id: "empty-state", fileName: "emptyState.css", importPath: "./emptyState.css", categoryIds: ["empty-state"] },
+    { id: "empty-state", fileName: "emptyState.css", importPath: "./emptyState.css", categoryIds: ["empty-state-skeleton", "empty-state-empty"] },
     { id: "navigation", fileName: "nav.css", importPath: "./nav.css", categoryIds: ["navigation", "breadcrumb"] },
 ] as const satisfies readonly LinsStylesheetSpec[];
 
@@ -147,15 +129,6 @@ export const LINS_ELEMENT_CATEGORY_SPECS = [
         stylesheetId: "card",
         selectors: ["article"],
         description: "Surface containers for content, nested cards, interactive cards, and selection states.",
-        variants: [
-            { id: "elevated", className: "elevated", name: "Elevated", applyAsDefault: ["&"], description: "Default raised card with the surface colour and a soft layered shadow.", scaffoldComment: "TODO: default/elevated card surface." },
-            { id: "flat", className: "flat", name: "Flat", description: "Filled surface without elevation.", scaffoldComment: "TODO: filled card without elevation." },
-            { id: "outlined", className: "outlined", name: "Outlined", applyAsDefault: ["& &"], description: "Transparent surface with a current-colour outline; also the default look for nested cards.", scaffoldComment: "TODO: transparent/border-only card surface." },
-            { id: "tonal", className: "tonal", name: "Tonal", description: "Low-opacity tint of the active colour with no border or shadow.", scaffoldComment: "TODO: low-opacity active-colour tint." },
-            { id: "inset", className: "inset", name: "Inset", description: "Recessed surface using the background colour and inner shadows.", scaffoldComment: "TODO: recessed/inner-shadow surface." },
-            { id: "highlighted", className: "highlighted", name: "Highlighted", description: "Tonal card with an accent rail rendered as a rounded pseudo-element.", scaffoldComment: "TODO: accent rail, marker, or other highlighted treatment." },
-            { id: "text", className: "text", name: "Text", description: "Transparent, chrome-free card treatment for low-emphasis content blocks.", scaffoldComment: "TODO: no-chrome card treatment." },
-        ],
         states: [
             { id: "interactive", name: "Interactive", selectors: ["&[role=\"button\"]:hover", "&[role=\"button\"]:focus-visible"], description: "Interactive card hover/focus affordance.", scaffoldComment: "TODO: interactive card affordance." },
             { id: "deselected", name: "Deselected", selectors: ["&[aria-selected=\"false\"]"], description: "Muted/desaturated deselected state.", scaffoldComment: "TODO: muted/deselected card state." },
@@ -168,15 +141,6 @@ export const LINS_ELEMENT_CATEGORY_SPECS = [
         stylesheetId: "button",
         selectors: ["button", "input[type=button]", "input[type=submit]", "input[type=reset]", "input[type=image]", "[role=\"button\"]:not(article)"],
         description: "Action controls and button-like inputs using the active colour cascade.",
-        variants: [
-            { id: "outlined", className: "outlined", name: "Outlined", applyAsDefault: ["&"], description: "Default transparent button with a current-colour border and subtle hover tint.", scaffoldComment: "TODO: medium-emphasis/border-only button look." },
-            { id: "flat", className: "flat", name: "Flat", description: "Filled high-emphasis button without elevation.", scaffoldComment: "TODO: filled, no-elevation high-emphasis button." },
-            { id: "elevated", className: "elevated", name: "Elevated", description: "Filled high-emphasis button with a layered shadow that increases on hover/focus.", scaffoldComment: "TODO: filled button with a shadow/elevation treatment." },
-            { id: "tonal", className: "tonal", name: "Tonal", description: "Low-opacity tint using the active colour.", scaffoldComment: "TODO: low-opacity tint using --current-color." },
-            { id: "text", className: "text", name: "Text", description: "Text-only action with a transparent background and hover tint.", scaffoldComment: "TODO: text-only button; normally no border or surface." },
-            { id: "plain", className: "plain", name: "Plain", description: "Low-emphasis text action that only strengthens colour on hover.", scaffoldComment: "TODO: extra-subtle button, often muted until hover." },
-            { id: "icon", className: "icon", name: "Icon", description: "Circular icon-only button with square aspect ratio and centred content.", scaffoldComment: "TODO: icon-only button radius/shape." },
-        ],
         states: [
             { id: "hover", name: "Hover", selectors: ["&:hover:not(:disabled):not([disabled])"], description: "Shared hover affordance.", scaffoldComment: "TODO: shared hover affordance if variants do not define their own." },
             { id: "focus", name: "Focus", selectors: ["&:focus-visible"], description: "Accessible focus ring.", scaffoldComment: "TODO: accessible focus ring." },
@@ -223,12 +187,6 @@ export const LINS_ELEMENT_CATEGORY_SPECS = [
         stylesheetId: "input",
         selectors: [textInputSelector, "textarea", "select", "input-shell"],
         description: "Text-like inputs, textareas, selects, and custom input shells.",
-        variants: [
-            { id: "flat", className: "flat", name: "Flat", applyAsDefault: ["&"], description: "Default filled control with no outline.", scaffoldComment: "TODO: default/flat text-field chrome." },
-            { id: "outlined", className: "outlined", name: "Outlined", applyAsDefault: ["article &"], description: "Transparent control with a current-colour outline; also the default inside articles.", scaffoldComment: "TODO: transparent control with current-colour outline." },
-            { id: "elevated", className: "elevated", name: "Elevated", description: "Filled control with subtle elevation.", scaffoldComment: "TODO: raised input surface." },
-            { id: "tonal", className: "tonal", name: "Tonal", applyAsDefault: ["form.tonal &"], description: "Light active-colour tint, also inherited from tonal forms.", scaffoldComment: "TODO: tonal input surface." },
-        ],
         states: [
             { id: "focus", name: "Focus", selectors: ["&:focus-visible", "&:focus-within"], description: "Focus ring/outline for native controls and input-shell.", scaffoldComment: "TODO: focus ring/outline for native controls and input-shell." },
             { id: "invalid", name: "Invalid", selectors: ["&:invalid", "&[aria-invalid=\"true\"]"], description: "Invalid state for native controls.", scaffoldComment: "TODO: invalid state for native controls." },
@@ -302,11 +260,6 @@ export const LINS_ELEMENT_CATEGORY_SPECS = [
         stylesheetId: "list",
         selectors: ["ul", "ol"],
         description: "Plain lists, navigation-list styling, and chip sets.",
-        variants: [
-            { id: "nav", className: "nav", name: "Navigation List", description: "List of navigation links/actions with rounded selected and hover backgrounds.", scaffoldComment: "TODO: nav-list item typography, radius, and interaction." },
-            { id: "plain", className: "plain", name: "Plain List", description: "Unbulleted list with subtle hover and active left-border emphasis.", scaffoldComment: "TODO: plain list item surface/marker treatment." },
-            { id: "chips", className: "chips", name: "Chips", description: "Compact inline chips with rounded filled backgrounds.", scaffoldComment: "TODO: chip border-radius, padding, font-size, line-height, colour." },
-        ],
         states: [
             { id: "item-active", name: "Item Active", selectors: ["& > li[aria-current=\"page\"]", "& > li[aria-selected=\"true\"]", "& > li.active", "& > li:has(> [aria-current=\"page\"])", "& > li:has(> [aria-selected=\"true\"])", "& > li:has(> .active)"], description: "Active/current list item state.", scaffoldComment: "TODO: active/current list item state." },
             { id: "item-hover", name: "Item Hover", selectors: ["& > li:hover:not(.active):not(:has(.active))"], description: "Hover state for inactive list items.", scaffoldComment: "TODO: hover state for inactive list items." },
@@ -318,30 +271,6 @@ export const LINS_ELEMENT_CATEGORY_SPECS = [
         stylesheetId: "list",
         selectors: ["ul[role=\"tablist\"]"],
         description: "Tab-list category with selected-item state styling.",
-        variants: [
-            {
-                id: "underlined",
-                className: "underlined",
-                name: "Underlined",
-                contexts: [
-                    { id: "tab", name: "Tab", selectors: ["& > li"], description: "Single underlined tab item styling.", scaffoldComment: "TODO: underlined tab item styling." },
-                    { id: "indicator", name: "Indicator", selectors: ["&::after"], description: "Decorative selected underline indicator.", scaffoldComment: "TODO: decorative underline indicator." },
-                ],
-                description: "Tabs with muted labels and an animated underline anchored to the selected tab.",
-                scaffoldComment: "TODO: underlined tab-list styling.",
-            },
-            {
-                id: "inset",
-                className: "inset",
-                name: "Inset",
-                contexts: [
-                    { id: "tab", name: "Tab", selectors: ["& > li"], description: "Single inset tab item styling.", scaffoldComment: "TODO: inset tab item styling." },
-                    { id: "indicator", name: "Indicator", selectors: ["&::after"], description: "Decorative selected pill indicator.", scaffoldComment: "TODO: decorative selected pill indicator." },
-                ],
-                description: "Pill-shaped recessed tab container with a raised active indicator.",
-                scaffoldComment: "TODO: recessed segmented-tab container.",
-            },
-        ],
         states: [
             { id: "selected-tab", name: "Selected Tab", selectors: ["& > li[aria-selected=\"true\"]", "& > li.active", "& > li:has(> [aria-selected=\"true\"])", "& > li:has(> .active)"], description: "Selected tab item state.", scaffoldComment: "TODO: selected tab state." },
             { id: "tab-hover", name: "Tab Hover", selectors: ["& > li:hover:not([aria-selected=\"true\"]):not(.active):not(:has(.active))"], description: "Hover state for unselected tabs.", scaffoldComment: "TODO: hover state for unselected tabs." },
@@ -353,9 +282,6 @@ export const LINS_ELEMENT_CATEGORY_SPECS = [
         stylesheetId: "list",
         selectors: ["ul[role=\"menu\"]", "ul.menu"],
         description: "Floating menu list surface and menu item states.",
-        variants: [
-            { id: "menu", className: "menu", name: "Menu", selectors: ["ul.menu"], applyAsDefault: ["ul[role=\"menu\"]"], description: "Class-based menu-list entry point matching ul[role=menu].", scaffoldComment: "TODO: floating menu surface." },
-        ],
         parts: [
             { id: "item", name: "Item", selectors: ["& > li", "& > [role=\"menuitem\"]"], description: "Menu item styling.", scaffoldComment: "TODO: menu item padding, hover, selected/current states." },
         ],
@@ -366,10 +292,6 @@ export const LINS_ELEMENT_CATEGORY_SPECS = [
         stylesheetId: "navigation",
         selectors: ["nav"],
         description: "Navigation landmarks for top bars and page/side navigation.",
-        variants: [
-            { id: "top", className: "top", name: "Top", description: "Top app-bar navigation with surface background and bottom border.", scaffoldComment: "TODO: top app-bar border/background/shadow." },
-            { id: "pageNav", className: "pageNav", name: "Page Nav", applyAsDefault: ["aside > nav"], description: "Side/page navigation surface treatment.", scaffoldComment: "TODO: side/page navigation surface." },
-        ],
         states: [
             { id: "current-link", name: "Current Link", selectors: ["nav a[aria-current=\"page\"]", "nav a.active"], description: "Current navigation link state.", scaffoldComment: "TODO: current navigation link state." },
         ],
@@ -392,9 +314,6 @@ export const LINS_ELEMENT_CATEGORY_SPECS = [
         stylesheetId: "popover",
         selectors: ["[popover][role=\"menu\"]", "[popover].menu"],
         description: "Floating popover menu surface.",
-        variants: [
-            { id: "menu", className: "menu", name: "Menu", selectors: ["[popover].menu"], applyAsDefault: ["[popover][role=\"menu\"]"], description: "Class-based popover menu entry point matching [popover][role=menu].", scaffoldComment: "TODO: popover/menu panel surface, radius, shadow, border." },
-        ],
     },
     {
         id: "dialog",
@@ -409,21 +328,26 @@ export const LINS_ELEMENT_CATEGORY_SPECS = [
         ],
     },
     {
-        id: "empty-state",
-        name: "Empty State",
+        id: "empty-state-skeleton",
+        name: "Skeleton Empty State",
         stylesheetId: "empty-state",
-        selectors: ["empty-state"],
-        description: "Custom placeholder element for loading skeletons and empty-content panels.",
-        variants: [
-            { id: "skeleton", className: "skeleton", name: "Skeleton", description: "Placeholder blocks that shimmer while aria-busy is present.", scaffoldComment: "TODO: skeleton block border-radius and base colour." },
-            { id: "empty", className: "empty", name: "Empty", description: "Empty-content panel with a dashed inset border drawn by a pseudo-element.", scaffoldComment: "TODO: empty-content surface/illustration style." },
-        ],
+        selectors: ["empty-state.skeleton"],
+        description: "Placeholder blocks that shimmer while aria-busy is present.",
         states: [
             { id: "busy", name: "Busy", selectors: ["empty-state.skeleton[aria-busy] *:not(:has(> *))"], description: "Animated busy skeleton placeholder blocks.", scaffoldComment: "TODO: busy skeleton shimmer animation/background." },
             { id: "not-busy", name: "Not Busy", selectors: ["empty-state.skeleton:not([aria-busy]) *:not(:has(> *))"], description: "Non-busy placeholder block style.", scaffoldComment: "TODO: non-busy placeholder style." },
         ],
         parts: [
             { id: "skeleton-block", name: "Skeleton Block", selectors: ["empty-state.skeleton *:not(:has(> *))"], description: "Base skeleton placeholder block.", scaffoldComment: "TODO: skeleton block base style." },
+        ],
+    },
+    {
+        id: "empty-state-empty",
+        name: "Empty State",
+        stylesheetId: "empty-state",
+        selectors: ["empty-state.empty"],
+        description: "Empty-content panel with a dashed inset border drawn by a pseudo-element.",
+        parts: [
             { id: "empty-decoration", name: "Empty Decoration", selectors: ["empty-state.empty::after"], description: "Optional decorative outline/illustration.", scaffoldComment: "TODO: decorative empty-state outline/illustration." },
         ],
     },
@@ -433,12 +357,6 @@ export const LINS_ELEMENT_CATEGORY_SPECS = [
         stylesheetId: "icon",
         selectors: ["i"],
         description: "Material Symbols icon element and size classes.",
-        variants: [
-            { id: "medium", className: "medium", name: "Medium", applyAsDefault: ["i"], description: "Default icon size around 1.3em.", scaffoldComment: "TODO: medium icon size." },
-            { id: "small", className: "small", name: "Small", description: "Icon rendered at 1em.", scaffoldComment: "TODO: small icon size." },
-            { id: "large", className: "large", name: "Large", description: "Larger icon size around 1.5em.", scaffoldComment: "TODO: large icon size." },
-            { id: "xlarge", className: "xlarge", name: "Extra Large", description: "Extra-large icon size around 2em.", scaffoldComment: "TODO: extra-large icon size." },
-        ],
     },
 ] as const satisfies readonly LinsElementCategorySpec[];
 
