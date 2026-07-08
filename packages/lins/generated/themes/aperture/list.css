@@ -1,5 +1,5 @@
 @layer elements {
-    @scope (body) to (.notAperture) {
+    @scope (.aperture) to (.notAperture) {
         ul,
         ol {
             &.nav {

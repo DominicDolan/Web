@@ -11,8 +11,12 @@ export interface LinsThemeSpec {
 }
 
 export interface LinsScopeSpec {
-    readonly rootSelector: string;
-    readonly optOutClassNamePattern: "not-{PascalId}";
+    /**
+     * The `@scope (...) to (...)` root is always the theme's own root
+     * selector (`.{theme.className}`), not a fixed selector — a theme is
+     * only ever active where its own root class is present.
+     */
+    readonly optOutClassNamePattern: "not{PascalId}";
 }
 
 export interface LinsStylesheetSpec {
@@ -431,8 +435,7 @@ export const LINS_ICON_SPEC = {
 export const LINS_THEME_SPEC = {
     automaticImports: ["../reset.css", "../base.css"],
     defaultScope: {
-        rootSelector: "body",
-        optOutClassNamePattern: "not-{PascalId}",
+        optOutClassNamePattern: "not{PascalId}",
     },
     stylesheets: LINS_STYLESHEET_SPECS,
     colorRoles: LINS_COLOR_ROLE_SPECS,

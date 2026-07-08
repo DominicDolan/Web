@@ -102,10 +102,9 @@ export interface LinsCategoryThemeDefinition {
 export interface LinsVariantThemeDefinition extends LinsRawCssBlock {
     /** Defaults to the variant id. Use only when the CSS class intentionally differs from the config key. */
     readonly className?: string;
-    readonly default?: boolean;
     /** Overrides the selectors generated from `className`; values may use `&` relative to the category root. */
     readonly selectors?: readonly string[];
-    /** Zero-specificity default selectors that share this variant's declarations. Values may use `&` relative to the category root. */
+    /** Zero-specificity default selectors that share this variant's declarations. Values may use `&` relative to the category root. Use `["&"]` to make this variant apply whenever no other variant class overrides it. */
     readonly applyAsDefault?: readonly string[];
     /** Variant-owned contextual selectors, such as tab items or indicators inside a tab-list variant. */
     readonly contexts?: Record<string, LinsRawCssBlock>;
@@ -250,7 +249,7 @@ function renderStylesheetRules(theme: LinsThemeDefinition, stylesheet: LinsStyle
     }
 
     if (scopedRules.length > 0) {
-        sections.push(renderAtRule("@layer elements", renderAtRule(`@scope (${LINS_THEME_SPEC.defaultScope.rootSelector}) to (${classSelector(getOptOutClassName(theme))})`, scopedRules.join("\n\n"))));
+        sections.push(renderAtRule("@layer elements", renderAtRule(`@scope (${getScopeRootSelector(theme)}) to (${classSelector(getOptOutClassName(theme))})`, scopedRules.join("\n\n"))));
     }
 
     return sections.join("\n\n");
@@ -393,11 +392,8 @@ function renderVariantRule(variantId: string, variant: LinsVariantThemeDefinitio
 function getVariantSelectors(variantId: string, variant: LinsVariantThemeDefinition, siblingVariantClassNames: readonly string[] = []): string[] {
     const className = getVariantClassName(variantId, variant);
     const explicitSelectors = variant.selectors ?? [`&${classSelector(className)}`];
-    const defaultSelector = variant.default ? getDefaultVariantSelector(className, siblingVariantClassNames) : undefined;
-    const defaultSelectors = uniqueStrings([
-        ...(defaultSelector ? [defaultSelector] : []),
-        ...(variant.applyAsDefault ?? []),
-    ]).map((selector) => `:where(${selector})`);
+    const applyAsDefaultSelectors = (variant.applyAsDefault ?? []).map((selector) => addDefaultVariantExclusions(selector, className, siblingVariantClassNames));
+    const defaultSelectors = uniqueStrings(applyAsDefaultSelectors).map((selector) => `:where(${selector})`);
 
     return [...defaultSelectors, ...explicitSelectors];
 }
@@ -406,20 +402,26 @@ function getVariantClassName(variantId: string, variant: LinsVariantThemeDefinit
     return variant.className ?? variantId;
 }
 
-function getDefaultVariantSelector(className: string, siblingVariantClassNames: readonly string[]): string {
+function addDefaultVariantExclusions(selector: string, className: string, siblingVariantClassNames: readonly string[]): string {
     const excludedVariantSelectors = uniqueStrings(siblingVariantClassNames)
         .filter((candidate) => candidate !== className)
         .map((candidate) => `:not(${classSelector(candidate)})`)
         .join("");
 
-    return `&${excludedVariantSelectors}`;
+    if (!excludedVariantSelectors) {
+        return selector;
+    }
+
+    return selector.includes("&")
+        ? selector.replace("&", `&${excludedVariantSelectors}`)
+        : `${selector}${excludedVariantSelectors}`;
 }
 
 function renderSlotRule(block: LinsRawCssBlock, spec?: LinsSelectorSlotSpec, options: LinsThemeBuildOptions = {}): string {
     const selectors = getBlockSelectors(block, spec?.selectors);
     const css = joinRawBlockParts(block.before, block.css, block.after);
 
-    if (!selectors?.length || !css) {
+    if (!selectors || selectors.length === 0 || !css) {
         return "";
     }
 
@@ -431,7 +433,7 @@ function renderSlotRule(block: LinsRawCssBlock, spec?: LinsSelectorSlotSpec, opt
 }
 
 function findSelectorSlot(slots: readonly LinsSelectorSlotSpec[] | undefined, id: string): LinsSelectorSlotSpec | undefined {
-    return slots?.find((candidate: LinsSelectorSlotSpec) => candidate.id === id);
+    return slots?.find((candidate) => candidate.id === id);
 }
 
 function getBlockSelectors(block: LinsRawCssBlock, fallback?: readonly string[]): readonly string[] | undefined {
@@ -665,7 +667,7 @@ function renderAppDefaults(theme: LinsThemeDefinition): string {
     const output: string[] = [...unscopedRules];
 
     if (scopedRules.length > 0) {
-        output.push(renderAtRule(`@scope (${LINS_THEME_SPEC.defaultScope.rootSelector}) to (${classSelector(getOptOutClassName(theme))})`, scopedRules.join("\n\n")));
+        output.push(renderAtRule(`@scope (${getScopeRootSelector(theme)}) to (${classSelector(getOptOutClassName(theme))})`, scopedRules.join("\n\n")));
     }
 
     return output.join("\n\n");
@@ -738,6 +740,10 @@ function getStylesheet(stylesheetId: string): LinsStylesheetSpec {
 
 function getOptOutClassName(theme: LinsThemeDefinition): string {
     return theme.optOutClassName ?? `not${toPascalCase(theme.id)}`;
+}
+
+function getScopeRootSelector(theme: LinsThemeDefinition): string {
+    return classSelector(theme.className);
 }
 
 function classSelector(className: string, fallback = className): string {

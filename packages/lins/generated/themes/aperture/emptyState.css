@@ -1,5 +1,5 @@
 @layer elements {
-    @scope (body) to (.notAperture) {
+    @scope (.aperture) to (.notAperture) {
         empty-state.skeleton {
             empty-state.skeleton[aria-busy] *:not(:has(> *)) {
                 animation: aperture-shimmer 1.4s linear infinite;

@@ -1,5 +1,5 @@
 @layer elements {
-    @scope (body) to (.notAperture) {
+    @scope (.aperture) to (.notAperture) {
         button,
         input[type=button],
         input[type=submit],

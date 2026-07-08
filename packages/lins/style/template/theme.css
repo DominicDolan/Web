@@ -15,7 +15,7 @@
  *
  * Copy this folder when starting a new theme, then rename:
  *   - the folder:         style/template -> style/<your-theme>
- *   - the root class:     .template -> .<yourTheme>Theme
+ *   - the root class:     .template -> .<yourTheme>
  *   - the opt-out class:  .notTemplate -> .not<YourTheme>
  *
  * This file owns the palette and cross-element role classes. Individual

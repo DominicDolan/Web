@@ -1,5 +1,5 @@
 @layer elements {
-    @scope (body) to (.notAperture) {
+    @scope (.aperture) to (.notAperture) {
         [popover][role="menu"],
         [popover].menu {
             border: 1px solid var(--aperture-border-color);

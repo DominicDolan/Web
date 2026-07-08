@@ -7,8 +7,8 @@ commented.
 ## How to start a new theme
 
 1. Copy `packages/lins/style/template/` to `packages/lins/style/<your-theme>/`.
-2. Rename `.templateTheme` in `theme.css` to your public root theme class.
-3. Rename `.notTemplate` in every file to your opt-out class.
+2. Rename `.template` in `theme.css` (and every other file's `@scope`) to your public root theme class, e.g. `.<yourTheme>`.
+3. Rename `.notTemplate` in every file to your opt-out class, e.g. `.not<YourTheme>`.
 4. Fill in the TODO selectors under `@layer elements`.
 5. Keep invariant resets and soft defaults in `@layer base`.
 

@@ -11,7 +11,7 @@
 }
 
 @layer elements {
-    @scope (body) to (.notAperture) {
+    @scope (.aperture) to (.notAperture) {
         :where(h1, h2, main > hgroup > h1, main > hgroup > h2, body > header h1, body > header h2, [role="banner"] h1, [role="banner"] h2),
         .display {
             --font-size: 3rem;

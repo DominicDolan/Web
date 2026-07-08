@@ -7,7 +7,7 @@ soft optical elevation.
 
 ## Root classes
 
-- Theme root: `.apertureTheme`
+- Theme root: `.aperture`
 - Light palette: `.light`
 - Dark palette: `.dark`
 - Scoped opt-out: `.notAperture`
@@ -15,7 +15,7 @@ soft optical elevation.
 Example:
 
 ```html
-<body class="apertureTheme light">
+<body class="aperture light">
   <article class="framed">
     <h2>Aperture card</h2>
     <p>Quiet hierarchy with a gallery-like frame.</p>

@@ -5,7 +5,7 @@ import type { LinsThemeDefinition } from "../../src/generator";
 export const apertureThemeInfo = defineLinsTheme({
     id: "aperture",
     name: "Aperture",
-    className: "apertureTheme",
+    className: "aperture",
     description: "A calm, editorial LINS theme with warm neutrals, soft optical elevation, precise typography, and gallery-like surface framing.",
     stylesheets: ["button", "text", "card", "input", "list", "icon", "popover", "empty-state", "navigation"],
     colorThemes: [
@@ -148,7 +148,7 @@ export const apertureThemeInfo = defineLinsTheme({
     categories: {
         card: {
             variants: {
-                elevated: { default: true, css: dedent`
+                elevated: { applyAsDefault: ["&"], css: dedent`
                     background-color: var(--current-color);
                     color: var(--on-current-color);
                     border-color: color-mix(in oklab, var(--on-current-color) 8%, transparent);
@@ -269,7 +269,7 @@ export const apertureThemeInfo = defineLinsTheme({
         },
         button: {
             variants: {
-                outlined: { default: true, css: dedent`
+                outlined: { applyAsDefault: ["&"], css: dedent`
                     color: var(--current-color);
                     background-color: color-mix(in oklab, var(--surface-color) 62%, transparent);
                     border-color: color-mix(in oklab, var(--current-color) 34%, var(--aperture-border-color));
@@ -425,7 +425,7 @@ export const apertureThemeInfo = defineLinsTheme({
         },
         "text-input": {
             variants: {
-                flat: { default: true, css: dedent`
+                flat: { applyAsDefault: ["&"], css: dedent`
                     background-color: color-mix(in oklab, var(--surface-color) 82%, var(--background-color));
                     color: var(--on-surface-color);
                     border-color: color-mix(in oklab, var(--on-surface-color) 12%, transparent);
@@ -562,7 +562,7 @@ export const apertureThemeInfo = defineLinsTheme({
                 }
             ` },
             variants: {
-                underlined: { default: true, css: dedent`
+                underlined: { applyAsDefault: ["&"], css: dedent`
                     position: relative;
                     anchor-scope: all;
                     > li {
@@ -633,7 +633,7 @@ export const apertureThemeInfo = defineLinsTheme({
                 &:not(:has(> *)) { padding: 0.5rem 0.65rem; }
             ` },
             variants: {
-                menu: { default: true },
+                menu: { applyAsDefault: ["&"] },
                 glass: { css: dedent`
                     background-color: var(--aperture-surface-glass);
                     backdrop-filter: blur(16px) saturate(1.06);
@@ -717,7 +717,7 @@ export const apertureThemeInfo = defineLinsTheme({
                 box-shadow: var(--elevation-3);
             ` },
             variants: {
-                menu: { default: true },
+                menu: { applyAsDefault: ["&"] },
                 glass: { css: dedent`
                     background-color: var(--aperture-surface-glass);
                     border-color: color-mix(in oklab, var(--surface-color) 45%, var(--aperture-border-color));
@@ -823,7 +823,7 @@ export const apertureThemeInfo = defineLinsTheme({
         icon: {
             variants: {
                 small: { css: "font-variation-settings: \"FILL\" 0, \"wght\" 420, \"GRAD\" -25, \"opsz\" 20;" },
-                medium: { default: true },
+                medium: { applyAsDefault: ["&"] },
                 large: { css: "font-variation-settings: \"FILL\" 0, \"wght\" 400, \"GRAD\" -25, \"opsz\" 32;" },
                 xlarge: { css: "font-variation-settings: \"FILL\" 0, \"wght\" 380, \"GRAD\" -25, \"opsz\" 40;" },
             },
@@ -839,7 +839,7 @@ export const apertureThemeInfo = defineLinsTheme({
             `,
         },
         {
-            selector: ".apertureTheme",
+            selector: ".aperture",
             scoped: false,
             css: dedent`
                 --aperture-radius-xs: 0.35rem;
@@ -883,7 +883,7 @@ export const apertureThemeInfo = defineLinsTheme({
             `,
         },
         {
-            selector: ["html", "body", "#app", ".apertureTheme"],
+            selector: ["html", "body", "#app", ".aperture"],
             scoped: false,
             css: dedent`
                 background: var(--background-color);
@@ -891,7 +891,7 @@ export const apertureThemeInfo = defineLinsTheme({
             `,
         },
         {
-            selector: ["#app.apertureTheme", ".apertureTheme #app"],
+            selector: ["#app.aperture", ".aperture #app"],
             scoped: false,
             css: "color: var(--on-background-color);",
         },

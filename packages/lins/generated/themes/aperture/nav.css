@@ -1,5 +1,5 @@
 @layer elements {
-    @scope (body) to (.notAperture) {
+    @scope (.aperture) to (.notAperture) {
         nav {
             color: color-mix(in oklab, currentColor 82%, var(--secondary-color));
 
@@ -10,7 +10,7 @@
                 box-shadow: 0 1px 0 color-mix(in oklab, var(--surface-color) 70%, transparent);
             }
 
-            :where(aside > &),
+            :where(aside > &:not(.top):not(.glass):not(.quiet)),
             &.pageNav {
                 background-color: color-mix(in oklab, var(--surface-color) 48%, transparent);
                 color: var(--on-surface-color);

@@ -94,7 +94,7 @@ const parserFixtureTheme = defineLinsTheme({
             },
             variants: {
                 flat: {
-                    default: true,
+                    applyAsDefault: ["&"],
                     css: "background: var(--current-color);\ncolor: var(--on-current-color);",
                 },
                 outlined: {
