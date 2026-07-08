@@ -8,7 +8,29 @@ export type LinsStylesheetParseWarningCode =
     | "unknown-scope"
     | "unknown-selector"
     | "unsupported-declaration"
-    | "malformed-rule";
+    | "malformed-rule"
+    | "ambiguous-category-match"
+    | "ambiguous-selector-superset"
+    | "partial-category-selectors"
+    | "duplicate-category-definition"
+    | "split-category-rule"
+    | "unrecognized-category"
+    | "inferred-variant-id"
+    | "unnamed-variant"
+    | "stale-default-exclusion"
+    | "custom-part-inferred"
+    | "selector-drift"
+    | "partial-typography-defaults"
+    | "extra-typography-defaults"
+    | "unrecognized-icon-size"
+    | "unsupported-icon-declaration"
+    | "unrecognized-color-role"
+    | "stylesheet-list-mismatch"
+    | "missing-color-scheme-declaration"
+    | "unrecognized-theme-root-declaration"
+    | "ambiguous-theme-root-declaration"
+    | "opt-out-class-mismatch"
+    | "empty-rule-body";
 
 // noinspection JSUnusedGlobalSymbols
 export interface LinsStylesheetParseWarning {
