@@ -4,7 +4,7 @@
         textarea,
         select,
         input-shell {
-            :where(&),
+            :where(&:not(.outlined):not(.elevated):not(.tonal):not(.quiet)),
             &.flat {
                 background-color: color-mix(in oklab, var(--surface-color) 82%, var(--background-color));
                 color: var(--on-surface-color);

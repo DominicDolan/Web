@@ -72,7 +72,7 @@
                 }
             }
 
-            :where(&),
+            :where(&:not(.inset):not(.framed)),
             &.underlined {
                 position: relative;
                 anchor-scope: all;

@@ -6,7 +6,7 @@
         input[type=reset],
         input[type=image],
         [role="button"]:not(article) {
-            :where(&),
+            :where(&:not(.flat):not(.elevated):not(.tonal):not(.text):not(.plain):not(.icon):not(.quiet):not(.focus)),
             &.outlined {
                 color: var(--current-color);
                 background-color: color-mix(in oklab, var(--surface-color) 62%, transparent);

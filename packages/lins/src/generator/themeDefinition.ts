@@ -305,15 +305,11 @@ function renderCategoryRules(category: ResolvedCategoryDefinition, options: Lins
     }
 
     const variantMap = (category.config.variants ?? {}) as Record<string, LinsVariantThemeDefinition | undefined>;
+    const variantEntries = Object.entries(variantMap).filter((entry): entry is [string, LinsVariantThemeDefinition] => Boolean(entry[1]));
+    const variantClassNames = variantEntries.map(([variantId, variant]) => getVariantClassName(variantId, variant));
 
-    for (const variantId of Object.keys(variantMap)) {
-        const variant = variantMap[variantId];
-
-        if (!variant) {
-            continue;
-        }
-
-        const renderedVariant = renderVariantRule(variantId, variant, options);
+    for (const [variantId, variant] of variantEntries) {
+        const renderedVariant = renderVariantRule(variantId, variant, options, variantClassNames);
 
         if (renderedVariant) {
             body.push(renderedVariant);
@@ -365,8 +361,8 @@ function renderCategoryRules(category: ResolvedCategoryDefinition, options: Lins
     return body.length > 0 ? [renderCssRule(selectors, body.join("\n\n"))] : [];
 }
 
-function renderVariantRule(variantId: string, variant: LinsVariantThemeDefinition, options: LinsThemeBuildOptions = {}): string {
-    const selectors = getVariantSelectors(variantId, variant);
+function renderVariantRule(variantId: string, variant: LinsVariantThemeDefinition, options: LinsThemeBuildOptions = {}, siblingVariantClassNames: readonly string[] = []): string {
+    const selectors = getVariantSelectors(variantId, variant, siblingVariantClassNames);
     const css = joinRawBlockParts(variant.before, variant.css, variant.after);
     const body: string[] = [];
 
@@ -394,15 +390,29 @@ function renderVariantRule(variantId: string, variant: LinsVariantThemeDefinitio
     return body.length > 0 ? renderCssRule(selectors, body.join("\n\n")) : "";
 }
 
-function getVariantSelectors(variantId: string, variant: LinsVariantThemeDefinition): string[] {
-    const className = variant.className ?? variantId;
+function getVariantSelectors(variantId: string, variant: LinsVariantThemeDefinition, siblingVariantClassNames: readonly string[] = []): string[] {
+    const className = getVariantClassName(variantId, variant);
     const explicitSelectors = variant.selectors ?? [`&${classSelector(className)}`];
+    const defaultSelector = variant.default ? getDefaultVariantSelector(className, siblingVariantClassNames) : undefined;
     const defaultSelectors = uniqueStrings([
-        ...(variant.default ? ["&"] : []),
+        ...(defaultSelector ? [defaultSelector] : []),
         ...(variant.applyAsDefault ?? []),
     ]).map((selector) => `:where(${selector})`);
 
     return [...defaultSelectors, ...explicitSelectors];
+}
+
+function getVariantClassName(variantId: string, variant: LinsVariantThemeDefinition): string {
+    return variant.className ?? variantId;
+}
+
+function getDefaultVariantSelector(className: string, siblingVariantClassNames: readonly string[]): string {
+    const excludedVariantSelectors = uniqueStrings(siblingVariantClassNames)
+        .filter((candidate) => candidate !== className)
+        .map((candidate) => `:not(${classSelector(candidate)})`)
+        .join("");
+
+    return `&${excludedVariantSelectors}`;
 }
 
 function renderSlotRule(block: LinsRawCssBlock, spec?: LinsSelectorSlotSpec, options: LinsThemeBuildOptions = {}): string {

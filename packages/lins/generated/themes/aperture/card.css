@@ -1,7 +1,7 @@
 @layer elements {
     @scope (body) to (.notAperture) {
         article {
-            :where(&),
+            :where(&:not(.flat):not(.outlined):not(.tonal):not(.inset):not(.highlighted):not(.text):not(.glass):not(.framed):not(.quiet):not(.focus)),
             &.elevated {
                 background-color: var(--current-color);
                 color: var(--on-current-color);
