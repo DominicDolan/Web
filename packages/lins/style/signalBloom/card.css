@@ -14,7 +14,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notSignalBloom) {
+    @scope (.signalBloom) to (.notSignalBloom) {
         article {
             :where(&),
             &.flat {

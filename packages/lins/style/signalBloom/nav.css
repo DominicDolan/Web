@@ -13,7 +13,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notSignalBloom) {
+    @scope (.signalBloom) to (.notSignalBloom) {
         nav.top {
             background: color-mix(in oklab, var(--surface-color) 86%, var(--primary-color));
             color: var(--on-surface-color);

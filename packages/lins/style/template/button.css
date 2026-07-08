@@ -17,7 +17,7 @@
      * Scope theme-specific variants so a subtree can opt out with .notTemplate.
      * Rename both classes when copying this folder for a real theme.
      */
-    @scope (body) to (.notTemplate) {
+    @scope (.template) to (.notTemplate) {
         button,
         input[type=button],
         input[type=submit],

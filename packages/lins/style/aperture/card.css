@@ -14,7 +14,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notAperture) {
+    @scope (.aperture) to (.notAperture) {
         article {
             :where(&),
             &.elevated {

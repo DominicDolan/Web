@@ -20,7 +20,7 @@
 */
 
 @layer elements {
-    @scope (body) to (.notSignalBloom) {
+    @scope (.signalBloom) to (.notSignalBloom) {
         i,
         i.medium {
             font-size: 1.3em;

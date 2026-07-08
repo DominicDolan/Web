@@ -112,26 +112,31 @@ Below is the complete set the minimal theme implements. New themes are
 expected to cover this list; new themes may also introduce additional
 categories of their own.
 
-| # | Category          | File              | Selectors (the group)                                                |
-|---|-------------------|-------------------|----------------------------------------------------------------------|
-| 1 | Card              | `card.css`        | `article`                                                            |
-| 2 | Button            | `button.css`      | `button`, `input[type=button\|submit\|reset\|image]`, `[role="button"]` |
-| 3 | Radio Group       | `button.css`      | `[role="radiogroup"]` + its child `button`s                          |
-| 4 | Link              | `button.css`      | `a`                                                                  |
-| 5 | Typography        | `text.css`        | `body`, `h1`–`h6`, `.display`/`.headline`/`.title`/`.body`/`.label` (× `.small`/`.medium`/`.large` × `.variant`) |
-| 6 | Inline Text       | `text.css`        | `code`, `hr`                                                         |
-| 7 | Text Input        | `input.css`       | `input:not([type=radio])`, `textarea`, `select`, `input-shell`       |
-| 8 | Choice Input      | `input.css`       | `input[type=checkbox\|radio\|range]`                                 |
-| 9 | Form Field        | `input.css`       | `form-field`, `fieldset`, `form-field output`                        |
-|10 | List              | `list.css`        | `ul`, `ol`, `li`                                                     |
-|11 | Tab List          | `list.css`        | `ul[role="tablist"]` + its `> li` tabs                               |
-|12 | Menu List         | `list.css`        | `ul[role="menu"]`, `ul.menu`                                         |
-|13 | Navigation        | `nav.css`         | `nav`, `nav.top`, `nav.pageNav`, `aside > nav`                       |
-|14 | Breadcrumb        | `nav.css`         | `nav[aria-label="Breadcrumb"]` + `nav > ol`                          |
-|15 | Popover           | `popover.css`     | `[popover][role="menu"]`, `[popover].menu`                           |
-|16 | Dialog            | `popover.css`     | `dialog`, `dialog > footer`                                          |
-|17 | Empty State       | `emptyState.css`  | `empty-state`, `empty-state.skeleton`, `empty-state.empty`           |
-|18 | Icon              | `icon.css`        | `i`                                                                  |
+| # | Category            | File              | Selectors (the group)                                                |
+|---|---------------------|-------------------|--------------------------------------------------------------------------|
+| 1 | Card                | `card.css`        | `article`                                                            |
+| 2 | Button              | `button.css`      | `button`, `input[type=button\|submit\|reset\|image]`, `[role="button"]:not(article)` |
+| 3 | Radio Group         | `button.css`      | `[role="radiogroup"]` + its child `button`s                          |
+| 4 | Link                | `button.css`      | `a`                                                                  |
+| 5 | Typography          | `text.css`        | `body`, `h1`–`h6`, `.display`/`.headline`/`.title`/`.body`/`.label` (× `.small`/`.medium`/`.large` × `.variant`) |
+| 6 | Inline Text         | `text.css`        | `code`, `hr`, `li`                                                    |
+| 7 | Text Input          | `input.css`       | text-like `input`, `textarea`, `select`, `input-shell`               |
+| 8 | Checkbox Input      | `input.css`       | `input[type=checkbox]`                                              |
+| 9 | Radio Input         | `input.css`       | `input[type=radio]`                                                  |
+|10 | Range Input         | `input.css`       | `input[type=range]`                                                  |
+|11 | Snackbar Feedback   | `feedback.css`    | `[popover] > output[role=status]`                                    |
+|12 | Tooltip Feedback    | `feedback.css`    | `[popover] > output[role=tooltip]`                                   |
+|13 | Form Feedback       | `feedback.css`    | `form-field output`                                                  |
+|14 | List                | `list.css`        | `ul`, `ol`                                                           |
+|15 | Tab List            | `list.css`        | `ul[role="tablist"]` + its `> li` tabs                               |
+|16 | Menu List           | `list.css`        | `ul[role="menu"]`, `ul.menu`                                         |
+|17 | Navigation          | `nav.css`         | `nav`                                                                |
+|18 | Breadcrumb          | `nav.css`         | `nav[aria-label="Breadcrumb"]` + its `> ol`                          |
+|19 | Popover             | `popover.css`     | `[popover][role="menu"]`, `[popover].menu`                           |
+|20 | Dialog              | `popover.css`     | `dialog`, `dialog > footer`                                          |
+|21 | Skeleton Empty State| `emptyState.css`  | `empty-state.skeleton`                                               |
+|22 | Empty State         | `emptyState.css`  | `empty-state.empty`                                                  |
+|23 | Icon                | `icon.css`        | `i`                                                                  |
 
 > **How to spot a new category.** If you find yourself starting a new
 > top-level selector that doesn't fit any row above, you're likely
@@ -149,6 +154,7 @@ category, the variants they accept, and the contexts that style them.
 | Nested card            | `article article`         | Auto-demoted to outlined           |
 | Interactive card       | `article[role="button"]`  | Adds hover elevation, cursor       |
 | Deselected card        | `article[aria-selected="false"]` | Muted/desaturated         |
+| Selected card          | `article[aria-selected="true"]`, `article.active` | Selected/current card treatment |
 
 ### 2.2 Action elements — `button.css`
 
@@ -156,9 +162,10 @@ category, the variants they accept, and the contexts that style them.
 | ---------------------- | ------------------------------------- | ---------------------- |
 | Button                 | `button`, `input[type=button\|submit\|reset\|image]` | Base action |
 | Link                   | `a`                                   | Resets browser default |
-| Pseudo-button          | `[role="button"]`                     | Cursor + interactive   |
+| Pseudo-button          | `[role="button"]:not(article)`        | Cursor + interactive   |
 | Radio group            | `[role="radiogroup"]`                 | Joined-button row      |
-| Radio group button     | `[role="radiogroup"] button`          | Shared borders, no rounding except ends |
+| Radio group button     | `[role="radiogroup"] > button`        | Shared borders, no rounding except ends |
+| Selected radio button  | `[role="radiogroup"] > button[aria-checked="true"]`, `[role="radiogroup"] > button[aria-selected="true"]`, `[role="radiogroup"] > button.active` | Selected segment state |
 
 ### 2.3 Typography elements — `text.css`
 
@@ -243,8 +250,8 @@ content model needs different defaults.
 :where(h2, h4),     .medium { --font-size-multiplier: 1; }
 :where(h5),         .small  { --font-size-multiplier: 0.85; }
 
-:where(ul > *),              .body  { --font-size: /* … */; }
-:where(form-field > output), .label { --font-size: /* … */; }
+:where(ul > *),               .body           { --font-size: /* … */; }
+:where(form-field output),    .label.variant  { --font-size: /* … */; }
 ```
 
 #### Common default role bindings
@@ -263,7 +270,7 @@ classes:
 | Article/dialog subtitles (`article > hgroup > p`, `dialog > hgroup > p`), breadcrumbs | `.title.variant` | Muted/secondary component subtitle text. |
 | Paragraphs, description lists, plain list items, form controls | `.body` | Standard reading and input text. |
 | Buttons, tabs, chips, menu items, nav links, labels | `.label` | Compact action/navigation text. |
-| Metadata (`small`, `time`, `figcaption`), validation output | `.label.variant` | Small muted/supporting text. |
+| Metadata (`small`, `time`, `figcaption`), validation output, popover feedback output (`form-field output`, `[popover] > output`) | `.label.variant` | Small muted/supporting text. |
 
 When adding a new category, bind its text to the nearest existing role via
 `:where(...)` before inventing a new typography class. For example, a pill
@@ -324,58 +331,88 @@ treatment — typically used for:
 | Control text        | `button`, tabs, chips, menu items         | Context maps to the label rule |
 | Breadcrumb text     | `nav[aria-label="Breadcrumb"]`           | Context maps to the title variant rule |
 | Inline code         | `code`                                    | Subtle chip                 |
+| Code focus          | `code:focus-within`                       | Focus ring for editable/interactive code |
 | Horizontal rule     | `hr`                                      | Thin theme-coloured line    |
 | Bullet item         | `li`                                      | Default `list-style` reset  |
 | List item text      | `ul > *`                                  | Context sets `--font-size` in the body rule |
+| Feedback/validation output | `form-field output`, `[popover] > output` | Context maps to the label variant + small rule |
 
 ### 2.4 Form elements — `input.css`
 
 | Element             | Selector                                          | Notes                          |
 | ------------------- | ------------------------------------------------- | ------------------------------ |
-| Text input          | `input` (text-like types only), `textarea`, `select`, `input-shell` | Share the same chrome, padding, radius, and variants. The "text-like" set is everything *except* `radio`, `checkbox`, `range`, `color`, `file`, `image`, `button`, `submit`, `reset`. Write it as a chained `:not()` list, e.g. `input:not([type=radio]):not([type=checkbox])…`. |
+| Text input          | text-like `input` types, `textarea`, `select`, `input-shell` | Share the same chrome, padding, radius, and variants. The "text-like" set is everything *except* `radio`, `checkbox`, `range`, `color`, `file`, `image`, `button`, `submit`, `reset`. Write it as a chained `:not()` list, e.g. `input:not([type=radio]):not([type=checkbox])…`. |
 | Input shell         | `input-shell`                                     | Custom wrapper, exposes `::part(default-control)`. Styled identically to `input` so a custom-element input feels native. |
-| Form field          | `form-field`                                      | Label + control + feedback group |
-| Validation output   | `form-field output`                               | Error text slot                |
-| Fieldset            | `fieldset`                                        | Unstyled grouping              |
-| Choice control      | `input[type=checkbox\|radio\|range]`              | Uses `accent-color`            |
+| Input shell control | `input-shell input`, `input-shell select`, `input-shell textarea`, `input-shell::part(default-control)` | Inner native controls reset so the shell owns the chrome |
+| Required marker     | `label:has(+ input[required])::after` (and `textarea`/`select`/`input-shell` variants) | Visual required marker |
+| Checkbox input      | `input[type=checkbox]`                            | Uses `accent-color`; `:checked`/`[aria-checked="true"]` state |
+| Radio input         | `input[type=radio]`                               | Uses `accent-color`; `:checked`/`[aria-checked="true"]` state |
+| Range input         | `input[type=range]`                               | Uses `accent-color`; focus + disabled states |
 
-### 2.5 List elements — `list.css`
+> **Note:** `form-field` and `fieldset` are layout wrappers (label +
+> control + feedback group) and are intentionally left unstyled/
+> layout-only. LINS styles only the controls inside them and the
+> feedback `output` they contain — see **2.5 Feedback elements** below.
+> Validation/error text is not part of `input.css`.
+
+### 2.5 Feedback elements — `feedback.css`
+
+| Element               | Selector                              | Notes                              |
+| ---------------------- | -------------------------------------- | ---------------------------------- |
+| Snackbar feedback     | `[popover] > output[role=status]`     | Transient status message inside a popover container |
+| Tooltip feedback      | `[popover] > output[role=tooltip]`    | Contextual message anchored to an element |
+| Form feedback         | `form-field output`                   | Feedback/error text slot associated with a form field |
+| Invalid form feedback | `form-field:has(:invalid) output`, `form-field:has([aria-invalid="true"]) output`, `form-field output[aria-invalid="true"]` | Error-coloured validation state |
+
+### 2.6 List elements — `list.css`
 
 | Element             | Selector                              | Notes                              |
-| ------------------- | ------------------------------------- | ---------------------------------- |
+| ------------------- | -------------------------------------- | ---------------------------------- |
 | Plain list          | `ul`, `ol`                            | Reset, theme tokens                |
+| List item (active)  | `ul > li[aria-current="page"]`, `ul > li[aria-selected="true"]`, `ul > li.active` | Active/current list item |
+| List item (hover)   | `ul > li:hover:not(.active)`          | Hover state for inactive items      |
 | Tab list            | `ul[role="tablist"]`                  | Horizontal tabs                    |
-| Menu                | `ul[role="menu"]`, `ul.menu`          | Floating menu surface              |
 | Tab                 | `[role="tablist"] > li`               | Single tab                         |
+| Selected tab        | `[role="tablist"] > li[aria-selected="true"]`, `[role="tablist"] > li.active` | Selected tab state |
+| Menu                | `ul[role="menu"]`, `ul.menu`          | Floating menu surface              |
+| Menu item           | `ul[role="menu"] > li`, `ul.menu > li`, `[role="menuitem"]` | Menu item padding/hover/selected states |
 
-### 2.6 Navigation elements — `nav.css`
+### 2.7 Navigation elements — `nav.css`
 
 | Element             | Selector                              | Notes                              |
-| ------------------- | ------------------------------------- | ---------------------------------- |
-| Top nav             | `nav.top`                             | App-bar style                      |
+| ------------------- | -------------------------------------- | ---------------------------------- |
+| Navigation          | `nav`                                 | App-bar / side-nav / generic landmark — `.top`, `.pageNav`, etc. are variants of this one category, not separate categories |
+| Current nav link    | `nav a[aria-current="page"]`, `nav a.active` | Current navigation link state |
 | Breadcrumb          | `nav[aria-label="Breadcrumb"]`        | Separator-delimited path           |
-| Side nav            | `nav.pageNav`, `aside > nav`          | Vertical sidebar                   |
+| Breadcrumb track    | `nav[aria-label="Breadcrumb"] > ol`   | Breadcrumb ordered-list track      |
+| Breadcrumb item     | `nav[aria-label="Breadcrumb"] > ol > li` | Breadcrumb item style            |
+| Breadcrumb separator | `nav[aria-label="Breadcrumb"] > ol > li + li::before` | Decorative separator |
 
-### 2.7 Overlay elements — `popover.css`
+### 2.8 Overlay elements — `popover.css`
 
 | Element             | Selector                              | Notes                              |
-| ------------------- | ------------------------------------- | ---------------------------------- |
+| ------------------- | -------------------------------------- | ---------------------------------- |
 | Popover menu        | `[popover][role="menu"]`, `[popover].menu` | Positioned floating panel    |
 | Dialog              | `dialog`                              | Modal surface                      |
+| Dialog backdrop     | `dialog::backdrop`                    | Modal backdrop tint/blur           |
 | Dialog actions      | `dialog > footer`                     | Button row                         |
+| Form actions        | `form > footer`                       | Form action row appearance         |
 
-### 2.8 Placeholder elements — `emptyState.css`
+### 2.9 Placeholder elements — `emptyState.css`
 
 | Element             | Selector                              | Notes                              |
-| ------------------- | ------------------------------------- | ---------------------------------- |
-| Empty slot          | `empty-state`                         | Generic missing-content holder     |
+| ------------------- | -------------------------------------- | ---------------------------------- |
 | Skeleton            | `empty-state.skeleton`                | Greyed-out shape stand-in          |
+| Skeleton block      | `empty-state.skeleton *:not(:has(> *))` | Base skeleton placeholder block  |
+| Skeleton (busy)     | `empty-state.skeleton[aria-busy] *:not(:has(> *))` | Animated shimmer while loading |
+| Skeleton (not busy) | `empty-state.skeleton:not([aria-busy]) *:not(:has(> *))` | Static placeholder style |
 | Empty illustration  | `empty-state.empty`                   | Dashed-border "nothing here" panel |
+| Empty decoration    | `empty-state.empty::after`            | Optional decorative outline/illustration |
 
-### 2.9 Icon elements — `icon.css`
+### 2.10 Icon elements — `icon.css`
 
 | Element             | Selector                              | Notes                              |
-| ------------------- | ------------------------------------- | ---------------------------------- |
+| ------------------- | -------------------------------------- | ---------------------------------- |
 | Icon                | `i`                                   | Material Symbols glyph             |
 
 > **Note on `ul` vs `ul[role="tablist"]`.** These belong to *different
@@ -647,6 +684,8 @@ LINS uses **selectors**, not classes, to express these.
 | `ul > *`                    | Default body-text size inside lists               |
 | `input-shell input`         | Inner input reset                                 |
 | `[role="radiogroup"] button`| Joined-button group                               |
+| `form-field output`         | Form feedback text, styled with the feedback category |
+| `[popover] > output`        | Snackbar/tooltip feedback text inside a popover    |
 
 ### 6.1 When to use context vs a variant
 
@@ -663,7 +702,7 @@ For variants that should only exist while the minimal theme is active,
 wrap them in `@scope`:
 
 ```css
-@scope (body) to (.notMinimal) {
+@scope (.minimal) to (.notMinimal) {
   button.elevated { /* … */ }
 }
 ```
@@ -725,6 +764,7 @@ style/<your-theme>/
   card.css         ← Surface elements
   text.css         ← Typography elements
   input.css        ← Form elements
+  feedback.css     ← Feedback elements (snackbar, tooltip, form feedback)
   list.css         ← List elements
   nav.css          ← Navigation elements
   popover.css      ← Overlay elements

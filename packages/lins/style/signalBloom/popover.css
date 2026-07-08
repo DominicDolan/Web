@@ -12,7 +12,7 @@
  */
 
 @layer elements {
-	@scope (body) to (.notSignalBloom) {
+	@scope (.signalBloom) to (.notSignalBloom) {
 		[popover][role="menu"],
 		[popover].menu {
 			border: 1px solid var(--signal-bloom-border-color);

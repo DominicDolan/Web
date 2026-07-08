@@ -20,7 +20,7 @@
 */
 
 @layer elements {
-    @scope (body) to (.notFoundry) {
+    @scope (.foundry) to (.notFoundry) {
         i,
         i.medium {
             font-size: 1.25em;

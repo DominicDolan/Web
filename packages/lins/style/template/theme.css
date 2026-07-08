@@ -15,7 +15,7 @@
  *
  * Copy this folder when starting a new theme, then rename:
  *   - the folder:         style/template -> style/<your-theme>
- *   - the root class:     .templateTheme -> .<yourTheme>Theme
+ *   - the root class:     .template -> .<yourTheme>Theme
  *   - the opt-out class:  .notTemplate -> .not<YourTheme>
  *
  * This file owns the palette and cross-element role classes. Individual
@@ -25,7 +25,7 @@
  *   palette token -> role token -> element token -> actual CSS property
  *
  * Example:
- *   --primary-color      defined on .templateTheme.light
+ *   --primary-color      defined on .template.light
  *   --active-color       set by .primary
  *   --current-color      resolved by button/article/input/etc.
  *   background/color     applied inside that element's variant rules
@@ -44,7 +44,7 @@
 	 * or icons placed on that role. For example, --on-primary-color should be
 	 * legible on --primary-color.
 	 */
-	.templateTheme.light {
+	.template.light {
 		/*
 		--primary-color: ...;
 		--on-primary-color: ...;
@@ -82,7 +82,7 @@
 	 * Fill this in when your theme supports dark mode. Keep the same token
 	 * names so every element file continues to work unchanged.
 	 */
-	.templateTheme.dark {
+	.template.dark {
 		/*
 		--primary-color: ...;
 		--on-primary-color: ...;
@@ -163,7 +163,7 @@
 	html,
 	body,
 	#app,
-	.templateTheme {
+	.template {
 		background: var(--background-color);
 		color: var(--on-background-color);
 	}

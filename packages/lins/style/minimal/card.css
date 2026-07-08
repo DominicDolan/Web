@@ -1,7 +1,7 @@
 
 
 @layer elements {
-    @scope (body) to (.notMinimal) {
+    @scope (.minimal) to (.notMinimal) {
         article {
 
         :where(&), &.flat, &.elevated {

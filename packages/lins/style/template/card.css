@@ -14,7 +14,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notTemplate) {
+    @scope (.template) to (.notTemplate) {
         article {
             /*
              * A plain article should map to one default variant. The template

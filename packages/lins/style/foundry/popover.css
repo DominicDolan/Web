@@ -12,7 +12,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notFoundry) {
+    @scope (.foundry) to (.notFoundry) {
         [popover][role="menu"],
         [popover].menu {
             color: var(--on-surface-color);

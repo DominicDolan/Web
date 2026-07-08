@@ -22,7 +22,7 @@
 /* Icon elements. */
 
 @layer elements {
-    @scope (body) to (.notMaterialInspired) {
+    @scope (.materialInspired) to (.notMaterialInspired) {
         i,
         i.medium {
             font-size: 1.25em;

@@ -14,7 +14,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notMaterialInspired) {
+    @scope (.materialInspired) to (.notMaterialInspired) {
         article {
             :where(&),
             &.tonal {

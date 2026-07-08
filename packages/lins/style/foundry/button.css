@@ -17,7 +17,7 @@
      * Scope theme-specific variants so a subtree can opt out with .notFoundry.
      * Rename both classes when copying this folder for a real theme.
      */
-    @scope (body) to (.notFoundry) {
+    @scope (.foundry) to (.notFoundry) {
         button,
         input[type=button],
         input[type=submit],

@@ -20,7 +20,7 @@
 */
 
 @layer elements {
-    @scope (body) to (.notTemplate) {
+    @scope (.template) to (.notTemplate) {
         i,
         i.medium {
             /* TODO: medium icon size, e.g. font-size: 1.3em; */

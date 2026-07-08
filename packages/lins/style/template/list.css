@@ -12,7 +12,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notTemplate) {
+    @scope (.template) to (.notTemplate) {
         ul.nav {
             /*
              * Navigation-list variant. Use this when a list of links/actions is

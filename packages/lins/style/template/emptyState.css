@@ -21,7 +21,7 @@
 }
 
 @layer elements {
-    @scope (body) to (.notTemplate) {
+    @scope (.template) to (.notTemplate) {
         /*noinspection CssInvalidHtmlTagReference*/
         empty-state.skeleton *:not(:has(> *)) {
             pointer-events: none;

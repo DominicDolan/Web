@@ -20,7 +20,7 @@
 */
 
 @layer elements {
-    @scope (body) to (.notAperture) {
+    @scope (.aperture) to (.notAperture) {
         i,
         i.medium {
             font-size: 1.25em;

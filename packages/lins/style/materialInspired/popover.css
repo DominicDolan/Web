@@ -12,7 +12,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notMaterialInspired) {
+    @scope (.materialInspired) to (.notMaterialInspired) {
         [popover][role="menu"],
         [popover].menu {
             padding: 0.5rem 0;

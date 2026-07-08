@@ -18,7 +18,7 @@
 }
 
 @layer elements {
-    @scope (body) to (.notMinimal) {
+    @scope (.minimal) to (.notMinimal) {
         :where(
             h1, h2,
             main > hgroup > h1, main > hgroup > h2,

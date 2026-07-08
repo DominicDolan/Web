@@ -52,7 +52,7 @@
         }
     }
 
-    @scope (body) to (.notMaterialInspired) {
+    @scope (.materialInspired) to (.notMaterialInspired) {
         /*noinspection CssInvalidHtmlTagReference*/
         form-field {
             &.magic {

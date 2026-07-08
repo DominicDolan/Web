@@ -13,7 +13,7 @@
 /* Aperture: calm editorial surfaces, precise typography, and soft optical depth. */
 
 @layer defaults {
-	.apertureTheme {
+	.aperture {
 		--aperture-radius-xs: 0.35rem;
 		--aperture-radius-sm: 0.55rem;
 		--aperture-radius-md: 0.8rem;
@@ -59,7 +59,7 @@
 		accent-color: var(--accent-color);
 	}
 
-	.apertureTheme.light {
+	.aperture.light {
 		--primary-color: #172033;
 		--on-primary-color: #f8fbff;
 		--secondary-color: #5e6878;
@@ -80,7 +80,7 @@
 		color-scheme: light;
 	}
 
-	.apertureTheme.dark {
+	.aperture.dark {
 		--primary-color: #edf4ff;
 		--on-primary-color: #111827;
 		--secondary-color: #9aa8bc;
@@ -169,13 +169,13 @@
 	html,
 	body,
 	#app,
-	.apertureTheme {
+	.aperture {
 		background: var(--background-color);
 		color: var(--on-background-color);
 	}
 
-	#app.apertureTheme,
-	.apertureTheme #app {
+	#app.aperture,
+	.aperture #app {
 		color: var(--on-background-color);
 	}
 }

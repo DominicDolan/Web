@@ -12,7 +12,7 @@
 
 @layer defaults {
     /* Palette tokens for the theme-builder app's own minimal LINS theme. */
-    .minimalTheme.light {
+    .minimal.light {
         --primary-color: #202020;
         --on-primary-color: white;
 
@@ -81,7 +81,7 @@
         --on-active-color: var(--on-background-color);
     }
 
-    html, body, #app, .minimalTheme {
+    html, body, #app, .minimal {
         background: var(--background-color);
         background-size: cover;
         color: var(--on-background-color);

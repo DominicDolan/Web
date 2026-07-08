@@ -25,7 +25,7 @@
         }
     }
 
-    @scope (body) to (.notMinimal) {
+    @scope (.minimal) to (.notMinimal) {
         input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
         textarea, select, input-shell {
             border-radius: 0.5rem;

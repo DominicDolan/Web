@@ -31,7 +31,7 @@
 }
 
 @layer elements {
-    @scope (body) to (.notTemplate) {
+    @scope (.template) to (.notTemplate) {
         /*
          * Typeface roles compose with size classes:
          *   <h1 class="display large">Hero</h1>

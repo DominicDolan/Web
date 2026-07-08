@@ -12,7 +12,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notAperture) {
+    @scope (.aperture) to (.notAperture) {
         ul.nav {
             > li {
                 border-radius: var(--aperture-radius-sm);

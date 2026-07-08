@@ -21,7 +21,7 @@
 }
 
 @layer elements {
-	@scope (body) to (.notSignalBloom) {
+	@scope (.signalBloom) to (.notSignalBloom) {
 		/*noinspection CssInvalidHtmlTagReference*/
 		empty-state.skeleton *:not(:has(> *)) {
 			pointer-events: none;

@@ -21,7 +21,7 @@
 }
 
 @layer elements {
-    @scope (body) to (.notFoundry) {
+    @scope (.foundry) to (.notFoundry) {
         /*noinspection CssInvalidHtmlTagReference*/
         empty-state.skeleton *:not(:has(> *)) {
             pointer-events: none;

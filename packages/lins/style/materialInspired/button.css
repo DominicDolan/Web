@@ -17,7 +17,7 @@
      * Scope theme-specific variants so a subtree can opt out with .notMaterialInspired.
      * Rename both classes when copying this folder for a real theme.
      */
-    @scope (body) to (.notMaterialInspired) {
+    @scope (.materialInspired) to (.notMaterialInspired) {
         button,
         input[type=button],
         input[type=submit],

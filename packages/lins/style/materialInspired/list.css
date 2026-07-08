@@ -12,7 +12,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notMaterialInspired) {
+    @scope (.materialInspired) to (.notMaterialInspired) {
         ul,
         ol {
             color: var(--on-surface-color);

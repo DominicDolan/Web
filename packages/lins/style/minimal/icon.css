@@ -1,6 +1,6 @@
 
 @layer elements {
-    @scope (body) to (.notMinimal) {
+    @scope (.minimal) to (.notMinimal) {
         i,
         i.medium {
             font-size: 1.3em;

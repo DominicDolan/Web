@@ -13,7 +13,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notMaterialInspired) {
+    @scope (.materialInspired) to (.notMaterialInspired) {
         nav {
             color: var(--on-surface-color);
         }

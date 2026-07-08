@@ -13,7 +13,7 @@
 /* Foundry: industrial, technical, high-contrast LINS theme. */
 
 @layer defaults {
-	.foundryTheme.light {
+	.foundry.light {
 		--primary-color: #171a1f;
 		--on-primary-color: #f8fafc;
 
@@ -59,7 +59,7 @@
 	 * Fill this in when your theme supports dark mode. Keep the same token
 	 * names so every element file continues to work unchanged.
 	 */
-	.foundryTheme.dark {
+	.foundry.dark {
 		--primary-color: #f3f4f6;
 		--on-primary-color: #111318;
 
@@ -168,12 +168,12 @@
 	html,
 	body,
 	#app,
-	.foundryTheme {
+	.foundry {
 		background: var(--background-color);
 		color: var(--on-background-color);
 	}
 
-	.foundryTheme {
+	.foundry {
 		accent-color: var(--accent-color);
 	}
 
@@ -183,8 +183,8 @@
 	 * app uses them. If your theme needs those hooks, uncomment/fill them here;
 	 * otherwise prefer element categories such as nav.pageNav in nav.css.
 	 */
-	#app.foundryTheme,
-	.foundryTheme #app {
+	#app.foundry,
+	.foundry #app {
 		color: var(--on-background-color);
 	}
 }

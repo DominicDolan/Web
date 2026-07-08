@@ -3,7 +3,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notMinimal) {
+    @scope (.minimal) to (.notMinimal) {
         nav.top {
             border-bottom: 1px solid oklab(from currentColor 70% a b / 0.5);
             background: var(--surface-color);

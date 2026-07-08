@@ -2,7 +2,7 @@
 
 @layer elements {
 
-    @scope (body) to (.notMinimal) {
+    @scope (.minimal) to (.notMinimal) {
         ul.nav {
             & > li {
                 font-size: 0.975rem;

@@ -13,7 +13,7 @@
 }
 
 @layer elements {
-    @scope (body) to (.notMinimal) {
+    @scope (.minimal) to (.notMinimal) {
         /*noinspection CssInvalidHtmlTagReference*/
         empty-state.skeleton *:not(:has(> *)) {
             pointer-events: none;

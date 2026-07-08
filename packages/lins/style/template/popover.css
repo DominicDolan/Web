@@ -12,7 +12,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notTemplate) {
+    @scope (.template) to (.notTemplate) {
         [popover][role="menu"],
         [popover].menu {
             /* TODO: popover/menu panel surface, radius, shadow, border. */

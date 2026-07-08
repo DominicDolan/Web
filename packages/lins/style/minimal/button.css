@@ -2,7 +2,7 @@
 
 @layer elements {
 
-    @scope (body) to (.notMinimal) {
+    @scope (.minimal) to (.notMinimal) {
 
         button, input[type=button], input[type=submit], input[type=reset], input[type=image] {
 

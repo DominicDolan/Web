@@ -21,7 +21,7 @@
  */
 
 @layer defaults {
-    .materialInspiredTheme {
+    .materialInspired {
         color-scheme: light;
 
         --md-state-hover-opacity: 0.08;
@@ -75,7 +75,7 @@
         --on-surface-variant-color: color-mix(in oklab, var(--on-surface-color) 74%, var(--surface-color) 26%);
     }
 
-    .materialInspiredTheme.light {
+    .materialInspired.light {
         --primary-color: #6750a4;
         --on-primary-color: #ffffff;
         --secondary-color: #625b71;
@@ -96,7 +96,7 @@
         color-scheme: light;
     }
 
-    .materialInspiredTheme.dark {
+    .materialInspired.dark {
         --primary-color: #d0bcff;
         --on-primary-color: #381e72;
         --secondary-color: #ccc2dc;
@@ -160,7 +160,7 @@
     html,
     body,
     #app,
-    .materialInspiredTheme {
+    .materialInspired {
         background: var(--background-color);
         color: var(--on-background-color);
     }

@@ -3,7 +3,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notMinimal) {
+    @scope (.minimal) to (.notMinimal) {
         [popover][role="menu"],
         [popover].menu {
             border-radius: 0.5rem;

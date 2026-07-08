@@ -13,7 +13,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notTemplate) {
+    @scope (.template) to (.notTemplate) {
         nav.top {
             /* TODO: top app-bar border/background/shadow. */
         }

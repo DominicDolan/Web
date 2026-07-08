@@ -21,7 +21,7 @@
 }
 
 @layer elements {
-    @scope (body) to (.notAperture) {
+    @scope (.aperture) to (.notAperture) {
         /*noinspection CssInvalidHtmlTagReference*/
         empty-state.skeleton *:not(:has(> *)) {
             pointer-events: none;

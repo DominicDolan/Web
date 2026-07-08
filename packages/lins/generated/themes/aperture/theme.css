@@ -13,7 +13,7 @@
 /* A calm, editorial LINS theme with warm neutrals, soft optical elevation, precise typography, and gallery-like surface framing. */
 
 @layer defaults {
-    .apertureTheme {
+    .aperture {
         --icon-font-family: Material Symbols Outlined;
         --font-family: Inter, Geist, "Avenir Next", "IBM Plex Sans", "Source Sans 3", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
         --mono-font-family: "Cascadia Code", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -24,7 +24,7 @@
         --heading-font-weight: 650;
     }
 
-    .apertureTheme.light {
+    .aperture.light {
         --primary-color: #172033;
         --on-primary-color: #f8fbff;
         --secondary-color: #5e6878;
@@ -45,7 +45,7 @@
         color-scheme: light;
     }
 
-    .apertureTheme.dark {
+    .aperture.dark {
         --primary-color: #edf4ff;
         --on-primary-color: #111827;
         --secondary-color: #9aa8bc;
@@ -111,7 +111,7 @@
         100% { background-position: 200% 0; }
     }
 
-    .apertureTheme {
+    .aperture {
         --aperture-radius-xs: 0.35rem;
         --aperture-radius-sm: 0.55rem;
         --aperture-radius-md: 0.8rem;
@@ -155,13 +155,13 @@
     html,
     body,
     #app,
-    .apertureTheme {
+    .aperture {
         background: var(--background-color);
         color: var(--on-background-color);
     }
 
-    #app.apertureTheme,
-    .apertureTheme #app {
+    #app.aperture,
+    .aperture #app {
         color: var(--on-background-color);
     }
 }

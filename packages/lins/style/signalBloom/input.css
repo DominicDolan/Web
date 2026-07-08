@@ -49,7 +49,7 @@
 		}
 	}
 
-	@scope (body) to (.notSignalBloom) {
+	@scope (.signalBloom) to (.notSignalBloom) {
 		/*noinspection CssInvalidHtmlTagReference*/
 		input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
 		textarea,

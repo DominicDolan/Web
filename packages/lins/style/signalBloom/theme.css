@@ -13,7 +13,7 @@
 /* Signal Bloom: expressive, optimistic, soft-saturated LINS theme. */
 
 @layer defaults {
-	.signalBloomTheme {
+	.signalBloom {
 		--signal-bloom-radius-xs: 0.55rem;
 		--signal-bloom-radius-sm: 0.8rem;
 		--signal-bloom-radius-md: 1rem;
@@ -61,7 +61,7 @@
 		accent-color: var(--accent-color);
 	}
 
-	.signalBloomTheme.light {
+	.signalBloom.light {
 		--primary-color: #5b5cf6;
 		--on-primary-color: #ffffff;
 		--secondary-color: #f05f8d;
@@ -82,7 +82,7 @@
 		color-scheme: light;
 	}
 
-	.signalBloomTheme.dark {
+	.signalBloom.dark {
 		--primary-color: #a7a8ff;
 		--on-primary-color: #11112a;
 		--secondary-color: #ff8bae;
@@ -146,7 +146,7 @@
 	html,
 	body,
 	#app,
-	.signalBloomTheme {
+	.signalBloom {
 		background:
 			radial-gradient(circle at 8% 0%, color-mix(in oklab, var(--primary-color) 15%, transparent), transparent 32rem),
 			radial-gradient(circle at 100% 8%, color-mix(in oklab, var(--accent-color) 13%, transparent), transparent 34rem),
@@ -154,8 +154,8 @@
 		color: var(--on-background-color);
 	}
 
-	#app.signalBloomTheme,
-	.signalBloomTheme #app {
+	#app.signalBloom,
+	.signalBloom #app {
 		color: var(--on-background-color);
 	}
 }

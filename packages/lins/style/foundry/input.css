@@ -51,7 +51,7 @@
         }
     }
 
-    @scope (body) to (.notFoundry) {
+    @scope (.foundry) to (.notFoundry) {
         /*noinspection CssInvalidHtmlTagReference*/
         input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
         textarea,

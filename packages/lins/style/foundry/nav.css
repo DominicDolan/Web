@@ -13,7 +13,7 @@
  */
 
 @layer elements {
-    @scope (body) to (.notFoundry) {
+    @scope (.foundry) to (.notFoundry) {
         nav.top {
             color: var(--on-surface-color);
             background: var(--surface-color);
