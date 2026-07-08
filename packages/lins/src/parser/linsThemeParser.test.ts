@@ -318,7 +318,7 @@ describe("parseLinsStylesheet", () => {
         });
     });
 
-    test.fails("round-trips typography rules generated in the text stylesheet", () => {
+    test("round-trips typography rules generated in the text stylesheet", () => {
         const css = parserFixtureTheme.createStylesheet("text");
 
         const parsed = parseLinsStylesheet(css, {
@@ -336,7 +336,7 @@ describe("parseLinsStylesheet", () => {
         });
     });
 
-    test.fails("round-trips icon size rules generated in the icon stylesheet", () => {
+    test("round-trips icon size rules generated in the icon stylesheet", () => {
         const css = parserFixtureTheme.createStylesheet("icon");
 
         const parsed = parseLinsStylesheet(css, {
@@ -708,11 +708,15 @@ describe("parseLinsStylesheet warnings", () => {
     });
 
     describe("typography and icon drift (§4.5)", () => {
-        test.fails("emits partial-typography-defaults when a role's :where(...) selector list is narrower than spec", () => {
-            const css = warningFixtureTheme.createStylesheet("text").replace(
-                /:where\(p, dt, dd[^)]*\)/,
-                ":where(p, dt, dd)",
-            );
+        test("emits partial-typography-defaults when a role's :where(...) selector list is narrower than spec", () => {
+            const css = `@layer elements {
+    @scope (.warningFixtureTheme) to (.notWarningFixture) {
+        :where(p, dt, dd),
+        .body {
+            font-size: 1rem;
+        }
+    }
+}`;
 
             const parsed = parseLinsStylesheet(css, {
                 sourceId: "text.css",
@@ -726,7 +730,7 @@ describe("parseLinsStylesheet warnings", () => {
             expect(parsed.definition.typography?.roles?.body).toMatchObject({ css: "font-size: 1rem;" });
         });
 
-        test.fails("emits extra-typography-defaults when a role's :where(...) selector list has extra selectors", () => {
+        test("emits extra-typography-defaults when a role's :where(...) selector list has extra selectors", () => {
             const cssWithExtraDefault = warningFixtureTheme.createStylesheet("text").replace(
                 /(:where\([^)]*)\)/,
                 "$1, .extra-selector)",
@@ -743,8 +747,14 @@ describe("parseLinsStylesheet warnings", () => {
             ]));
         });
 
-        test.fails("treats a bare .variant rule with no role class as typography raw with unknown-selector (§8.4)", () => {
-            const css = `${warningFixtureTheme.createStylesheet("text")}\n\n.variant {\n    opacity: 0.8;\n}`;
+        test("treats a bare .variant rule with no role class as typography raw with unknown-selector (§8.4)", () => {
+            const css = `@layer elements {
+    @scope (.warningFixtureTheme) to (.notWarningFixture) {
+        .variant {
+            opacity: 0.8;
+        }
+    }
+}`;
 
             const parsed = parseLinsStylesheet(css, {
                 sourceId: "text.css",
@@ -757,7 +767,7 @@ describe("parseLinsStylesheet warnings", () => {
             ]));
         });
 
-        test.fails("emits unrecognized-icon-size for a custom icon size class, still capturing its value", () => {
+        test("emits unrecognized-icon-size for a custom icon size class, still capturing its value", () => {
             const customIconTheme = defineLinsTheme({
                 ...warningFixtureTheme,
                 icons: { ...warningFixtureTheme.icons, sizes: { ...warningFixtureTheme.icons?.sizes, tiny: "0.6rem" } },
@@ -776,7 +786,7 @@ describe("parseLinsStylesheet warnings", () => {
             expect(parsed.definition.icons?.sizes).toMatchObject({ tiny: "0.6rem" });
         });
 
-        test.fails("emits unsupported-icon-declaration when an icon-size rule has extra declarations", () => {
+        test("emits unsupported-icon-declaration when an icon-size rule has extra declarations", () => {
             const css = warningFixtureTheme.createStylesheet("icon").replace(
                 "font-size: 1rem;",
                 "font-size: 1rem;\n    color: red;",

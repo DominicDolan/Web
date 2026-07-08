@@ -99,6 +99,14 @@ function parseElementStylesheet(root: Root, options: LinsStylesheetParseOptions 
             continue;
         }
 
+        if (options.stylesheetId === LINS_THEME_SPEC.typography.stylesheetId && parseTypographyRule(node, definition, warnings)) {
+            continue;
+        }
+
+        if (options.stylesheetId === "icon" && parseIconSizeRule(node, definition, warnings)) {
+            continue;
+        }
+
         parseCategoryRule(node, definition, options, warnings);
     }
 
@@ -136,6 +144,146 @@ function parseCategoryRule(rule: Rule, definition: MutablePartialThemeDefinition
         ...(definition.categories ?? {}),
         [categoryId]: category,
     };
+}
+
+function parseTypographyRule(rule: Rule, definition: MutablePartialThemeDefinition, warnings: LinsStylesheetParseWarning[]): boolean {
+    const selectors = splitSelectorList(rule.selector);
+    const explicitSelectors = selectors.filter((selector) => !selector.startsWith(":where("));
+    const whereSelectors = selectors.filter((selector) => selector.startsWith(":where("));
+    const classNames = explicitSelectors.flatMap((selector) => [...selector.matchAll(/\.([_a-zA-Z-][_a-zA-Z0-9-]*)/g)].map((match) => match[1]!));
+    const compoundClassSelector = explicitSelectors.find((selector) => /^\.[_a-zA-Z-][_a-zA-Z0-9-]*\.variant$/.test(normalizeWhitespace(selector)));
+    const roleVariantSpec = compoundClassSelector ? LINS_THEME_SPEC.typography.roleVariants.find((spec) => selectorSetKey(spec.selector) === selectorSetKey(compoundClassSelector)) : undefined;
+    const roleSpec = !roleVariantSpec && classNames.length === 1 ? LINS_THEME_SPEC.typography.roles.find((spec) => spec.className === classNames[0]) : undefined;
+    const sizeSpec = !roleVariantSpec && !roleSpec && classNames.length === 1 ? LINS_THEME_SPEC.typography.sizes.find((spec) => spec.className === classNames[0]) : undefined;
+
+    if (!roleVariantSpec && !roleSpec && !sizeSpec) {
+        if (whereSelectors.length === 0 && explicitSelectors.length > 0) {
+            definition.typography = {
+                ...(definition.typography ?? {}),
+                raw: [...(definition.typography?.raw ?? []), { selector: rule.selector, css: stringifyContainerBody(rule) }],
+            };
+
+            if (classNames.length > 0) {
+                warnings.push({
+                    code: "unknown-selector",
+                    message: `Could not map typography selector ${JSON.stringify(rule.selector)} to a known role, variant, or size.`,
+                    selector: rule.selector,
+                });
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    const spec = roleVariantSpec ?? roleSpec ?? sizeSpec!;
+    warnForTypographyDefaultDrift(rule, whereSelectors, spec.defaultSelectors, warnings);
+    const defaultExplicitSelector = "selector" in spec ? spec.selector : `.${spec.className}`;
+    const cssBlock = buildRawCssBlock(rule, explicitSelectors, defaultExplicitSelector);
+
+    if (roleVariantSpec) {
+        definition.typography = {
+            ...(definition.typography ?? {}),
+            roleVariants: { ...(definition.typography?.roleVariants ?? {}), [roleVariantSpec.id]: cssBlock },
+        };
+    } else if (roleSpec) {
+        definition.typography = {
+            ...(definition.typography ?? {}),
+            roles: { ...(definition.typography?.roles ?? {}), [roleSpec.id]: cssBlock },
+        };
+    } else if (sizeSpec) {
+        definition.typography = {
+            ...(definition.typography ?? {}),
+            sizes: { ...(definition.typography?.sizes ?? {}), [sizeSpec.id]: cssBlock },
+        };
+    }
+
+    return true;
+}
+
+function warnForTypographyDefaultDrift(rule: Rule, whereSelectors: readonly string[], expectedSelectors: readonly string[], warnings: LinsStylesheetParseWarning[]): void {
+    if (whereSelectors.length === 0) {
+        return;
+    }
+
+    const actual = new Set(whereSelectors.flatMap((selector) => splitSelectorList(unwrapWhereSelector(selector))).map(normalizeSelectorForComparison));
+    const expected = new Set(expectedSelectors.map(normalizeSelectorForComparison));
+    const missing = [...expected].filter((selector) => !actual.has(selector));
+    const extra = [...actual].filter((selector) => !expected.has(selector));
+
+    if (missing.length > 0) {
+        warnings.push({
+            code: "partial-typography-defaults",
+            message: `Typography selector ${JSON.stringify(rule.selector)} is missing default selectors: ${missing.join(", ")}.`,
+            selector: rule.selector,
+        });
+    }
+
+    if (extra.length > 0) {
+        warnings.push({
+            code: "extra-typography-defaults",
+            message: `Typography selector ${JSON.stringify(rule.selector)} has extra default selectors: ${extra.join(", ")}.`,
+            selector: rule.selector,
+        });
+    }
+}
+
+function parseIconSizeRule(rule: Rule, definition: MutablePartialThemeDefinition, warnings: LinsStylesheetParseWarning[]): boolean {
+    const selectors = splitSelectorList(rule.selector);
+    const explicitIconSelector = selectors.find((selector) => /^i\.[_a-zA-Z-][_a-zA-Z0-9-]*$/.test(normalizeWhitespace(selector)));
+
+    if (!explicitIconSelector) {
+        return false;
+    }
+
+    const sizeId = getLastClassName(explicitIconSelector);
+
+    if (!sizeId) {
+        return false;
+    }
+
+    const fontSize = rule.nodes?.find((node): node is Declaration => isDeclaration(node) && node.prop === "font-size");
+
+    if (!fontSize) {
+        return false;
+    }
+
+    const unsupported = (rule.nodes ?? []).filter((node) => !(isDeclaration(node) && node.prop === "font-size"));
+
+    for (const node of unsupported) {
+        warnings.push({
+            code: "unsupported-icon-declaration",
+            message: `Dropped unsupported declaration from icon size ${JSON.stringify(sizeId)}.`,
+            selector: rule.selector,
+            css: stringifyCssNode(node),
+        });
+    }
+
+    if (!LINS_THEME_SPEC.icons.sizes.some((spec) => spec.id === sizeId)) {
+        warnings.push({
+            code: "unrecognized-icon-size",
+            message: `Captured unrecognized icon size ${JSON.stringify(sizeId)}.`,
+            selector: rule.selector,
+        });
+    }
+
+    definition.icons = {
+        ...(definition.icons ?? {}),
+        sizes: { ...(definition.icons?.sizes ?? {}), [sizeId]: declarationValue(fontSize) },
+    };
+
+    return true;
+}
+
+function buildRawCssBlock(rule: Rule, explicitSelectors: readonly string[], defaultSelector: string): LinsRawCssBlock {
+    const overrideSelectors = explicitSelectors.filter((selector) => selectorSetKey(selector) !== selectorSetKey(defaultSelector));
+
+    if (overrideSelectors.length > 0) {
+        return { selector: overrideSelectors.join(", "), css: stringifyDirectDeclarations(rule) };
+    }
+
+    return { css: stringifyDirectDeclarations(rule) };
 }
 
 type MutableCategoryThemeDefinition = Partial<{
