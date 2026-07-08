@@ -1,7 +1,7 @@
 import postcss, { type AtRule, type Declaration, type Node, type Root, type Rule } from "postcss";
 import safeParse from "postcss-safe-parser";
-import { LINS_THEME_SPEC, type LinsStylesheetId } from "../generator/spec.ts";
-import type { LinsRawRuleDefinition, LinsThemeColorSchemeDefinition, LinsThemeDefinition } from "../generator/themeDefinition.ts";
+import { LINS_THEME_SPEC, type LinsElementCategorySpec, type LinsSelectorSlotSpec, type LinsStylesheetId } from "../generator/spec.ts";
+import type { LinsCategoryThemeDefinition, LinsRawCssBlock, LinsRawRuleDefinition, LinsThemeColorSchemeDefinition, LinsThemeDefinition, LinsVariantThemeDefinition } from "../generator/themeDefinition.ts";
 
 type MutablePartialThemeDefinition = Partial<{
     -readonly [Key in keyof LinsThemeDefinition]: LinsThemeDefinition[Key];
@@ -69,10 +69,147 @@ export function parseLinsStylesheet(_css: string, _options: LinsStylesheetParseO
     const root = parseCss(_css, warnings);
 
     if (_options.stylesheetId) {
-        return { definition: {}, warnings };
+        return parseElementStylesheet(root, { ..._options, stylesheetId: _options.stylesheetId }, warnings);
     }
 
     return parseThemeStylesheet(root, _options, warnings);
+}
+
+function parseElementStylesheet(root: Root, options: LinsStylesheetParseOptions & { readonly stylesheetId: LinsStylesheetId }, warnings: LinsStylesheetParseWarning[]): LinsParsedStylesheet {
+    const definition: MutablePartialThemeDefinition = {};
+    const elementsLayer = root.nodes?.find((node): node is AtRule => isAtRule(node, "layer") && normalizeWhitespace(node.params) === "elements");
+
+    if (!elementsLayer) {
+        return { definition, warnings };
+    }
+
+    const scope = elementsLayer.nodes?.find((node): node is AtRule => isAtRule(node, "scope"));
+    const categoryParents = scope?.nodes ?? elementsLayer.nodes ?? [];
+
+    if (!scope) {
+        warnings.push({
+            code: "unknown-scope",
+            message: "Expected @layer elements to contain a generated @scope wrapper; parsing direct child rules as best effort.",
+            atRule: "@layer elements",
+        });
+    }
+
+    for (const node of categoryParents) {
+        if (node.type !== "rule") {
+            continue;
+        }
+
+        parseCategoryRule(node, definition, options, warnings);
+    }
+
+    return { definition, warnings };
+}
+
+function parseCategoryRule(rule: Rule, definition: MutablePartialThemeDefinition, options: LinsStylesheetParseOptions & { readonly stylesheetId: LinsStylesheetId }, warnings: LinsStylesheetParseWarning[]): void {
+    const spec = findMatchingCategorySpec(rule.selector, options.stylesheetId);
+    const categoryId = spec?.id ?? slugifySelector(firstSelector(rule.selector));
+    const category: MutableCategoryThemeDefinition = spec ? {} : { stylesheetId: options.stylesheetId, selectors: splitSelectorList(rule.selector) };
+
+    if (!spec && rule.nodes?.some((node) => node.type === "rule")) {
+        warnings.push({
+            code: "unrecognized-category",
+            message: `Captured unrecognized category-like rule ${JSON.stringify(rule.selector)} as ${JSON.stringify(categoryId)}.`,
+            selector: rule.selector,
+        });
+    }
+
+    const rootCss: string[] = [];
+
+    for (const child of rule.nodes ?? []) {
+        if (isDeclaration(child)) {
+            rootCss.push(stringifyCssNode(child));
+        } else if (child.type === "rule") {
+            parseCategoryChildRule(child, category, spec);
+        }
+    }
+
+    if (rootCss.length > 0) {
+        category.root = { css: rootCss.join("\n") };
+    }
+
+    definition.categories = {
+        ...(definition.categories ?? {}),
+        [categoryId]: category,
+    };
+}
+
+type MutableCategoryThemeDefinition = Partial<{
+    -readonly [Key in keyof LinsCategoryThemeDefinition]: LinsCategoryThemeDefinition[Key];
+}>;
+
+function parseCategoryChildRule(rule: Rule, category: MutableCategoryThemeDefinition, spec: LinsElementCategorySpec | undefined): void {
+    const selectors = splitSelectorList(rule.selector);
+    const state = findMatchingSlotSpec(rule.selector, spec?.states);
+
+    if (state) {
+        category.states = { ...(category.states ?? {}), [state.id]: { css: stringifyDirectDeclarations(rule) } };
+        return;
+    }
+
+    const part = findMatchingSlotSpec(rule.selector, spec?.parts);
+
+    if (part) {
+        category.parts = { ...(category.parts ?? {}), [part.id]: { css: stringifyDirectDeclarations(rule) } };
+        return;
+    }
+
+    if (selectors.some((selector) => selector.startsWith(":where(")) || selectors.some(isVariantClassSelector)) {
+        const [variantId, variant] = parseVariantRule(rule);
+        category.variants = { ...(category.variants ?? {}), [variantId]: variant };
+        return;
+    }
+
+    category.raw = [...(category.raw ?? []), { selector: rule.selector, css: stringifyContainerBody(rule) }];
+}
+
+function parseVariantRule(rule: Rule): readonly [string, LinsVariantThemeDefinition] {
+    const selectors = splitSelectorList(rule.selector);
+    const explicitSelectors = selectors.filter((selector) => !selector.startsWith(":where("));
+    const classSelector = explicitSelectors.find(isVariantClassSelector);
+    const variantId = classSelector ? classSelector.replace(/^&\./, "") : slugifySelector(explicitSelectors[0] ?? selectors[0] ?? "variant");
+    const variant: MutableVariantThemeDefinition = { css: stringifyDirectDeclarations(rule) };
+    const defaultSelectors = selectors.filter((selector) => selector.startsWith(":where(")).map((selector) => unwrapWhereSelector(selector));
+    const applyAsDefault = defaultSelectors.map(removeDefaultVariantExclusions);
+
+    if (applyAsDefault.length > 0) {
+        variant.applyAsDefault = applyAsDefault;
+    }
+
+    if (explicitSelectors.length > 0 && !(explicitSelectors.length === 1 && explicitSelectors[0] === `&.${variantId}`)) {
+        variant.selectors = explicitSelectors;
+    }
+
+    for (const child of rule.nodes ?? []) {
+        if (child.type !== "rule") {
+            continue;
+        }
+
+        const contextId = selectorContextId(child.selector);
+        variant.contexts = { ...(variant.contexts ?? {}), [contextId]: { selector: child.selector, css: stringifyDirectDeclarations(child) } };
+    }
+
+    return [variantId, variant];
+}
+
+type MutableVariantThemeDefinition = Partial<{
+    -readonly [Key in keyof LinsVariantThemeDefinition]: LinsVariantThemeDefinition[Key];
+}>;
+
+function findMatchingCategorySpec(selector: string, stylesheetId: LinsStylesheetId): LinsElementCategorySpec | undefined {
+    const selectorKey = selectorSetKey(selector);
+
+    return LINS_THEME_SPEC.elementCategories.find((spec) => spec.stylesheetId === stylesheetId && selectorSetKey(spec.selectors.join(",")) === selectorKey);
+}
+
+function findMatchingSlotSpec(selector: string, slots: readonly LinsSelectorSlotSpec[] | undefined): LinsSelectorSlotSpec | undefined {
+    const selectorKey = selectorSetKey(selector);
+
+    return slots?.find((slot) => selectorSetKey(slot.selectors.join(",")) === selectorKey);
 }
 
 function parseCss(css: string, warnings: LinsStylesheetParseWarning[]): Root {
@@ -323,17 +460,29 @@ function parseColorSchemeRule(rule: Rule, colorRoleAliases: ReadonlySet<string>,
         colorScheme = "light";
     }
 
-    const colorTheme: LinsThemeColorSchemeDefinition = {
+    const colorTheme: MutableColorSchemeDefinition = {
         id: className,
         className,
         colorScheme,
         colors,
         ...(Object.keys(tokens).length > 0 ? { tokens } : {}),
-        ...readSurroundingComments(rule),
     };
+    const comments = readSurroundingComments(rule);
+
+    if (comments.before) {
+        colorTheme.before = comments.before;
+    }
+
+    if (comments.after) {
+        colorTheme.after = comments.after;
+    }
 
     definition.colorThemes = [...(definition.colorThemes ?? []), colorTheme];
 }
+
+type MutableColorSchemeDefinition = Partial<{
+    -readonly [Key in keyof LinsThemeColorSchemeDefinition]: LinsThemeColorSchemeDefinition[Key];
+}> & Pick<LinsThemeColorSchemeDefinition, "id" | "className" | "colorScheme" | "colors">;
 
 function warnForCustomColorRole(roleId: string, _options: LinsStylesheetParseOptions, warnings: LinsStylesheetParseWarning[], declaration: Declaration): void {
     if (LINS_THEME_SPEC.colorRoles.some((role) => role.id === roleId)) {
@@ -371,6 +520,10 @@ function stringifyRuleBody(rule: Rule): string {
 
 function stringifyContainerBody(node: Rule | AtRule): string {
     return node.nodes?.map((child) => stringifyCssNode(child)).filter(Boolean).join("\n") ?? "";
+}
+
+function stringifyDirectDeclarations(rule: Rule): string {
+    return rule.nodes?.filter(isDeclaration).map((child) => stringifyCssNode(child)).join("\n") ?? "";
 }
 
 function stringifyCssNode(node: Node): string {
@@ -415,6 +568,97 @@ function isDeclaration(node: Node): node is Declaration {
 
 function normalizeWhitespace(value: string): string {
     return value.replace(/\s+/g, " ").trim();
+}
+
+function splitSelectorList(selector: string): string[] {
+    const selectors: string[] = [];
+    let current = "";
+    let depth = 0;
+    let quote: string | undefined;
+
+    for (const character of selector) {
+        if (quote) {
+            current += character;
+
+            if (character === quote) {
+                quote = undefined;
+            }
+
+            continue;
+        }
+
+        if (character === "\"" || character === "'") {
+            quote = character;
+            current += character;
+            continue;
+        }
+
+        if (character === "(" || character === "[") {
+            depth += 1;
+        } else if (character === ")" || character === "]") {
+            depth = Math.max(0, depth - 1);
+        }
+
+        if (character === "," && depth === 0) {
+            selectors.push(current.trim());
+            current = "";
+        } else {
+            current += character;
+        }
+    }
+
+    if (current.trim()) {
+        selectors.push(current.trim());
+    }
+
+    return selectors;
+}
+
+function selectorSetKey(selector: string): string {
+    return splitSelectorList(selector).map(normalizeSelectorForComparison).sort().join(",");
+}
+
+function normalizeSelectorForComparison(selector: string): string {
+    return normalizeWhitespace(selector)
+        .replace(/\s*([>+~])\s*/g, " $1 ")
+        .replace(/\[([\w-]+)=['\"]?([^'\"\]]+)['\"]?\]/g, (_match, name: string, value: string) => `[${name.toLowerCase()}=${value}]`)
+        .replace(/:not\(\s*([^)]*?)\s*\)/g, ":not($1)")
+        .replace(/:where\(\s*([^)]*?)\s*\)/g, ":where($1)")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function firstSelector(selector: string): string {
+    return splitSelectorList(selector)[0] ?? selector;
+}
+
+function isVariantClassSelector(selector: string): boolean {
+    return /^&\.[_a-zA-Z-][_a-zA-Z0-9-]*$/.test(selector.trim());
+}
+
+function unwrapWhereSelector(selector: string): string {
+    const trimmed = selector.trim();
+
+    return trimmed.startsWith(":where(") && trimmed.endsWith(")") ? trimmed.slice(7, -1).trim() : trimmed;
+}
+
+function removeDefaultVariantExclusions(selector: string): string {
+    return selector.replace(/:not\(\.[^)]+\)/g, "") || "&";
+}
+
+function selectorContextId(selector: string): string {
+    const className = getLastClassName(selector);
+
+    return className ?? slugifySelector(selector);
+}
+
+function slugifySelector(selector: string): string {
+    return selector
+        .replace(/^&/, "")
+        .replace(/[.#]/g, "-")
+        .replace(/[^a-zA-Z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .toLowerCase() || "custom";
 }
 
 function classSelector(className: string): string {
