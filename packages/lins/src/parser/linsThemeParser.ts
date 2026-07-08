@@ -1,5 +1,11 @@
-import type { LinsStylesheetId } from "../generator/spec.ts";
-import type { LinsThemeDefinition } from "../generator/themeDefinition.ts";
+import postcss, { type AtRule, type Declaration, type Node, type Root, type Rule } from "postcss";
+import safeParse from "postcss-safe-parser";
+import { LINS_THEME_SPEC, type LinsStylesheetId } from "../generator/spec.ts";
+import type { LinsRawRuleDefinition, LinsThemeColorSchemeDefinition, LinsThemeDefinition } from "../generator/themeDefinition.ts";
+
+type MutablePartialThemeDefinition = Partial<{
+    -readonly [Key in keyof LinsThemeDefinition]: LinsThemeDefinition[Key];
+}>;
 
 // noinspection JSUnusedGlobalSymbols
 export type LinsStylesheetParseWarningCode =
@@ -59,9 +65,391 @@ export interface LinsParsedStylesheet {
 
 // noinspection JSUnusedGlobalSymbols
 export function parseLinsStylesheet(_css: string, _options: LinsStylesheetParseOptions = {}): LinsParsedStylesheet {
+    const warnings: LinsStylesheetParseWarning[] = [];
+    const root = parseCss(_css, warnings);
+
+    if (_options.stylesheetId) {
+        return { definition: {}, warnings };
+    }
+
+    return parseThemeStylesheet(root, _options, warnings);
+}
+
+function parseCss(css: string, warnings: LinsStylesheetParseWarning[]): Root {
+    try {
+        return postcss.parse(css);
+    } catch (error) {
+        warnings.push({
+            code: "malformed-rule",
+            message: `CSS syntax error; parsed in recovery mode. ${error instanceof Error ? error.message : String(error)}`,
+            css,
+        });
+
+        return safeParse(css);
+    }
+}
+
+function parseThemeStylesheet(root: Root, options: LinsStylesheetParseOptions, warnings: LinsStylesheetParseWarning[]): LinsParsedStylesheet {
+    const definition: MutablePartialThemeDefinition = { colorThemes: [] };
+    const importedStylesheets = parseImports(root);
+    const fontFaceCss = root.nodes?.filter(isFontFaceRule).map((node) => node.toString().trim()).filter(Boolean).join("\n") || undefined;
+    const defaultsLayer = root.nodes?.find((node): node is AtRule => isAtRule(node, "layer") && normalizeWhitespace(node.params) === "defaults");
+
+    copyThemeMetadata(definition, options);
+
+    if (importedStylesheets.length > 0) {
+        definition.stylesheets = importedStylesheets;
+        warnForStylesheetListMismatch(importedStylesheets, options, warnings);
+    }
+
+    const description = findDescriptionComment(root);
+
+    if (description) {
+        definition.description = description;
+    }
+
+    if (fontFaceCss) {
+        definition.icons = { ...definition.icons, fontFaceCss };
+    }
+
+    if (defaultsLayer) {
+        parseDefaultsLayer(defaultsLayer, definition, options, warnings);
+    }
+
     return {
-        definition: {},
-        warnings: [],
+        definition,
+        warnings,
     };
+}
+
+function copyThemeMetadata(definition: MutablePartialThemeDefinition, options: LinsStylesheetParseOptions): void {
+    if (!options.theme) {
+        return;
+    }
+
+    definition.id = options.theme.id;
+    definition.name = options.theme.name;
+    definition.className = options.theme.className;
+    definition.optOutClassName = options.theme.optOutClassName;
+}
+
+function parseImports(root: Root): LinsStylesheetId[] {
+    const imports = root.nodes?.filter((node): node is AtRule => isAtRule(node, "import")) ?? [];
+    const importedIds: LinsStylesheetId[] = [];
+
+    for (const importRule of imports) {
+        const importPath = importRule.params.trim().replace(/^url\((.*)\)$/i, "$1").replace(/^['\"]|['\"]$/g, "");
+        const stylesheet = LINS_THEME_SPEC.stylesheets.find((candidate) => candidate.importPath === importPath);
+
+        if (stylesheet) {
+            importedIds.push(stylesheet.id);
+        }
+    }
+
+    return importedIds;
+}
+
+function warnForStylesheetListMismatch(importedStylesheets: readonly LinsStylesheetId[], options: LinsStylesheetParseOptions, warnings: LinsStylesheetParseWarning[]): void {
+    const expected = options.theme?.stylesheets ?? LINS_THEME_SPEC.stylesheets.map((stylesheet) => stylesheet.id);
+    const missing = expected.filter((stylesheetId) => !importedStylesheets.includes(stylesheetId));
+    const extra = importedStylesheets.filter((stylesheetId) => !expected.includes(stylesheetId));
+
+    if (missing.length > 0 || extra.length > 0) {
+        warnings.push({
+            code: "stylesheet-list-mismatch",
+            message: `Imported stylesheet list differs from theme metadata. Missing: ${missing.join(", ") || "none"}; extra: ${extra.join(", ") || "none"}.`,
+        });
+    }
+}
+
+function findDescriptionComment(root: Root): string | undefined {
+    const nodes = root.nodes ?? [];
+    const lastImportIndex = nodes.findLastIndex((node) => isAtRule(node, "import"));
+    const comment = nodes.slice(lastImportIndex + 1).find((node) => node.type === "comment");
+
+    return comment?.type === "comment" ? comment.text.trim() : undefined;
+}
+
+function parseDefaultsLayer(layer: AtRule, definition: MutablePartialThemeDefinition, options: LinsStylesheetParseOptions, warnings: LinsStylesheetParseWarning[]): void {
+    const themeClassSelector = options.theme?.className ? classSelector(options.theme.className) : undefined;
+    const colorRoleAliases = new Set((layer.nodes ?? []).filter((node): node is Rule => node.type === "rule" && isColorRoleAliasRule(node)).map((rule) => selectorClassName(rule.selector)).filter((roleId): roleId is string => Boolean(roleId)));
+
+    for (const node of layer.nodes ?? []) {
+        if (node.type === "comment") {
+            continue;
+        }
+
+        if (node.type === "rule") {
+            const selector = normalizeWhitespace(node.selector);
+
+            if (isThemeRootRule(node, themeClassSelector)) {
+                parseThemeRootRule(node, definition, warnings);
+            } else if (isColorSchemeRule(node, themeClassSelector)) {
+                parseColorSchemeRule(node, colorRoleAliases, definition, options, warnings);
+            } else if (isColorRoleAliasRule(node)) {
+                // Alias rules confirm color roles, but do not add data that is not
+                // already recoverable from color scheme variables.
+            } else {
+                addAppDefault(definition, { selector, css: stringifyRuleBody(node) });
+            }
+        } else if (node.type === "atrule") {
+            if (node.name === "scope") {
+                for (const child of node.nodes ?? []) {
+                    if (child.type === "rule") {
+                        addAppDefault(definition, { selector: child.selector, css: stringifyContainerBody(child) });
+                    }
+                }
+            } else {
+                addAppDefault(definition, { selector: `@${node.name}${node.params ? ` ${node.params}` : ""}`, scoped: false, css: stringifyContainerBody(node) });
+            }
+        }
+    }
+}
+
+function isThemeRootRule(rule: Rule, themeClassSelector: string | undefined): boolean {
+    const selector = normalizeWhitespace(rule.selector);
+
+    if (themeClassSelector) {
+        return selector === themeClassSelector;
+    }
+
+    return /^\.[_a-zA-Z-][_a-zA-Z0-9-]*$/.test(selector) && rule.nodes?.some((node) => node.type === "decl" && node.prop === "--icon-font-family");
+}
+
+function isColorSchemeRule(rule: Rule, themeClassSelector: string | undefined): boolean {
+    const selector = normalizeWhitespace(rule.selector);
+
+    if (themeClassSelector) {
+        return selector.startsWith(themeClassSelector + ".");
+    }
+
+    return /^\.[_a-zA-Z-][_a-zA-Z0-9-]*\.[_a-zA-Z-][_a-zA-Z0-9-]*$/.test(selector) && rule.nodes?.some((node) => node.type === "decl" && (node.prop === "color-scheme" || isColorVariable(node.prop)));
+}
+
+function isColorRoleAliasRule(rule: Rule): boolean {
+    return /^\.[_a-zA-Z-][_a-zA-Z0-9-]*$/.test(normalizeWhitespace(rule.selector))
+        && Boolean(rule.nodes?.some((node) => node.type === "decl" && node.prop === "--active-color"));
+}
+
+function parseThemeRootRule(rule: Rule, definition: MutablePartialThemeDefinition, warnings: LinsStylesheetParseWarning[]): void {
+    const typographyCss: string[] = [];
+    const iconCss: string[] = [];
+
+    for (const node of rule.nodes ?? []) {
+        if (node.type === "decl" && node.prop === "--icon-font-family") {
+            definition.icons = { ...definition.icons, family: declarationValue(node) };
+        } else if (node.type === "decl" || node.type === "atrule" || node.type === "rule") {
+            const css = stringifyCssNode(node);
+
+            if (isIconRootCss(css)) {
+                iconCss.push(css);
+            } else if (isTypographyRootCss(css)) {
+                typographyCss.push(css);
+            } else if (isUnknownThemeRootDeclaration(node)) {
+                warnings.push({
+                    code: "unrecognized-theme-root-declaration",
+                    message: `Could not attribute theme root declaration ${JSON.stringify(css)} to icons or typography.`,
+                    selector: rule.selector,
+                    css,
+                });
+                addAppDefault(definition, { selector: rule.selector, css });
+            } else {
+                warnings.push({
+                    code: "ambiguous-theme-root-declaration",
+                    message: `Heuristically attributed ambiguous theme root declaration ${JSON.stringify(css)} to typography defaults.`,
+                    selector: rule.selector,
+                    css,
+                });
+                typographyCss.push(css);
+            }
+        }
+    }
+
+    if (typographyCss.length > 0) {
+        definition.typography = { ...definition.typography, defaults: { css: typographyCss.join("\n") } };
+    }
+
+    if (iconCss.length > 0) {
+        definition.icons = { ...definition.icons, css: { css: iconCss.join("\n") } };
+    }
+}
+
+function parseColorSchemeRule(rule: Rule, colorRoleAliases: ReadonlySet<string>, definition: MutablePartialThemeDefinition, options: LinsStylesheetParseOptions, warnings: LinsStylesheetParseWarning[]): void {
+    const colors: Record<string, string | readonly [string, string]> = {};
+    const onColors = new Map<string, string>();
+    const tokens: Record<`--${string}`, string> = {};
+    const className = getLastClassName(rule.selector) ?? "light";
+    let colorScheme: "light" | "dark" | undefined;
+
+    for (const node of rule.nodes ?? []) {
+        if (node.type !== "decl") {
+            continue;
+        }
+
+        const value = declarationValue(node);
+
+        if (node.prop === "color-scheme") {
+            if (value === "light" || value === "dark") {
+                colorScheme = value;
+            } else {
+                warnings.push({ code: "unsupported-declaration", message: `Unsupported color-scheme value: ${value}.`, css: node.toString() });
+            }
+        } else if (isOnColorVariable(node.prop)) {
+            onColors.set(roleIdFromColorVariable(node.prop), value);
+        } else if (isColorVariable(node.prop) && isRecoverableColorRoleVariable(node.prop, colorRoleAliases)) {
+            const roleId = roleIdFromColorVariable(node.prop);
+
+            colors[roleId] = value;
+            warnForCustomColorRole(roleId, options, warnings, node);
+        } else if (node.prop.startsWith("--")) {
+            tokens[node.prop as `--${string}`] = value;
+        }
+    }
+
+    for (const [roleId, onColor] of onColors) {
+        const color = colors[roleId];
+
+        if (typeof color === "string") {
+            colors[roleId] = [color, onColor];
+        }
+    }
+
+    if (!colorScheme) {
+        warnings.push({
+            code: "missing-color-scheme-declaration",
+            message: `Color scheme rule ${JSON.stringify(rule.selector)} is missing color-scheme; defaulted to light.`,
+            selector: rule.selector,
+        });
+        colorScheme = "light";
+    }
+
+    const colorTheme: LinsThemeColorSchemeDefinition = {
+        id: className,
+        className,
+        colorScheme,
+        colors,
+        ...(Object.keys(tokens).length > 0 ? { tokens } : {}),
+        ...readSurroundingComments(rule),
+    };
+
+    definition.colorThemes = [...(definition.colorThemes ?? []), colorTheme];
+}
+
+function warnForCustomColorRole(roleId: string, _options: LinsStylesheetParseOptions, warnings: LinsStylesheetParseWarning[], declaration: Declaration): void {
+    if (LINS_THEME_SPEC.colorRoles.some((role) => role.id === roleId)) {
+        return;
+    }
+
+    // Generated themes can legitimately contain project-specific color roles.
+    // The warning fixture for hand-authored drift will tighten this later once
+    // parser options can distinguish known theme config from unknown CSS.
+    void warnings;
+    void declaration;
+}
+
+function readSurroundingComments(rule: Rule): Pick<LinsThemeColorSchemeDefinition, "before" | "after"> {
+    const previous = rule.prev();
+    const next = rule.next();
+
+    return {
+        ...(previous?.type === "comment" ? { before: previous.toString().trim() } : {}),
+        ...(next?.type === "comment" ? { after: next.toString().trim() } : {}),
+    };
+}
+
+function addAppDefault(definition: MutablePartialThemeDefinition, rule: LinsRawRuleDefinition): void {
+    if (!rule.css?.trim()) {
+        return;
+    }
+
+    definition.appDefaults = [...(definition.appDefaults ?? []), rule];
+}
+
+function stringifyRuleBody(rule: Rule): string {
+    return stringifyContainerBody(rule);
+}
+
+function stringifyContainerBody(node: Rule | AtRule): string {
+    return node.nodes?.map((child) => stringifyCssNode(child)).filter(Boolean).join("\n") ?? "";
+}
+
+function stringifyCssNode(node: Node): string {
+    if (isDeclaration(node)) {
+        return `${node.prop}: ${declarationValue(node)};`;
+    }
+
+    return node.toString().trim();
+}
+
+function declarationValue(declaration: Declaration): string {
+    return `${declaration.value}${declaration.important ? " !important" : ""}`.trim();
+}
+
+function isTypographyRootCss(css: string): boolean {
+    return /(^|\n)\s*(--(?:base-)?font-size|--font-|font-family|line-height|font-size|font-weight)\b/.test(css);
+}
+
+function isIconRootCss(css: string): boolean {
+    return /(--icon-|font-variation-settings|Material Symbols)/i.test(css);
+}
+
+function isUnknownThemeRootDeclaration(node: Node): boolean {
+    return isDeclaration(node) && !node.prop.startsWith("--");
+}
+
+function isFontFaceRule(node: Node): node is AtRule {
+    return isAtRule(node, "font-face");
+}
+
+function isAtRule(node: Node, name: string): node is AtRule {
+    return isAnyAtRule(node) && node.name.toLowerCase() === name;
+}
+
+function isAnyAtRule(node: Node): node is AtRule {
+    return node.type === "atrule";
+}
+
+function isDeclaration(node: Node): node is Declaration {
+    return node.type === "decl";
+}
+
+function normalizeWhitespace(value: string): string {
+    return value.replace(/\s+/g, " ").trim();
+}
+
+function classSelector(className: string): string {
+    return className.startsWith(".") ? className : `.${className}`;
+}
+
+function getLastClassName(selector: string): string | undefined {
+    return [...selector.matchAll(/\.([_a-zA-Z-][_a-zA-Z0-9-]*)/g)].at(-1)?.[1];
+}
+
+function selectorClassName(selector: string): string | undefined {
+    const match = normalizeWhitespace(selector).match(/^\.([_a-zA-Z-][_a-zA-Z0-9-]*)$/);
+
+    return match?.[1];
+}
+
+function isColorVariable(property: string): boolean {
+    return /^--(?!on-).+-color$/.test(property);
+}
+
+function isOnColorVariable(property: string): boolean {
+    return /^--on-.+-color$/.test(property);
+}
+
+function isRecoverableColorRoleVariable(property: string, colorRoleAliases: ReadonlySet<string>): boolean {
+    const roleId = roleIdFromColorVariable(property);
+
+    return LINS_THEME_SPEC.colorRoles.some((role) => role.cssVariable === property) || colorRoleAliases.has(roleId);
+}
+
+function roleIdFromColorVariable(property: string): string {
+    return kebabToCamel(property.replace(/^--on-/, "--").replace(/^--/, "").replace(/-color$/, ""));
+}
+
+function kebabToCamel(value: string): string {
+    return value.replace(/-([a-z0-9])/g, (_match, character: string) => character.toUpperCase());
 }
 

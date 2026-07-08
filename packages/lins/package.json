@@ -9,7 +9,10 @@
     "check": "tsc --noEmit"
   },
   "dependencies": {
-    "@web/utils": "workspace:"
+    "@web/utils": "workspace:",
+    "postcss": "^8.5.16",
+    "postcss-safe-parser": "^7.0.1",
+    "postcss-selector-parser": "^7.1.4"
   },
   "devDependencies": {
     "typescript": "catalog:",
