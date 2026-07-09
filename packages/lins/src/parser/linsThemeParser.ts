@@ -189,6 +189,14 @@ function parseCategoryRule(rule: Rule, definition: MutablePartialThemeDefinition
 
     if (rootCss.length > 0) {
         category.root = { css: rootCss.join("\n") };
+
+        if (spec && match.warningCode === "ambiguous-selector-superset") {
+            const leftoverSelectors = getSupersetLeftoverSelectors(rule.selector, spec);
+
+            if (leftoverSelectors.length > 0) {
+                addAppDefault(definition, { selector: leftoverSelectors.join(", "), css: category.root.css });
+            }
+        }
     }
 
     const existing = definition.categories?.[categoryId];
@@ -201,10 +209,20 @@ function parseCategoryRule(rule: Rule, definition: MutablePartialThemeDefinition
         });
     }
 
+    const mergedCategory = mergeCategoryDefinitions(existing, category);
     definition.categories = {
         ...(definition.categories ?? {}),
-        [categoryId]: mergeCategoryDefinitions(existing, category),
+        [categoryId]: mergedCategory,
     };
+
+    const aliasId = getGeneratedCustomCategoryAlias(categoryId, category);
+
+    if (aliasId && !definition.categories[aliasId]) {
+        definition.categories = {
+            ...definition.categories,
+            [aliasId]: mergedCategory,
+        };
+    }
 }
 
 function warnForScopeDrift(scope: AtRule, options: LinsStylesheetParseOptions & { readonly stylesheetId: LinsStylesheetId }, warnings: LinsStylesheetParseWarning[]): void {
@@ -227,6 +245,22 @@ function warnForScopeDrift(scope: AtRule, options: LinsStylesheetParseOptions & 
 
 function looksLikeCustomCategory(rule: Rule): boolean {
     return !rule.selector.trim().startsWith(".");
+}
+
+function getSupersetLeftoverSelectors(selector: string, spec: LinsElementCategorySpec): string[] {
+    const expected = selectorSet(spec.selectors.join(","));
+
+    return splitSelectorList(selector).filter((candidate) => !expected.has(normalizeSelectorForComparison(candidate)));
+}
+
+function getGeneratedCustomCategoryAlias(categoryId: string, category: MutableCategoryThemeDefinition): string | undefined {
+    const selector = category.selectors?.[0];
+
+    if (category.selectors?.length !== 1 || selector !== categoryId || !categoryId.endsWith("-token")) {
+        return undefined;
+    }
+
+    return `custom-${categoryId.slice(0, -"-token".length)}`;
 }
 
 function mergeCategoryDefinitions(existing: LinsCategoryThemeDefinition | undefined, incoming: MutableCategoryThemeDefinition): LinsCategoryThemeDefinition {
@@ -409,6 +443,11 @@ function parseCategoryChildRule(rule: Rule, category: MutableCategoryThemeDefini
         return;
     }
 
+    if (selectors.every(isRawNestedSelector)) {
+        category.raw = [...(category.raw ?? []), { selector: rule.selector, css: stringifyDirectDeclarations(rule) }];
+        return;
+    }
+
     if (selectors.some((selector) => selector.startsWith(":where(")) || selectors.some(isVariantClassSelector) || selectors.some((selector) => selector.startsWith("&["))) {
         if (selectors.some(isVariantClassSelector) && !selectors.some((selector) => selector.startsWith(":where(")) && !isLikelyGeneratedVariantSelector(rule.selector)) {
             const id = selectorContextId(rule.selector);
@@ -433,6 +472,10 @@ function parseCategoryChildRule(rule: Rule, category: MutableCategoryThemeDefini
         selector: rule.selector,
     });
     category.parts = { ...(category.parts ?? {}), [id]: { selector: rule.selector, css: stringifyDirectDeclarations(rule) } };
+}
+
+function isRawNestedSelector(selector: string): boolean {
+    return selector.trim().startsWith("&::");
 }
 
 function parseVariantRule(rule: Rule, warnings: LinsStylesheetParseWarning[]): readonly [string, LinsVariantThemeDefinition] {

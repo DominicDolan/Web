@@ -316,6 +316,9 @@ describe("parseLinsStylesheet", () => {
                 root: parserFixtureTheme.categories?.["custom-chip"]?.root,
             },
         });
+        expect(parsed.definition.categories?.button?.variants?.icon?.contexts).toMatchObject({
+            badge: parserFixtureTheme.categories?.button?.variants?.icon?.contexts?.badge,
+        });
     });
 
     test("round-trips typography rules generated in the text stylesheet", () => {
@@ -351,7 +354,7 @@ describe("parseLinsStylesheet", () => {
         });
     });
 
-    test.fails("warns for non-LINS CSS while recovering parseable generated rules", () => {
+    test("warns for non-LINS CSS while recovering parseable generated rules", () => {
         const css = `${parserFixtureTheme.createStylesheet("button")}\n\n@layer utilities {\n    .grid { display: grid; }\n}\n\n@layer elements {\n    .marketing-callout {\n        color: hotpink;\n    }\n}`;
 
         const parsed = parseLinsStylesheet(css, {
@@ -552,6 +555,46 @@ describe("parseLinsStylesheet warnings", () => {
             expect(parsed.warnings).toEqual(expect.arrayContaining([
                 expect.objectContaining({ code: "ambiguous-selector-superset" }),
             ]));
+            expect(parsed.definition.categories?.button).toMatchObject(warningFixtureTheme.categories!.button!);
+            expect(parsed.definition.appDefaults).toEqual(expect.arrayContaining([
+                expect.objectContaining({ selector: ".brand-button", css: expect.stringContaining("border-radius: 4px;") }),
+            ]));
+        });
+
+        test("matches category selector lists as sets regardless of emitted order (§3)", () => {
+            const css = `@layer elements {
+    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {
+        [role="button"]:not(article),
+        input[type=image],
+        input[type=reset],
+        input[type=submit],
+        input[type=button],
+        button {
+            border-radius: 4px;
+
+            :where(&:not(.outlined)),
+            &.flat {
+                background: red;
+            }
+
+            &.outlined {
+                background: transparent;
+            }
+
+            &:hover:not(:disabled):not([disabled]) {
+                opacity: 0.9;
+            }
+        }
+    }
+}`;
+
+            const parsed = parseLinsStylesheet(css, {
+                sourceId: "button.css",
+                stylesheetId: "button",
+                theme: warningFixtureMetadata,
+            });
+
+            expect(parsed.warnings).toEqual([]);
             expect(parsed.definition.categories?.button).toMatchObject(warningFixtureTheme.categories!.button!);
         });
 
