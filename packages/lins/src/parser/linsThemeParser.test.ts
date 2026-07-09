@@ -380,7 +380,7 @@ describe("parseLinsStylesheet", () => {
 
 describe("parseLinsStylesheet warnings", () => {
     describe("structural at-rule / layer / scope warnings (§6.2, §6.3, §8.3)", () => {
-        test.fails("emits unknown-at-rule for an unrecognized top-level at-rule, still parsing its contents", () => {
+        test("emits unknown-at-rule for an unrecognized top-level at-rule, still parsing its contents", () => {
             const css = `${warningFixtureTheme.createStylesheet("button")}\n\n@container (min-width: 40rem) {\n    button {\n        gap: 0.5rem;\n    }\n}`;
 
             const parsed = parseLinsStylesheet(css, {
@@ -395,7 +395,7 @@ describe("parseLinsStylesheet warnings", () => {
             expect(parsed.definition.categories?.button).toMatchObject(warningFixtureTheme.categories!.button!);
         });
 
-        test.fails("emits unknown-layer for a non-LINS @layer and does not walk its contents", () => {
+        test("emits unknown-layer for a non-LINS @layer and does not walk its contents", () => {
             const css = `${warningFixtureTheme.createStylesheet("button")}\n\n@layer utilities {\n    .stack { display: flex; }\n    .row { display: flex; }\n}`;
 
             const parsed = parseLinsStylesheet(css, {
@@ -427,7 +427,7 @@ describe("parseLinsStylesheet warnings", () => {
             expect(parsed.definition.categories?.button).toMatchObject(warningFixtureTheme.categories!.button!);
         });
 
-        test.fails("emits unknown-scope for opt-out class drift and opt-out-class-mismatch when theme metadata disagrees (§8.5)", () => {
+        test("emits unknown-scope for opt-out class drift and opt-out-class-mismatch when theme metadata disagrees (§8.5)", () => {
             const css = warningFixtureTheme.createStylesheet("button").replace("notWarningFixtureTheme", "notWarningFixtureThemeActual");
 
             const parsed = parseLinsStylesheet(css, {
@@ -441,7 +441,7 @@ describe("parseLinsStylesheet warnings", () => {
             ]));
         });
 
-        test.fails("emits unknown-at-rule for a misplaced @layer defaults in an element stylesheet without typography (§8.3)", () => {
+        test("emits unknown-at-rule for a misplaced @layer defaults in an element stylesheet without typography (§8.3)", () => {
             const css = `@layer defaults {\n    :root {\n        --stray: 1;\n    }\n}\n\n${warningFixtureTheme.createStylesheet("button")}`;
 
             const parsed = parseLinsStylesheet(css, {
@@ -471,7 +471,7 @@ describe("parseLinsStylesheet warnings", () => {
             ]));
         });
 
-        test.fails("emits unsupported-declaration for a structurally-invalid color-scheme value, keeping the raw text", () => {
+        test("emits unsupported-declaration for a structurally-invalid color-scheme value, keeping the raw text", () => {
             const css = warningFixtureTheme.createThemeStylesheet().replace("color-scheme: light;", "color-scheme: banana;");
 
             const parsed = parseLinsStylesheet(css, {
@@ -484,7 +484,7 @@ describe("parseLinsStylesheet warnings", () => {
             ]));
         });
 
-        test.fails("emits unknown-selector for a one-off foreign rule and preserves it as a scoped appDefaults entry", () => {
+        test("emits unknown-selector for a one-off foreign rule and preserves it as a scoped appDefaults entry", () => {
             const css = `${warningFixtureTheme.createStylesheet("button")}\n\n@layer elements {\n    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {\n        .marketing-callout {\n            color: hotpink;\n        }\n    }\n}`;
 
             const parsed = parseLinsStylesheet(css, {
@@ -503,11 +503,27 @@ describe("parseLinsStylesheet warnings", () => {
     });
 
     describe("category matching drift (§4.1, §8.1, §8.2)", () => {
-        test.fails("emits partial-category-selectors when only a subset of the button selector list is present", () => {
-            const css = warningFixtureTheme.createStylesheet("button").replace(
-                /button, input\[type=button], input\[type=submit], input\[type=reset], input\[type=image], \[role="button"]:not\(article\)/,
-                "button",
-            );
+        test("emits partial-category-selectors when only a subset of the button selector list is present", () => {
+            const css = `@layer elements {
+    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {
+        button {
+            border-radius: 4px;
+
+            :where(&:not(.outlined)),
+            &.flat {
+                background: red;
+            }
+
+            &.outlined {
+                background: transparent;
+            }
+
+            &:hover:not(:disabled):not([disabled]) {
+                opacity: 0.9;
+            }
+        }
+    }
+}`;
 
             const parsed = parseLinsStylesheet(css, {
                 sourceId: "button.css",
@@ -521,7 +537,7 @@ describe("parseLinsStylesheet warnings", () => {
             expect(parsed.definition.categories?.button).toMatchObject(warningFixtureTheme.categories!.button!);
         });
 
-        test.fails("emits ambiguous-selector-superset when a category rule includes an extra, unexplained selector", () => {
+        test("emits ambiguous-selector-superset when a category rule includes an extra, unexplained selector", () => {
             const css = warningFixtureTheme.createStylesheet("button").replace(
                 '[role="button"]:not(article) {',
                 '[role="button"]:not(article),\n.brand-button {',
@@ -539,7 +555,7 @@ describe("parseLinsStylesheet warnings", () => {
             expect(parsed.definition.categories?.button).toMatchObject(warningFixtureTheme.categories!.button!);
         });
 
-        test.fails("emits ambiguous-category-match when a rule's selectors overlap two known categories", () => {
+        test("emits ambiguous-category-match when a rule's selectors overlap two known categories", () => {
             const css = `@layer elements {\n    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {\n        button,\n        a {\n            border-radius: 4px;\n        }\n    }\n}`;
 
             const parsed = parseLinsStylesheet(css, {
@@ -553,7 +569,7 @@ describe("parseLinsStylesheet warnings", () => {
             ]));
         });
 
-        test.fails("emits duplicate-category-definition and merges bodies (later wins) when a category is defined twice", () => {
+        test("emits duplicate-category-definition and merges bodies (later wins) when a category is defined twice", () => {
             const css = `@layer elements {\n    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {\n        button, input[type=button], input[type=submit], input[type=reset], input[type=image], [role="button"]:not(article) {\n            border-radius: 4px;\n        }\n\n        button, input[type=button], input[type=submit], input[type=reset], input[type=image], [role="button"]:not(article) {\n            border-radius: 999px;\n        }\n    }\n}`;
 
             const parsed = parseLinsStylesheet(css, {
@@ -568,7 +584,7 @@ describe("parseLinsStylesheet warnings", () => {
             expect(parsed.definition.categories?.button?.root?.css).toContain("border-radius: 999px;");
         });
 
-        test.fails("merges a category hand-split across two rules and flags split-category-rule (§8.2)", () => {
+        test("merges a category hand-split across two rules and flags split-category-rule (§8.2)", () => {
             const css = `@layer elements {\n    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {\n        button {\n            border-radius: 4px;\n        }\n\n        input[type=button] {\n            border-radius: 4px;\n        }\n    }\n}`;
 
             const parsed = parseLinsStylesheet(css, {
@@ -583,7 +599,7 @@ describe("parseLinsStylesheet warnings", () => {
             expect(parsed.definition.categories?.button?.root?.css).toContain("border-radius: 4px;");
         });
 
-        test.fails("captures a structurally category-like rule with no spec overlap as unrecognized-category", () => {
+        test("captures a structurally category-like rule with no spec overlap as unrecognized-category", () => {
             const css = `${warningFixtureTheme.createStylesheet("button")}\n\n@layer elements {\n    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {\n        chip-token {\n            border: 1px solid currentColor;\n\n            &.selected {\n                font-weight: 700;\n            }\n        }\n    }\n}`;
 
             const parsed = parseLinsStylesheet(css, {
@@ -604,7 +620,7 @@ describe("parseLinsStylesheet warnings", () => {
             });
         });
 
-        test.fails("emits empty-rule-body for a matched category rule with no declarations or nested rules", () => {
+        test("emits empty-rule-body for a matched category rule with no declarations or nested rules", () => {
             const css = `@layer elements {\n    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {\n        button, input[type=button], input[type=submit], input[type=reset], input[type=image], [role="button"]:not(article) {\n        }\n    }\n}`;
 
             const parsed = parseLinsStylesheet(css, {
@@ -620,7 +636,7 @@ describe("parseLinsStylesheet warnings", () => {
     });
 
     describe("variant, state, and part matching drift (§4.2, §4.3)", () => {
-        test.fails("emits selector-drift when a state's :not() exclusion list is narrower than the spec default", () => {
+        test("emits selector-drift when a state's :not() exclusion list is narrower than the spec default", () => {
             const css = warningFixtureTheme.createStylesheet("button").replace(
                 "&:hover:not(:disabled):not([disabled])",
                 "&:hover:not(:disabled)",
@@ -640,11 +656,16 @@ describe("parseLinsStylesheet warnings", () => {
             });
         });
 
-        test.fails("emits custom-part-inferred for a nested rule that matches no known state/part slot", () => {
-            const css = warningFixtureTheme.createStylesheet("button").replace(
-                "&:hover:not(:disabled):not([disabled]) {\n        opacity: 0.9;\n    }",
-                "&:hover:not(:disabled):not([disabled]) {\n        opacity: 0.9;\n    }\n\n    &.loading {\n        cursor: wait;\n    }",
-            );
+        test("emits custom-part-inferred for a nested rule that matches no known state/part slot", () => {
+            const css = `@layer elements {
+    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {
+        button, input[type=button], input[type=submit], input[type=reset], input[type=image], [role="button"]:not(article) {
+            &.loading {
+                cursor: wait;
+            }
+        }
+    }
+}`;
 
             const parsed = parseLinsStylesheet(css, {
                 sourceId: "button.css",
@@ -658,10 +679,18 @@ describe("parseLinsStylesheet warnings", () => {
             expect(parsed.definition.categories?.button?.parts?.loading).toMatchObject({ css: "cursor: wait;" });
         });
 
-        test.fails("emits inferred-variant-id for a variant rule with no &.<class> selector", () => {
+        test("emits inferred-variant-id for a variant rule with no &.<class> selector", () => {
             // Hand-authored variant that only carries a data-attribute selector, so
             // the parser cannot recover a className and must infer variantId.
-            const finalCss = `${warningFixtureTheme.createStylesheet("button").replace(/\n\}\s*$/, "\n")}\n\n    &[data-icon] {\n        aspect-ratio: 1;\n    }\n}`;
+            const finalCss = `@layer elements {
+    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {
+        button, input[type=button], input[type=submit], input[type=reset], input[type=image], [role="button"]:not(article) {
+            &[data-icon] {
+                aspect-ratio: 1;
+            }
+        }
+    }
+}`;
 
             const parsed = parseLinsStylesheet(finalCss, {
                 sourceId: "button.css",
@@ -674,8 +703,16 @@ describe("parseLinsStylesheet warnings", () => {
             ]));
         });
 
-        test.fails("emits unnamed-variant when a nested rule only declares :where(...) default selectors", () => {
-            const finalCss = `${warningFixtureTheme.createStylesheet("button").replace(/\n\}\s*$/, "\n")}\n\n    :where(&[data-soft]) {\n        opacity: 0.85;\n    }\n}`;
+        test("emits unnamed-variant when a nested rule only declares :where(...) default selectors", () => {
+            const finalCss = `@layer elements {
+    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {
+        button, input[type=button], input[type=submit], input[type=reset], input[type=image], [role="button"]:not(article) {
+            :where(&[data-soft]) {
+                opacity: 0.85;
+            }
+        }
+    }
+}`;
 
             const parsed = parseLinsStylesheet(finalCss, {
                 sourceId: "button.css",
@@ -688,11 +725,21 @@ describe("parseLinsStylesheet warnings", () => {
             ]));
         });
 
-        test.fails("emits stale-default-exclusion when the :where(&:not(...)) chain doesn't match sibling variants", () => {
-            const css = warningFixtureTheme.createStylesheet("button").replace(
-                ":where(&:not(.outlined)) {",
-                ":where(&:not(.outlined):not(.tonal)) {",
-            );
+        test("emits stale-default-exclusion when the :where(&:not(...)) chain doesn't match sibling variants", () => {
+            const css = `@layer elements {
+    @scope (.warningFixtureTheme) to (.notWarningFixtureTheme) {
+        button, input[type=button], input[type=submit], input[type=reset], input[type=image], [role="button"]:not(article) {
+            :where(&:not(.outlined):not(.tonal)),
+            &.flat {
+                background: red;
+            }
+
+            &.outlined {
+                background: transparent;
+            }
+        }
+    }
+}`;
 
             const parsed = parseLinsStylesheet(css, {
                 sourceId: "button.css",
@@ -834,7 +881,7 @@ describe("parseLinsStylesheet warnings", () => {
             expect(parsed.definition.colorThemes?.[0]).toMatchObject({ colorScheme: "light" });
         });
 
-        test.fails("emits unrecognized-color-role for a custom color role not present in the spec", () => {
+        test("emits unrecognized-color-role for a custom color role not present in the spec", () => {
             const customRoleTheme = defineLinsTheme({
                 ...warningFixtureTheme,
                 colorThemes: [

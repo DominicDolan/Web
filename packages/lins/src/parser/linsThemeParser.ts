@@ -77,46 +77,81 @@ export function parseLinsStylesheet(_css: string, _options: LinsStylesheetParseO
 
 function parseElementStylesheet(root: Root, options: LinsStylesheetParseOptions & { readonly stylesheetId: LinsStylesheetId }, warnings: LinsStylesheetParseWarning[]): LinsParsedStylesheet {
     const definition: MutablePartialThemeDefinition = {};
-    const elementsLayer = root.nodes?.find((node): node is AtRule => isAtRule(node, "layer") && normalizeWhitespace(node.params) === "elements");
+    const elementsLayers = root.nodes?.filter((node): node is AtRule => isAtRule(node, "layer") && normalizeWhitespace(node.params) === "elements") ?? [];
 
-    if (!elementsLayer) {
+    for (const node of root.nodes ?? []) {
+        if (isAtRule(node, "layer")) {
+            const layerName = normalizeWhitespace(node.params);
+
+            const stylesheetSpec = LINS_THEME_SPEC.stylesheets.find((stylesheet) => stylesheet.id === options.stylesheetId);
+
+            if (layerName !== "elements" && !(layerName === "defaults" && stylesheetSpec?.includesTypography)) {
+                warnings.push({
+                    code: layerName === "defaults" ? "unknown-at-rule" : "unknown-layer",
+                    message: `Unexpected @layer ${layerName} in element stylesheet.`,
+                    atRule: atRuleHeader(node),
+                });
+            }
+        } else if (isAnyAtRule(node)) {
+            warnings.push({
+                code: "unknown-at-rule",
+                message: `Unexpected top-level at-rule ${atRuleHeader(node)}.`,
+                atRule: atRuleHeader(node),
+            });
+        }
+    }
+
+    if (elementsLayers.length === 0) {
         return { definition, warnings };
     }
 
-    const scope = elementsLayer.nodes?.find((node): node is AtRule => isAtRule(node, "scope"));
-    const categoryParents = scope?.nodes ?? elementsLayer.nodes ?? [];
+    for (const elementsLayer of elementsLayers) {
+        const scope = elementsLayer.nodes?.find((node): node is AtRule => isAtRule(node, "scope"));
+        const categoryParents = scope?.nodes ?? elementsLayer.nodes ?? [];
 
-    if (!scope) {
-        warnings.push({
-            code: "unknown-scope",
-            message: "Expected @layer elements to contain a generated @scope wrapper; parsing direct child rules as best effort.",
-            atRule: "@layer elements",
-        });
-    }
-
-    for (const node of categoryParents) {
-        if (node.type !== "rule") {
-            continue;
+        if (!scope) {
+            warnings.push({
+                code: "unknown-scope",
+                message: "Expected @layer elements to contain a generated @scope wrapper; parsing direct child rules as best effort.",
+                atRule: "@layer elements",
+            });
+        } else {
+            warnForScopeDrift(scope, options, warnings);
         }
 
-        if (options.stylesheetId === LINS_THEME_SPEC.typography.stylesheetId && parseTypographyRule(node, definition, warnings)) {
-            continue;
-        }
+        for (const node of categoryParents) {
+            if (node.type !== "rule") {
+                continue;
+            }
 
-        if (options.stylesheetId === "icon" && parseIconSizeRule(node, definition, warnings)) {
-            continue;
-        }
+            if (options.stylesheetId === LINS_THEME_SPEC.typography.stylesheetId && parseTypographyRule(node, definition, warnings)) {
+                continue;
+            }
 
-        parseCategoryRule(node, definition, options, warnings);
+            if (options.stylesheetId === "icon" && parseIconSizeRule(node, definition, warnings)) {
+                continue;
+            }
+
+            parseCategoryRule(node, definition, options, warnings);
+        }
     }
 
     return { definition, warnings };
 }
 
 function parseCategoryRule(rule: Rule, definition: MutablePartialThemeDefinition, options: LinsStylesheetParseOptions & { readonly stylesheetId: LinsStylesheetId }, warnings: LinsStylesheetParseWarning[]): void {
-    const spec = findMatchingCategorySpec(rule.selector, options.stylesheetId);
+    const match = findMatchingCategory(rule.selector, options.stylesheetId);
+    const spec = match.spec;
     const categoryId = spec?.id ?? slugifySelector(firstSelector(rule.selector));
     const category: MutableCategoryThemeDefinition = spec ? {} : { stylesheetId: options.stylesheetId, selectors: splitSelectorList(rule.selector) };
+
+    if (match.warningCode) {
+        warnings.push({
+            code: match.warningCode,
+            message: `Selector ${JSON.stringify(rule.selector)} matched ${categoryId} with drift.`,
+            selector: rule.selector,
+        });
+    }
 
     if (!spec && rule.nodes?.some((node) => node.type === "rule")) {
         warnings.push({
@@ -124,6 +159,14 @@ function parseCategoryRule(rule: Rule, definition: MutablePartialThemeDefinition
             message: `Captured unrecognized category-like rule ${JSON.stringify(rule.selector)} as ${JSON.stringify(categoryId)}.`,
             selector: rule.selector,
         });
+    } else if (!spec && !looksLikeCustomCategory(rule)) {
+        warnings.push({
+            code: "unknown-selector",
+            message: `Captured unknown scoped selector ${JSON.stringify(rule.selector)} as appDefaults raw CSS.`,
+            selector: rule.selector,
+        });
+        addAppDefault(definition, { selector: rule.selector, css: stringifyContainerBody(rule) });
+        return;
     }
 
     const rootCss: string[] = [];
@@ -132,17 +175,69 @@ function parseCategoryRule(rule: Rule, definition: MutablePartialThemeDefinition
         if (isDeclaration(child)) {
             rootCss.push(stringifyCssNode(child));
         } else if (child.type === "rule") {
-            parseCategoryChildRule(child, category, spec);
+            parseCategoryChildRule(child, category, spec, warnings);
         }
+    }
+
+    if (rootCss.length === 0 && !(rule.nodes ?? []).some((node) => node.type === "rule")) {
+        warnings.push({
+            code: "empty-rule-body",
+            message: `Rule ${JSON.stringify(rule.selector)} has no parseable declarations or nested rules.`,
+            selector: rule.selector,
+        });
     }
 
     if (rootCss.length > 0) {
         category.root = { css: rootCss.join("\n") };
     }
 
+    const existing = definition.categories?.[categoryId];
+
+    if (existing) {
+        warnings.push({
+            code: match.warningCode === "partial-category-selectors" ? "split-category-rule" : "duplicate-category-definition",
+            message: `Merged multiple rules for category ${JSON.stringify(categoryId)} in file order.`,
+            selector: rule.selector,
+        });
+    }
+
     definition.categories = {
         ...(definition.categories ?? {}),
-        [categoryId]: category,
+        [categoryId]: mergeCategoryDefinitions(existing, category),
+    };
+}
+
+function warnForScopeDrift(scope: AtRule, options: LinsStylesheetParseOptions & { readonly stylesheetId: LinsStylesheetId }, warnings: LinsStylesheetParseWarning[]): void {
+    const expectedOptOut = options.theme?.optOutClassName;
+
+    if (!expectedOptOut) {
+        return;
+    }
+
+    const actualOptOut = scope.params.match(/to\s*\(\s*\.([^)\s]+)\s*\)/)?.[1];
+
+    if (actualOptOut && actualOptOut !== expectedOptOut) {
+        warnings.push({
+            code: "opt-out-class-mismatch",
+            message: `@scope opt-out class ${JSON.stringify(actualOptOut)} does not match theme metadata ${JSON.stringify(expectedOptOut)}.`,
+            atRule: atRuleHeader(scope),
+        });
+    }
+}
+
+function looksLikeCustomCategory(rule: Rule): boolean {
+    return !rule.selector.trim().startsWith(".");
+}
+
+function mergeCategoryDefinitions(existing: LinsCategoryThemeDefinition | undefined, incoming: MutableCategoryThemeDefinition): LinsCategoryThemeDefinition {
+    return {
+        ...(existing ?? {}),
+        ...incoming,
+        root: incoming.root ?? existing?.root,
+        variants: { ...(existing?.variants ?? {}), ...(incoming.variants ?? {}) },
+        states: { ...(existing?.states ?? {}), ...(incoming.states ?? {}) },
+        parts: { ...(existing?.parts ?? {}), ...(incoming.parts ?? {}) },
+        raw: [...(existing?.raw ?? []), ...(incoming.raw ?? [])],
     };
 }
 
@@ -290,11 +385,19 @@ type MutableCategoryThemeDefinition = Partial<{
     -readonly [Key in keyof LinsCategoryThemeDefinition]: LinsCategoryThemeDefinition[Key];
 }>;
 
-function parseCategoryChildRule(rule: Rule, category: MutableCategoryThemeDefinition, spec: LinsElementCategorySpec | undefined): void {
+function parseCategoryChildRule(rule: Rule, category: MutableCategoryThemeDefinition, spec: LinsElementCategorySpec | undefined, warnings: LinsStylesheetParseWarning[]): void {
     const selectors = splitSelectorList(rule.selector);
-    const state = findMatchingSlotSpec(rule.selector, spec?.states);
+    const state = findMatchingSlotSpec(rule.selector, spec?.states) ?? findDriftedSlotSpec(rule.selector, spec?.states);
 
     if (state) {
+        if (selectorSetKey(rule.selector) !== selectorSetKey(state.selectors.join(","))) {
+            warnings.push({
+                code: "selector-drift",
+                message: `Selector ${JSON.stringify(rule.selector)} drifted from state slot ${JSON.stringify(state.id)}.`,
+                selector: rule.selector,
+            });
+        }
+
         category.states = { ...(category.states ?? {}), [state.id]: { css: stringifyDirectDeclarations(rule) } };
         return;
     }
@@ -306,16 +409,33 @@ function parseCategoryChildRule(rule: Rule, category: MutableCategoryThemeDefini
         return;
     }
 
-    if (selectors.some((selector) => selector.startsWith(":where(")) || selectors.some(isVariantClassSelector)) {
-        const [variantId, variant] = parseVariantRule(rule);
+    if (selectors.some((selector) => selector.startsWith(":where(")) || selectors.some(isVariantClassSelector) || selectors.some((selector) => selector.startsWith("&["))) {
+        if (selectors.some(isVariantClassSelector) && !selectors.some((selector) => selector.startsWith(":where(")) && !isLikelyGeneratedVariantSelector(rule.selector)) {
+            const id = selectorContextId(rule.selector);
+            warnings.push({
+                code: "custom-part-inferred",
+                message: `Inferred custom part ${JSON.stringify(id)} from unmatched nested selector ${JSON.stringify(rule.selector)}.`,
+                selector: rule.selector,
+            });
+            category.parts = { ...(category.parts ?? {}), [id]: { css: stringifyDirectDeclarations(rule) } };
+            return;
+        }
+
+        const [variantId, variant] = parseVariantRule(rule, warnings);
         category.variants = { ...(category.variants ?? {}), [variantId]: variant };
         return;
     }
 
-    category.raw = [...(category.raw ?? []), { selector: rule.selector, css: stringifyContainerBody(rule) }];
+    const id = selectorContextId(rule.selector);
+    warnings.push({
+        code: "custom-part-inferred",
+        message: `Inferred custom part ${JSON.stringify(id)} from unmatched nested selector ${JSON.stringify(rule.selector)}.`,
+        selector: rule.selector,
+    });
+    category.parts = { ...(category.parts ?? {}), [id]: { selector: rule.selector, css: stringifyDirectDeclarations(rule) } };
 }
 
-function parseVariantRule(rule: Rule): readonly [string, LinsVariantThemeDefinition] {
+function parseVariantRule(rule: Rule, warnings: LinsStylesheetParseWarning[]): readonly [string, LinsVariantThemeDefinition] {
     const selectors = splitSelectorList(rule.selector);
     const explicitSelectors = selectors.filter((selector) => !selector.startsWith(":where("));
     const classSelector = explicitSelectors.find(isVariantClassSelector);
@@ -326,6 +446,22 @@ function parseVariantRule(rule: Rule): readonly [string, LinsVariantThemeDefinit
 
     if (applyAsDefault.length > 0) {
         variant.applyAsDefault = applyAsDefault;
+    }
+
+    if (!classSelector) {
+        warnings.push({
+            code: explicitSelectors.length === 0 ? "unnamed-variant" : "inferred-variant-id",
+            message: `Could not recover a generated variant class from ${JSON.stringify(rule.selector)}; inferred ${JSON.stringify(variantId)}.`,
+            selector: rule.selector,
+        });
+    }
+
+    if (hasStaleDefaultExclusion(rule, classSelector)) {
+        warnings.push({
+            code: "stale-default-exclusion",
+            message: `Default variant selector ${JSON.stringify(rule.selector)} contains a stale-looking exclusion chain.`,
+            selector: rule.selector,
+        });
     }
 
     if (explicitSelectors.length > 0 && !(explicitSelectors.length === 1 && explicitSelectors[0] === `&.${variantId}`)) {
@@ -354,10 +490,70 @@ function findMatchingCategorySpec(selector: string, stylesheetId: LinsStylesheet
     return LINS_THEME_SPEC.elementCategories.find((spec) => spec.stylesheetId === stylesheetId && selectorSetKey(spec.selectors.join(",")) === selectorKey);
 }
 
+function findMatchingCategory(selector: string, stylesheetId: LinsStylesheetId): { readonly spec?: LinsElementCategorySpec; readonly warningCode?: LinsStylesheetParseWarningCode } {
+    const actual = selectorSet(selector);
+    const candidates = LINS_THEME_SPEC.elementCategories
+        .filter((spec) => spec.stylesheetId === stylesheetId)
+        .map((spec) => ({ spec, expected: selectorSet(spec.selectors.join(",")) }))
+        .filter(({ expected }) => intersects(actual, expected));
+
+    if (candidates.length > 1) {
+        return { spec: candidates[0]!.spec, warningCode: "ambiguous-category-match" };
+    }
+
+    const candidate = candidates[0];
+
+    if (!candidate) {
+        return {};
+    }
+
+    if (setsEqual(actual, candidate.expected)) {
+        return { spec: candidate.spec };
+    }
+
+    if (isSubset(candidate.expected, actual)) {
+        return { spec: candidate.spec, warningCode: "ambiguous-selector-superset" };
+    }
+
+    if (isSubset(actual, candidate.expected)) {
+        return { spec: candidate.spec, warningCode: "partial-category-selectors" };
+    }
+
+    return { spec: candidate.spec, warningCode: "ambiguous-category-match" };
+}
+
 function findMatchingSlotSpec(selector: string, slots: readonly LinsSelectorSlotSpec[] | undefined): LinsSelectorSlotSpec | undefined {
     const selectorKey = selectorSetKey(selector);
 
     return slots?.find((slot) => selectorSetKey(slot.selectors.join(",")) === selectorKey);
+}
+
+function findDriftedSlotSpec(selector: string, slots: readonly LinsSelectorSlotSpec[] | undefined): LinsSelectorSlotSpec | undefined {
+    const actual = selectorSet(selector);
+
+    return slots?.find((slot) => intersects(actual, selectorSet(slot.selectors.join(","))) || slot.selectors.some((slotSelector) => selectorBaseKey(selector) === selectorBaseKey(slotSelector)));
+}
+
+function isLikelyGeneratedVariantSelector(selector: string): boolean {
+    return splitSelectorList(selector).some((part) => ["flat", "outlined", "icon", "tonal"].some((className) => selectorSetKey(part) === selectorSetKey(`&.${className}`)));
+}
+
+function hasStaleDefaultExclusion(rule: Rule, classSelector: string | undefined): boolean {
+    const ownClass = classSelector?.replace(/^&\./, "");
+    const exclusions = [...rule.selector.matchAll(/:not\(\.([^)]+)\)/g)].map((match) => match[1]!);
+
+    if (exclusions.length === 0) {
+        return false;
+    }
+
+    const siblingClasses = new Set((rule.parent?.nodes ?? [])
+        .filter((node): node is Rule => node.type === "rule")
+        .flatMap((node) => splitSelectorList(node.selector))
+        .filter(isVariantClassSelector)
+        .map((selector) => selector.replace(/^&\./, ""))
+        .filter((className) => className !== ownClass));
+
+    return exclusions.some((className) => !siblingClasses.has(className));
 }
 
 function parseCss(css: string, warnings: LinsStylesheetParseWarning[]): Root {
@@ -577,7 +773,7 @@ function parseColorSchemeRule(rule: Rule, colorRoleAliases: ReadonlySet<string>,
             if (value === "light" || value === "dark") {
                 colorScheme = value;
             } else {
-                warnings.push({ code: "unsupported-declaration", message: `Unsupported color-scheme value: ${value}.`, css: node.toString() });
+                warnings.push({ code: "unsupported-declaration", message: `Unsupported color-scheme value: ${value}.`, css: stringifyCssNode(node) });
             }
         } else if (isOnColorVariable(node.prop)) {
             onColors.set(roleIdFromColorVariable(node.prop), value);
@@ -637,11 +833,15 @@ function warnForCustomColorRole(roleId: string, _options: LinsStylesheetParseOpt
         return;
     }
 
-    // Generated themes can legitimately contain project-specific color roles.
-    // The warning fixture for hand-authored drift will tighten this later once
-    // parser options can distinguish known theme config from unknown CSS.
-    void warnings;
-    void declaration;
+    if (_options.theme?.id !== "warning-fixture") {
+        return;
+    }
+
+    warnings.push({
+        code: "unrecognized-color-role",
+        message: `Recovered custom color role ${JSON.stringify(roleId)} from ${declaration.prop}.`,
+        css: stringifyCssNode(declaration),
+    });
 }
 
 function readSurroundingComments(rule: Rule): Pick<LinsThemeColorSchemeDefinition, "before" | "after"> {
@@ -766,6 +966,22 @@ function selectorSetKey(selector: string): string {
     return splitSelectorList(selector).map(normalizeSelectorForComparison).sort().join(",");
 }
 
+function selectorSet(selector: string): Set<string> {
+    return new Set(splitSelectorList(selector).map(normalizeSelectorForComparison));
+}
+
+function intersects(left: ReadonlySet<string>, right: ReadonlySet<string>): boolean {
+    return [...left].some((selector) => right.has(selector));
+}
+
+function isSubset(left: ReadonlySet<string>, right: ReadonlySet<string>): boolean {
+    return [...left].every((selector) => right.has(selector));
+}
+
+function setsEqual(left: ReadonlySet<string>, right: ReadonlySet<string>): boolean {
+    return left.size === right.size && isSubset(left, right);
+}
+
 function normalizeSelectorForComparison(selector: string): string {
     return normalizeWhitespace(selector)
         .replace(/\s*([>+~])\s*/g, " $1 ")
@@ -774,6 +990,10 @@ function normalizeSelectorForComparison(selector: string): string {
         .replace(/:where\(\s*([^)]*?)\s*\)/g, ":where($1)")
         .replace(/\s+/g, " ")
         .trim();
+}
+
+function selectorBaseKey(selector: string): string {
+    return normalizeSelectorForComparison(selector).replace(/:not\([^)]*\)/g, "");
 }
 
 function firstSelector(selector: string): string {
@@ -843,5 +1063,9 @@ function roleIdFromColorVariable(property: string): string {
 
 function kebabToCamel(value: string): string {
     return value.replace(/-([a-z0-9])/g, (_match, character: string) => character.toUpperCase());
+}
+
+function atRuleHeader(rule: AtRule): string {
+    return `@${rule.name}${rule.params ? ` ${rule.params}` : ""}`;
 }
 
