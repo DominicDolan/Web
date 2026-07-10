@@ -17,7 +17,7 @@ The design is intentionally split into two low-level primitives plus convenience
 - wrapper: `defineReadModelProjection(...)`
 - wrapper: `defineChangeHistoryProjection(...)`
 - wrapper: `defineRetentionPolicy(...)`
-- wrapper: `blockStaleCleanupUsingProjection(...)`
+- wrapper: `defineProjectionAckPolicy(...)`
 - runtime: `runDeltaProjections(...)`
 - runtime: `runStaleDeltaCleanup(...)`
 
@@ -44,7 +44,7 @@ The design is intentionally split into two low-level primitives plus convenience
    ```
 
 6. **Convenience wrappers compose primitives.**
-   `defineReadModelProjection(...)`, `defineChangeHistoryProjection(...)`, `defineRetentionPolicy(...)`, and `blockStaleCleanupUsingProjection(...)` should all be implemented in terms of `defineDeltaProjection(...)` and/or `defineStaleDeltaPolicy(...)`.
+   `defineReadModelProjection(...)`, `defineChangeHistoryProjection(...)`, `defineRetentionPolicy(...)`, and `defineProjectionAckPolicy(...)` should all be implemented in terms of `defineDeltaProjection(...)` and/or `defineStaleDeltaPolicy(...)`.
 
 7. **Projection writes must be idempotent.**
    Workers can crash or retry after writing target rows but before marking source deltas as acked. Projection code must tolerate repeated processing.
@@ -505,12 +505,12 @@ delta.timestamp < now - 24 hours
 
 ---
 
-# Convenience wrapper: `blockStaleCleanupUsingProjection(...)`
+# Convenience wrapper: `defineProjectionAckPolicy(...)`
 
-`blockStaleCleanupUsingProjection(...)` should wrap `defineStaleDeltaPolicy(...)`.
+`defineProjectionAckPolicy(...)` should wrap `defineStaleDeltaPolicy(...)`.
 
 ```ts
-export const themeHistoryAckPolicy = blockStaleCleanupUsingProjection(themeChangeHistoryProjection)
+export const themeHistoryAckPolicy = defineProjectionAckPolicy(themeChangeHistoryProjection)
 ```
 
 This should expand to:
@@ -868,7 +868,7 @@ unless the count is derived from an idempotent source table or guarded by a uniq
   - `defineReadModelProjection(...)`,
   - `defineChangeHistoryProjection(...)`,
   - `defineRetentionPolicy(...)`,
-  - `blockStaleCleanupUsingProjection(...)`.
+  - `defineProjectionAckPolicy(...)`.
 - Add registries and registry getters/resetters for `generateSchema`.
 
 ### Phase 4: migration generation
@@ -947,4 +947,3 @@ Running a projection twice over the same pending delta should produce the same t
 2. Which Zod types should be supported by read-model SQL inference in v1, and which should require explicit overrides?
 3. Should read-model projection include every schema field by default, or exclude object/array fields unless explicitly opted in?
 4. Should ack columns use `acked_at` timestamps only, or also store worker/version diagnostic metadata elsewhere?
-
