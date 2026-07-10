@@ -9,7 +9,8 @@
     "check": "tsc --noEmit --project tsconfig.json",
     "generate:schema": "generate-schema src/models migrations",
     "apply:schema": "wrangler d1 migrations apply DB --local --config ./wrangler.jsonc",
-    "apply:schema:prod": "wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc"
+    "apply:schema:prod": "wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc",
+    "run:projections:local": "run-projections-local src/models"
   },
   "dependencies": {
     "@codemirror/lang-css": "6.3.1",

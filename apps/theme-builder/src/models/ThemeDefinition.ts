@@ -1,5 +1,5 @@
 import {z} from "zod";
-import {createModelSchema} from "@web/d1";
+import {createModelSchema, defineReadModelProjection} from "@web/d1";
 import {modelSchema} from "@web/schema";
 
 export const themeDefinitionSchema = z.object({
@@ -13,3 +13,11 @@ export const themeDefinitionSchema = z.object({
 })
 
 export type ThemeDefinition = z.infer<typeof themeDefinitionSchema>
+
+// Test read-model projection: keeps a `theme_read_models` table with the
+// current state of every theme, derived from the `theme_events` deltas.
+export const themeReadProjection = defineReadModelProjection(themeDefinitionSchema, {
+    name: "theme_read",
+    version: 1,
+})
+

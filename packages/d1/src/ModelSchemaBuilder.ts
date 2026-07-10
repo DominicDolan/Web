@@ -33,6 +33,7 @@ export function createModelSchema<T extends Model>(
     const foreignKeys: ForeignKey[] = []
     const indexes: IndexDef[] = []
 
+    columns.push(`event_id TEXT NOT NULL PRIMARY KEY`)
     columns.push(`id TEXT NOT NULL`)
     columns.push(`path TEXT NOT NULL`)
     columns.push(`value TEXT`)

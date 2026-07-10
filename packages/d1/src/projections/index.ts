@@ -4,4 +4,5 @@ export * from "./StaleDeltaPolicy"
 export * from "./ProjectionAckPolicy.ts"
 export * from "./ReadModelProjection"
 export * from "./ChangeHistoryProjection"
+export * from "./RunDeltaProjections"
 

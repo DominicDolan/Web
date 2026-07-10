@@ -130,8 +130,8 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
             const extraColumns = extra ? Object.keys(extra) : []
             const extraValues = extra ? Object.values(extra) : []
 
-            const columns = ['id', 'path', 'value', 'timestamp', ...extraColumns].join(', ')
-            const placeholders = ['?', '?', '?', '?', ...extraColumns.map(() => '?')].join(', ')
+            const columns = ['event_id', 'id', 'path', 'value', 'timestamp', ...extraColumns].join(', ')
+            const placeholders = ['?', '?', '?', '?', '?', ...extraColumns.map(() => '?')].join(', ')
 
 
             const valueSets = deltaArray.map(() => `(${placeholders})`).join(', ')
@@ -139,6 +139,7 @@ export function useDatabaseTable<M extends Model>(schema: ZodType<M>) {
 
             await db.prepare(sql).bind(
                 ...deltaArray.flatMap(delta => [
+                    delta.eventId ?? crypto.randomUUID(),
                     delta.id,
                     delta.path,
                     delta.value === undefined ? null : (typeof delta.value === 'object' ? JSON.stringify(delta.value) : delta.value),

@@ -8,6 +8,7 @@ import { DatabaseSync } from "node:sqlite"
 import type { ModelSchema } from "./ModelSchemaBuilder"
 import { type TableSchema, type ColumnDef, parseCreateTable } from "./SchemaDiffer"
 import { setSchemaContext, clearSchemaContext } from "./SchemaContext"
+import { type DeltaProjection, getRegisteredDeltaProjections, clearDeltaProjectionRegistry } from "./projections/DeltaProjection"
 
 // Accept models and migrations directories as command-line arguments
 const args = process.argv.slice(2)
@@ -170,7 +171,67 @@ async function loadSchemaModulesFromDir(dir: string) {
     return loaded
 }
 
-function buildMigrationSql(loaded: Array<{ file: string; sql: string }>) {
+function sanitizeIdentifierPart(value: string) {
+    return value.replace(/[^a-zA-Z0-9_]/g, "_")
+}
+
+function quoteIdentifier(identifier: string) {
+    return `"${identifier.replace(/"/g, '""')}"`
+}
+
+type ProjectionMigrationEntry = { label: string; sql: string }
+
+/**
+ * Builds migration SQL for registered delta projections: the target table
+ * (+ indexes) the first time it's introduced, and the ack column (+ pending
+ * work index) on the source delta table the first time it's introduced.
+ * Both are skipped once `oldSchemas` (derived from previously-written
+ * migration files) shows they already exist, so re-running this generator
+ * doesn't keep re-emitting the same statements.
+ */
+function buildProjectionMigrationEntries(
+    projections: ReadonlyArray<DeltaProjection<any>>,
+    oldSchemas: Map<string, TableSchema>,
+): ProjectionMigrationEntry[] {
+    const entries: ProjectionMigrationEntry[] = []
+
+    for (const projection of projections) {
+        const statements: string[] = []
+
+        const targetAlreadyExists = oldSchemas.has(projection.target.tableName)
+        if (!targetAlreadyExists) {
+            statements.push(projection.target.sql.trim())
+        }
+
+        const oldSourceSchema = oldSchemas.get(projection.sourceTable)
+        const ackColumnAlreadyExists = oldSourceSchema?.columns.some((c) => c.name === projection.ackColumn) ?? false
+
+        if (!ackColumnAlreadyExists) {
+            const sourceTable = quoteIdentifier(projection.sourceTable)
+            const ackColumn = quoteIdentifier(projection.ackColumn)
+            const pendingIndexName = quoteIdentifier(
+                `${projection.sourceTable}_${sanitizeIdentifierPart(projection.ackColumn)}_pending_idx`
+            )
+
+            statements.push(`ALTER TABLE ${sourceTable} ADD COLUMN ${ackColumn} INTEGER;`)
+            statements.push(`CREATE INDEX IF NOT EXISTS ${pendingIndexName} ON ${sourceTable} (${ackColumn}, "timestamp");`)
+        }
+
+        if (statements.length === 0) continue
+
+        entries.push({
+            label: `Projection: ${projection.name} (${projection.mode}) -> ${projection.target.tableName}`,
+            sql: statements.join("\n"),
+        })
+    }
+
+    return entries
+}
+
+function buildMigrationSql(
+    loaded: Array<{ file: string; sql: string }>,
+    projectionEntries: ProjectionMigrationEntry[],
+) {
     const header = [
         "-- Generated migration file. Do not edit by hand.",
         `-- Generated at: ${new Date().toISOString()}`,
@@ -178,14 +239,20 @@ function buildMigrationSql(loaded: Array<{ file: string; sql: string }>) {
         "",
     ].join("\n")
 
-    const body = loaded
+    const modelBody = loaded
         .map((x) => {
             const rel = path.relative(process.cwd(), x.file)
             return `-- Source: ${rel}\n${x.sql.trim()}`
         })
         .join("\n\n")
 
-    return `${header}\n${body}\n`
+    const projectionBody = projectionEntries
+        .map((x) => `-- ${x.label}\n${x.sql}`)
+        .join("\n\n")
+
+    const sections = [modelBody, projectionBody].filter(Boolean)
+
+    return `${header}\n${sections.join("\n\n")}\n`
 }
 
 async function main() {
@@ -197,15 +264,23 @@ async function main() {
     // Extract old schemas and set context
     const oldSchemas = extractOldSchemas(migrationFiles)
     setSchemaContext({ oldSchemas })
+    clearDeltaProjectionRegistry()
 
     try {
         const loaded = await loadSchemaModulesFromDir(MODELS_DIR)
-        if (loaded.length === 0) {
-            console.log(`No schema modules found in ${MODELS_DIR}`)
+
+        // Importing model modules above also runs any `defineDeltaProjection(...)` /
+        // `defineReadModelProjection(...)` / etc. calls at their top level, which
+        // registers projection metadata here.
+        const projections = getRegisteredDeltaProjections()
+        const projectionEntries = buildProjectionMigrationEntries(projections, oldSchemas)
+
+        if (loaded.length === 0 && projectionEntries.length === 0) {
+            console.log(`No schema modules or projections found in ${MODELS_DIR}`)
             return
         }
 
-        const sql = buildMigrationSql(loaded)
+        const sql = buildMigrationSql(loaded, projectionEntries)
         const sqlHash = sha256(sql)
 
         const latestGenerated = latestGeneratedMigration(migrationFiles)

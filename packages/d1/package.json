@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "bin": {
-    "generate-schema": "./src/generateSchema.ts"
+    "generate-schema": "./src/generateSchema.ts",
+    "run-projections-local": "./src/runProjectionsLocal.ts"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./plugin": "./src/NitroD1Plugin.ts"
+    ".": "./src/index.ts"
   },
   "dependencies": {
     "@web/utils": "workspace:*",
