@@ -6,4 +6,6 @@ export * from "./ReadModelProjection"
 export * from "./ChangeHistoryProjection"
 export * from "./RunDeltaProjections"
 export * from "./RunDeltaProjectionsLocal"
+export * from "./RunStaleDeltaCleanup"
+export * from "./RunStaleDeltaCleanupLocal"
 

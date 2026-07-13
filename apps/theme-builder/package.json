@@ -11,7 +11,9 @@
     "apply:schema": "wrangler d1 migrations apply DB --local --config ./wrangler.jsonc",
     "apply:schema:prod": "wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc",
     "run:projections:local": "run-projections-local src/models --config ./wrangler.jsonc --binding DB",
-    "deploy:projections": "wrangler deploy --config ./wrangler.projections.jsonc"
+    "run:stale-delta-cleanup:local": "run-stale-delta-cleanup-local --config ./wrangler.jsonc --binding DB",
+    "deploy:projections": "wrangler deploy --config ./wrangler.projections.jsonc",
+    "deploy:stale-delta-cleanup": "wrangler deploy --config ./wrangler.stale-delta-cleanup.jsonc"
   },
   "dependencies": {
     "@codemirror/lang-css": "6.3.1",
