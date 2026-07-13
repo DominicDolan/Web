@@ -30,7 +30,7 @@ export default function App() {
     }
 
     return (
-        <div class="minimalTheme light h-full">
+        <div class="minimal light h-full">
             <Switch fallback={<><div>404</div></>}>
                 <Match when={location.segments()[0] === "editor" && location.segments()[2] === "colors" && location.segments().length === 4}>
                     <ColorScope themeId={location.segments()[1]} colorId={location.segments()[3]}>

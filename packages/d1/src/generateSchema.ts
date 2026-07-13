@@ -8,7 +8,7 @@ import { DatabaseSync } from "node:sqlite"
 import type { ModelSchema } from "./ModelSchemaBuilder"
 import { type TableSchema, type ColumnDef, parseCreateTable } from "./SchemaDiffer"
 import { setSchemaContext, clearSchemaContext } from "./SchemaContext"
-import { type DeltaProjection, getRegisteredDeltaProjections, clearDeltaProjectionRegistry } from "./projections/DeltaProjection"
+import { type DeltaProjection, getRegisteredDeltaProjections, clearDeltaProjectionRegistry } from "./projections"
 
 // Accept models and migrations directories as command-line arguments
 const args = process.argv.slice(2)
@@ -75,7 +75,7 @@ function extractOldSchemas(migrationFiles: string[]): Map<string, TableSchema> {
     for (const { name: tableName, sql: tableSql } of tables) {
         const columns: ColumnDef[] = []
         const tableInfo = db.prepare(`PRAGMA table_info("${tableName}")`).all() as any[]
-        
+
         const isAutoIncrement = tableSql.toUpperCase().includes("AUTOINCREMENT")
 
         for (const col of tableInfo) {
@@ -93,7 +93,7 @@ function extractOldSchemas(migrationFiles: string[]): Map<string, TableSchema> {
         for (const idx of indexList) {
             // Skip implicit indexes (like those for PRIMARY KEY)
             if (idx.origin === 'pk') continue
-            
+
             const indexInfo = db.prepare(`PRAGMA index_info("${idx.name}")`).all() as any[]
             indexes.push({
                 name: idx.name,
@@ -260,7 +260,7 @@ async function main() {
 
     // Get all migrations to extract old schemas
     const migrationFiles = listMigrationFiles()
-    
+
     // Extract old schemas and set context
     const oldSchemas = extractOldSchemas(migrationFiles)
     setSchemaContext({ oldSchemas })

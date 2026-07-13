@@ -10,7 +10,8 @@
     "generate:schema": "generate-schema src/models migrations",
     "apply:schema": "wrangler d1 migrations apply DB --local --config ./wrangler.jsonc",
     "apply:schema:prod": "wrangler d1 migrations apply DB --remote --config ./wrangler.jsonc",
-    "run:projections:local": "run-projections-local src/models"
+    "run:projections:local": "run-projections-local src/models --config ./wrangler.jsonc --binding DB",
+    "deploy:projections": "wrangler deploy --config ./wrangler.projections.jsonc"
   },
   "dependencies": {
     "@codemirror/lang-css": "6.3.1",
@@ -39,6 +40,7 @@
     "typescript": "catalog:"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "4.20251218.0",
     "tsx": "4.22.4"
   }
 }
