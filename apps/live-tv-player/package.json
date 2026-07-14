@@ -7,8 +7,8 @@
     "dev": "vite dev --port 3001"
   },
   "dependencies": {
-    "solid-js": "2.0.0-beta.15",
-    "@solidjs/web": "2.0.0-beta.15",
+    "solid-js": "catalog:",
+    "@solidjs/web": "catalog:",
     "@web/components": "workspace:*",
     "@web/utils": "workspace:*",
     "@web/schema": "workspace:*",
@@ -16,11 +16,11 @@
     "dayjs": "1.11.20"
   },
   "devDependencies": {
-    "tailwindcss": "4.2.2",
+    "tailwindcss": "catalog:",
     "@tailwindcss/vite": "4.2.2",
     "postcss": "^8.4.49",
     "autoprefixer": "^10.4.20",
-    "vite-plugin-solid": "3.0.0-next.2"
+    "vite-plugin-solid": "catalog:"
   },
   "optionalDependencies": {
     "@tailwindcss/oxide-linux-arm64-gnu": "4.2.2",

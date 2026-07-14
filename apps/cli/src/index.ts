@@ -3,7 +3,7 @@ import {createInterface} from "node:readline/promises";
 import {access, copyFile, mkdir, readdir, readFile, writeFile} from "node:fs/promises";
 import path from "node:path";
 
-const TEMPLATE_APP_NAME = "appTemplate";
+const TEMPLATE_APP_NAME = "app-template";
 const EXCLUDE_DIRS = new Set(["node_modules", ".output", ".mf", ".wrangler"]);
 const EXCLUDE_FILES = new Set([".DS_Store"]);
 
@@ -35,7 +35,7 @@ async function findRepoRoot(startDir: string): Promise<string> {
         }
         const parent = path.dirname(current);
         if (parent === current) {
-            throw new Error("Could not find repo root (expected apps/appTemplate and package.json). Run this from within the repo.");
+            throw new Error("Could not find repo root (expected apps/app-template and package.json). Run this from within the repo.");
         }
         current = parent;
     }
@@ -201,7 +201,7 @@ async function promptYesNo(rl: ReturnType<typeof createInterface>, label: string
 
 function printUsage(): void {
     console.log("Usage: web-cli <app-folder-name>\n");
-    console.log("Creates a new app in apps/<name> based on apps/appTemplate.");
+    console.log("Creates a new app in apps/<name> based on apps/app-template.");
 }
 
 async function main(): Promise<void> {

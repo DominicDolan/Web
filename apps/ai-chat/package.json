@@ -3,25 +3,26 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vinxi dev --port 3001",
-    "build": "vinxi build",
-    "start": "vinxi start"
+    "dev": "vite dev",
+    "build": "vite build",
   },
   "dependencies": {
+    "solid-js": "catalog:",
+    "@solidjs/web": "catalog:",
     "@paralleldrive/cuid2": "3.3.0",
-    "@solidjs/web": "2.0.0-beta.15",
     "@web/components": "workspace:*",
+    "@web/utils": "workspace:*",
     "@web/schema": "workspace:*",
+    "@web/server-functions": "workspace:*",
     "@web/solid-delta": "workspace:*",
     "@web/solid-scope": "workspace:*",
-    "@web/unolayout": "workspace:*",
-    "@web/utils": "workspace:*",
-    "@web/vinxi": "workspace:*",
+    "tailwindcss": "catalog:",
+    "@tailwindcss/vite": "catalog:",
+    "vite-plugin-solid": "catalog:",
+    "vite": "catalog:",
     "katex": "^0.16.45",
     "marked": "18.0.0",
     "marked-katex-extension": "^5.1.8",
     "node-llama-cpp": "3.18.1",
-    "solid-js": "2.0.0-beta.15",
-    "tailwindcss": "4.2.2"
   }
 }

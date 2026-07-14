@@ -7,7 +7,7 @@ export default defineConfig({
     appType: "spa",
     plugins: [
         solidServerFunctions({
-            serverEntry: "/home/doghouse/Source/SolidJS/web/apps/testBench/src/server.tsx"
+            serverEntry: "./src/server.tsx"
         }),
         solidPlugin()
     ],

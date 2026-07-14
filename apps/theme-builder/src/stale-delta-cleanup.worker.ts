@@ -1,3 +1,4 @@
+import { D1Database, ScheduledController, ExecutionContext, ExportedHandler } from "@cloudflare/workers-types"
 import { runStaleDeltaCleanup } from "@web/d1"
 
 type StaleDeltaCleanupWorkerEnvironment = {
