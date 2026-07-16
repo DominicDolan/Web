@@ -2,7 +2,7 @@ import style from "../colors.module.css"
 import { createMemo } from "solid-js"
 import {useColorUtils} from "~/app/colors/ColorUtils";
 
-export function ColorEditCard(props: { name: string, color: string, textColor: string, onClick: () => void }) {
+export function ColorValueCard(props: { id: string, name: string, color: string, textColor: string, onClick: () => void }) {
     const {rgb, hsl, contrastRatio} = useColorUtils(() => props.color)
 
     const largeTextSuccess = createMemo(() => contrastRatio() >= 4.5)

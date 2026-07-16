@@ -2,7 +2,7 @@
 -- Generated at: 2026-06-22T10:23:21.484Z
 -- Source directory: src/models
 
--- Source: src/models/ColorDefinition.ts
+-- Source: src/models/ColorTokenDefinition.ts
 DROP TABLE IF EXISTS "color_events";
 CREATE TABLE IF NOT EXISTS "color_events" (
   id TEXT NOT NULL,

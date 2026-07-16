@@ -1,10 +1,10 @@
 -- Generated migration file. Do not edit by hand.
--- Generated at: 2026-07-13T10:50:57.659Z
+-- Generated at: 2026-07-16T12:05:49.541Z
 -- Source directory: src/models
 
 -- Source: src/models/ColorTokenDefinition.ts
-DROP TABLE IF EXISTS "color_events";
-CREATE TABLE IF NOT EXISTS "color_events" (
+DROP TABLE IF EXISTS "color_token_events";
+CREATE TABLE IF NOT EXISTS "color_token_events" (
   event_id TEXT NOT NULL PRIMARY KEY,
   id TEXT NOT NULL,
   path TEXT NOT NULL,
@@ -12,8 +12,21 @@ CREATE TABLE IF NOT EXISTS "color_events" (
   timestamp INTEGER NOT NULL,
   "theme" TEXT
 );
-CREATE INDEX IF NOT EXISTS "color_events_id_idx_1" ON "color_events" ("id");
-CREATE INDEX IF NOT EXISTS "color_events_timestamp_idx_2" ON "color_events" ("timestamp");
+CREATE INDEX IF NOT EXISTS "color_token_events_id_idx_1" ON "color_token_events" ("id");
+CREATE INDEX IF NOT EXISTS "color_token_events_timestamp_idx_2" ON "color_token_events" ("timestamp");
+
+-- Source: src/models/ColorValueDefinition.ts
+DROP TABLE IF EXISTS "color_hex_events";
+CREATE TABLE IF NOT EXISTS "color_hex_events" (
+  event_id TEXT NOT NULL PRIMARY KEY,
+  id TEXT NOT NULL,
+  path TEXT NOT NULL,
+  value TEXT,
+  timestamp INTEGER NOT NULL,
+  "theme" TEXT
+);
+CREATE INDEX IF NOT EXISTS "color_hex_events_id_idx_1" ON "color_hex_events" ("id");
+CREATE INDEX IF NOT EXISTS "color_hex_events_timestamp_idx_2" ON "color_hex_events" ("timestamp");
 
 -- Source: src/models/ElementStyleDefinition.ts
 DROP TABLE IF EXISTS "element_style_events";
@@ -65,15 +78,3 @@ CREATE TABLE IF NOT EXISTS "typeface_events" (
 );
 CREATE INDEX IF NOT EXISTS "typeface_events_id_idx_1" ON "typeface_events" ("id");
 CREATE INDEX IF NOT EXISTS "typeface_events_timestamp_idx_2" ON "typeface_events" ("timestamp");
-
--- Projection: theme_read (model) -> theme_read_models
-CREATE TABLE IF NOT EXISTS "theme_read_models" (
-  "id" TEXT PRIMARY KEY,
-  "name" TEXT NOT NULL,
-  "class" TEXT NOT NULL,
-  "description" TEXT,
-  "mode" TEXT NOT NULL,
-  "updated_at" INTEGER
-);
-ALTER TABLE "theme_events" ADD COLUMN "theme_read_v1_acked_at" INTEGER;
-CREATE INDEX IF NOT EXISTS "theme_events_theme_read_v1_acked_at_pending_idx" ON "theme_events" ("theme_read_v1_acked_at", "timestamp");

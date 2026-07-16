@@ -1,16 +1,16 @@
-import {ColorEditCard} from "~/app/colors/ColorList/ColorEditCard";
+import {ColorTokenCard} from "~/app/colors/ColorList/ColorTokenCard.tsx";
 import {ColorAddCard} from "~/app/colors/ColorList/ColorAddCard";
 import {useColorListScope} from "~/app/colors/ColorList/ColorListScope";
 import {For, Loading} from "solid-js";
-import {ColorDefinition} from "~/models/ColorDefinition";
+import {ColorTokenDefinition} from "~/models/ColorTokenDefinition.ts";
 import {useNavigate} from "@web/router";
 import {useColorNameUtils} from "~/app/colors/ColorUtils";
 
 export default function ColorList() {
 
-    const {colors, theme} = useColorListScope()
+    const {tokens, theme} = useColorListScope()
     const navigate = useNavigate()
-    function onColorClicked(color: ColorDefinition) {
+    function onColorClicked(color: ColorTokenDefinition) {
         navigate(`/editor/${theme().id}/colors/${color.id}`)
     }
 
@@ -19,11 +19,11 @@ export default function ColorList() {
         <h2>Color Palette</h2>
         <div class={"grid grid-cols-[repeat(auto-fit,minmax(150px,350px))] gap-6"}>
             <Loading fallback={<div>Loading...</div>}>
-                <For each={colors}>{
-                    color => <ColorEditCard
+                <For each={tokens}>{
+                    color => <ColorTokenCard
+                        id={color.id}
+                        className={color.cssClass}
                         name={variableNameToTitle(color.name)}
-                        color={color.hex}
-                        textColor={color.onHex}
                         onClick={() => onColorClicked(color)} />}
                 </For>
                 <ColorAddCard />

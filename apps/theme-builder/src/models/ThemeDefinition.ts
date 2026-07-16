@@ -7,7 +7,6 @@ export const themeDefinitionSchema = z.object({
     name: z.string().trim().nonempty(),
     class: z.string().trim().nonempty(),
     description: z.string().optional(),
-    mode: z.enum(["light", "dark"]).default("light"),
 }).meta({
     table: createModelSchema("theme_events", { recreate: true }).build(),
 })

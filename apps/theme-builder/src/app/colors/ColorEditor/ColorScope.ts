@@ -1,9 +1,9 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
 import {action, createStore, refresh} from "solid-js";
-import {getSingleColorDelta, saveColor} from "~/app/colors/ColorRepository.server";
+import {getSingleColorDelta} from "~/app/colors/ColorRepository.server";
 import {debounce} from "@web/utils/Debounce.js";
 import {createDeltaTracker, createModels, ModelDelta} from "@web/solid-delta";
-import {ColorDefinition} from "~/models/ColorDefinition.ts";
+import {ColorTokenDefinition} from "~/models/ColorTokenDefinition.ts";
 
 
 export const ColorScope = createScopeProvider<{ themeId: string, colorId: string }>();
@@ -15,13 +15,13 @@ export const useColorScope = defineScope(ColorScope, (props) => {
             setTimeout(() => acked.mark(res));
             return res;
         })
-    }, [] as ModelDelta<ColorDefinition>[])
+    }, [] as ModelDelta<ColorTokenDefinition>[])
 
     const acked = createDeltaTracker(() => colorDeltas)
 
     const [colors, createDeltas] = createModels(() => colorDeltas)
 
-    const saveDeltas = action(async function* (deltas?: ModelDelta<ColorDefinition>[]) {
+    const saveDeltas = action(async function* (deltas?: ModelDelta<ColorTokenDefinition>[]) {
         if (deltas != null) {
             pushColorDeltas(deltas);
         }
@@ -33,7 +33,7 @@ export const useColorScope = defineScope(ColorScope, (props) => {
     })
 
 
-    function pushColorDeltas(deltas: ModelDelta<ColorDefinition>[]) {
+    function pushColorDeltas(deltas: ModelDelta<ColorTokenDefinition>[]) {
         setColorDeltas((draft) => {
             draft.push(...deltas);
         });
@@ -41,7 +41,7 @@ export const useColorScope = defineScope(ColorScope, (props) => {
 
     const debounceSave = debounce(saveDeltas, 1000)
 
-    function setColorValue(key: keyof ColorDefinition, value: ColorDefinition[keyof ColorDefinition], debounce = false) {
+    function setColorValue(key: keyof ColorTokenDefinition, value: ColorTokenDefinition[keyof ColorTokenDefinition], debounce = false) {
         const deltas = createDeltas(props.colorId, {[key]: value})
 
         if (debounce) {

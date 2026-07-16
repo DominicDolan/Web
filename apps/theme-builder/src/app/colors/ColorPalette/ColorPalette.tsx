@@ -1,10 +1,10 @@
 import {createMemo, createSignal, For, Loading, Match, Show, Switch} from "solid-js";
 import {ColorPaletteRow, getColorPalette} from "~/app/colors/ColorRepository.server";
 import style from "../colors.module.css"
-import {ColorDefinition} from "~/models/ColorDefinition";
+import {ColorTokenDefinition} from "~/models/ColorTokenDefinition.ts";
 
 
-export function ColorPalette(props: { selected: ColorDefinition, onColorClicked: (color: string) => void, onColorShiftClicked: (color: string) => void }) {
+export function ColorPalette(props: { selected: ColorTokenDefinition, onColorClicked: (color: string) => void, onColorShiftClicked: (color: string) => void }) {
 
     const colorPalette = createMemo(() => getColorPalette())
     const [selectedFilter, setFilter] = createSignal<"tailwind" | "material" | null>("tailwind")

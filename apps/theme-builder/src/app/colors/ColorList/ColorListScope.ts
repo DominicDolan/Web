@@ -5,67 +5,99 @@ import {
     action,
     flush,
     refresh,
-    createStore,
+    createStore, createMemo,
 } from 'solid-js'
-import { getColorDeltas, saveColor } from '~/app/colors/ColorRepository.server'
+import {getColorDeltas, saveColorDeltas} from '~/app/colors/ColorRepository.server'
 import { createId } from '@paralleldrive/cuid2'
 import { useNavigate } from '@web/router'
-import { ColorDefinition } from '~/models/ColorDefinition.ts'
+import { ColorTokenDefinition } from '~/models/ColorTokenDefinition.ts'
+import {ColorValueDefinition} from "~/models/ColorValueDefinition.ts";
+
+type ColorScheme = {
+    tokens: ModelDelta<ColorTokenDefinition>[]
+    values: ModelDelta<ColorValueDefinition>[]
+}
 
 export const useColorListScope = defineScope(ThemeScope, (props) => {
     const [colorDeltas, setColorDeltas] = createStore(async () => {
-        const res = await getColorDeltas(props.theme.id)
-        setTimeout(() => acked.mark(res))
-        return res
-    }, [] as ModelDelta<ColorDefinition>[])
-    const acked = createDeltaTracker(() => colorDeltas)
+        const {tokens, values} = await getColorDeltas(props.theme.id)
+        setTimeout(() => ackedTokens.mark(tokens))
+        setTimeout(() => ackedValues.mark(values))
+        return {tokens, values}
+    }, {} as ColorScheme)
+    const ackedTokens = createDeltaTracker(() => colorDeltas.tokens)
+    const ackedValues = createDeltaTracker(() => colorDeltas.values)
 
-    const [colors, createDeltas] = createModels(() => colorDeltas)
+    const [tokens, createTokenDeltas] = createModels(() => colorDeltas.tokens)
+    const [values, createValueDeltas] = createModels(() => colorDeltas.values)
+
+    const colorSchemeNames = createMemo(() => Array.from(new Set(values.map(v => v.colorScheme))))
 
     const navigate = useNavigate()
 
     const saveDeltas = action(function* (
-        deltas?: ModelDelta<ColorDefinition>[]
+        tokenDeltas?: ModelDelta<ColorTokenDefinition>[],
+        valueDeltas?: ModelDelta<ColorValueDefinition>[],
     ) {
-        if (deltas != null) {
-            pushColorDeltas(deltas)
-        }
+        pushColorDeltas(tokenDeltas, valueDeltas)
 
-        const uncommitted = acked.inverseIncluding(deltas ?? [])
-        yield saveColor(uncommitted, props.theme.id)
+        const uncommittedTokens = ackedTokens.inverseIncluding(tokenDeltas ?? [])
+        const uncommittedValues = ackedValues.inverseIncluding(valueDeltas ?? [])
+        yield saveColorDeltas(uncommittedTokens, uncommittedValues, props.theme.id)
 
         refresh(colorDeltas)
     })
 
-    function pushColorDeltas(deltas: ModelDelta<ColorDefinition>[]) {
+    function pushColorDeltas(tokenDeltas?: ModelDelta<ColorTokenDefinition>[], valueDeltas?: ModelDelta<ColorValueDefinition>[]) {
+        if (tokenDeltas == null && valueDeltas == null) {
+            return
+        }
         setColorDeltas((old) => {
-            old.push(...deltas)
+            if (tokenDeltas != null) {
+                old.tokens.push(...tokenDeltas)
+            }
+
+            if (valueDeltas != null) {
+                old.values.push(...valueDeltas)
+            }
         })
     }
 
     async function addColor() {
         const newId = createId()
-        const deltas = createDeltas('create', {
+        const tokenDeltas = createTokenDeltas('create', {
             id: newId,
             name: '',
-            hex: '#000000',
-            alpha: 1,
             cssClass: "",
-            onHex: "",
         })
 
-        pushColorDeltas(deltas)
+        const valueDeltas: ModelDelta<ColorValueDefinition>[] = []
+
+        for (const name of colorSchemeNames()) {
+            valueDeltas.push(...createValueDeltas("create", {
+                tokenId: newId,
+                hex: "#000000",
+                alpha: 1,
+                onHex: "#ffffff",
+                colorScheme: name,
+            }))
+        }
+
+        await saveDeltas(tokenDeltas, valueDeltas)
 
         flush()
 
         navigate(`/editor/${props.theme.id}/colors/${newId}`)
+    }
 
-        await saveDeltas()
+    function getColorValues(tokenId: string) {
+        return values.filter(v => v.tokenId === tokenId)
     }
 
     return {
         theme: () => props.theme,
         addColor,
-        colors,
+        tokens,
+        getColorValues
     }
 })

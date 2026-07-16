@@ -2,7 +2,7 @@
 -- Generated at: 2026-03-30T23:43:44.860Z
 -- Source directory: apps/theme-builder/src/models
 
--- Source: apps/theme-builder/src/models/ColorDefinition.ts
+-- Source: apps/theme-builder/src/models/ColorTokenDefinition.ts
 DROP TABLE IF EXISTS "color_events";
 CREATE TABLE IF NOT EXISTS "color_events" (
   id TEXT NOT NULL,
