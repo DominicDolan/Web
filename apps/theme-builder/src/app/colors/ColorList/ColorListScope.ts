@@ -73,7 +73,8 @@ export const useColorListScope = defineScope(ThemeScope, (props) => {
 
         const valueDeltas: ModelDelta<ColorValueDefinition>[] = []
 
-        for (const name of colorSchemeNames()) {
+        const schemeNames = colorSchemeNames().length > 0 ? colorSchemeNames() : ["light", "dark"]
+        for (const name of schemeNames) {
             valueDeltas.push(...createValueDeltas("create", {
                 tokenId: newId,
                 hex: "#000000",

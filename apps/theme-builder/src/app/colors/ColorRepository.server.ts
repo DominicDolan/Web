@@ -43,9 +43,18 @@ export async function getColorDeltas(themeId: string) {
     return {tokens, values}
 }
 
-export async function getSingleColorDelta(colorId: string) {
-    const db = useDatabaseTable(colorTokenDefinitionSchema)
-    return (await db.getOne(colorId) as ModelDelta<ColorTokenDefinition>[])
+export async function getSingleColorDeltas(themeId: string, colorId: string) {
+    const tokenDatabase = useDatabaseTable(colorTokenDefinitionSchema)
+    const valueDatabase = useDatabaseTable(colorValueDefinitionSchema)
+
+    const [tokens, values] = await Promise.all([
+        tokenDatabase.getOne(colorId) as Promise<ModelDelta<ColorTokenDefinition>[]>,
+        valueDatabase.getMany()
+            .byColumn("theme", themeId)
+            .execute() as Promise<ModelDelta<ColorValueDefinition>[]>,
+    ])
+
+    return {tokens, values}
 }
 
 export async function saveColorToken(colorDeltas: ModelDelta<ColorTokenDefinition>[], themeId: string) {

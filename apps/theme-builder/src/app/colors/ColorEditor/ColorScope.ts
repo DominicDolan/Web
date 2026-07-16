@@ -1,79 +1,111 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
-import {action, createStore, refresh} from "solid-js";
-import {getSingleColorDelta} from "~/app/colors/ColorRepository.server";
+import {action, createMemo, createStore, refresh} from "solid-js";
+import {getSingleColorDeltas, saveColorDeltas} from "~/app/colors/ColorRepository.server";
 import {debounce} from "@web/utils/Debounce.js";
 import {createDeltaTracker, createModels, ModelDelta} from "@web/solid-delta";
 import {ColorTokenDefinition} from "~/models/ColorTokenDefinition.ts";
+import {ColorValueDefinition} from "~/models/ColorValueDefinition.ts";
 
+type ColorDefinitions = {
+    tokens: ModelDelta<ColorTokenDefinition>[]
+    values: ModelDelta<ColorValueDefinition>[]
+}
 
 export const ColorScope = createScopeProvider<{ themeId: string, colorId: string }>();
 
 export const useColorScope = defineScope(ColorScope, (props) => {
-
     const [colorDeltas, setColorDeltas] = createStore(() => {
-        return getSingleColorDelta(props.colorId).then((res) => {
-            setTimeout(() => acked.mark(res));
-            return res;
+        return getSingleColorDeltas(props.themeId, props.colorId).then((definitions) => {
+            setTimeout(() => {
+                ackedTokens.mark(definitions.tokens)
+                ackedValues.mark(definitions.values)
+            })
+            return definitions
         })
-    }, [] as ModelDelta<ColorTokenDefinition>[])
+    }, {} as ColorDefinitions)
 
-    const acked = createDeltaTracker(() => colorDeltas)
+    const ackedTokens = createDeltaTracker(() => colorDeltas.tokens)
+    const ackedValues = createDeltaTracker(() => colorDeltas.values)
 
-    const [colors, createDeltas] = createModels(() => colorDeltas)
+    const [tokens, createTokenDeltas] = createModels(() => colorDeltas.tokens)
+    const [values, createValueDeltas] = createModels(() => colorDeltas.values)
 
-    const saveDeltas = action(async function* (deltas?: ModelDelta<ColorTokenDefinition>[]) {
-        if (deltas != null) {
-            pushColorDeltas(deltas);
-        }
-
-        const uncommitted = acked.inverseIncluding(deltas ?? []);
-        yield saveColor(uncommitted, props.themeId);
-
-        refresh(colorDeltas);
+    const colorSchemeNames = createMemo(() => {
+        return Array.from(new Set(values.map(value => value.colorScheme)))
     })
 
+    const saveDeltas = action(async function* (
+        tokenDeltas?: ModelDelta<ColorTokenDefinition>[],
+        valueDeltas?: ModelDelta<ColorValueDefinition>[],
+    ) {
+        pushColorDeltas(tokenDeltas, valueDeltas)
 
-    function pushColorDeltas(deltas: ModelDelta<ColorTokenDefinition>[]) {
+        const uncommittedTokens = ackedTokens.inverseIncluding(tokenDeltas ?? [])
+        const uncommittedValues = ackedValues.inverseIncluding(valueDeltas ?? [])
+        yield saveColorDeltas(uncommittedTokens, uncommittedValues, props.themeId)
+
+        refresh(colorDeltas)
+    })
+
+    function pushColorDeltas(tokenDeltas?: ModelDelta<ColorTokenDefinition>[], valueDeltas?: ModelDelta<ColorValueDefinition>[]) {
+        if (tokenDeltas == null && valueDeltas == null) {
+            return
+        }
+
         setColorDeltas((draft) => {
-            draft.push(...deltas);
-        });
+            if (tokenDeltas != null) {
+                draft.tokens.push(...tokenDeltas)
+            }
+
+            if (valueDeltas != null) {
+                draft.values.push(...valueDeltas)
+            }
+        })
     }
 
     const debounceSave = debounce(saveDeltas, 1000)
 
-    function setColorValue(key: keyof ColorTokenDefinition, value: ColorTokenDefinition[keyof ColorTokenDefinition], debounce = false) {
-        const deltas = createDeltas(props.colorId, {[key]: value})
+    function updateToken(key: keyof ColorTokenDefinition, value: ColorTokenDefinition[keyof ColorTokenDefinition], shouldDebounce = false) {
+        const deltas = createTokenDeltas(props.colorId, {[key]: value})
+        save(tokenDeltasOnly(deltas), shouldDebounce)
+    }
 
-        if (debounce) {
-            pushColorDeltas(deltas)
+    function updateValue(colorScheme: string, key: "hex" | "alpha" | "onHex", value: string | number, shouldDebounce = false) {
+        const colorValue = values.find(value => value.tokenId === props.colorId && value.colorScheme === colorScheme)
+        if (colorValue == null) {
+            return
+        }
+
+        const deltas = createValueDeltas(colorValue.id, {[key]: value})
+        save(valueDeltasOnly(deltas), shouldDebounce)
+    }
+
+    function save(deltas: {tokens?: ModelDelta<ColorTokenDefinition>[], values?: ModelDelta<ColorValueDefinition>[]}, shouldDebounce: boolean) {
+        if (shouldDebounce) {
+            pushColorDeltas(deltas.tokens, deltas.values)
             debounceSave()
         } else {
-            saveDeltas(deltas)
+            saveDeltas(deltas.tokens, deltas.values)
         }
     }
 
-    function updateName(newName: string, debounce = false) {
-        setColorValue("name", newName, debounce)
+    function tokenDeltasOnly(deltas: ModelDelta<ColorTokenDefinition>[]) {
+        return {tokens: deltas}
     }
 
-    function updateHex(newHex: string, debounce = false) {
-        setColorValue("hex", newHex, debounce)
-    }
-
-    function updateAlpha(newAlpha: number, debounce = false) {
-        setColorValue("alpha", newAlpha, debounce)
-    }
-
-    function updateOnHex(hex: string, debounce = false) {
-        setColorValue("onHex", hex, debounce)
+    function valueDeltasOnly(deltas: ModelDelta<ColorValueDefinition>[]) {
+        return {values: deltas}
     }
 
     return {
-        updateName,
-        updateHex,
-        updateAlpha,
-        updateOnHex,
-        color: () => colors[0],
+        updateName: (name: string, shouldDebounce = false) => updateToken("name", name, shouldDebounce),
+        updateCssClass: (cssClass: string, shouldDebounce = false) => updateToken("cssClass", cssClass, shouldDebounce),
+        updateHex: (colorScheme: string, hex: string, shouldDebounce = false) => updateValue(colorScheme, "hex", hex, shouldDebounce),
+        updateAlpha: (colorScheme: string, alpha: number, shouldDebounce = false) => updateValue(colorScheme, "alpha", alpha, shouldDebounce),
+        updateOnHex: (colorScheme: string, onHex: string, shouldDebounce = false) => updateValue(colorScheme, "onHex", onHex, shouldDebounce),
+        color: () => tokens[0],
+        colorValue: (colorScheme: string) => values.find(value => value.tokenId === props.colorId && value.colorScheme === colorScheme),
+        colorSchemeNames,
         themeId: () => props.themeId,
     }
 })

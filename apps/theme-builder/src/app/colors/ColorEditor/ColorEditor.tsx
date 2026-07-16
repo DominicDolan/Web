@@ -1,5 +1,5 @@
 import {useColorScope} from "~/app/colors/ColorEditor/ColorScope";
-import {createMemo, createSignal, Loading} from "solid-js";
+import {createMemo, createSignal, For, Loading} from "solid-js";
 import style from "../colors.module.css"
 import {useColorNameUtils, useColorUtils} from "~/app/colors/ColorUtils";
 import {useNavigate} from "@web/router";
@@ -7,87 +7,95 @@ import {ColorPalette} from "~/app/colors/ColorPalette/ColorPalette";
 import {SubPageTemplate} from "~/components/SubPageTemplate";
 
 export function ColorEditor() {
-
-    const {color, updateName, updateHex, themeId, updateAlpha, updateOnHex} = useColorScope()
+    const {
+        color,
+        colorValue,
+        colorSchemeNames,
+        updateName,
+        updateCssClass,
+        updateHex,
+        themeId,
+        updateAlpha,
+        updateOnHex,
+    } = useColorScope()
 
     const {variableNameToTitle} = useColorNameUtils()
     const navigate = useNavigate()
+    const [selectedColorScheme, setSelectedColorScheme] = createSignal<string>()
 
+    const selectedScheme = createMemo(() => selectedColorScheme() ?? colorSchemeNames()[0])
+    const value = createMemo(() => colorValue(selectedScheme()))
     const colorName = createMemo(() => variableNameToTitle(color().name))
+    const onColorVariableName = createMemo(() => `--on-${color().name.replace("--", "")}`)
+    const {bestContrast} = useColorUtils(() => value()?.hex ?? "#000000")
+    const [isOnColorSynced, setIsOnColorSynced] = createSignal(true)
+    const onColorHex = createMemo(() => isOnColorSynced() ? bestContrast() : value()?.onHex ?? bestContrast())
 
     function onBackClicked() {
         navigate(`/editor/${themeId()}/colors`)
     }
 
-    const onColorVariableName = () => {
-        const base = color().name.replace("--", "")
-
-        return `--on-${base}`
+    function onColorClicked(hex: string) {
+        updateHex(selectedScheme(), hex)
     }
 
-    const {bestContrast} = useColorUtils(() => color().hex)
-
-    const [isOnColorSynced, setIsOnColorSynced] = createSignal(() => color().onHex == null)
-
-    const onColorHex = createMemo(() => {
-        if (isOnColorSynced() || color().onHex == null) return bestContrast()
-        return color().onHex
-    })
-
-    function onColorClicked(color: string) {
-        updateHex(color)
-    }
-
-    function onColorShiftClicked(color: string) {
-        updateOnHex(color)
+    function onColorShiftClicked(hex: string) {
+        setIsOnColorSynced(false)
+        updateOnHex(selectedScheme(), hex)
     }
 
     return <Loading>
-        <SubPageTemplate onBackClicked={onBackClicked} title={"Edit Color"} backButtonText={"Back to Palette"} >
-            <div class="grid grid-cols-[1fr_2fr] gap-x-8 h-full min-h-0">
-                <div class="flex flex-col gap-8 px-4">
-                    <div class="flex flex-col gap-12 px-8">
-                        <section class="flex flex-col gap-2">
+        <SubPageTemplate onBackClicked={onBackClicked} title="Edit Color" backButtonText="Back to Palette">
+            <div class="flex flex-col gap-6 h-full min-h-0">
+                <ul role="tablist" class="underlined flex gap-2 px-4" aria-label="Colour scheme">
+                    <For each={colorSchemeNames()}>{scheme =>
+                        <li
+                            role="tab"
+                            aria-selected={selectedScheme() === scheme}
+                            class="px-4 py-2"
+                            onClick={() => setSelectedColorScheme(scheme)}>
+                            {scheme}
+                        </li>
+                    }</For>
+                </ul>
+                <div class="grid grid-cols-[1fr_2fr] gap-x-8 flex-1 min-h-0">
+                    <div class="flex flex-col gap-8 px-4 overflow-auto">
+                        <section class="flex flex-col gap-2 px-8">
                             <h2>Preview</h2>
                             <div
-                                class={[style.colorPresentation, "col-span-full h-64 mx-4"]}
-                                style={`--presentation-color: ${color().hex}; --on-presentation-color: ${onColorHex()}; --alpha: ${color().alpha};`}>
-                                <span class={[style.hexPresentation, "flex items-center justify-center"]}>{color().hex}</span>
+                                class={[style.colorPresentation, "h-64 mx-4"]}
+                                style={`--presentation-color: ${value()?.hex}; --on-presentation-color: ${onColorHex()}; --alpha: ${value()?.alpha};`}>
+                                <span class={[style.hexPresentation, "flex items-center justify-center"]}>{value()?.hex}</span>
                             </div>
                         </section>
-                        <section class="flex flex-col gap-8">
+                        <section class="flex flex-col gap-8 px-8">
                             <h2>{colorName()}</h2>
                             <div class="grid grid-cols-[1fr_1fr] gap-y-8 gap-x-4 px-4">
                                 <form-field class="col-span-full flex flex-col">
                                     <label for="cssVariableName">CSS Variable Name</label>
-                                    <div class="flex flex-row items-center gap-2">
-                                        <input class="flex-1" id="cssVariableName" type="text" value={color().name} onInput={e => updateName(e.currentTarget.value, true)}/>
-                                        <button class="text">
-                                            <i>content_copy</i>
-                                        </button>
-                                    </div>
+                                    <input id="cssVariableName" type="text" value={color().name} onInput={e => updateName(e.currentTarget.value, true)}/>
                                 </form-field>
                                 <form-field class="flex flex-col">
                                     <label for="colorHex">Color Hex</label>
                                     <input-shell class="flex gap-2 h-full p-0">
-                                        <input id="colorHex" type="color" class="h-full w-9 py-1 pl-2" value={color().hex} onInput={e => updateHex(e.currentTarget.value)}/>
-                                        <input id="colorHex" type="text" value={color().hex} onInput={e => updateHex(e.currentTarget.value, true)}/>
+                                        <input id="colorPicker" type="color" class="h-full w-9 py-1 pl-2" value={value()?.hex} onInput={e => updateHex(selectedScheme(), e.currentTarget.value)}/>
+                                        <input id="colorHex" type="text" value={value()?.hex} onInput={e => updateHex(selectedScheme(), e.currentTarget.value, true)}/>
                                     </input-shell>
                                 </form-field>
                                 <form-field class="flex flex-col">
                                     <label for="cssClass">CSS Class</label>
-                                    <input id="cssClass" type="text"/>
+                                    <input id="cssClass" type="text" value={color().cssClass} onInput={e => updateCssClass(e.currentTarget.value, true)}/>
                                 </form-field>
                                 <form-field class="flex flex-col col-span-full">
                                     <div class="flex flex-row justify-between">
                                         <label for="alpha">Opacity</label>
-                                        <span>{color().alpha}</span>
+                                        <span>{value()?.alpha}</span>
                                     </div>
-                                    <input id="alpha" type="range" min={0} max={1} step={0.01} value={color().alpha} onInput={e => updateAlpha(parseFloat(e.currentTarget.value), true)}/>
+                                    <input id="alpha" type="range" min={0} max={1} step={0.01} value={value()?.alpha} onInput={e => updateAlpha(selectedScheme(), parseFloat(e.currentTarget.value), true)}/>
                                 </form-field>
                             </div>
                         </section>
-                        <section class="flex flex-col gap-8">
+                        <section class="flex flex-col gap-8 px-8">
                             <h2>On {colorName()}</h2>
                             <div class="grid grid-cols-[1fr_1fr] gap-y-8 gap-x-4 px-4">
                                 <form-field class="flex flex-col">
@@ -95,24 +103,13 @@ export function ColorEditor() {
                                     <input id="onColorVariableName" disabled value={onColorVariableName()} class="w-full"/>
                                 </form-field>
                                 <form-field class="flex flex-col">
-                                    <label for="colorHex">Color Hex</label>
+                                    <label for="onColorHex">Color Hex</label>
                                     <div class="flex gap-2 h-full">
                                         <input-shell class="flex gap-2 h-full p-0">
-                                            <input
-                                                id="colorHex"
-                                                type="color"
-                                                class="h-full w-9 py-1 pl-2"
-                                                disabled={isOnColorSynced()}
-                                                value={onColorHex()}
-                                                onInput={e => updateHex(e.currentTarget.value)}/>
-                                            <input
-                                                id="colorHex"
-                                                type="text"
-                                                disabled={isOnColorSynced()}
-                                                value={onColorHex()}
-                                                onInput={e => updateHex(e.currentTarget.value, true)}/>
+                                            <input id="onColorPicker" type="color" class="h-full w-9 py-1 pl-2" disabled={isOnColorSynced()} value={onColorHex()} onInput={e => updateOnHex(selectedScheme(), e.currentTarget.value)}/>
+                                            <input id="onColorHex" type="text" disabled={isOnColorSynced()} value={onColorHex()} onInput={e => updateOnHex(selectedScheme(), e.currentTarget.value, true)}/>
                                         </input-shell>
-                                        <button class={[isOnColorSynced() ? "outlined active" : "outlined", "py-1 px-2 flex flex-row items-center"]} onClick={() => setIsOnColorSynced(!isOnColorSynced())}>
+                                        <button class="outlined py-1 px-2 flex flex-row items-center" aria-pressed={isOnColorSynced()} onClick={() => setIsOnColorSynced(!isOnColorSynced())}>
                                             <i>sync</i>
                                         </button>
                                     </div>
@@ -120,9 +117,9 @@ export function ColorEditor() {
                             </div>
                         </section>
                     </div>
-                </div>
-                <div class="px-4 h-full min-h-0 pb-6">
-                    <ColorPalette selected={color()} onColorClicked={onColorClicked} onColorShiftClicked={onColorShiftClicked}/>
+                    <div class="px-4 min-h-0 pb-6">
+                        <ColorPalette selected={value()!} onColorClicked={onColorClicked} onColorShiftClicked={onColorShiftClicked}/>
+                    </div>
                 </div>
             </div>
         </SubPageTemplate>

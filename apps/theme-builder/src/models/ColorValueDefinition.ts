@@ -8,7 +8,7 @@ export const colorValueDefinitionSchema = z.object({
     alpha: z.number(),
     onHex: z.string(),
     tokenId: z.string(),
-    colorScheme: z.string(),
+    colorScheme: z.string(), // eg. "light" or "dark"
 }).meta({
     table: createModelSchema("color_hex_events", { recreate: true })
         .addColumn("theme", "TEXT")

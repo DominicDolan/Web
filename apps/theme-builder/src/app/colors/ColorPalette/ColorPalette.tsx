@@ -1,10 +1,10 @@
-import {createMemo, createSignal, For, Loading, Match, Show, Switch} from "solid-js";
+import {createMemo, createSignal, Errored, For, Loading, Match, Show, Switch} from "solid-js";
 import {ColorPaletteRow, getColorPalette} from "~/app/colors/ColorRepository.server";
 import style from "../colors.module.css"
-import {ColorTokenDefinition} from "~/models/ColorTokenDefinition.ts";
+import {ColorValueDefinition} from "~/models/ColorValueDefinition.ts";
 
 
-export function ColorPalette(props: { selected: ColorTokenDefinition, onColorClicked: (color: string) => void, onColorShiftClicked: (color: string) => void }) {
+export function ColorPalette(props: { selected: ColorValueDefinition, onColorClicked: (color: string) => void, onColorShiftClicked: (color: string) => void }) {
 
     const colorPalette = createMemo(() => getColorPalette())
     const [selectedFilter, setFilter] = createSignal<"tailwind" | "material" | null>("tailwind")
@@ -162,36 +162,38 @@ export function ColorPalette(props: { selected: ColorTokenDefinition, onColorCli
             </div>
         </hgroup>
         <div class="flex flex-col gap-6 p-4 flex-1 overflow-y-auto">
-            <Loading fallback={<div>Loading...</div>}>
-                <Show when={isSearchView()} fallback={<>
-                    <For each={groups()}>{(group) => (<div class="flex flex-col gap-2">
-                        <h3 class="headline variant">{group}</h3>
-                        <div class="flex flex-row gap-4">
-                            <For each={groupedColors()[group]}>{(color) => (<>
-                                <div onClick={(event) => onColorClicked(color, event)} class={["w-10 h-10", style.colorPresentationCompact]} style={{ ["background-color"]: color.hex_value }}>
-                                    <Show when={color.hex_value === props.selected.hex}>
-                                        <i>check</i>
-                                    </Show>
-                                </div>
-                            </>)}</For>
-                        </div>
-                    </div>)}</For>
-                </>}>
-                    <ul class="flex flex-col gap-4">
-                        <For each={searchedAndSortedColors()}>{(color) => <>
-                            <li class="flex flex-row gap-6 items-center">
-                                <div onClick={(event) => onColorClicked(color, event)} class={["aspect-square w-10", style.colorPresentationCompact]} style={{ ["background-color"]: color.hex_value }}></div>
-                                <hgroup>
-                                    <h4 class="title medium">{color.color_name}</h4>
-                                    <span>{color.hex_value}</span>
-                                </hgroup>
-                            </li>
-                            <hr/>
-                        </>}
-                        </For>
-                    </ul>
-                </Show>
-            </Loading>
+            <Errored fallback={"Error occurred loading Color Palette"}>
+                <Loading fallback={<div>Loading...</div>}>
+                    <Show when={isSearchView()} fallback={<>
+                        <For each={groups()}>{(group) => (<div class="flex flex-col gap-2">
+                            <h3 class="headline variant">{group}</h3>
+                            <div class="flex flex-row gap-4">
+                                <For each={groupedColors()[group]}>{(color) => (<>
+                                    <div onClick={(event) => onColorClicked(color, event)} class={["w-10 h-10", style.colorPresentationCompact]} style={{ ["background-color"]: color.hex_value }}>
+                                        <Show when={color.hex_value === props.selected.hex}>
+                                            <i>check</i>
+                                        </Show>
+                                    </div>
+                                </>)}</For>
+                            </div>
+                        </div>)}</For>
+                    </>}>
+                        <ul class="flex flex-col gap-4">
+                            <For each={searchedAndSortedColors()}>{(color) => <>
+                                <li class="flex flex-row gap-6 items-center">
+                                    <div onClick={(event) => onColorClicked(color, event)} class={["aspect-square w-10", style.colorPresentationCompact]} style={{ ["background-color"]: color.hex_value }}></div>
+                                    <hgroup>
+                                        <h4 class="title medium">{color.color_name}</h4>
+                                        <span>{color.hex_value}</span>
+                                    </hgroup>
+                                </li>
+                                <hr/>
+                            </>}
+                            </For>
+                        </ul>
+                    </Show>
+                </Loading>
+            </Errored>
         </div>
         <hr />
         <footer class="flex flex-row justify-between items-center p-2">

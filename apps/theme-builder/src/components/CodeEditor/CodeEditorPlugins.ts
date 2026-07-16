@@ -1,6 +1,6 @@
 import {Extension} from "@codemirror/state";
 import {EditorState, Transaction} from "@codemirror/state";
-import {Decoration, ViewPlugin, ViewUpdate} from "@codemirror/view";
+import {Decoration, ViewPlugin, ViewUpdate, EditorView as AnyEditorView} from "@codemirror/view";
 import {EditorView} from "codemirror";
 
 // Make the given 1-based line numbers read-only
@@ -65,17 +65,17 @@ export function highlightReadOnlyLines(lines: number[], cssClass: string): Exten
         class {
             decorations;
 
-            constructor(view: EditorView) {
+            constructor(view: AnyEditorView) {
                 this.decorations = this.buildDecorations(view);
             }
 
             update(update: ViewUpdate) {
                 if (update.docChanged || update.viewportChanged) {
-                    this.decorations = this.buildDecorations(update.view);
+                    this.decorations = this.buildDecorations(update.view as any);
                 }
             }
 
-            private buildDecorations(view: EditorView) {
+            private buildDecorations(view: AnyEditorView) {
                 const builder = Decoration.set([]);
                 const state = view.state;
                 const lastLineNumber = state.doc.lines;
