@@ -1,7 +1,7 @@
 import type { Model } from "@web/schema"
 import type { PersistedModelDelta } from "./SchemaRuntimeContext"
 import { quoteIdentifier } from "./SchemaRuntimeContext"
-import type { ProjectionRunnerDb } from "./RunDeltaProjections"
+import type { ProjectionRunnerDb } from "./ProjectionRunnerShared"
 import type { StaleDeltaPolicy, StaleDeltaSqlCondition } from "./StaleDeltaPolicy"
 
 export type RunStaleDeltaCleanupOptions = {

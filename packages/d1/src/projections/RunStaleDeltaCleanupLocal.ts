@@ -27,7 +27,7 @@ function walk(dir: string): string[] {
     return files
 }
 
-async function loadModels(modelsDir: string): string[] {
+async function loadModels(modelsDir: string): Promise<string[]> {
     if (!fs.existsSync(modelsDir)) {
         throw new Error(`Models directory does not exist: ${modelsDir}`)
     }
