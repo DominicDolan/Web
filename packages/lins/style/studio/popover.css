@@ -1,0 +1,59 @@
+/*
+ * Overlay elements: Popover Menu and Dialog.
+ *
+ * Category selectors:
+ *   - [popover][role="menu"], [popover].menu
+ *   - dialog
+ *   - dialog > footer
+ *
+ * Popover positioning often comes from JS, anchor positioning, or markup
+ * utilities. Keep this file focused on the overlay surface, border, shadow,
+ * backdrop, and motion.
+ */
+
+@layer elements {
+    @scope (.studio) to (.notStudio) {
+        [popover][role="menu"],
+        [popover].menu {
+            color: var(--studio-on-popover-color);
+            background: var(--studio-popover-color);
+            border: 1px solid var(--studio-border-color);
+            border-radius: var(--surface-radius, 0.5rem);
+            box-shadow:
+                0 4px 6px -4px var(--shadow-color),
+                0 18px 32px -18px var(--shadow-color);
+        }
+
+        dialog {
+            color: var(--on-current-color);
+            background: var(--current-color);
+            border: 1px solid var(--studio-border-color);
+            border-radius: var(--surface-radius, 0.5rem);
+            box-shadow:
+                0 4px 6px -4px var(--shadow-color),
+                0 24px 48px -24px var(--shadow-color);
+        }
+
+        dialog::backdrop {
+            background: oklab(from var(--background-color) l a b / 0.78);
+            backdrop-filter: blur(3px);
+        }
+
+        dialog > footer {
+            /*
+             * Context hook for dialog actions. A small gap/inline row may be a
+             * reasonable soft default; leave empty if layout utilities own it.
+             */
+            color: var(--studio-muted-color);
+            border-block-start: 1px solid var(--studio-border-color);
+            padding-block-start: 0.75rem;
+        }
+
+        form > footer {
+            color: var(--studio-muted-color);
+            border-block-start: 1px solid var(--studio-border-color);
+            padding-block-start: 0.75rem;
+        }
+    }
+}
+

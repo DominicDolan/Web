@@ -1,0 +1,187 @@
+/*
+ * List elements: List, Tab List, Menu List.
+ *
+ * Category selectors:
+ *   - ul, ol, li
+ *   - ul[role="tablist"] and its > li tabs
+ *   - ul[role="menu"], ul.menu
+ *   - list variants such as .nav, .plain, .chips, .underlined, .inset
+ *
+ * Note: ul and ul[role="tablist"] are different element categories even
+ * though they share a tag. Keep their rules separate.
+ */
+
+@layer elements {
+    @scope (.studio) to (.notStudio) {
+        ul.nav {
+            /*
+             * Navigation-list variant. Use this when a list of links/actions is
+             * not semantically a <nav> landmark by itself.
+             */
+            > li {
+                color: var(--studio-muted-color);
+                border-radius: var(--control-radius, 0.375rem);
+                transition:
+                    color 0.15s ease,
+                    background-color 0.15s ease;
+
+                &:not(:has(> *)) {
+                    /* Optional soft layout for text-only items. */
+                    padding: 0.5rem 0.75rem;
+                }
+
+                > * {
+                    /* Optional soft layout for linked items. */
+                    display: block;
+                    padding: 0.5rem 0.75rem;
+                }
+
+                &[aria-current="page"],
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-current="page"]),
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    color: var(--on-background-color);
+                    background: var(--studio-muted-surface-color);
+                }
+
+                &:hover:not(.active):not(:has(.active)) {
+                    color: var(--on-background-color);
+                    background: color-mix(in oklab, currentColor 6%, transparent);
+                }
+            }
+        }
+
+        ul.plain {
+            > li {
+                padding-block: 0.5rem;
+                border-block-end: 1px solid var(--studio-border-color);
+            }
+        }
+
+        ul.menu,
+        ul[role="menu"] {
+            color: var(--studio-on-popover-color);
+            background: var(--studio-popover-color);
+            border: 1px solid var(--studio-border-color);
+            border-radius: var(--surface-radius, 0.5rem);
+            box-shadow:
+                0 4px 6px -4px var(--shadow-color),
+                0 10px 18px -12px var(--shadow-color);
+            padding-block: 0.25rem;
+
+            > li,
+            > [role="menuitem"] {
+                cursor: pointer;
+                display: block;
+                padding: 0.5rem 0.75rem;
+                border-radius: calc(var(--control-radius, 0.375rem) - 0.125rem);
+
+                &:hover,
+                &[aria-selected="true"],
+                &[aria-current="page"],
+                &.active {
+                    color: var(--on-background-color);
+                    background: var(--studio-muted-surface-color);
+                }
+            }
+        }
+
+        ul.chips {
+            > li {
+                --current-color: var(--active-color, var(--primary-color));
+                --on-current-color: var(--on-active-color, var(--on-primary-color));
+
+                /* Chips always read as inline rows — soft layout. */
+                display: inline-flex;
+                align-items: center;
+
+                color: var(--current-color);
+                background: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+                border: 1px solid color-mix(in oklab, var(--current-color) 18%, var(--studio-border-color));
+                border-radius: 999px;
+                padding: 0.2rem 0.55rem;
+                line-height: 1.25;
+                font-weight: 500;
+            }
+        }
+
+        ul[role="tablist"] {
+            /*
+             * Base tab-list appearance. Keep horizontal/vertical layout out of
+             * the theme unless every design using this theme should agree.
+             */
+            > li {
+                cursor: pointer;
+                color: var(--studio-muted-color);
+                padding: 0.5rem 0.75rem;
+                border-block-end: 2px solid transparent;
+                transition:
+                    color 0.15s ease,
+                    background-color 0.15s ease,
+                    border-color 0.15s ease;
+
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    color: var(--on-background-color);
+                    border-block-end-color: var(--primary-color);
+                }
+
+                &:hover:not([aria-selected="true"]):not(.active):not(:has(.active)) {
+                    color: var(--on-background-color);
+                    background: color-mix(in oklab, currentColor 5%, transparent);
+                }
+            }
+        }
+
+        ul[role="tablist"].underlined {
+            /*
+             * Example variant: underline selected tab.
+             * The minimal theme uses CSS anchor positioning here. If you use
+             * that technique, keep it as decorative state styling.
+             */
+            border-block-end: 1px solid var(--studio-border-color);
+
+            > li {
+                border-block-end-color: transparent;
+            }
+
+            &::after {
+                content: none;
+            }
+        }
+
+        ul[role="tablist"].inset {
+            display: inline-flex;
+            gap: 0.25rem;
+            padding: 0.25rem;
+            background: var(--studio-muted-surface-color);
+            border: 1px solid var(--studio-border-color);
+            border-radius: var(--surface-radius, 0.5rem);
+
+            > li {
+                border: 1px solid transparent;
+                border-radius: var(--control-radius, 0.375rem);
+                border-block-end-width: 1px;
+
+                &[aria-selected="true"],
+                &.active,
+                &:has(> [aria-selected="true"]),
+                &:has(> .active) {
+                    color: var(--on-surface-color);
+                    background: var(--surface-color);
+                    border-color: var(--studio-border-color);
+                    box-shadow: 0 1px 2px 0 var(--shadow-color);
+                }
+            }
+
+            &::after {
+                content: none;
+            }
+        }
+    }
+}
+

@@ -1,5 +1,6 @@
 import materialInspiredThemeInfo from "./materialInspired/theme.ts";
 import signalBloomThemeInfo from "./signalBloom/theme.ts";
+import studioThemeInfo from "./studio/theme.ts";
 import apertureThemeDefinition from "./aperture/theme.ts";
 import { LINS_THEME_SPEC, type LinsThemeDefinition, type LinsThemeColorValueDefinition } from "../src/generator/index.ts";
 import type { LinsColorThemeValue, LinsElementCategoryInfo, LinsThemeInfo, LinsVariantInfo } from "./themeInfo.ts";
@@ -17,6 +18,7 @@ export { minimalThemeInfo } from "./minimal/theme.ts";
 export { foundryThemeInfo } from "./foundry/theme.ts";
 export { materialInspiredThemeInfo } from "./materialInspired/theme.ts";
 export { signalBloomThemeInfo } from "./signalBloom/theme.ts";
+export { studioThemeInfo } from "./studio/theme.ts";
 export { apertureThemeDefinition };
 
 import { minimalThemeInfo } from "./minimal/theme.ts";
@@ -116,7 +118,7 @@ function definedThemeInfo(theme: LinsThemeDefinition): LinsThemeInfo {
 
 export const apertureThemeInfo = definedThemeInfo(apertureThemeDefinition);
 
-export const linsThemes = [minimalThemeInfo, foundryThemeInfo, materialInspiredThemeInfo, signalBloomThemeInfo, apertureThemeInfo] as const;
+export const linsThemes = [minimalThemeInfo, foundryThemeInfo, materialInspiredThemeInfo, signalBloomThemeInfo, studioThemeInfo, apertureThemeInfo] as const;
 
 export type LinsThemeId = typeof linsThemes[number]["id"];
 

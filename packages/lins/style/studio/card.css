@@ -1,0 +1,135 @@
+/*
+ * Surface elements: Card.
+ *
+ * Category selectors:
+ *   - article
+ *   - article article                  nested card context
+ *   - article[role="button"]           interactive card state/augmentation
+ *   - article[aria-selected="false"]   deselected state
+ *
+ * Cards are a good example of the LINS distinction between:
+ *   - variants: .elevated, .flat, .outlined, .tonal, .inset, .highlighted, .text
+ *   - states:   [role="button"], :hover, [aria-selected]
+ *   - context:  article article, article > footer, article > hgroup
+ */
+
+@layer elements {
+    @scope (.studio) to (.notStudio) {
+        article {
+            /*
+             * A plain article should map to one default variant. The studio
+             * leaves the exact look empty, but shows the selectors you should
+             * group to make the default explicit.
+             */
+            :where(&),
+            &.elevated {
+                color: var(--on-current-color);
+                background: var(--current-color);
+                border: 1px solid var(--studio-border-color);
+                box-shadow:
+                    0 1px 2px 0 var(--shadow-color),
+                    0 10px 24px -18px var(--shadow-color);
+            }
+
+            &.flat {
+                color: var(--on-current-color);
+                background: var(--current-color);
+                border: 1px solid transparent;
+                box-shadow: none;
+            }
+
+            &.outlined,
+            :where(& &) {
+                /*
+                 * Nested cards often default to outlined so surfaces do not
+                 * stack excessive elevation. Because :where(& &) is zero
+                 * specificity, article.elevated inside another article can win.
+                 */
+                color: var(--on-surface-color);
+                background: var(--surface-color);
+                border: 1px solid var(--studio-border-color);
+                box-shadow: none;
+            }
+
+            &.tonal {
+                color: var(--current-color);
+                background: color-mix(in oklab, var(--current-color) 8%, var(--studio-muted-surface-color));
+                border: 1px solid color-mix(in oklab, var(--current-color) 18%, var(--studio-border-color));
+                box-shadow: none;
+            }
+
+            &.inset {
+                color: var(--on-surface-color);
+                background: var(--studio-muted-surface-color);
+                border: 1px solid var(--studio-border-color);
+                box-shadow: inset 0 1px 3px color-mix(in oklab, black 8%, transparent);
+            }
+
+            &.highlighted {
+                /*
+                 * Accent bar treatment for emphasized card content.
+                 * Decorative pseudo-elements are allowed in a theme; avoid
+                 * positioning real content here.
+                 */
+                color: var(--on-surface-color);
+                background: var(--surface-color);
+                border: 1px solid var(--studio-border-color);
+                border-inline-start: 0.25rem solid var(--current-color);
+                box-shadow: 0 1px 2px 0 var(--shadow-color);
+            }
+
+            &.text {
+                color: inherit;
+                background: transparent;
+                border-color: transparent;
+                box-shadow: none;
+            }
+
+            &[role="button"]:hover,
+            &[role="button"]:focus-visible {
+                border-color: color-mix(in oklab, var(--current-color) 24%, var(--studio-border-color));
+                box-shadow:
+                    0 1px 2px 0 var(--shadow-color),
+                    0 12px 28px -18px var(--shadow-color);
+            }
+
+            &[aria-selected="false"] {
+                opacity: 0.6;
+                filter: saturate(0.82);
+            }
+
+            &[aria-selected="true"],
+            &.active {
+                border-color: var(--studio-ring-color);
+                box-shadow:
+                    0 0 0 1px var(--studio-ring-color),
+                    0 8px 22px -18px var(--shadow-color);
+            }
+
+            > hgroup,
+            > h3 {
+                /*
+             * Context hook for card headings. Typography defaults live in
+             * text.css; add only card-specific colour/border/etc. here.
+             */
+                color: inherit;
+            }
+
+            > section {
+                color: color-mix(in oklab, currentColor 78%, var(--studio-muted-color));
+            }
+
+            > footer {
+                /*
+             * Soft layout may be acceptable here if every card footer in
+             * the design reads as an action row. Otherwise leave empty and
+             * let markup utilities control layout.
+             */
+                color: var(--studio-muted-color);
+                border-block-start: 1px solid var(--studio-border-color);
+                padding-block-start: 0.75rem;
+            }
+        }
+    }
+}
+

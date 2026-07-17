@@ -1,0 +1,87 @@
+/*
+ * Placeholder elements: Empty State and Skeleton.
+ *
+ * Category selectors:
+ *   - empty-state
+ *   - empty-state.skeleton
+ *   - empty-state.empty
+ *
+ * State hook:
+ *   - [aria-busy] for loading skeletons
+ */
+
+@keyframes studio-shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+@layer elements {
+    @scope (.studio) to (.notStudio) {
+        /*noinspection CssInvalidHtmlTagReference*/
+        empty-state.skeleton *:not(:has(> *)) {
+            pointer-events: none;
+            user-select: none;
+
+            color: transparent;
+            background-color: var(--studio-muted-surface-color);
+            border-radius: var(--control-radius, 0.375rem);
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        empty-state.skeleton[aria-busy] *:not(:has(> *)) {
+            /*
+             * Example animated skeleton pattern. Tune colours to your palette
+             * or remove animation for a quieter theme.
+             */
+            animation: studio-shimmer 1.4s linear infinite;
+            background-size: 200% 100%;
+            background-image: linear-gradient(
+                90deg,
+                var(--studio-muted-surface-color),
+                color-mix(in oklab, var(--on-background-color) 8%, var(--studio-muted-surface-color)),
+                var(--studio-muted-surface-color)
+            );
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        empty-state.skeleton:not([aria-busy]) *:not(:has(> *)) {
+            opacity: 0.7;
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        empty-state.empty {
+            --current-color: var(--active-color, var(--surface-color));
+            --on-current-color: var(--on-active-color, var(--on-surface-color));
+
+            isolation: isolate;
+            position: relative;
+
+            color: var(--studio-muted-color);
+            background: var(--surface-color);
+            border: 1px dashed var(--studio-border-color);
+            border-radius: var(--surface-radius, 0.5rem);
+            padding: 1.5rem;
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        empty-state.empty::after {
+            /*
+         * Optional decorative outline/illustration. Decorative absolute
+         * pseudo-elements are allowed; do not use this to place content.
+         */
+            content: "";
+            position: absolute;
+            inset: 0.5rem;
+            pointer-events: none;
+            border: 1px solid color-mix(in oklab, var(--studio-border-color) 72%, transparent);
+            border-radius: calc(var(--surface-radius, 0.5rem) - 0.125rem);
+        }
+    }
+}
+
+

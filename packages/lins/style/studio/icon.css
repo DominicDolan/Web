@@ -1,0 +1,43 @@
+/*
+ * Icon elements.
+ *
+ * Category selector:
+ *   - i
+ *
+ * The minimal theme uses Material Symbols. This studio does not import a
+ * remote font by default because icon families are theme/product decisions.
+ * If your theme standardises on a font, add @font-face here or import it from
+ * your app.
+ */
+
+/*
+@font-face {
+    font-family: "Your Icon Font";
+    font-style: normal;
+    font-weight: 100 700;
+    src: url("...") format("woff2");
+}
+*/
+
+@layer elements {
+    @scope (.studio) to (.notStudio) {
+        i,
+        i.medium {
+            font-size: 1.25em;
+        }
+
+        i.large {
+            font-size: 1.5em;
+        }
+
+        i.xlarge {
+            font-size: 2em;
+        }
+
+        i.small {
+            font-size: 1em;
+        }
+    }
+}
+
+

@@ -1,0 +1,180 @@
+/*
+ * Action elements: Button, Link, Pseudo-button, Radio Group.
+ *
+ * Category selectors:
+ *   - button
+ *   - input[type=button], input[type=submit], input[type=reset], input[type=image]
+ *   - [role="button"]
+ *   - [role="radiogroup"] and its child buttons
+ *   - a
+ *
+ * Shared invariant reset/default behaviour lives in ../base.css. Put visual
+ * variants, states, and context-dependent appearance in @layer elements.
+ */
+
+@layer elements {
+    /*
+     * Scope theme-specific variants so a subtree can opt out with .notStudio.
+     * Rename both classes when copying this folder for a real theme.
+     */
+    @scope (.studio) to (.notStudio) {
+        button,
+        input[type=button],
+        input[type=submit],
+        input[type=reset],
+        input[type=image] {
+            /*
+             * Default variant pattern.
+             * :where(&) has zero specificity, so explicit classes like .flat or
+             * .text can override the default without a specificity fight.
+             */
+            :where(&),
+            &.outlined {
+                color: var(--current-color);
+                background: var(--surface-color);
+                border-color: var(--studio-input-color);
+                box-shadow: 0 1px 2px 0 var(--shadow-color);
+            }
+
+            &.flat {
+                color: var(--on-current-color);
+                background: var(--current-color);
+                border-color: var(--current-color);
+                box-shadow: none;
+            }
+
+            &.elevated {
+                color: var(--on-current-color);
+                background: var(--current-color);
+                border-color: var(--current-color);
+                box-shadow:
+                    0 1px 2px 0 var(--shadow-color),
+                    0 6px 16px -12px var(--shadow-color);
+            }
+
+            &.tonal {
+                color: var(--current-color);
+                background: color-mix(in oklab, var(--current-color) 10%, var(--studio-muted-surface-color));
+                border-color: transparent;
+                box-shadow: none;
+            }
+
+            &.text {
+                color: var(--current-color);
+                background: transparent;
+                border-color: transparent;
+                box-shadow: none;
+            }
+
+            &.plain {
+                color: var(--studio-muted-color);
+                background: transparent;
+                border-color: transparent;
+                box-shadow: none;
+            }
+
+            &.icon {
+                /*
+                 * Icon-only buttons are conventionally square — keep aspect-ratio
+                 * as soft layout. The radius is a theme decision: 50% for circular,
+                 * a smaller value for rounded-square.
+                 */
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                aspect-ratio: 1;
+                padding: 0.5rem;
+                border-radius: var(--button-radius, 0.375rem);
+            }
+
+            &:hover:not(:disabled):not([disabled]) {
+                background: color-mix(in oklab, var(--current-color) 8%, var(--surface-color));
+                border-color: color-mix(in oklab, var(--current-color) 20%, var(--studio-input-color));
+            }
+
+            &.flat:hover:not(:disabled):not([disabled]),
+            &.elevated:hover:not(:disabled):not([disabled]),
+            &[aria-pressed="true"]:hover:not(:disabled):not([disabled]),
+            &[aria-selected="true"]:hover:not(:disabled):not([disabled]),
+            &.active:hover:not(:disabled):not([disabled]) {
+                color: var(--on-current-color);
+                background: color-mix(in oklab, var(--on-current-color) 10%, var(--current-color));
+                border-color: var(--current-color);
+            }
+
+            &:focus-visible {
+                outline: var(--focus-ring-width, 2px) solid var(--studio-ring-color);
+                outline-offset: 2px;
+            }
+
+            &[aria-pressed="true"],
+            &[aria-selected="true"],
+            &.active {
+                /*
+                 * Prefer ARIA for state, but support .active because routers and
+                 * UI libraries often emit it. Keep these visually identical.
+                 */
+                color: var(--on-current-color);
+                background: var(--current-color);
+                border-color: var(--current-color);
+                box-shadow: none;
+            }
+        }
+
+        [role="radiogroup"] {
+            /*
+             * Radio groups often render as joined segmented buttons.
+             * Keep only unopinionated grouping affordances here; fill the exact
+             * borders/backgrounds once the theme voice is known.
+             */
+            display: inline-flex;
+            gap: 0;
+
+            & > button {
+                border-radius: 0;
+                margin-inline-start: -1px;
+            }
+
+            & > button:first-child {
+                margin-inline-start: 0;
+                border-start-start-radius: var(--button-radius, 0.375rem);
+                border-end-start-radius: var(--button-radius, 0.375rem);
+            }
+
+            & > button:last-child {
+                border-start-end-radius: var(--button-radius, 0.375rem);
+                border-end-end-radius: var(--button-radius, 0.375rem);
+            }
+
+            & > button[aria-checked="true"],
+            & > button[aria-selected="true"],
+            & > button.active {
+                color: var(--on-current-color);
+                background: var(--current-color);
+                border-color: var(--current-color);
+            }
+        }
+
+        a {
+            color: var(--active-color, var(--accent-color));
+            text-decoration-line: underline;
+            text-decoration-color: color-mix(in oklab, currentColor 32%, transparent);
+            text-underline-offset: 0.25em;
+
+            &[aria-current="page"],
+            &.active {
+                color: var(--current-color, var(--primary-color));
+                font-weight: 600;
+                text-decoration-color: currentColor;
+            }
+
+            &:hover,
+            &:focus-visible {
+                color: color-mix(in oklab, var(--active-color, var(--accent-color)) 82%, var(--on-background-color));
+                text-decoration-color: currentColor;
+            }
+        }
+    }
+}
+
+

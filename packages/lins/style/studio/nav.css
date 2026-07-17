@@ -1,0 +1,65 @@
+/*
+ * Navigation elements.
+ *
+ * Category selectors:
+ *   - nav
+ *   - nav.top
+ *   - nav.pageNav
+ *   - aside > nav
+ *   - nav[aria-label="Breadcrumb"] and its nav > ol track
+ *
+ * Use nav.css for landmark/navigation chrome. Use list.css for ul.nav when the
+ * list itself is the stylable category.
+ */
+
+@layer elements {
+    @scope (.studio) to (.notStudio) {
+        nav.top {
+            color: var(--on-surface-color);
+            background: color-mix(in oklab, var(--surface-color) 88%, transparent);
+            border-block-end: 1px solid var(--studio-border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        nav.pageNav,
+        aside > nav {
+            color: var(--on-surface-color);
+            background: var(--surface-color);
+            border-inline-end: 1px solid var(--studio-border-color);
+        }
+
+        nav a[aria-current="page"],
+        nav a.active {
+            color: var(--on-background-color);
+            font-weight: 600;
+            text-decoration-color: currentColor;
+        }
+
+        nav[aria-label="Breadcrumb"] {
+            color: var(--studio-muted-color);
+        }
+
+        nav[aria-label="Breadcrumb"] > ol {
+            /*
+             * Breadcrumbs are naturally inline rows, so display is a reasonable
+             * soft default. The gap between items is a theme call — fill it
+             * once the visual rhythm is known.
+             */
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        nav[aria-label="Breadcrumb"] > ol > li {
+            color: inherit;
+        }
+
+        nav[aria-label="Breadcrumb"] > ol > li + li::before {
+            content: "/";
+            margin-inline-end: 0.5rem;
+            color: var(--studio-muted-color);
+            opacity: 0.65;
+        }
+    }
+}
+

@@ -1,0 +1,313 @@
+/*
+ * Typography and inline text.
+ *
+ * Category selectors:
+ *   - body
+ *   - h1-h6
+ *   - .display/.headline/.title/.body/.label composed with .small/.medium/.large
+ *   - .variant for muted/secondary type
+ *   - code, hr
+ *   - heading contexts such as section > hgroup > h* and article > hgroup > *
+ *
+ * The type scale below is intentionally fill-ready. A new theme can change the
+ * font family, weights, letter spacing, or sizes while keeping the same class
+ * API.
+ */
+
+@layer defaults {
+    :root {
+        /*
+         * Unopinionated typography baseline. Themes are free to replace any of
+         * these, but the names are part of the LINS contract.
+         */
+        --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        --base-font-size: 16px;
+        /* Fallback only. Implementations should set --font-size in the role rules below. */
+        --font-size: var(--base-font-size);
+        --line-height: 1.5;
+        --heading-line-height: 1.15;
+        --heading-font-weight: 650;
+        --mono-font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
+}
+
+@layer elements {
+    @scope (.studio) to (.notStudio) {
+        /*
+         * Typeface roles compose with size classes:
+         *   <h1 class="display large">Hero</h1>
+         *   <p class="title medium variant">Subtitle</p>
+         *
+         * Each typeface has its own fill-ready rule. Put its full visual
+         * treatment here: --font-size, weight, letter-spacing, transform,
+         * colour, etc. Tag/context defaults belong in :where(...); the explicit
+         * class remains authoritative and easy to override. The defaults below
+         * are a starter map for common website semantics; change them or add to
+         * them during a theme implementation when your content model needs it.
+         */
+
+        :where(
+            h1, h2,
+            main > hgroup > h1, main > hgroup > h2,
+            body > header h1, body > header h2,
+            [role="banner"] h1, [role="banner"] h2
+        ),
+        .display {
+            --font-size: 3.5rem;
+
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        :where(
+            h3, h4, h5,
+            section > h1, section > h2, section > h3,
+            section > h4, section > h5, section > h6,
+            section > hgroup > h1, section > hgroup > h2,
+            section > hgroup > h3, section > hgroup > h4,
+            section > hgroup > h5, section > hgroup > h6
+        ),
+        .headline {
+            --font-size: 2rem;
+
+            font-weight: 650;
+            letter-spacing: 0;
+        }
+
+        :where(
+            h6,
+            article > h1, article > h2, article > h3,
+            article > h4, article > h5, article > h6,
+            article > hgroup > h1, article > hgroup > h2,
+            article > hgroup > h3, article > hgroup > h4,
+            article > hgroup > h5, article > hgroup > h6,
+            dialog > h1, dialog > h2, dialog > h3,
+            dialog > h4, dialog > h5, dialog > h6,
+            dialog > hgroup > h1, dialog > hgroup > h2,
+            dialog > hgroup > h3, dialog > hgroup > h4,
+            dialog > hgroup > h5, dialog > hgroup > h6,
+            nav.top h1, nav.top h2, nav.top h3,
+            nav.top h4, nav.top h5, nav.top h6,
+            empty-state.empty > h1, empty-state.empty > h2,
+            empty-state.empty > h3, empty-state.empty > h4,
+            empty-state.empty > h5, empty-state.empty > h6,
+            empty-state.empty > hgroup > h1, empty-state.empty > hgroup > h2,
+            empty-state.empty > hgroup > h3, empty-state.empty > hgroup > h4,
+            empty-state.empty > hgroup > h5, empty-state.empty > hgroup > h6
+        ),
+        .title {
+            --font-size: 1.25rem;
+
+            font-weight: 600;
+            letter-spacing: 0;
+        }
+
+        :where(
+            p, dt, dd,
+            article > p, article > section,
+            article > section > p,
+            section > p,
+            ul > *, ol > *,
+            blockquote,
+            input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+            textarea, select, input-shell,
+            empty-state.empty,
+            empty-state > p
+        ),
+        .body {
+            --font-size: 1rem;
+
+            font-weight: 400;
+            letter-spacing: 0;
+        }
+
+        /*noinspection CssInvalidHtmlTagReference*/
+        :where(
+            button,
+            input[type=button], input[type=submit], input[type=reset], input[type=image],
+            [role="button"]:not(article),
+            [role="tab"], ul[role="tablist"] > li,
+            ul.chips > li,
+            nav, nav a, nav li,
+            ul.nav > li,
+            ul.menu > li, ul[role="menu"] > li,
+            ul.menu > [role="menuitem"], ul[role="menu"] > [role="menuitem"],
+            label, form-field > label, fieldset > legend
+        ),
+        .label {
+            --font-size: 0.875rem;
+
+            font-weight: 500;
+            letter-spacing: 0;
+        }
+
+        /*
+         * Typeface variants. A variant may set a different --font-size than its
+         * base typeface, then add its own muted/secondary visual treatment.
+         * Context defaults attach here too rather than living as standalone
+         * selectors. Treat these as implementation defaults too: change, remove,
+         * or extend them for the content patterns your theme supports.
+         */
+
+        :where(
+            main > hgroup > p,
+            body > header hgroup > p,
+            [role="banner"] hgroup > p
+        ),
+        .display.variant {
+            --font-size: 1.25rem;
+
+            color: var(--studio-muted-color);
+            font-weight: 400;
+            letter-spacing: 0;
+        }
+
+        :where(
+            section > hgroup > p,
+            section > header > p
+        ),
+        .headline.variant {
+            --font-size: 1rem;
+
+            color: var(--studio-muted-color);
+            font-weight: 400;
+            letter-spacing: 0;
+        }
+
+        :where(
+            article > hgroup > p,
+            article > header > p,
+            dialog > hgroup > p,
+            dialog > header > p,
+            empty-state.empty > hgroup > p,
+            nav[aria-label="Breadcrumb"],
+            nav[aria-label="Breadcrumb"] > ol,
+            nav[aria-label="Breadcrumb"] > ol > li,
+            nav[aria-label="Breadcrumb"] a
+        ),
+        .title.variant {
+            --font-size: 0.95rem;
+
+            color: var(--studio-muted-color);
+            font-weight: 400;
+            letter-spacing: 0;
+        }
+
+        :where(
+            article > footer,
+            section > footer,
+            dialog > footer,
+            form > footer,
+            blockquote > footer
+        ),
+        .body.variant {
+            --font-size: 0.95rem;
+
+            color: var(--studio-muted-color);
+            font-weight: 400;
+            letter-spacing: 0;
+        }
+
+        :where(
+            small, figcaption, caption, time,
+            form-field > output
+        ),
+        .label.variant {
+            --font-size: 0.8125rem;
+
+            color: var(--studio-muted-color);
+            font-weight: 500;
+            letter-spacing: 0;
+        }
+
+        /*
+         * Size → --font-size-multiplier. Tag/context defaults in :where().
+         * These are starter defaults; implementations can change or add to them
+         * alongside the role mappings above.
+         */
+        :where(
+            h1, h3, h6,
+            main > hgroup > h1,
+            body > header h1,
+            [role="banner"] h1,
+            section > h1, section > hgroup > h1,
+            empty-state.empty > h1, empty-state.empty > hgroup > h1
+        ), .large {
+            --font-size-multiplier: 1.2;
+        }
+
+        :where(
+            h2, h4,
+            button,
+            input[type=button], input[type=submit], input[type=reset], input[type=image],
+            [role="button"]:not(article),
+            [role="tab"], ul[role="tablist"] > li,
+            nav:not([aria-label="Breadcrumb"]), nav:not([aria-label="Breadcrumb"]) a,
+            article > h1, article > h2, article > h3,
+            article > h4, article > h5, article > h6,
+            article > hgroup > h1, article > hgroup > h2,
+            article > hgroup > h3, article > hgroup > h4,
+            article > hgroup > h5, article > hgroup > h6,
+            dialog > h1, dialog > h2, dialog > h3,
+            dialog > h4, dialog > h5, dialog > h6,
+            dialog > hgroup > h1, dialog > hgroup > h2,
+            dialog > hgroup > h3, dialog > hgroup > h4,
+            dialog > hgroup > h5, dialog > hgroup > h6,
+            input:not([type=radio]):not([type=checkbox]):not([type=range]):not([type=color]):not([type=file]):not([type=image]):not([type=button]):not([type=submit]):not([type=reset]),
+            textarea, select, input-shell
+        ), .medium {
+            --font-size-multiplier: 1;
+        }
+
+        :where(
+            h5,
+            small, figcaption, caption, time,
+            main > hgroup > p,
+            body > header hgroup > p,
+            [role="banner"] hgroup > p,
+            section > hgroup > p,
+            section > header > p,
+            article > hgroup > p,
+            article > header > p,
+            dialog > hgroup > p,
+            dialog > header > p,
+            empty-state.empty > hgroup > p,
+            ul.chips > li,
+            nav[aria-label="Breadcrumb"],
+            nav[aria-label="Breadcrumb"] > ol,
+            nav[aria-label="Breadcrumb"] > ol > li,
+            nav[aria-label="Breadcrumb"] a,
+            form-field > label,
+            form-field > output,
+            fieldset > legend
+        ), .small {
+            --font-size-multiplier: 0.85;
+        }
+
+
+        code {
+            color: var(--on-background-color);
+            background: var(--studio-muted-surface-color);
+            border: 1px solid var(--studio-border-color);
+            border-radius: 0.25rem;
+            padding: 0.12em 0.32em;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        code:focus-within {
+            outline: var(--focus-ring-width, 2px) solid var(--studio-ring-color);
+            outline-offset: 2px;
+        }
+
+        li {
+            /*
+             * Many LINS list categories remove native bullets. If your theme
+             * wants normal document lists to keep bullets, move this rule into
+             * ul.plain/nav/menu/tablist variants in list.css instead.
+             */
+            list-style-type: none;
+        }
+    }
+}
+
