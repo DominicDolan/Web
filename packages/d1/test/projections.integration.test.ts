@@ -71,13 +71,16 @@ describe("projection integration", () => {
                     );
                 `,
             },
-            async project({ db, id, model }) {
+            async project(ctx) {
+                const projectionDb = ctx.db as InMemoryD1
+
+                const { id, model } = ctx
                 if (!model) {
-                    await db.prepare("DELETE FROM task_read_models WHERE id = ?").bind(id).run()
+                    await projectionDb.prepare("DELETE FROM task_read_models WHERE id = ?").bind(id).run()
                     return
                 }
 
-                await db.prepare(`
+                await projectionDb.prepare(`
                     INSERT INTO task_read_models (id, title, status, updated_at)
                     VALUES (?, ?, ?, ?)
                     ON CONFLICT(id) DO UPDATE SET

@@ -1,5 +1,5 @@
-import { DatabaseSync } from "node:sqlite"
-import type { ProjectionRunnerDb, ProjectionRunnerStatement } from "../src/projections/ProjectionRunnerShared"
+import {DatabaseSync, SQLInputValue} from "node:sqlite"
+import type { ProjectionRunnerDb, ProjectionRunnerStatement } from "../src"
 
 class InMemoryD1Statement implements ProjectionRunnerStatement {
     private readonly statement
@@ -15,11 +15,11 @@ class InMemoryD1Statement implements ProjectionRunnerStatement {
     }
 
     async run() {
-        return this.statement.run(...this.bindings)
+        return this.statement.run(...this.bindings as SQLInputValue[])
     }
 
     async all<T = any>() {
-        return { results: this.statement.all(...this.bindings) as T[] }
+        return { results: this.statement.all(...this.bindings as SQLInputValue[]) as T[] }
     }
 }
 
