@@ -1,4 +1,4 @@
-import { z, ZodType } from "zod";
+import { ZodType } from "zod";
 import { Model } from "@web/schema";
 import { createModel } from "@web/solid-delta";
 import {
@@ -8,8 +8,13 @@ import {
     ProjectionTableSchema,
 } from "./DeltaProjection";
 import { quoteIdentifier } from "./SchemaRuntimeContext";
-
-type SqlColumnType = "TEXT" | "INTEGER" | "REAL" | "BLOB"
+import {
+    SqlColumnType,
+    toSnakeCase,
+    unwrapZodType,
+    inferSqlType,
+    serializeColumnValue,
+} from "./ColumnInference";
 
 export type ReadModelColumnOverride = {
     type: SqlColumnType
@@ -40,44 +45,6 @@ type InferredColumn = {
     isJson: boolean
 }
 
-function toSnakeCase(value: string) {
-    return value.replaceAll(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase()
-}
-
-function unwrapZodType(zodType: any): { inner: any; nullable: boolean } {
-    let nullable = false
-    let current = zodType
-
-    while (current) {
-        if (current instanceof z.ZodOptional || current instanceof z.ZodNullable) {
-            nullable = true
-            current = current.unwrap()
-        } else if (current instanceof z.ZodDefault) {
-            current = current._def.innerType
-        } else {
-            break
-        }
-    }
-
-    return { inner: current, nullable }
-}
-
-function inferSqlType(zodType: any): { sqlType: SqlColumnType; isJson: boolean } {
-    if (zodType instanceof z.ZodString) return { sqlType: "TEXT", isJson: false }
-    if (zodType instanceof z.ZodNumber) return { sqlType: "REAL", isJson: false }
-    if (zodType instanceof z.ZodBoolean) return { sqlType: "INTEGER", isJson: false }
-    if (zodType instanceof z.ZodEnum) return { sqlType: "TEXT", isJson: false }
-
-    if (zodType instanceof z.ZodLiteral) {
-        const value = (zodType as any).value
-        if (typeof value === "number") return { sqlType: "REAL", isJson: false }
-        if (typeof value === "boolean") return { sqlType: "INTEGER", isJson: false }
-        return { sqlType: "TEXT", isJson: false }
-    }
-
-    // Arrays, objects, records, unions, etc. are stored as JSON text.
-    return { sqlType: "TEXT", isJson: true }
-}
 
 function inferColumnsFromSchema(
     schema: ZodType<any>,
@@ -134,12 +101,6 @@ function buildTargetTableSql(tableName: string, columns: InferredColumn[], index
     return [createTable, ...createIndexes].join("\n")
 }
 
-function serializeColumnValue(value: unknown, isJson: boolean) {
-    if (value === undefined || value === null) return null
-    if (isJson && typeof value === "object") return JSON.stringify(value)
-    if (typeof value === "boolean") return value ? 1 : 0
-    return value
-}
 
 /**
  * Convenience wrapper around `defineDeltaProjection(...)` (mode: "model") that
