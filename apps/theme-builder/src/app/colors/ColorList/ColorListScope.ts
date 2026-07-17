@@ -91,6 +91,41 @@ export const useColorListScope = defineScope(ThemeScope, (props) => {
         navigate(`/editor/${props.theme.id}/colors/${newId}`)
     }
 
+    function addColorScheme() {
+        let colorScheme = "scheme"
+        let suffix = 2
+        while (colorSchemeNames().includes(colorScheme)) colorScheme = `scheme-${suffix++}`
+
+        const valueDeltas = tokens.flatMap(token => createValueDeltas("create", {
+            tokenId: token.id,
+            hex: "#000000",
+            alpha: 1,
+            onHex: "#ffffff",
+            colorScheme,
+        }))
+        saveDeltas(undefined, valueDeltas).then(() => {
+            flush()
+        })
+
+    }
+
+    function updateColorSchemeName(colorScheme: string, name: string) {
+        const nextName = name.trim()
+        if (!nextName || nextName === colorScheme || colorSchemeNames().includes(nextName)) return
+
+        const valueDeltas = values
+            .filter(value => value.colorScheme === colorScheme)
+            .flatMap(value => createValueDeltas(value.id, {colorScheme: nextName}))
+        saveDeltas(undefined, valueDeltas)
+    }
+
+    function deleteColorScheme(colorScheme: string) {
+        const valueDeltas = values
+            .filter(value => value.colorScheme === colorScheme)
+            .flatMap(value => createValueDeltas("delete", value.id))
+        saveDeltas(undefined, valueDeltas)
+    }
+
     function getColorValues(tokenId: string) {
         return values.filter(v => v.tokenId === tokenId)
     }
@@ -98,6 +133,10 @@ export const useColorListScope = defineScope(ThemeScope, (props) => {
     return {
         theme: () => props.theme,
         addColor,
+        addColorScheme,
+        updateColorSchemeName,
+        deleteColorScheme,
+        colorSchemeNames,
         tokens,
         getColorValues
     }

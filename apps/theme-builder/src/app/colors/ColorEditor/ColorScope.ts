@@ -1,6 +1,6 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
 import {action, createMemo, createStore, refresh} from "solid-js";
-import {getSingleColorDeltas, saveColorDeltas} from "~/app/colors/ColorRepository.server";
+import {getColorDeltas, saveColorDeltas} from "~/app/colors/ColorRepository.server";
 import {debounce} from "@web/utils/Debounce.js";
 import {createDeltaTracker, createModels, ModelDelta} from "@web/solid-delta";
 import {ColorTokenDefinition} from "~/models/ColorTokenDefinition.ts";
@@ -11,11 +11,17 @@ type ColorDefinitions = {
     values: ModelDelta<ColorValueDefinition>[]
 }
 
-export const ColorScope = createScopeProvider<{ themeId: string, colorId: string }>();
+const defaultColorValue = {
+    hex: "#000000",
+    alpha: 1,
+    onHex: "#ffffff",
+}
+
+export const ColorScope = createScopeProvider<{ themeId: string, tokenId: string }>();
 
 export const useColorScope = defineScope(ColorScope, (props) => {
     const [colorDeltas, setColorDeltas] = createStore(() => {
-        return getSingleColorDeltas(props.themeId, props.colorId).then((definitions) => {
+        return getColorDeltas(props.themeId).then((definitions) => {
             setTimeout(() => {
                 ackedTokens.mark(definitions.tokens)
                 ackedValues.mark(definitions.values)
@@ -26,59 +32,34 @@ export const useColorScope = defineScope(ColorScope, (props) => {
 
     const ackedTokens = createDeltaTracker(() => colorDeltas.tokens)
     const ackedValues = createDeltaTracker(() => colorDeltas.values)
-
     const [tokens, createTokenDeltas] = createModels(() => colorDeltas.tokens)
     const [values, createValueDeltas] = createModels(() => colorDeltas.values)
 
-    const colorSchemeNames = createMemo(() => {
-        return Array.from(new Set(values.map(value => value.colorScheme)))
-    })
+    const colorSchemeNames = createMemo(() => Array.from(new Set(values.map(value => value.colorScheme))))
 
     const saveDeltas = action(async function* (
         tokenDeltas?: ModelDelta<ColorTokenDefinition>[],
         valueDeltas?: ModelDelta<ColorValueDefinition>[],
     ) {
         pushColorDeltas(tokenDeltas, valueDeltas)
-
-        const uncommittedTokens = ackedTokens.inverseIncluding(tokenDeltas ?? [])
-        const uncommittedValues = ackedValues.inverseIncluding(valueDeltas ?? [])
-        yield saveColorDeltas(uncommittedTokens, uncommittedValues, props.themeId)
-
+        yield saveColorDeltas(
+            ackedTokens.inverseIncluding(tokenDeltas ?? []),
+            ackedValues.inverseIncluding(valueDeltas ?? []),
+            props.themeId,
+        )
         refresh(colorDeltas)
     })
 
     function pushColorDeltas(tokenDeltas?: ModelDelta<ColorTokenDefinition>[], valueDeltas?: ModelDelta<ColorValueDefinition>[]) {
-        if (tokenDeltas == null && valueDeltas == null) {
-            return
-        }
+        if (tokenDeltas == null && valueDeltas == null) return
 
         setColorDeltas((draft) => {
-            if (tokenDeltas != null) {
-                draft.tokens.push(...tokenDeltas)
-            }
-
-            if (valueDeltas != null) {
-                draft.values.push(...valueDeltas)
-            }
+            if (tokenDeltas != null) draft.tokens.push(...tokenDeltas)
+            if (valueDeltas != null) draft.values.push(...valueDeltas)
         })
     }
 
     const debounceSave = debounce(saveDeltas, 1000)
-
-    function updateToken(key: keyof ColorTokenDefinition, value: ColorTokenDefinition[keyof ColorTokenDefinition], shouldDebounce = false) {
-        const deltas = createTokenDeltas(props.colorId, {[key]: value})
-        save(tokenDeltasOnly(deltas), shouldDebounce)
-    }
-
-    function updateValue(colorScheme: string, key: "hex" | "alpha" | "onHex", value: string | number, shouldDebounce = false) {
-        const colorValue = values.find(value => value.tokenId === props.colorId && value.colorScheme === colorScheme)
-        if (colorValue == null) {
-            return
-        }
-
-        const deltas = createValueDeltas(colorValue.id, {[key]: value})
-        save(valueDeltasOnly(deltas), shouldDebounce)
-    }
 
     function save(deltas: {tokens?: ModelDelta<ColorTokenDefinition>[], values?: ModelDelta<ColorValueDefinition>[]}, shouldDebounce: boolean) {
         if (shouldDebounce) {
@@ -89,12 +70,63 @@ export const useColorScope = defineScope(ColorScope, (props) => {
         }
     }
 
-    function tokenDeltasOnly(deltas: ModelDelta<ColorTokenDefinition>[]) {
-        return {tokens: deltas}
+    function updateToken(key: keyof ColorTokenDefinition, value: ColorTokenDefinition[keyof ColorTokenDefinition], shouldDebounce = false) {
+        save({tokens: createTokenDeltas(props.tokenId, {[key]: value})}, shouldDebounce)
     }
 
-    function valueDeltasOnly(deltas: ModelDelta<ColorValueDefinition>[]) {
-        return {values: deltas}
+    function createColorValue(tokenId: string, colorScheme: string, changes: Partial<typeof defaultColorValue> = {}) {
+        return createValueDeltas("create", {
+            tokenId,
+            colorScheme,
+            ...defaultColorValue,
+            ...changes,
+        })
+    }
+
+    function updateValue(colorScheme: string, key: keyof typeof defaultColorValue, value: string | number, shouldDebounce = false) {
+        const colorValue = values.find(value => value.tokenId === props.tokenId && value.colorScheme === colorScheme)
+        const changes = {[key]: value} as Partial<typeof defaultColorValue>
+        const deltas = colorValue == null
+            ? createColorValue(props.tokenId, colorScheme, changes)
+            : createValueDeltas(colorValue.id, changes)
+        save({values: deltas}, shouldDebounce)
+    }
+
+    function addColorScheme() {
+        let colorScheme = "scheme"
+        let suffix = 2
+        while (colorSchemeNames().includes(colorScheme)) colorScheme = `scheme-${suffix++}`
+
+        const deltas = tokens.flatMap(token => createColorValue(token.id, colorScheme))
+        save({values: deltas}, false)
+        return colorScheme
+    }
+
+    function updateColorSchemeName(colorScheme: string, name: string, shouldDebounce = false) {
+        if (!name.trim() || name === colorScheme || colorSchemeNames().includes(name)) return
+
+        const deltas = values
+            .filter(value => value.colorScheme === colorScheme)
+            .flatMap(value => createValueDeltas(value.id, {colorScheme: name}))
+        save({values: deltas}, shouldDebounce)
+    }
+
+    function deleteColorScheme(colorScheme: string) {
+        const deltas = values
+            .filter(value => value.colorScheme === colorScheme)
+            .flatMap(value => createValueDeltas("delete", value.id))
+        save({values: deltas}, false)
+    }
+
+    function colorValue(colorScheme: string): ColorValueDefinition | undefined {
+        return values.find(value => value.tokenId === props.tokenId && value.colorScheme === colorScheme)
+            ?? (colorScheme ? {
+                id: `unsaved-${props.tokenId}-${colorScheme}`,
+                tokenId: props.tokenId,
+                colorScheme,
+                ...defaultColorValue,
+                updatedAt: 0,
+            } : undefined)
     }
 
     return {
@@ -103,8 +135,17 @@ export const useColorScope = defineScope(ColorScope, (props) => {
         updateHex: (colorScheme: string, hex: string, shouldDebounce = false) => updateValue(colorScheme, "hex", hex, shouldDebounce),
         updateAlpha: (colorScheme: string, alpha: number, shouldDebounce = false) => updateValue(colorScheme, "alpha", alpha, shouldDebounce),
         updateOnHex: (colorScheme: string, onHex: string, shouldDebounce = false) => updateValue(colorScheme, "onHex", onHex, shouldDebounce),
-        color: () => tokens[0],
-        colorValue: (colorScheme: string) => values.find(value => value.tokenId === props.colorId && value.colorScheme === colorScheme),
+        addColorScheme,
+        updateColorSchemeName,
+        deleteColorScheme,
+        token: () => {
+            const token = tokens.find(token => token.id === props.tokenId);
+            if (token == null) {
+                throw new Error(`Token with id ${props.tokenId} not found`);
+            }
+            return token
+        },
+        colorValue,
         colorSchemeNames,
         themeId: () => props.themeId,
     }

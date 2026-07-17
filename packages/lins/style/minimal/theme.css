@@ -36,6 +36,9 @@
         --error-color: #c01c28;
         --on-error-color: white;
 
+        --info-color: #909090;
+        --on-info-color: black;
+
         --shadow-color: oklab(from black l a b / 0.3);
 
         color-scheme: light;

@@ -8,7 +8,7 @@ import {SubPageTemplate} from "~/components/SubPageTemplate";
 
 export function ColorEditor() {
     const {
-        color,
+        token,
         colorValue,
         colorSchemeNames,
         updateName,
@@ -25,8 +25,8 @@ export function ColorEditor() {
 
     const selectedScheme = createMemo(() => selectedColorScheme() ?? colorSchemeNames()[0])
     const value = createMemo(() => colorValue(selectedScheme()))
-    const colorName = createMemo(() => variableNameToTitle(color().name))
-    const onColorVariableName = createMemo(() => `--on-${color().name.replace("--", "")}`)
+    const colorName = createMemo(() => variableNameToTitle(token().name))
+    const onColorVariableName = createMemo(() => `--on-${token().name.replace("--", "")}`)
     const {bestContrast} = useColorUtils(() => value()?.hex ?? "#000000")
     const [isOnColorSynced, setIsOnColorSynced] = createSignal(true)
     const onColorHex = createMemo(() => isOnColorSynced() ? bestContrast() : value()?.onHex ?? bestContrast())
@@ -51,7 +51,7 @@ export function ColorEditor() {
                     <For each={colorSchemeNames()}>{scheme =>
                         <li
                             role="tab"
-                            aria-selected={selectedScheme() === scheme}
+                            aria-selected={selectedScheme() === scheme ? "true" : "false"}
                             class="px-4 py-2"
                             onClick={() => setSelectedColorScheme(scheme)}>
                             {scheme}
@@ -73,7 +73,7 @@ export function ColorEditor() {
                             <div class="grid grid-cols-[1fr_1fr] gap-y-8 gap-x-4 px-4">
                                 <form-field class="col-span-full flex flex-col">
                                     <label for="cssVariableName">CSS Variable Name</label>
-                                    <input id="cssVariableName" type="text" value={color().name} onInput={e => updateName(e.currentTarget.value, true)}/>
+                                    <input id="cssVariableName" type="text" value={token().name} onInput={e => updateName(e.currentTarget.value, true)}/>
                                 </form-field>
                                 <form-field class="flex flex-col">
                                     <label for="colorHex">Color Hex</label>
@@ -84,7 +84,7 @@ export function ColorEditor() {
                                 </form-field>
                                 <form-field class="flex flex-col">
                                     <label for="cssClass">CSS Class</label>
-                                    <input id="cssClass" type="text" value={color().cssClass} onInput={e => updateCssClass(e.currentTarget.value, true)}/>
+                                    <input id="cssClass" type="text" value={token().cssClass} onInput={e => updateCssClass(e.currentTarget.value, true)}/>
                                 </form-field>
                                 <form-field class="flex flex-col col-span-full">
                                     <div class="flex flex-row justify-between">
@@ -109,7 +109,7 @@ export function ColorEditor() {
                                             <input id="onColorPicker" type="color" class="h-full w-9 py-1 pl-2" disabled={isOnColorSynced()} value={onColorHex()} onInput={e => updateOnHex(selectedScheme(), e.currentTarget.value)}/>
                                             <input id="onColorHex" type="text" disabled={isOnColorSynced()} value={onColorHex()} onInput={e => updateOnHex(selectedScheme(), e.currentTarget.value, true)}/>
                                         </input-shell>
-                                        <button class="outlined py-1 px-2 flex flex-row items-center" aria-pressed={isOnColorSynced()} onClick={() => setIsOnColorSynced(!isOnColorSynced())}>
+                                        <button class="outlined py-1 px-2 flex flex-row items-center" aria-pressed={isOnColorSynced() ? "true" : "false"} onClick={() => setIsOnColorSynced(!isOnColorSynced())}>
                                             <i>sync</i>
                                         </button>
                                     </div>

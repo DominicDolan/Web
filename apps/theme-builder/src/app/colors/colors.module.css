@@ -19,8 +19,12 @@
     initial-value: white;
 }
 
+.colorHeader {
+    border-radius: 10px !important;
+    overflow: hidden;
+}
+
 .colorPresentation {
-    border-radius: 5px;
     background-color: oklab(from var(--presentation-color) l a b / var(--alpha));
     color: var(--on-presentation-color);
     position: relative;
