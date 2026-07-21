@@ -6,6 +6,21 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "alias": {
+    "path": "node:path",
+    "url": "node:url",
+    "crypto": "node:crypto",
+    "stream": "node:stream",
+    "buffer": "node:buffer",
+    "util": "node:util",
+    "assert": "node:assert",
+    "events": "node:events",
+    "zlib": "node:zlib",
+    "querystring": "node:querystring",
+    "string_decoder": "node:string_decoder",
+    "timers": "node:timers",
+    "os": "node:os"
+  },
   "d1_databases": [
     {
       "binding": "DB",
