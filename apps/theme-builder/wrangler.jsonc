@@ -8,8 +8,8 @@
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "theme-builder-db",
-      "database_id": "30fff605-e147-432c-b72c-622bce91557e"
+      "database_name": "theme-builder-v2-db",
+      "database_id": "256b28b1-106c-48e4-9fad-577fbd0b90ef"
     }
   ],
   "assets": {
