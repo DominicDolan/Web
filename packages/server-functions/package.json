@@ -6,34 +6,36 @@
   "exports": {
     ".": {
       "types": "./src/index.ts",
-      "import": "./src/index.ts"
+      "development": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./client": {
       "types": "./src/client.ts",
-      "import": "./src/client.ts"
+      "development": "./src/client.ts",
+      "default": "./src/client.ts"
     },
     "./server": {
       "cloudflare": {
         "types": "./src/cloudflare/server.ts",
-        "import": "./src/cloudflare/server.ts"
+        "default": "./src/cloudflare/server.ts"
       },
       "default": {
         "types": "./src/node/server.ts",
-        "import": "./src/node/server.ts"
+        "default": "./src/node/server.ts"
       }
     },
     "./vite": {
       "types": "./src/node/vite-plugin.ts",
-      "import": "./src/node/vite-plugin.ts"
+      "default": "./src/node/vite-plugin.ts"
     },
     "./runtime": {
       "cloudflare": {
         "types": "./src/cloudflare/runtime/index.ts",
-        "import": "./src/cloudflare/runtime/index.ts"
+        "default": "./src/cloudflare/runtime/index.ts"
       },
       "default": {
         "types": "./src/node/runtime/index.ts",
-        "import": "./src/node/runtime/index.ts"
+        "default": "./src/node/runtime/index.ts"
       }
     }
   },
