@@ -13,16 +13,28 @@
       "import": "./src/client.ts"
     },
     "./server": {
-      "types": "./src/server.ts",
-      "import": "./src/server.ts"
+      "cloudflare": {
+        "types": "./src/cloudflare/server.ts",
+        "import": "./src/cloudflare/server.ts"
+      },
+      "default": {
+        "types": "./src/node/server.ts",
+        "import": "./src/node/server.ts"
+      }
     },
     "./vite": {
-      "types": "./src/vite-plugin.ts",
-      "import": "./src/vite-plugin.ts"
+      "types": "./src/node/vite-plugin.ts",
+      "import": "./src/node/vite-plugin.ts"
     },
     "./runtime": {
-      "types": "./src/runtime/index.ts",
-      "import": "./src/runtime/index.ts"
+      "cloudflare": {
+        "types": "./src/cloudflare/runtime/index.ts",
+        "import": "./src/cloudflare/runtime/index.ts"
+      },
+      "default": {
+        "types": "./src/node/runtime/index.ts",
+        "import": "./src/node/runtime/index.ts"
+      }
     }
   },
   "scripts": {"hello": "echo hello",

@@ -1,2 +1,2 @@
-export { solidServerFunctions, type SolidServerFunctionsPluginOptions } from './vite-plugin.ts'
+export { solidServerFunctions, type SolidServerFunctionsPluginOptions } from './node/vite-plugin.ts'
 

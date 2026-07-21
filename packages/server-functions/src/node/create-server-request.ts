@@ -1,10 +1,9 @@
-import type { IncomingMessage, ServerResponse } from 'node:http'
 import { runWithEvent, type ServerFunctionEvent } from './runtime/event.ts'
 
 export const CREATE_SERVER_REQUEST_HANDLER_SYMBOL = Symbol.for('web.server-functions.create-server-request-handler')
 export const CREATE_SERVER_NO_LISTEN_ENV = 'WEB_SERVER_FUNCTIONS_NO_LISTEN'
 
-export type CreateServerRequestEvent = ServerFunctionEvent<IncomingMessage, ServerResponse, unknown>
+export type CreateServerRequestEvent = ServerFunctionEvent
 
 export type CreateServerRequestResult =
   | ArrayBuffer
