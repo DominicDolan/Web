@@ -1,5 +1,5 @@
 import ThemeEditor from "~/app/themes/ThemeEditor/ThemeEditor"
-import {Match, Show, Switch} from "solid-js";
+import {Errored, Match, Show, Switch} from "solid-js";
 import {Navigate, useLocation} from "@web/router";
 import ContactUs from "~/app/contact/ContactUs/ContactUs";
 import {ThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
@@ -31,38 +31,41 @@ export default function App() {
 
     return (
         <div class="minimal light h-full">
-            <Switch fallback={<><div>404</div></>}>
-                <Match when={location.segments()[0] === "editor" && location.segments()[2] === "colors" && location.segments().length === 4}>
-                    <ColorScope themeId={location.segments()[1]} tokenId={location.segments()[3]}>
-                        <ColorEditor/>
-                    </ColorScope>
-                </Match>
-                <Match when={matchesTypographyPath()}>
-                    <TypefaceScope
-                        themeId={location.segments()[1]}
-                        role={location.segments()[3] as TypefaceRole}
-                        type={location.segments()[5] == null ? "default" : location.segments()[5] as TypefaceType}>
-                        <TypefaceEditor/>
-                    </TypefaceScope>
-                </Match>
-                <Match when={matchesElementPath()}>
-                    <ElementEditorScope themeId={location.segments()[1]} elementType={location.segments()[3]}>
-                        <ElementEditor />
-                    </ElementEditorScope>
-                </Match>
-                <Match when={location.path() === "/" || location.segments()[0] === "editor"}>
-                    <Show when={location.path() === "/"}>
-                        <Navigate to="/editor"/>
-                    </Show>
-                    <ThemesListScope>
-                        <ThemeEditor/>
-                    </ThemesListScope>
-                </Match>
-                <Match when={location.segments()[0] === "contactus"}>
-                    <ContactUs/>
-                </Match>
-            </Switch>
-
+            <Errored fallback={(e) => <div>Error Occurred: {e()}</div>}>
+                <Switch fallback={<><div>404</div></>}>
+                    <Match when={location.segments()[0] === "editor" && location.segments()[2] === "colors" && location.segments().length === 4}>
+                        <ColorScope themeId={location.segments()[1]} tokenId={location.segments()[3]}>
+                            <ColorEditor/>
+                        </ColorScope>
+                    </Match>
+                    <Match when={matchesTypographyPath()}>
+                        <TypefaceScope
+                            themeId={location.segments()[1]}
+                            role={location.segments()[3] as TypefaceRole}
+                            type={location.segments()[5] == null ? "default" : location.segments()[5] as TypefaceType}>
+                            <TypefaceEditor/>
+                        </TypefaceScope>
+                    </Match>
+                    <Match when={matchesElementPath()}>
+                        <ElementEditorScope themeId={location.segments()[1]} elementType={location.segments()[3]}>
+                            <ElementEditor />
+                        </ElementEditorScope>
+                    </Match>
+                    <Match when={location.path() === "/" || location.segments()[0] === "editor"}>
+                        <Show when={location.path() === "/"}>
+                            <Navigate to="/editor"/>
+                        </Show>
+                        <Errored fallback={() => <div>ThemeListScopeBoundary</div>}>
+                            <ThemesListScope>
+                                <ThemeEditor/>
+                            </ThemesListScope>
+                        </Errored>
+                    </Match>
+                    <Match when={location.segments()[0] === "contactus"}>
+                        <ContactUs/>
+                    </Match>
+                </Switch>
+            </Errored>
         </div>
     )
 }

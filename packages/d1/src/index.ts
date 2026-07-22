@@ -3,4 +3,4 @@ export type {D1Database} from "@cloudflare/workers-types";
 export * from "./DatabaseTable"
 export * from "./ModelSchemaBuilder"
 export * from "./Database"
-export * from "./projections"
+export * from "./projections/runtime"

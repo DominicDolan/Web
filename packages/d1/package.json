@@ -12,7 +12,9 @@
     "test": "vitest --run"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./runtime": "./src/runtime.ts",
+    "./projections": "./src/projections/index.ts"
   },
   "dependencies": {
     "@web/utils": "workspace:*",

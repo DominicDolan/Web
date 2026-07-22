@@ -1,5 +1,5 @@
 import MainPageNav from "~/components/MainPageNav";
-import {createMemo, For, Loading, Show} from "solid-js";
+import {createMemo, Errored, For, Loading, Show} from "solid-js";
 import {A, useLocation} from "@web/router";
 import ThemeSettings from "~/app/themes/ThemeEditor/ThemeSettings";
 import {ThemeScope} from "~/app/themes/ThemeEditor/ThemeScope";
@@ -21,13 +21,18 @@ export default function ThemeEditor() {
         <div class={"grid grid-cols-[14rem_20rem_1fr] w-full h-full"}>
             <MainPageNav class={"themeEditor"}>
                 <div class={"w-full flex flex-col gap-6"}>
-                    <button onClick={() => addNewThemeLocal()} class="flat surface flex flex-row gap-2 items-center"><i>add</i><span>Add Theme</span></button>
+                    <button onClick={() => {
+                        console.log("clicked button")
+                        return addNewThemeLocal();
+                    }} class="flat surface flex flex-row gap-2 items-center"><i>add</i><span>Add Theme</span></button>
                     <ul class="nav flex flex-col gap-4 w-full pl-0">
-                        <For each={themes}>
-                            {(theme) => <li>
-                                <A href={`/editor/${theme.id}`} class={"block"}>{theme.name}</A>
-                            </li>}
-                        </For>
+                        <Errored fallback={(e) => <div>Unable to load themes: {e()}</div>}>
+                            <For each={themes}>
+                                {(theme) => <li>
+                                    <A href={`/editor/${theme.id}`} class={"block"}>{theme.name}</A>
+                                </li>}
+                            </For>
+                        </Errored>
                     </ul>
                 </div>
             </MainPageNav>

@@ -1,42 +1,48 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
-import {action, createMemo, createOptimisticStore, refresh, storePath} from "solid-js";
-import {createDeltaStore, ModelDelta} from "@web/solid-delta";
+import {action, createMemo, createOptimisticStore, createStore, refresh, storePath} from "solid-js";
+import {createModels, ModelDelta} from "@web/solid-delta";
 import {retrieveTodos, Todo, writeTodo} from "~/TodoPage/TodoRepository.server";
 
 export const UserScope = createScopeProvider<{ userId: string }>()
 
 export const useTodoScope = defineScope(UserScope, (props) => {
 
-    const [getTodos, setOptimisticTodos] = createOptimisticStore(() => retrieveTodos(), [])
+    const [getTodos, setTodoDeltas] = createStore(() => retrieveTodos(), [])
 
-    const [todos, setTodos] = createDeltaStore(() => getTodos)
+    const [todos, createDeltas] = createModels(() => getTodos)
 
     const markCompleteState = action(function* (id: string, value: boolean) {
-        // const deltas = setTodos(storePath(id, "text", text))
-        const delta: ModelDelta<Todo> = {id, path: "completed", value, timestamp: Date.now()}
-        setOptimisticTodos(store => {
-            store.push(delta)
+        const deltas = createDeltas(id, {completed: value})
+        setTodoDeltas(store => {
+            store.push(...deltas)
         })
-        yield writeTodo(delta)
+        yield writeTodo(deltas)
 
         refresh(getTodos)
     })
 
     const updateTodo = action(function* (id: string, text: string) {
-        // const deltas = setTodos(storePath(id, "text", text))
-        const delta: ModelDelta<Todo> = {id, path: "text", value: text, timestamp: Date.now()}
-        setOptimisticTodos(store => {
-            store.push(delta)
+        const deltas = createDeltas(id, {
+            text
         })
-        yield writeTodo(delta)
+        setTodoDeltas(store => {
+            store.push(...deltas)
+        })
+        yield writeTodo(deltas)
 
         refresh(getTodos)
     })
 
     function addTodo(text: string) {
-        setTodos((draft) => {
+        const deltas = createDeltas("create", {
+            text, completed: false,
+            user: {
+                name: "Unknown"
+            }
+        })
+        setTodoDeltas((draft) => {
             const newId = "some-new-id"
-            draft[newId] = {text, completed: false}
+            draft.push(...deltas)
         })
     }
 

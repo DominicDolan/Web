@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import { runDeltaProjectionsLocal } from "./projections"
+import { runDeltaProjectionsLocal } from "./projections/index.ts"
 
 function optionValue(args: string[], name: string) {
     const index = args.indexOf(name)

@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 
-import { runStaleDeltaCleanupLocal } from "./projections"
+import { runStaleDeltaCleanupLocal } from "./projections/index.ts"
 
 function optionValue(args: string[], name: string) {
     const index = args.indexOf(name)

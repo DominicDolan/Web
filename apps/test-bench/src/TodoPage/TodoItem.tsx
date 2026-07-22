@@ -17,6 +17,8 @@ function EditingTodoItem(props: { todo: PartialModel<Todo>, onSave: (value: stri
         <button onClick={props.onCancel}>Cancel</button>
     </form>
 }
+
+
 export function TodoItem(props: { todo: Todo}) {
     const {markCompleteState, updateTodo, getTodos} = useTodoScope()
 
@@ -33,7 +35,6 @@ export function TodoItem(props: { todo: Todo}) {
 
     return <>
         <div flex="row gap-2">
-            <div>Todo Deltas {JSON.stringify(getTodos)}</div>
             <Switch>
                 <Match when={isEditing()}>
                     <form class="flex gap-4" onSubmit={onSubmitted}>

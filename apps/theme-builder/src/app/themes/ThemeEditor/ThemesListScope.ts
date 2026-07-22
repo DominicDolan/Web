@@ -19,11 +19,16 @@ export const ThemesListScope = createScopeProvider();
 
 export const useThemesListScope = defineScope(ThemesListScope, () => {
   const [themeDeltas, setThemeDeltas] = createStore(
-    () =>
-      getThemesDeltas().then((res) => {
+    async () => {
+      try {
+        const res = await getThemesDeltas();
         setTimeout(() => acked.mark(res));
         return res;
-      }),
+      } catch(e) {
+        console.error(e);
+        return []
+      }
+    },
     [] as readonly ModelDelta<ThemeDefinition>[],
   );
   const acked = createDeltaTracker(() => themeDeltas);
@@ -64,10 +69,13 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
       id: newId,
       name: "New Theme",
       class: "newTheme",
-      mode: "light",
     });
 
+    console.log("pushing deltas", deltas)
     pushThemeDeltas(deltas);
+    setTimeout(() => {
+      console.log("theme deltas", themeDeltas)
+    }, 1000)
 
     navigate(`/editor/${newId}`);
   }
