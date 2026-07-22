@@ -1,7 +1,12 @@
 import {createScopeProvider, defineScope} from "@web/solid-scope";
-import {action, createMemo, createOptimisticStore, createStore, refresh, storePath} from "solid-js";
-import {createModels, ModelDelta} from "@web/solid-delta";
-import {retrieveTodos, Todo, writeTodo} from "~/TodoPage/TodoRepository.server";
+import {
+    createEffect,
+    createStore,
+    refresh,
+    snapshot,
+} from "solid-js";
+import {createModels} from "@web/solid-delta";
+import {retrieveTodos, writeTodo} from "~/TodoPage/TodoRepository.server";
 
 export const UserScope = createScopeProvider<{ userId: string }>()
 
@@ -11,27 +16,27 @@ export const useTodoScope = defineScope(UserScope, (props) => {
 
     const [todos, createDeltas] = createModels(() => getTodos)
 
-    const markCompleteState = action(function* (id: string, value: boolean) {
+    const markCompleteState = async function (id: string, value: boolean) {
         const deltas = createDeltas(id, {completed: value})
         setTodoDeltas(store => {
             store.push(...deltas)
         })
-        yield writeTodo(deltas)
+        await writeTodo(deltas)
 
         refresh(getTodos)
-    })
+    }
 
-    const updateTodo = action(function* (id: string, text: string) {
+    const updateTodo = async function (id: string, text: string) {
         const deltas = createDeltas(id, {
             text
         })
         setTodoDeltas(store => {
             store.push(...deltas)
         })
-        yield writeTodo(deltas)
+        await writeTodo(deltas)
 
         refresh(getTodos)
-    })
+    }
 
     function addTodo(text: string) {
         const deltas = createDeltas("create", {
@@ -41,7 +46,6 @@ export const useTodoScope = defineScope(UserScope, (props) => {
             }
         })
         setTodoDeltas((draft) => {
-            const newId = "some-new-id"
             draft.push(...deltas)
         })
     }
