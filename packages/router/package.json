@@ -6,11 +6,11 @@
   "exports": {
     ".": "./src/index.tsx"
   },
-  "scripts": {"hello": "echo hello", 
+  "scripts": {"hello": "echo hello",
     "test": "vitest"
   },
   "dependencies": {
-    "solid-js": "2.0.0-beta.15",
-    "@solidjs/web": "2.0.0-beta.15"
+    "solid-js": "catalog:",
+    "@solidjs/web": "catalog:"
   }
 }
