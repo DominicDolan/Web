@@ -13,9 +13,9 @@
   },
   "dependencies": {
     "jsdom": "29.0.1",
-    "solid-js": "2.0.0-beta.15",
+    "solid-js": "catalog:",
     "@paralleldrive/cuid2": "3.3.0",
-    "@solidjs/web": "2.0.0-beta.15",
+    "@solidjs/web": "catalog:",
     "@web/solid-scope": "workspace:*",
     "@web/schema": "workspace:*",
     "vite-plugin-solid": "catalog:"

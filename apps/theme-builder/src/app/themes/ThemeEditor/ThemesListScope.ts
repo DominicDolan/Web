@@ -1,6 +1,5 @@
 import { createScopeProvider, defineScope } from "@web/solid-scope";
 import {
-  action,
   createStore,
   onSettled,
   refresh,
@@ -46,16 +45,16 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
     });
   });
 
-  const saveDeltas = action(function* (deltas?: ModelDelta<ThemeDefinition>[]) {
+  const saveDeltas = async function(deltas?: ModelDelta<ThemeDefinition>[]) {
     if (deltas != null) {
       pushThemeDeltas(deltas);
     }
 
     const uncommitted = acked.inverseIncluding(deltas ?? []);
-    yield saveTheme(uncommitted);
+    await saveTheme(uncommitted);
 
     refresh(themeDeltas);
-  });
+  }
 
   function pushThemeDeltas(deltas: ModelDelta<ThemeDefinition>[]) {
     setThemeDeltas((draft) => {
@@ -71,11 +70,7 @@ export const useThemesListScope = defineScope(ThemesListScope, () => {
       class: "newTheme",
     });
 
-    console.log("pushing deltas", deltas)
-    pushThemeDeltas(deltas);
-    setTimeout(() => {
-      console.log("theme deltas", themeDeltas)
-    }, 1000)
+    pushThemeDeltas(deltas)
 
     navigate(`/editor/${newId}`);
   }
