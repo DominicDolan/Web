@@ -21,10 +21,7 @@ export default function ThemeEditor() {
         <div class={"grid grid-cols-[14rem_20rem_1fr] w-full h-full"}>
             <MainPageNav class={"themeEditor"}>
                 <div class={"w-full flex flex-col gap-6"}>
-                    <button onClick={() => {
-                        console.log("clicked button")
-                        return addNewThemeLocal();
-                    }} class="flat surface flex flex-row gap-2 items-center"><i>add</i><span>Add Theme</span></button>
+                    <button onClick={() => addNewThemeLocal()} class="flat surface flex flex-row gap-2 items-center"><i>add</i><span>Add Theme</span></button>
                     <ul class="nav flex flex-col gap-4 w-full pl-0">
                         <Errored fallback={(e) => <div>Unable to load themes: {e()}</div>}>
                             <For each={themes}>

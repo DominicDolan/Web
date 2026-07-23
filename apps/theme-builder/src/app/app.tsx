@@ -1,7 +1,6 @@
 import ThemeEditor from "~/app/themes/ThemeEditor/ThemeEditor"
 import {Errored, Match, Show, Switch} from "solid-js";
 import {Navigate, useLocation} from "@web/router";
-import ContactUs from "~/app/contact/ContactUs/ContactUs";
 import {ThemesListScope} from "~/app/themes/ThemeEditor/ThemesListScope";
 import {TypefaceRole, typefaceRoles, TypefaceType} from "~/constants/TypefaceRoles";
 import {ColorScope} from "~/app/colors/ColorEditor/ColorScope.ts";
@@ -55,14 +54,11 @@ export default function App() {
                         <Show when={location.path() === "/"}>
                             <Navigate to="/editor"/>
                         </Show>
-                        <Errored fallback={() => <div>ThemeListScopeBoundary</div>}>
+                        <Errored fallback={(e) => <div>Theme List error: {e()}</div>}>
                             <ThemesListScope>
                                 <ThemeEditor/>
                             </ThemesListScope>
                         </Errored>
-                    </Match>
-                    <Match when={location.segments()[0] === "contactus"}>
-                        <ContactUs/>
                     </Match>
                 </Switch>
             </Errored>
